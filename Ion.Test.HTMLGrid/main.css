@@ -1,0 +1,56 @@
+/*Global things for reseting to fullscreen*/
+html{
+    margin: 0;
+    height: 100%;
+}
+body{
+    margin: 0;
+    height: 100%;
+    background-color: lightgreen;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+
+/*Application window*/
+.window{
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border:1px solid red;
+}
+
+/* Dividers*/
+.hdiv, .vdiv{
+    background-color: lightgray;
+}
+.vdiv{
+    width: 100%;
+    height: 4px;
+    cursor: ns-resize;
+    
+}
+.hdiv{
+    height: 100%;
+    width: 4px;
+    cursor: ew-resize;
+}
+
+/*Containers*/
+.box{
+    margin: 0;
+    border: 1px solid black;
+    flex-grow: 1;
+}
+.hcon, .vcon{
+    display: flex;
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
+}
+.hcon{
+    flex-direction: row;
+}
+.vcon{
+    flex-direction: column;
+}    
