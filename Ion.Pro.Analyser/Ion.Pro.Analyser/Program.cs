@@ -31,15 +31,7 @@ namespace Ion.Pro.Analyser
             FileInfo fi = new FileInfo(Path.Combine(contentPath, request.RelativePath.Remove(0, 1)));
             if (fi.Exists)
             {
-                switch (fi.Extension)
-                {
-                    case ".css":
-                        respons.ContentType = "text/css";
-                        break;
-                    case ".js":
-                        respons.ContentType = "application/javascript";
-                        break;
-                }
+                respons.ContentType = MimeTypes.GetMimeType(fi.Extension);
                 response = File.ReadAllText(fi.FullName);
             }
             else
@@ -70,6 +62,7 @@ namespace Ion.Pro.Analyser
             s.Write(data, 0, data.Length);
             s.Close();
             wrapper.Client.Close();
+            Console.WriteLine("Request handled in: " + ((DateTime.Now - wrapper.Received).Ticks / 10).ToString() + "µs");
         }
 
         public static string[] ReadHttp(ProtocolReader reader)

@@ -7,6 +7,58 @@ using System.Threading.Tasks;
 
 namespace Ion.Pro.Analyser
 {
+    public class MimeTypes
+    {
+        public static Dictionary<string, string> StoredMimeTypes { get; private set; } = new Dictionary<string, string>()
+        {
+            [".png"]    = "image/png",
+            [".jpg"]    = "image/jpeg",
+            [".jpeg"]   = "image/jpeg",
+            [".gif"]    = "image/gif",
+
+            [".pdf"]    = "application/pdf",
+            [".log"]    = "application/log",
+            [".js"]     = "application/javascript",
+            [".json"]   = "application/json",
+            [".xml"]    = "application/xml",
+
+            [".zip"]    = "application/zip",
+
+            [".css"]    = "text/css",
+            [".htm"]    = "text/html",
+            [".html"]   = "text/html",
+            [".csv"]    = "text/csv",
+
+            [".doc"]    = "application/msword",
+            [".ppt"]    = "application/vnd.ms-powerpoint",
+            [".xls"]    = "application/vnd.ms-excel",
+
+            [".docx"]   = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            [".pptx"]   = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            [".xlsx"]   = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+
+            ["binary"]  = "application/octet-stream",
+        };
+
+        public static string GetMimeType(string extension)
+        {
+            if (StoredMimeTypes.ContainsKey(extension))
+                return StoredMimeTypes[extension];
+            return StoredMimeTypes["binary"];
+        }
+
+        public static string ReverseLookup(string mimeType)
+        {
+            foreach (KeyValuePair<string, string> pair in StoredMimeTypes)
+            {
+                if (mimeType == pair.Value)
+                    return pair.Key;
+            }
+            return null;
+        }
+    }
+
     public enum HttpRequestType
     {
         UNKNOWN,
@@ -71,7 +123,7 @@ namespace Ion.Pro.Analyser
             header.HttpVersion = "HTTP/1.1";
             header.HttpHeaderFields["Server"] = "Ion Analytics Server";
             header.HttpHeaderFields["Date"] = DateTime.Now.ToString("R");
-            header.HttpHeaderFields["Cache-Control"] = "no-store";
+            header.HttpHeaderFields["Cache-Control"] = "no-cache, no-store, must-revalidate";
             header.HttpHeaderFields["Connection"] = "close";
             header.code = code;
             return header;

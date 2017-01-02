@@ -1,1 +1,1 @@
-﻿alert("Hello World");
+﻿console.log("This works :D");
