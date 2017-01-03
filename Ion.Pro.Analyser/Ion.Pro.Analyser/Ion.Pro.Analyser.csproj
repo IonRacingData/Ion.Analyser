@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Http.cs" />
     <Compile Include="HttpServer.cs" />
+    <Compile Include="JSON.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

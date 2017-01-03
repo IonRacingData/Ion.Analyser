@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NicroWare.Pro.DmxControl.JSON;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -138,6 +139,11 @@ namespace Ion.Pro.Analyser
             return new ViewResult(BasePath, file);
         }
 
+        public IActionResult Json(object obj)
+        {
+            return new JsonResult(obj);
+        }
+
         public IActionResult String(string data)
         {
             return new StringResult(data);
@@ -249,6 +255,22 @@ namespace Ion.Pro.Analyser
         }
     }
 
+    public class JsonResult : IActionResult
+    {
+        object baseObject;
+
+        public JsonResult(object obj)
+        {
+            this.baseObject = obj;
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            StringResult result = new StringResult(JSONObject.Create(baseObject).ToJsonString(), MimeTypes.GetMimeType(".json"));
+            await result.ExecuteResultAsync(context);
+        }
+    }
+
     public interface IActionResult
     {
         Task ExecuteResultAsync(ActionContext context);
@@ -280,6 +302,11 @@ namespace Ion.Pro.Analyser
                 return String("<h1>this is a help page</h1>".ToUpper(), MimeTypes.GetMimeType(".html"));
             }
             return String("<h1>this is a help page</h1>", MimeTypes.GetMimeType(".html"));
+        }
+
+        public IActionResult JsonTest()
+        {
+            return Json(new { hello = "Hello World" });
         }
     }
 }
