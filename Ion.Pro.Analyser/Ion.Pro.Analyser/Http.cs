@@ -98,6 +98,7 @@ namespace Ion.Pro.Analyser
     {
         Encoding defaultEncoding;
         public HttpStatus Code { get; set; }
+        public byte[] Data { get; set; } = new byte[0];
 
         public string ContentType
         {
@@ -167,6 +168,11 @@ namespace Ion.Pro.Analyser
             }
             sb.AppendLine();
             return sb.ToString();
+        }
+
+        public byte[] GetBytes()
+        {
+            return GetBytes(Data);
         }
 
         public byte[] GetBytes(string data)

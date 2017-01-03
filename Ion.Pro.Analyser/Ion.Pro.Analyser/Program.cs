@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ion.Pro.Analyser
 {
-    public delegate byte[] HttpAction();
+    public delegate IActionResult HttpAction();
     class Program
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
@@ -30,20 +30,18 @@ namespace Ion.Pro.Analyser
             string[] httpLines = await Task.Run(() => ReadHttp(reader));
             HttpHeaderRequest request = HttpHeaderRequest.Parse(httpLines);
             string contentPath = "../../Content/";
-            byte[] responseData = new byte[0];
+            //byte[] responseData = new byte[0];
             string requestPath = request.RelativePath;
 
             HttpHeaderResponse httpResponse = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
+            IActionResult result = null;
+            HttpContext context = new HttpContext() { Request = request, Response = httpResponse };
+
+            
             FileInfo fi = new FileInfo(Path.Combine(contentPath, request.RelativePath.Remove(0, 1)));
             if (fi.Exists)
             {
-                /*if (fi.Extension == ".pdf")
-                {
-                    httpResponse.ContentType = MimeTypes.GetMimeType("binary");
-                }
-                else*/
-                httpResponse.ContentType = MimeTypes.GetMimeType(fi.Extension);
-                responseData = File.ReadAllBytes(fi.FullName);
+                result = new FileResult(fi.FullName);
             }
             else
             {
@@ -53,6 +51,8 @@ namespace Ion.Pro.Analyser
                     requestPath = "/home/index";
                 }
                 string[] requestParts = requestPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                
+
                 if (requestParts.Length > 0 && controllers.ContainsKey(requestParts[0].ToLower()))
                 {
                     string requestAction = "index";
@@ -60,42 +60,22 @@ namespace Ion.Pro.Analyser
                     {
                         requestAction = requestParts[1].ToLower();
                     }
-
                     Controller temp = (Controller)Activator.CreateInstance(controllers[requestParts[0].ToLower()]);
-                    temp.Request = request;
-                    temp.Response = httpResponse;
+                    temp.HttpContext = context;
+
                     HttpAction a = (HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp);
-                    responseData = a();
-                    
+                    result = a();
+
                 }
                 else
                 {
-                    switch (requestPath)
-                    {
-                        case "/":
-                            HomeController controller = new HomeController();
-                            responseData = controller.Index();
-                            //responseData = File.ReadAllBytes(contentPath + "index.html");
-                            break;
-                        case "/home/index":
-                            if (controllers.ContainsKey("home"))
-                            {
-                                Controller temp = (Controller)Activator.CreateInstance(controllers["home"]);
-                                if (temp.AllActions.ContainsKey("index"))
-                                {
-                                    responseData = (byte[])temp.AllActions["index"].Invoke(temp, new object[] { request, httpResponse });
-                                }
-                            }
-                            break;
-                        default:
-                            httpResponse.Code = HttpStatus.NotFound404;
-                            responseData = Encoding.Default.GetBytes("<h1>404 Not found</h1>");
-                            break;
-                    }
+                    result = new ErrorResult(HttpStatus.NotFound404, "");
                 }
             }
 
-            byte[] data = httpResponse.GetBytes(responseData);
+            Task t = result.ExecuteResultAsync(new ActionContext() { HttpContext = context });
+            t.Wait();
+            byte[] data = httpResponse.GetBytes();
             s.Write(data, 0, data.Length);
             s.Close();
             wrapper.Client.Close();
@@ -134,8 +114,10 @@ namespace Ion.Pro.Analyser
     public class Controller
     {
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
-        public HttpHeaderRequest Request { get; set; }
-        public HttpHeaderResponse Response { get; set; }
+        public HttpContext HttpContext { get; set; }
+        public string BasePath = "../../Content/";
+        //public HttpHeaderRequest Request { get; set; }
+        //public HttpHeaderResponse Response { get; set; }
         public Controller()
         {
             Type thisType = GetType();
@@ -143,44 +125,161 @@ namespace Ion.Pro.Analyser
 
             foreach (MethodInfo mi in allInfos)
             {
-                if (mi.ReturnType == typeof(byte[]))
+                if (mi.ReturnType == typeof(IActionResult))
                 {
-                    AllActions.Add(mi.Name.ToLower(), mi);
+                    AllActions[mi.Name.ToLower()] = mi;
                 }
+            }
+        }
+
+
+        public IActionResult View(string file)
+        {
+            return new ViewResult(BasePath, file);
+        }
+
+        public IActionResult String(string data)
+        {
+            return new StringResult(data);
+        }
+
+        public IActionResult String(string data, string contentType)
+        {
+            return new StringResult(data, contentType);
+        }
+    }
+
+    public class ErrorResult : IActionResult
+    {
+        HttpStatus statusCode;
+        string message;
+
+        public ErrorResult(HttpStatus code, string message)
+        {
+            this.statusCode = code;
+            this.message = message;
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            StringResult result = new StringResult("<h1>404 file not found</h1><h3>" + message + "</h3>", MimeTypes.GetMimeType(".html"));
+            await result.ExecuteResultAsync(context);
+            context.HttpContext.Response.Code = statusCode;
+        }
+    }
+
+    public class ViewResult : IActionResult
+    {
+        string fileName = "";
+        public ViewResult(string path, string file)
+        {
+            fileName = Path.Combine(path, file + ".html");
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            FileInfo fi = new FileInfo(fileName);
+            if (fi.Exists)
+            {
+                context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(".html");
+                context.HttpContext.Response.Data = await Task.Run(() => File.ReadAllBytes(fi.FullName));
+            }
+            else
+            {
+                ErrorResult result = new ErrorResult(HttpStatus.NotFound404, fi.FullName + " was not found");
+                await result.ExecuteResultAsync(context);
+            }
+        }
+    }
+
+    public class StringResult : IActionResult
+    {
+        string data;
+        string contentType = "text/plain";
+
+        public StringResult(string data)
+        {
+            this.data = data;
+        }
+
+        public StringResult(string data, string contentType)
+            :this(data)
+        {
+            this.contentType = contentType;
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            context.HttpContext.Response.ContentType = contentType;
+            context.HttpContext.Response.Data = await Task.Run(() => Encoding.Default.GetBytes(this.data));
+        }
+
+    }
+
+    public class FileResult : IActionResult
+    {
+        string file;
+        bool forceDownload;
+
+        public FileResult(string file)
+            :this(file, false)
+        {
+
+        }
+
+        public FileResult(string file, bool forceDownload)
+        {
+            this.file = file;
+            this.forceDownload = forceDownload;
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            FileInfo fi = new FileInfo(file);
+            if (fi.Exists)
+            {
+                context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(fi.Extension);
+                context.HttpContext.Response.Data = await Task.Run(() => File.ReadAllBytes(fi.FullName));
+            }
+            else
+            {
+                ErrorResult result = new ErrorResult(HttpStatus.NotFound404, fi.FullName + " was not found");
+                await result.ExecuteResultAsync(context);
             }
         }
     }
 
     public interface IActionResult
     {
-        void Process()
-        {
-
-        }
+        Task ExecuteResultAsync(ActionContext context);
     }
 
-    public class ActionResultContext
+    public class HttpContext
     {
+        public HttpHeaderRequest Request { get; set; }
+        public HttpHeaderResponse Response { get; set; }
+    }
 
+    public class ActionContext
+    {
+        public HttpContext HttpContext { get; set; }
     }
 
     public class HomeController : Controller
     {
-        string content = "../../Content/";
 
-        public byte[] Index()
+        public IActionResult Index()
         {
-            Response.ContentType = MimeTypes.GetMimeType(".html");
-            return File.ReadAllBytes(content + "index.html");
+            return View("index");
         }
 
-        public byte[] Help()
+        public IActionResult Help()
         {
-            if (Request.RelativePath.Contains("HELP"))
+            if (HttpContext.Request.RelativePath.Contains("HELP"))
             {
-                return Encoding.Default.GetBytes("<h1>this is a help page</h1>".ToUpper());
+                return String("<h1>this is a help page</h1>".ToUpper(), MimeTypes.GetMimeType(".html"));
             }
-            return Encoding.Default.GetBytes("<h1>this is a help page</h1>");
+            return String("<h1>this is a help page</h1>", MimeTypes.GetMimeType(".html"));
         }
     }
 }
