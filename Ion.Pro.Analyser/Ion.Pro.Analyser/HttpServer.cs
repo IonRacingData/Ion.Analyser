@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -85,13 +86,53 @@ namespace Ion.Pro.Analyser
     public class HttpWrapper
     {
         public DateTime Received { get; set; }
+        public TimingService Watch { get; set; }
         public TcpClient Client { get; set; }
 
         public HttpWrapper(TcpClient client)
         {
             this.Client = client;
             this.Received = DateTime.Now;
+            Watch = new TimingService(true);
         }
+    }
+
+    public class TimingService
+    {
+        public Stopwatch Watch { get; private set; }
+        public List<Tuple<long, string>> Records { get; private set; }
+
+        public TimingService(bool start)
+        {
+            this.Records = new List<Tuple<long, string>>();
+            if (start)
+                this.Watch = Stopwatch.StartNew();
+            else
+                this.Watch = new Stopwatch();
+        }
+
+        public void Mark(string comment)
+        {
+            Records.Add(new Tuple<long, string>(Watch.ElapsedTicks, comment));
+        }
+
+        public void Stop()
+        {
+            Watch.Stop();
+            Mark("Stopwatch stoped");
+        }
+
+        internal void Restart()
+        {
+            Records.Clear();
+            Watch.Restart();
+        }
+    }
+
+    public class HttpContext
+    {
+        public HttpHeaderRequest Request { get; set; }
+        public HttpHeaderResponse Response { get; set; }
     }
 }
 
