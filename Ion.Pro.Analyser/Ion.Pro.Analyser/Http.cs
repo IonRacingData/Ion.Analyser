@@ -76,7 +76,7 @@ namespace Ion.Pro.Analyser
     public enum HttpStatus : int
     {
         OK200 = 200,
-        NotFound = 404,
+        NotFound404 = 404,
     }
 
     public abstract class HttpHeader
@@ -97,7 +97,7 @@ namespace Ion.Pro.Analyser
     public class HttpHeaderResponse : HttpHeader
     {
         Encoding defaultEncoding;
-        HttpStatus code;
+        public HttpStatus Code { get; set; }
 
         public string ContentType
         {
@@ -125,7 +125,7 @@ namespace Ion.Pro.Analyser
             header.HttpHeaderFields["Date"] = DateTime.Now.ToString("R");
             header.HttpHeaderFields["Cache-Control"] = "no-cache, no-store, must-revalidate";
             header.HttpHeaderFields["Connection"] = "close";
-            header.code = code;
+            header.Code = code;
             return header;
         }
 
@@ -156,7 +156,7 @@ namespace Ion.Pro.Analyser
             StringBuilder sb = new StringBuilder();
             //string s = "HTTP/1.1 " + ((int)this.code).ToString() + " OK";
 
-            sb.AppendLine($"{HttpVersion} {(int)this.code} {GetStatusWord(this.code)}");
+            sb.AppendLine($"{HttpVersion} {(int)this.Code} {GetStatusWord(this.Code)}");
             foreach (KeyValuePair<string, string> pair in HttpHeaderFields)
             {
                 sb.AppendLine($"{pair.Key}: {pair.Value}");

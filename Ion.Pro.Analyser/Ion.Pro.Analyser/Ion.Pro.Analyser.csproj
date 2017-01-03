@@ -49,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Content\testpdf.pdf" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\image.jpg" />
     <Content Include="Content\index.html" />
     <Content Include="Content\main.css" />
     <Content Include="Content\main.js" />
