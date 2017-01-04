@@ -1,15 +1,15 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Index</title>
+    <title>Analyser</title>
     <meta charset="us-ascii" />
     <link rel="stylesheet" href="/main.css" />
     <script src="/main.js"></script>
 </head>
 <body>
     <div class="page">
-        <h1>Index</h1>
-        <div>
+        <h1>Analyser</h1>
+        <div class="left">
             <ul class="link-menu">
                 <li>
                     <a href="/home/index">Home</a>
@@ -25,19 +25,29 @@
                 </li>
             </ul>
         </div>
-        <p>
-            This is a paragraph
-        </p>
-        <img src="/image.jpg" style="width:300px;" />
-        <!--<video id="player" src="/videotest.mp4" style="width: 880px"></video>
-        <button id="play">Play</button>-->
-        <form action="/" method="post" enctype="multipart/form-data">
-            <input type="text" name="firstname" />
-            <input type="text" name="lastname" />
-            <input type="file" name="afile" />
-            <input type="submit" value="Submit" />
-        </form>
-        
+        <div class="right">
+            <h3>
+                This is the heading of a page
+            </h3>
+            <p>
+                This is a paragraph
+            </p>
+            <img src="/image.jpg" style="width:300px;" alt="A Space image"/><br />
+            <span class="image-text">Image 1. The big space</span>
+            <!--<video id="player" src="/videotest.mp4" style="width: 880px"></video>
+            <button id="play">Play</button>-->
+            <form action="/" method="post" enctype="multipart/form-data">
+                <label for="firstname" >FirstName:</label> <br />
+                <input type="text" name="firstname" /><br />
+                <label for="lastname">LastName:</label> <br />
+                <input type="text" name="lastname" /><br />
+                <label for="file">File Upload:</label> <br />
+                <input type="file" name="afile" /><br /><br />
+                <input type="submit" value="Submit" /><br />
+            </form>
+
+        </div>
+        <div class="footer">(C) Ion Racing 2017 Test page</div>
     </div>
 </body>
 </html>
