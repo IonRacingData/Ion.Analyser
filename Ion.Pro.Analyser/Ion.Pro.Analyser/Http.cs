@@ -101,6 +101,7 @@ namespace Ion.Pro.Analyser
         Encoding defaultEncoding;
         public HttpStatus Code { get; set; }
         public byte[] Data { get; set; } = new byte[0];
+        public List<HttpCookie> SetCookie { get; set; } = new List<HttpCookie>();
 
         public string ContentType
         {
@@ -168,6 +169,10 @@ namespace Ion.Pro.Analyser
             {
                 sb.AppendLine(s);
             }
+            foreach (HttpCookie cookie in SetCookie)
+            {
+                sb.AppendLine($"Set-Cookie: {cookie.ToString()}");
+            }
             sb.AppendLine();
             return sb.ToString();
         }
@@ -194,6 +199,21 @@ namespace Ion.Pro.Analyser
         }
 
 
+    }
+
+    public class HttpCookie
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+        public DateTime? Expires { get; set; }
+        public int? MaxAge { get; set; }
+        public string Domain { get; set; }
+        public bool? Secure { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Key}={Value} {(Expires == null ? "": "; Expires=" + Expires.Value.ToString("R"))}";
+        }
     }
 
     public class HttpHeaderRequest : HttpHeader
@@ -230,6 +250,10 @@ namespace Ion.Pro.Analyser
                 if (httpFieldParts.Length == 2)
                 {
                     request.HttpHeaderFields.Add(httpFieldParts[0], httpFieldParts[1].Trim());
+                    if (httpFieldParts[0] == "Cookie")
+                    {
+                        request.ParseCookie(httpFieldParts[1]);
+                    }
                 }
                 else
                 {
@@ -324,7 +348,17 @@ namespace Ion.Pro.Analyser
 
         private void ParseCookie(string cookieData)
         {
-
+            cookieData = cookieData.Trim();
+            this.CookieString = cookieData;
+            string[] cookieParts = cookieData.Split(';');
+            foreach (string s in cookieParts)
+            {
+                string[] cookieParamParts = s.Split('=');
+                string data = "";
+                if (cookieParamParts.Length > 1)
+                    data = cookieParamParts[1];
+                Cookies[cookieParamParts[0].Trim()] = data.Trim();
+            }
         }
 
         private void ParseMultipartCode(string boundary, byte[] data)

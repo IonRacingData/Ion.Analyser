@@ -25,6 +25,7 @@ namespace Ion.Pro.Analyser
             
         }
         static HttpAction testAction = null;
+        static SessionService service = new SessionService();
 
         public static async Task WebHandlerAsync(HttpWrapper wrapper)
         {
@@ -40,8 +41,18 @@ namespace Ion.Pro.Analyser
 
             HttpHeaderRequest request = await Task.Run(() => HttpHeaderRequest.ReadFromProtocolReader(reader));
             HttpHeaderResponse response = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
+            Session s;
+            if (request.Cookies.ContainsKey(SessionService.sessionKey))
+            {
+                s = service.GetOrCreate(request.Cookies[SessionService.sessionKey]);
+            }
+            else
+            {
+                s = service.CreateSession();
+                response.SetCookie.Add(new HttpCookie() { Key = SessionService.sessionKey, Value = s.Key });
+            }
 
-            HttpContext context = new HttpContext() { Request = request, Response = response };
+            HttpContext context = new HttpContext() { Request = request, Response = response, Session = s };
 
             Watch.Mark("Parsed http");
 
@@ -150,6 +161,48 @@ namespace Ion.Pro.Analyser
 
     public class SessionService
     {
+        public const string sessionKey = "__sessionid";
+        public Dictionary<string, Session> Sessions { get; private set; } = new Dictionary<string, Session>();
 
+        public Session CreateSession()
+        {
+            return CreateSession(Guid.NewGuid().ToString());
+        }
+
+        private Session CreateSession(string key)
+        {
+            Session session = new Session() { Key = key };
+            Sessions[key] = session;
+            return session;
+        }
+
+        public Session GetOrCreate(string key)
+        {
+            if (!Sessions.ContainsKey(key))
+            {
+                return CreateSession(key);
+            }
+            return Sessions[key];
+        }
+    }
+
+    public class Session
+    {
+        public string Key { get; set; }
+        public Dictionary<string, object> SessionData { get; private set; } = new Dictionary<string, object>();
+
+        public T GetValueOrDefault<T>(string key)
+        {
+            return GetValueOrDefault<T>(key, default(T));
+        }
+
+        public T GetValueOrDefault<T>(string key, T defaultValue)
+        {
+            if (SessionData.ContainsKey(key) && SessionData[key] is T)
+            {
+                return (T)SessionData[key];
+            }
+            return defaultValue;
+        }
     }
 }

@@ -134,6 +134,7 @@ namespace Ion.Pro.Analyser
     {
         public HttpHeaderRequest Request { get; set; }
         public HttpHeaderResponse Response { get; set; }
+        public Session Session { get; set; }
     }
 }
 
