@@ -16,14 +16,18 @@ namespace Ion.Pro.Analyser
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
 
+        static string DefaultAction = "index";
+        static string DefaultPath = "/home/index";
+        static string ContentPath = "../../Content/";
+
         static void Main(string[] args)
         {
             InitControllers();
             HttpServer server = new HttpServer();
             server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
             Console.Read();
-            
         }
+
         static HttpAction testAction = null;
         static SessionService service = new SessionService();
 
@@ -34,42 +38,68 @@ namespace Ion.Pro.Analyser
 
             TimingService Watch = wrapper.Watch;
 
-            //string[] httpLines = await Task.Run(() => ReadHttp(reader));
-            //string[] httpLines = ReadHttp(reader);
-
-            Watch.Mark("Read http");
-
             HttpHeaderRequest request = await Task.Run(() => HttpHeaderRequest.ReadFromProtocolReader(reader));
+            Watch.Mark("Read and parsed http");
             HttpHeaderResponse response = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
+            HttpContext context = new HttpContext() { Request = request, Response = response, Wrapper = wrapper };
+
+            HandleSession(context);
+
+            Watch.Mark("Handle Session");
+
+            HandleContext(context, Watch);
+        }
+
+        private static void HandleSession(HttpContext context)
+        {
             Session s;
-            if (request.Cookies.ContainsKey(SessionService.sessionKey))
+            if (context.Request.Cookies.ContainsKey(SessionService.sessionKey))
             {
-                s = service.GetOrCreate(request.Cookies[SessionService.sessionKey]);
+                s = service.GetOrCreate(context.Request.Cookies[SessionService.sessionKey]);
             }
             else
             {
                 s = service.CreateSession();
-                response.SetCookie.Add(new HttpCookie() { Key = SessionService.sessionKey, Value = s.Key });
+                context.Response.SetCookie.Add(new HttpCookie() { Key = SessionService.sessionKey, Value = s.Key });
             }
-
-            HttpContext context = new HttpContext() { Request = request, Response = response, Session = s };
-
-            Watch.Mark("Parsed http");
-
-            HandleContext(context, wrapper, Watch);
+            context.Session = s;
         }
 
-        private static void HandleContext(HttpContext context, HttpWrapper wrapper, TimingService Watch)
+        private static void HandleContext(HttpContext context, TimingService Watch)
         {
-            Stream s = wrapper.Client.GetStream();
+            Stream s = context.Wrapper.Client.GetStream();
             Watch.Mark("Got stream");
-            string contentPath = "../../Content/";
+
+            IActionResult result = HandleResult(context, Watch);
+            Watch.Mark("Finished handling request");
+
+            Task t = result.ExecuteResultAsync(new ActionContext() { HttpContext = context });
+            t.Wait();
+            Watch.Mark("Finished Result run");
+
+            byte[] data = context.Response.GetBytes();
+            s.Write(data, 0, data.Length);
+
+            s.Flush();
+            s.Close();
+            context.Wrapper.Client.Close();
+
+            Watch.Stop();
+
+            Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
+
+            bool printTimes = false;
+            if (printTimes)
+            {
+                PrintTimes(Watch);
+            }
+        }
+
+        private static IActionResult HandleResult(HttpContext context, TimingService Watch)
+        {
             string requestPath = context.Request.RelativePath;
-
-            IActionResult result = null;
-            
-
-            FileInfo fi = new FileInfo(Path.Combine(contentPath, context.Request.RelativePath.Remove(0, 1)));
+            FileInfo fi = new FileInfo(Path.Combine(ContentPath, context.Request.RelativePath.Remove(0, 1)));
+            IActionResult result;
             Watch.Mark("Prepared variables");
             if (fi.Exists)
             {
@@ -78,27 +108,19 @@ namespace Ion.Pro.Analyser
             }
             else
             {
-                context.Response.ContentType = "text/html";
-                if (requestPath.Length == 1)
-                {
-                    requestPath = "/home/index";
-                }
-                string[] requestParts = requestPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                context.Response.ContentType = MimeTypes.GetMimeType(".html");
 
+                //{Controller}/{Action}
+                string[] requestParts = (requestPath.Length == 1 ? DefaultPath : requestPath ).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (requestParts.Length > 0 && controllers.ContainsKey(requestParts[0].ToLower()))
                 {
-                    string requestAction = "index";
-                    if (requestParts.Length > 1)
-                    {
-                        requestAction = requestParts[1].ToLower();
-                    }
+                    string requestAction = (requestParts.Length > 1) ? requestParts[1].ToLower() : DefaultAction;
 
                     Controller temp = (Controller)Activator.CreateInstance(controllers[requestParts[0].ToLower()]);
                     temp.HttpContext = context;
 
-                    testAction = (HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp);
-                    result = testAction();
+                    result = ((HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp))();
                     Watch.Mark("Created Http Action Result");
                 }
                 else
@@ -107,26 +129,16 @@ namespace Ion.Pro.Analyser
                     Watch.Mark("Created Error Result");
                 }
             }
-            Watch.Mark("Finished handling request");
-            Task t = result.ExecuteResultAsync(new ActionContext() { HttpContext = context });
-            t.Wait();
-            Watch.Mark("Finished Result run");
-            byte[] data = context.Response.GetBytes();
-            s.Write(data, 0, data.Length);
-            s.Flush();
-            s.Close();
-            wrapper.Client.Close();
-            Watch.Stop();
-            Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
-            long total = 0;
-            bool printTimes = false;
-            if (printTimes)
+            return result;
+        }
+
+        private static void PrintTimes(TimingService Watch)
+        {
+            long lastTime = 0;
+            foreach (Tuple<long, string> record in Watch.Records)
             {
-                foreach (Tuple<long, string> record in Watch.Records)
-                {
-                    Console.WriteLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - total) / 10.0}µs) {record.Item2}");
-                    total = record.Item1;
-                }
+                Console.WriteLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - lastTime) / 10.0}µs) {record.Item2}");
+                lastTime = record.Item1;
             }
         }
 
@@ -156,53 +168,6 @@ namespace Ion.Pro.Analyser
                     }
                 }
             }
-        }
-    }
-
-    public class SessionService
-    {
-        public const string sessionKey = "__sessionid";
-        public Dictionary<string, Session> Sessions { get; private set; } = new Dictionary<string, Session>();
-
-        public Session CreateSession()
-        {
-            return CreateSession(Guid.NewGuid().ToString());
-        }
-
-        private Session CreateSession(string key)
-        {
-            Session session = new Session() { Key = key };
-            Sessions[key] = session;
-            return session;
-        }
-
-        public Session GetOrCreate(string key)
-        {
-            if (!Sessions.ContainsKey(key))
-            {
-                return CreateSession(key);
-            }
-            return Sessions[key];
-        }
-    }
-
-    public class Session
-    {
-        public string Key { get; set; }
-        public Dictionary<string, object> SessionData { get; private set; } = new Dictionary<string, object>();
-
-        public T GetValueOrDefault<T>(string key)
-        {
-            return GetValueOrDefault<T>(key, default(T));
-        }
-
-        public T GetValueOrDefault<T>(string key, T defaultValue)
-        {
-            if (SessionData.ContainsKey(key) && SessionData[key] is T)
-            {
-                return (T)SessionData[key];
-            }
-            return defaultValue;
         }
     }
 }

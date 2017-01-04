@@ -14,8 +14,7 @@ namespace Ion.Pro.Analyser
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
         public HttpContext HttpContext { get; set; }
         public string BasePath = "../../Content/";
-        //public HttpHeaderRequest Request { get; set; }
-        //public HttpHeaderResponse Response { get; set; }
+
         public Controller()
         {
             Type thisType = GetType();
@@ -177,6 +176,4 @@ namespace Ion.Pro.Analyser
             await result.ExecuteResultAsync(context);
         }
     }
-
-    
 }
