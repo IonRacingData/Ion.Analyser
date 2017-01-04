@@ -22,11 +22,12 @@ namespace Ion.Pro.Analyser
         {
             TcpFetcher fetcher = new TcpFetcher(address, port);
             allFetcher.Add(fetcher);
-            fetcher.Start();
 
             fetcher.Receive += (object sender, ReceiveEventArgs e) => {
                 Task t = handler(e.Wrapper);
             };
+
+            fetcher.Start();
         }
     }
 

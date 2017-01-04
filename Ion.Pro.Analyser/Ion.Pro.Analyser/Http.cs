@@ -37,6 +37,8 @@ namespace Ion.Pro.Analyser
             [".pptx"]   = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             [".xlsx"]   = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 
+            [".mp4"]    = "video/mp4",
+
 
             ["binary"]  = "application/octet-stream",
         };
@@ -199,7 +201,14 @@ namespace Ion.Pro.Analyser
         public HttpRequestType RequestType { get; private set; }
         public string RelativePath { get; private set; }
         public string FullRelativePath { get; private set; }
-        public string GetParams { get; private set; }
+        public string GetString { get; private set; }
+        public string PostString { get; private set; }
+        public string CookieString { get; private set; }
+        public Dictionary<string, string> GetParameters { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> PostParameters { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Cookies { get; private set; } = new Dictionary<string, string>();
+        public List<HttpPart> allParts = new List<HttpPart>();
+
 
         public string Host
         {
@@ -209,16 +218,48 @@ namespace Ion.Pro.Analyser
             }
         }
 
-        
-
-        public static HttpHeaderRequest Parse(string[] parts)
+        public static HttpHeaderRequest ReadFromProtocolReader(ProtocolReader reader)
         {
             HttpHeaderRequest request = new HttpHeaderRequest();
-            string[] requestParts = parts[0].Split(' ');
-            request.RequestType = (HttpRequestType)Enum.Parse(typeof(HttpRequestType), requestParts[0]);
-            request.ParseUrl(requestParts[1]);
-            request.FullRelativePath = requestParts[1];
-            request.HttpVersion = requestParts[2];
+            string requestField = reader.ReadLine();
+            request.ParseRequestField(requestField);
+            string curLine = "";
+            while ((curLine = reader.ReadLine()).Length > 0)
+            {
+                string[] httpFieldParts = curLine.Split(new[] { ':' }, 2);
+                if (httpFieldParts.Length == 2)
+                {
+                    request.HttpHeaderFields.Add(httpFieldParts[0], httpFieldParts[1].Trim());
+                }
+                else
+                {
+                    Console.WriteLine("Missing value in http field");
+                }
+            }
+            if (request.RequestType == HttpRequestType.POST)
+            {
+                int contentLength = int.Parse(request.HttpHeaderFields["Content-Length"]);
+                string[] contentTypeParts = request.HttpHeaderFields["Content-Type"].Split(';');
+
+                switch (contentTypeParts[0].Trim())
+                {
+                    case "application/x-www-form-urlencoded":
+                        string data = Encoding.Default.GetString(reader.ReadBytes(contentLength));
+                        request.ParsePost(data);
+                        break;
+                    case "multipart/form-data":
+                        request.ParseMultipartCode(contentTypeParts[1].Trim(), reader.ReadBytes(contentLength));
+                        break;
+                }
+            }
+
+            return request;
+        }
+
+        public static HttpHeaderRequest ParseHeader(string[] parts)
+        {
+            HttpHeaderRequest request = new HttpHeaderRequest();
+            request.ParseRequestField(parts[0]);
 
             for (int i = 1; i < parts.Length; i++)
             {
@@ -235,13 +276,157 @@ namespace Ion.Pro.Analyser
             return request;
         }
 
+        private void ParseRequestField(string requestField)
+        {
+            string[] requestParts = requestField.Split(' ');
+            RequestType = (HttpRequestType)Enum.Parse(typeof(HttpRequestType), requestParts[0]);
+            ParseUrl(requestParts[1]);
+            HttpVersion = requestParts[2];
+        }
+
         private void ParseUrl(string url)
         {
             this.FullRelativePath = url;
             string[] urlParts = url.Split(new[] { '?' }, 2);
             this.RelativePath = urlParts[0];
             if (urlParts.Length > 1)
-                this.GetParams = urlParts[1];
+                ParseGet(urlParts[1]);
+                
+        }
+
+        private void ParseGet(string getData)
+        {
+            this.GetString = getData;
+            string[] getParts = getData.Split('&');
+            foreach (string s in getParts)
+            {
+                string[] getParamParts = s.Split('=');
+                string data = "";
+                if (getParamParts.Length > 1)
+                    data = getParamParts[1];
+                GetParameters[getParamParts[0]] = data;
+            }
+        }
+
+        private void ParsePost(string postData)
+        {
+            this.PostString = postData;
+            string[] postParts = postData.Split('&');
+            foreach (string s in postParts)
+            {
+                string[] postParamParts = s.Split('=');
+                string data = "";
+                if (postParamParts.Length > 1)
+                    data = postParamParts[1];
+                PostParameters[postParamParts[0]] = data;
+            }
+        }
+
+        private void ParseCookie(string cookieData)
+        {
+
+        }
+
+        private void ParseMultipartCode(string boundary, byte[] data)
+        {
+            string boundaryValue = boundary.Split('=')[1].Trim();
+            ByteArrayReader reader = new ByteArrayReader(data);
+            List<byte> currentBytes = new List<byte>();
+            bool stringReading = false;
+            HttpPart currentPart = null;
+            
+            while (!reader.EndOfData)
+            {
+                if (stringReading)
+                {
+                    string curLine = "";
+                    List<string> lines = new List<string>();
+                    while ((curLine = reader.ReadLine()).Length > 0)
+                    {
+                        lines.Add(curLine);
+                    }
+                    currentPart = new HttpPart(lines.ToArray());
+                    allParts.Add(currentPart);
+                    stringReading = false;
+                }
+                else
+                {
+                    byte[] line = reader.ReadLineAsBytes();
+                    if (Math.Abs(line.Length - boundaryValue.Length) < 8 && Encoding.Default.GetString(line).Contains(boundaryValue))
+                    {
+                        if (currentPart != null)
+                        {
+                            currentPart.Data = currentBytes.ToArray();
+                            currentBytes.Clear();
+                        }
+                        stringReading = true;
+                    }
+                    else
+                    {
+                        currentBytes.AddRange(line);
+                    }
+                }
+            }
+        }
+
+        private class ByteArrayReader
+        {
+            byte[] data;
+            int curIndex = 0;
+
+            public bool EndOfData => curIndex >= data.Length;
+
+            public ByteArrayReader(byte[] data)
+            {
+                this.data = data;
+            }
+
+            public byte[] ReadLineAsBytes()
+            {
+                List<byte> currentBytes = new List<byte>();
+                for (; curIndex < data.Length; curIndex++)
+                {
+                    if (data[curIndex] == 13 || data[curIndex] == 10)
+                    {
+                        currentBytes.Add(data[curIndex]);
+                        if (curIndex + 1 < data.Length && data[curIndex] == 13 && data[curIndex + 1] == 10)
+                        {
+                            curIndex++;
+                            currentBytes.Add(data[curIndex]);
+                        }
+                        curIndex++;
+                        break;
+                    }
+                    else
+                        currentBytes.Add(data[curIndex]);
+                }
+                return currentBytes.ToArray();
+            }
+
+            public string ReadLine()
+            {
+                return Encoding.Default.GetString(ReadLineAsBytes()).Trim();
+            }
+        }
+
+        public class HttpPart
+        {
+            public Dictionary<string, string> MultipartValues { get; private set; } = new Dictionary<string, string>();
+            public byte[] Data { get; set; }
+
+            public HttpPart(string[] data)
+            {
+                Parse(data);
+            }
+
+            private void Parse(string[] data)
+            {
+                foreach (string s in data)
+                {
+                    string[] parts = s.Split(new[] { ':' }, 2);
+                    MultipartValues[parts[0]] = parts[1];
+                }
+            }
         }
     }
 

@@ -7,11 +7,37 @@
     <script src="/main.js"></script>
 </head>
 <body>
-    <h1>Index</h1>
-    <p>
-        This is a paragraph
-    </p>
-    <img src="/image.jpg" style="width:200px;" />
-    <a href="/image.jpg" >Open PDF</a>
+    <div class="page">
+        <h1>Index</h1>
+        <div>
+            <ul class="link-menu">
+                <li>
+                    <a href="/home/index">Home</a>
+                </li>
+                <li>
+                    <a href="/testpdf.pdf">Open PDF</a>
+                </li>
+                <li>
+                    <a href="/home/help">Help page</a>
+                </li>
+                <li>
+                    <a href="/home/jsontest">Json Test</a>
+                </li>
+            </ul>
+        </div>
+        <p>
+            This is a paragraph
+        </p>
+        <img src="/image.jpg" style="width:300px;" />
+        <!--<video id="player" src="/videotest.mp4" style="width: 880px"></video>
+        <button id="play">Play</button>-->
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="text" name="firstname" />
+            <input type="text" name="lastname" />
+            <input type="file" name="afile" />
+            <input type="submit" value="Submit" />
+        </form>
+        
+    </div>
 </body>
 </html>

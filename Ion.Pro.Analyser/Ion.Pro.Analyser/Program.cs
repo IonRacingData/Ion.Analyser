@@ -25,6 +25,7 @@ namespace Ion.Pro.Analyser
             
         }
         static HttpAction testAction = null;
+
         public static async Task WebHandlerAsync(HttpWrapper wrapper)
         {
             wrapper.Watch.Mark("Entered handler");
@@ -32,12 +33,12 @@ namespace Ion.Pro.Analyser
 
             TimingService Watch = wrapper.Watch;
 
-            string[] httpLines = await Task.Run(() => ReadHttp(reader));
+            //string[] httpLines = await Task.Run(() => ReadHttp(reader));
             //string[] httpLines = ReadHttp(reader);
 
             Watch.Mark("Read http");
 
-            HttpHeaderRequest request = HttpHeaderRequest.Parse(httpLines);
+            HttpHeaderRequest request = await Task.Run(() => HttpHeaderRequest.ReadFromProtocolReader(reader));
             HttpHeaderResponse response = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
 
             HttpContext context = new HttpContext() { Request = request, Response = response };
@@ -58,7 +59,7 @@ namespace Ion.Pro.Analyser
             
 
             FileInfo fi = new FileInfo(Path.Combine(contentPath, context.Request.RelativePath.Remove(0, 1)));
-
+            Watch.Mark("Prepared variables");
             if (fi.Exists)
             {
                 result = new FileResult(fi.FullName);
@@ -81,16 +82,18 @@ namespace Ion.Pro.Analyser
                     {
                         requestAction = requestParts[1].ToLower();
                     }
+
                     Controller temp = (Controller)Activator.CreateInstance(controllers[requestParts[0].ToLower()]);
                     temp.HttpContext = context;
 
                     testAction = (HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp);
                     result = testAction();
-
+                    Watch.Mark("Created Http Action Result");
                 }
                 else
                 {
                     result = new ErrorResult(HttpStatus.NotFound404, "");
+                    Watch.Mark("Created Error Result");
                 }
             }
             Watch.Mark("Finished handling request");
@@ -98,7 +101,6 @@ namespace Ion.Pro.Analyser
             t.Wait();
             Watch.Mark("Finished Result run");
             byte[] data = context.Response.GetBytes();
-            //await s.WriteAsync(data, 0, data.Length);
             s.Write(data, 0, data.Length);
             s.Flush();
             s.Close();
@@ -106,12 +108,15 @@ namespace Ion.Pro.Analyser
             Watch.Stop();
             Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
             long total = 0;
-            foreach (Tuple<long, string> record in Watch.Records)
+            bool printTimes = false;
+            if (printTimes)
             {
-                Console.WriteLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - total) / 10.0}µs) {record.Item2}");
-                total = record.Item1;
+                foreach (Tuple<long, string> record in Watch.Records)
+                {
+                    Console.WriteLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - total) / 10.0}µs) {record.Item2}");
+                    total = record.Item1;
+                }
             }
-            //wrapper.Watch.Restart();
         }
 
         public static string[] ReadHttp(ProtocolReader reader)
@@ -141,5 +146,10 @@ namespace Ion.Pro.Analyser
                 }
             }
         }
+    }
+
+    public class SessionService
+    {
+
     }
 }
