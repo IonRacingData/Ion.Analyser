@@ -14,7 +14,7 @@ namespace Ion.Pro.Analyser
 
         public static IFileService GetFileService()
         {
-            return fileServiceBasic.Value;
+            return fileService.Value;
         }
     }
 
