@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Desktop V2</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="window.css" type="text/css" />
+    <script src="htmlhelper.js"></script>
+    <script src="windowsystem.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="taskbar">
+
+    </div>
+    <template id="temp-window">
+        <!--<div class="window-wrapper">-->
+        <!--<div class="window-top-left"></div>
+        <div class="window-top"></div>
+        <div class="window-top-right"></div>
+        <div class="window-left"></div>-->
+        <div class="window">
+            <div class="window-header">
+                <div class="window-title">
+                    Hello World
+                </div>
+                <div class="window-control">
+                    <span class="window-control-min">-</span>
+                    <span class="window-control-max">+</span>
+                    <span class="window-control-exit">&#x2715;</span>
+                </div>
+            </div>
+            <div class="window-body"></div>
+        </div>
+        <!--<div class="window-right"></div>
+        <div class="window-bottom-left"></div>
+        <div class="window-bottom"></div>-->
+        <div class="window-bottom-right"></div>
+        <!--</div>-->
+    </template>
+    <template>
+        <div class="menu-window">
+            <ul>
+                <li>
+                    <a href="">Hello World</a>
+                    <ul>
+                        <li><a href="#">This is a sub menu</a></li>
+                        <li>
+                            <a href="#">This is a sub menu</a>
+                        </li>
+                        <li><a href="#">This is a sub menu</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="">Hello World</a>
+                </li>
+                <li><a href="">Hello World</a></li>
+
+                <li><a href="">Hello World</a></li>
+            </ul>
+        </div>
+    </template>
+    <script>
+        function InitResize() {
+            document.addEventListener("mousemove", function (e) {
+                if (selectedSpan != null) {
+                    selectedSpan.parentElement.style.width = (selectedSpan.deltaX + e.pageX).toString() + "px";
+                    //selected.parentElement.style.height = (selected.deltaY + e.pageY).toString() + "px";
+                }
+            });
+            document.addEventListener("mouseup", function () { selectedSpan = null; });
+        }
+
+        InitResize();
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+﻿.window-top-left, .window-top, .window-top-right, .window-left, .window-right, .window-bottom, .window-bottom-left, .window-bottom-right {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+}
+
+.window-top-left, .window-top, .window-top-right { top: 0px; }
+
+.window-bottom-left, .window-bottom, .window-bottom-right { bottom: 0px; }
+
+.window-left, .window-right {
+    top: 8px;
+    height: calc(100% - 16px);
+    cursor: ew-resize;
+}
+
+.window-top, .window-bottom {
+    width: calc(100% - 16px);
+    cursor:ns-resize;
+}
+
+.window-top-left{
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.window-top-right {
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.window-bottom-left{
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.window-bottom-right {
+    right: 0;
+    cursor: nwse-resize;
+}
+
+.window-left { left: 0; }
+
+.window-right { right: 0px; }

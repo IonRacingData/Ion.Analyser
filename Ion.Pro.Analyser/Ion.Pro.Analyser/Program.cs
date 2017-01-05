@@ -18,7 +18,8 @@ namespace Ion.Pro.Analyser
 
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
-        static string ContentPath = "../../Content/";
+        //static string ContentPath = "../../Content/";
+        static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
 
         static void Main(string[] args)
         {
@@ -88,7 +89,7 @@ namespace Ion.Pro.Analyser
 
             Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
 
-            bool printTimes = false;
+            bool printTimes = true;
             if (printTimes)
             {
                 PrintTimes(Watch);
@@ -120,7 +121,9 @@ namespace Ion.Pro.Analyser
                     Controller temp = (Controller)Activator.CreateInstance(controllers[requestParts[0].ToLower()]);
                     temp.HttpContext = context;
 
-                    result = ((HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp))();
+                    result = InvokeAction(temp, temp.AllActions[requestAction], context);
+                    
+                    //result = ((HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp))();
                     Watch.Mark("Created Http Action Result");
                 }
                 else
@@ -130,6 +133,25 @@ namespace Ion.Pro.Analyser
                 }
             }
             return result;
+        }
+
+        private static IActionResult InvokeAction(Controller controller, MethodInfo info, HttpContext context)
+        {
+            List<object> allData = new List<object>();
+            ParameterInfo[] param = info.GetParameters();
+            foreach (ParameterInfo paramInfo in param)
+            {
+                string name = paramInfo.Name;
+                if (context.Request.GETParameters.ContainsKey(name))
+                {
+                    allData.Add(context.Request.GETParameters[name]);
+                }
+                else
+                {
+                    allData.Add(null);
+                }
+            }
+            return (IActionResult)info.Invoke(controller, allData.ToArray());
         }
 
         private static void PrintTimes(TimingService Watch)

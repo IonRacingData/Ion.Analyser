@@ -1,0 +1,206 @@
+﻿html{
+    width: 100%;
+    height: 100%;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background-color: #262626;
+    background: radial-gradient(circle, #202020 40%, #000000 90%);
+    overflow: hidden;
+}
+
+.background{
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    background: url(IonLogo.png);
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 75%;
+}
+
+.window-wrapper {
+    /*border: 1px solid darkgrey;*/
+    padding: 8px;
+    display: inline-block;
+    margin: 0;
+    /*top: 50px;
+    left: 300px;*/
+    position: absolute;
+    /*cursor: nwse-resize;*/
+}
+
+.window {
+    /*! border: 1px solid darkgrey; */
+    box-shadow: 0 0 8px 2px #111111;
+    background-color: white;
+    border-radius: 4px 4px 0 0;
+    cursor: default;
+}
+
+.window-title {
+    padding: 3px 0 3px 6px;
+    display: inline-block;
+    color: #009F99;
+}
+
+.window-header {
+    /*! border: 1px solid green; */
+    background-color: #1A1A1A;
+    color: white;
+    border-radius: 1px 1px 0 0;
+    cursor: default;
+
+
+}
+
+.window-body{
+    /*width: 300px;
+    height: 300px;*/
+    /*! border: 1px solid red; */
+    overflow: auto;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
+    -webkit-user-select: initial;
+    user-select: initial;
+}
+
+.window-control{
+    font-family: 'Global Monospace';
+    font-size: 18px;
+    /*display: inline-block;*/
+    float: right;
+}
+
+.window-control-exit {
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+.window-control span {
+    padding: 3px 6px;
+    display: inline-block;
+    width: 15px;
+    text-align: center;
+    border-radius: 20px;
+}
+
+.window-control span:hover {
+    background-color: #101010;
+}
+
+.window-control .window-control-exit:hover {
+    background-color: #DD0000;
+}
+
+.taskbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
+    background-color: #161616;
+    width: 100%;
+    color: white;
+    z-index: 10000;
+}
+
+.taskbar-applet {
+    /*background-color: #29292D;*/
+    display: inline-block;
+}
+
+.taskbar-button-text {
+    display: inline-block;
+    padding: 8.5px;
+    cursor: default;
+}
+
+.taskbar-button-select {
+    background-color: #29292D;
+}
+
+.taskbar-button-text:hover {
+    background-color: #313C53;
+
+}
+
+table.table {
+    width: 100%;
+    /*border: 0;*/
+    border-collapse: collapse;
+    text-align: left;
+    border: 1px solid black;
+}
+
+.table tr:nth-child(2n) {
+    background-color: #babfd1;
+}
+
+.table thead {
+    background-color: #383e47;
+    color: white;
+    font-size: 1.1em;
+    padding: 0px;
+    border: 1px solid black;
+}
+
+.table th {
+    padding-right: 7px;
+}
+
+
+span.table-resize{
+    background-color: #23262f;
+    width: 2px;
+    /*display: inline-block;*/
+    height: 26px;
+    margin: -1px -5px -1px 0px;
+    cursor: ew-resize;
+    float:right;
+}
+
+.menu-window{
+
+    display: inline-block;
+    position: absolute;
+    z-index: 10000;
+    color: red;
+    background-color: white;
+    top: 40px;
+    left: 30px;
+}
+
+.menu-window ul {
+    list-style: none;
+    margin: 0px;
+    padding: 4px;
+    position: absolute;
+    display: inline-block;
+    background-color: #1A1A1A;
+    border: 1px solid #00B8C8;
+}
+
+/*.menu-window ul li {
+    
+}*/
+.menu-window ul li a{
+    width: 150px;
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    padding: 3px 14px;
+}
+
+.menu-window ul li a:hover{
+    background-color: #29292D;
+}

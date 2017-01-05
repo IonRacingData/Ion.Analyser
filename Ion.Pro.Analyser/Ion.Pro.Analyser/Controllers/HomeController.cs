@@ -14,7 +14,7 @@ namespace Ion.Pro.Analyser.Controllers
             return View("index");
         }
 
-        public IActionResult Help()
+        public IActionResult Help(string arg, string firstname)
         {
             int counter = HttpContext.Session.GetValueOrDefault<int>("counter");
             counter++;
@@ -24,7 +24,7 @@ namespace Ion.Pro.Analyser.Controllers
             {
                 return String("<h1>this is a help page</h1>".ToUpper(), MimeTypes.GetMimeType(".html"));
             }
-            return String("<h1>this is a help page</h1><span>Number of requests: " + counter.ToString() + "</span>", MimeTypes.GetMimeType(".html"));
+            return String("<h1>this is a help page</h1><div>Number of requests: " + counter.ToString() + "</div><div>Arg argument: " + arg + " " + firstname + "</div>", MimeTypes.GetMimeType(".html"));
         }
 
         public IActionResult JsonTest()

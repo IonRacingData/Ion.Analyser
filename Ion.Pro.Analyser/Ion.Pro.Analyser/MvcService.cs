@@ -13,7 +13,7 @@ namespace Ion.Pro.Analyser
     {
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
         public HttpContext HttpContext { get; set; }
-        public string BasePath = "../../Content/";
+        public string BasePath = "../../../Ion.Web.AnalyserDesktop/";
 
         public Controller()
         {

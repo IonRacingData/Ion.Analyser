@@ -221,11 +221,11 @@ namespace Ion.Pro.Analyser
         public HttpRequestType RequestType { get; private set; }
         public string RelativePath { get; private set; }
         public string FullRelativePath { get; private set; }
-        public string GetString { get; private set; }
-        public string PostString { get; private set; }
+        public string GETString { get; private set; }
+        public string POSTString { get; private set; }
         public string CookieString { get; private set; }
-        public Dictionary<string, string> GetParameters { get; private set; } = new Dictionary<string, string>();
-        public Dictionary<string, string> PostParameters { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> GETParameters { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> POSTParameters { get; private set; } = new Dictionary<string, string>();
         public Dictionary<string, string> Cookies { get; private set; } = new Dictionary<string, string>();
         public List<HttpPart> allParts = new List<HttpPart>();
 
@@ -320,7 +320,7 @@ namespace Ion.Pro.Analyser
 
         private void ParseGet(string getData)
         {
-            this.GetString = getData;
+            this.GETString = getData;
             string[] getParts = getData.Split('&');
             foreach (string s in getParts)
             {
@@ -328,13 +328,13 @@ namespace Ion.Pro.Analyser
                 string data = "";
                 if (getParamParts.Length > 1)
                     data = getParamParts[1];
-                GetParameters[getParamParts[0]] = data;
+                GETParameters[getParamParts[0]] = data;
             }
         }
 
         private void ParsePost(string postData)
         {
-            this.PostString = postData;
+            this.POSTString = postData;
             string[] postParts = postData.Split('&');
             foreach (string s in postParts)
             {
@@ -342,7 +342,7 @@ namespace Ion.Pro.Analyser
                 string data = "";
                 if (postParamParts.Length > 1)
                     data = postParamParts[1];
-                PostParameters[postParamParts[0]] = data;
+                POSTParameters[postParamParts[0]] = data;
             }
         }
 
