@@ -277,6 +277,6 @@ class GridViewer implements IApplication
         var clone = document.importNode(template.content, true);
         //console.log(clone);
         this.window.content.appendChild(clone);
-        addEvents();
+        //addEvents();
     }
 }

@@ -21,6 +21,7 @@ var MenuWindow = (function () {
             }
         }
         this.hide();
+        // console.log(e);
     };
     MenuWindow.prototype.add = function (item, category) {
         if (category === void 0) { category = ""; }
@@ -107,3 +108,4 @@ var MenuItem = (function () {
     }
     return MenuItem;
 }());
+//# sourceMappingURL=MenuWindow.js.map

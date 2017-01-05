@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace Ion.Pro.Analyser
 {
+    public delegate IActionResult HttpAction();
+
     public class Controller
     {
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
@@ -94,7 +96,7 @@ namespace Ion.Pro.Analyser
             if (fi.Exists)
             {
                 context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(".html");
-                context.HttpContext.Response.Data = await Task.Run(() => File.ReadAllBytes(fi.FullName));
+                context.HttpContext.Response.Data = await Task.FromResult(ServiceManager.GetFileService().ReadAllBytes(fi.FullName));
             }
             else
             {
@@ -123,7 +125,7 @@ namespace Ion.Pro.Analyser
         public async Task ExecuteResultAsync(ActionContext context)
         {
             context.HttpContext.Response.ContentType = contentType;
-            context.HttpContext.Response.Data = await Task.Run(() => Encoding.Default.GetBytes(this.data));
+            context.HttpContext.Response.Data = await Task.FromResult(Encoding.Default.GetBytes(this.data));
         }
 
     }
@@ -151,7 +153,7 @@ namespace Ion.Pro.Analyser
             if (fi.Exists)
             {
                 context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(fi.Extension);
-                context.HttpContext.Response.Data = await Task.Run(() => File.ReadAllBytes(fi.FullName));
+                context.HttpContext.Response.Data = await Task.FromResult(ServiceManager.GetFileService().ReadAllBytes(fi.FullName));
             }
             else
             {

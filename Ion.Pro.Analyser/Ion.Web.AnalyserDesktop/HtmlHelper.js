@@ -127,3 +127,4 @@ var HtmlTableGen = (function () {
     };
     return HtmlTableGen;
 }());
+//# sourceMappingURL=HtmlHelper.js.map

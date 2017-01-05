@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CacheService.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Http.cs" />
     <Compile Include="HttpServer.cs" />

@@ -280,6 +280,48 @@ namespace Ion.Pro.Analyser
             return request;
         }
 
+        public static async Task<HttpHeaderRequest> ReadFromProtocolReaderAsync(ProtocolReader reader)
+        {
+            HttpHeaderRequest request = new HttpHeaderRequest();
+            string requestField = await reader.ReadLineAsync();
+            request.ParseRequestField(requestField);
+            string curLine = "";
+            while ((curLine = await reader.ReadLineAsync()).Length > 0)
+            {
+                string[] httpFieldParts = curLine.Split(new[] { ':' }, 2);
+                if (httpFieldParts.Length == 2)
+                {
+                    request.HttpHeaderFields.Add(httpFieldParts[0], httpFieldParts[1].Trim());
+                    if (httpFieldParts[0] == "Cookie")
+                    {
+                        request.ParseCookie(httpFieldParts[1]);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Missing value in http field");
+                }
+            }
+            if (request.RequestType == HttpRequestType.POST)
+            {
+                int contentLength = int.Parse(request.HttpHeaderFields["Content-Length"]);
+                string[] contentTypeParts = request.HttpHeaderFields["Content-Type"].Split(';');
+
+                switch (contentTypeParts[0].Trim())
+                {
+                    case "application/x-www-form-urlencoded":
+                        string data = Encoding.Default.GetString(await reader.ReadBytesAsync(contentLength));
+                        request.ParsePost(data);
+                        break;
+                    case "multipart/form-data":
+                        request.ParseMultipartCode(contentTypeParts[1].Trim(), await reader.ReadBytesAsync(contentLength));
+                        break;
+                }
+            }
+
+            return request;
+        }
+
         public static HttpHeaderRequest ParseHeader(string[] parts)
         {
             HttpHeaderRequest request = new HttpHeaderRequest();
@@ -557,6 +599,98 @@ namespace Ion.Pro.Analyser
             while (true)
             {
                 current = ReadChar();
+                if (current == '\r' || current == '\n')
+                {
+                    if (current == '\r' && PeekChar() == '\n')
+                        Read();
+                    break;
+                }
+                else
+                    builder.Append(current);
+            }
+            return builder.ToString();
+        }
+
+
+
+
+
+        private async Task ReadBufferAsync()
+        {
+            available = await BaseStream.ReadAsync(buffer, 0, bufferSize);
+            position = 0;
+        }
+
+        private async Task<int> FillBufferAsync(byte[] buffer, int offset, int length, bool allowIncomplete)
+        {
+            int curIndex = 0;
+            bool breakLoop = false;
+            while (curIndex < length)
+            {
+                if (left == 0)
+                    await ReadBufferAsync();
+                int read = 0;
+                if (left > length - curIndex)
+                {
+                    read = length - curIndex;
+                }
+                else if (allowIncomplete && available < bufferSize)
+                {
+                    read = left;
+                    breakLoop = true;
+                }
+                else
+                {
+                    read = left;
+                }
+                Buffer.BlockCopy(this.buffer, position, buffer, offset + curIndex, read);
+                curIndex += read;
+                position += read;
+                if (breakLoop)
+                    break;
+            }
+            return curIndex;
+        }
+
+        public async Task<byte[]> ReadBytesAsync(int count)
+        {
+            byte[] tempBuffer = new byte[count];
+            await FillBufferAsync(tempBuffer, 0, count, false);
+            return tempBuffer;
+        }
+
+        public async Task<byte> ReadAsync()
+        {
+            if (left == 0)
+                await ReadBufferAsync();
+            return buffer[position++];
+        }
+
+        public async Task<byte> PeekAsync()
+        {
+            if (left == 0)
+                await ReadBufferAsync();
+            return buffer[position];
+        }
+
+
+        public async Task<char> ReadCharAsync()
+        {
+            return (char)(await ReadAsync());
+        }
+
+        public async Task<char> PeekCharAsync()
+        {
+            return (char)(await PeekAsync());
+        }
+
+        public async Task<string> ReadLineAsync()
+        {
+            StringBuilder builder = new StringBuilder();
+            char current = ' ';
+            while (true)
+            {
+                current = await ReadCharAsync();
                 if (current == '\r' || current == '\n')
                 {
                     if (current == '\r' && PeekChar() == '\n')

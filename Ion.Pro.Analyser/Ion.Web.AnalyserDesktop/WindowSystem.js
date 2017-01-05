@@ -3,6 +3,7 @@ var AppWindow = (function () {
         var _this = this;
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
+        //kernel.winMan.registerWindow(this);
         handle.addEventListener("mousedown", function (e) { return _this.mouseDown_main(e); });
         this.moveHandle = handle;
         this.sizeHandle = handle.getElementsByClassName("window-body")[0];
@@ -41,6 +42,7 @@ var AppWindow = (function () {
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
         this.deltaY = this.height - e.pageY;
+        // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
         this.winMan.resizing = true;
         this.winMan.selectWindow(this);
     };
@@ -182,3 +184,4 @@ var WindowState;
     WindowState[WindowState["MAXIMIZED"] = 2] = "MAXIMIZED";
     WindowState[WindowState["TILED"] = 3] = "TILED";
 })(WindowState || (WindowState = {}));
+//# sourceMappingURL=WindowSystem.js.map

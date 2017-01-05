@@ -88,3 +88,4 @@ var MainMenu = (function (_super) {
     };
     return MainMenu;
 }(Applet));
+//# sourceMappingURL=TaskBar.js.map

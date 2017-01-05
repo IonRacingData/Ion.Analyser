@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 namespace Ion.Pro.Analyser
 {
-    public delegate IActionResult HttpAction();
-
     class Program
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
@@ -157,11 +155,13 @@ namespace Ion.Pro.Analyser
         private static void PrintTimes(TimingService Watch)
         {
             long lastTime = 0;
+            StringBuilder builder = new StringBuilder();
             foreach (Tuple<long, string> record in Watch.Records)
             {
-                Console.WriteLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - lastTime) / 10.0}µs) {record.Item2}");
+                builder.AppendLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - lastTime) / 10.0}µs) {record.Item2}");
                 lastTime = record.Item1;
             }
+            Console.WriteLine(builder.ToString());
         }
 
         public static string[] ReadHttp(ProtocolReader reader)
