@@ -29,6 +29,8 @@ namespace Ion.Pro.Analyser
             [".html"]   = "text/html",
             [".csv"]    = "text/csv",
 
+            [".ts"]     = "text/x-typescript",
+
             [".doc"]    = "application/msword",
             [".ppt"]    = "application/vnd.ms-powerpoint",
             [".xls"]    = "application/vnd.ms-excel",

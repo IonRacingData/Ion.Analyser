@@ -10,10 +10,11 @@ namespace Ion.Pro.Analyser
     public static class ServiceManager
     {
         static Singelton<CacheService> fileService { get; set; } = new Singelton<CacheService>();
+        static Singelton<FileSerice> fileServiceBasic { get; set; } = new Singelton<FileSerice>();
 
         public static IFileService GetFileService()
         {
-            return fileService.Value;
+            return fileServiceBasic.Value;
         }
     }
 
@@ -57,6 +58,19 @@ namespace Ion.Pro.Analyser
     public interface IFileService
     {
         byte[] ReadAllBytes(string path);
+    }
+
+    class FileSerice : IFileService
+    {
+        public byte[] ReadAllBytes(string path)
+        {
+            FileInfo fi = new FileInfo(path);
+            if (fi.Exists)
+            {
+                return File.ReadAllBytes(fi.FullName);
+            }
+            throw new FileNotFoundException("Could not find file: " + path.ToString());
+        }
     }
 
     class CacheService : IFileService
