@@ -26,7 +26,7 @@ var MenuWindow = (function () {
     MenuWindow.prototype.add = function (item, category) {
         if (category === void 0) { category = ""; }
         var name = (item instanceof Launcher) ? item.name : item.toString();
-        if (category == "") {
+        if (category === "") {
             this.items.push(new MenuItem(name, item));
         }
         else {

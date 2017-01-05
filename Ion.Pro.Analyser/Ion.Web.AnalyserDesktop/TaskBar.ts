@@ -10,19 +10,19 @@ class WindowList extends Applet {
     constructor(content: HTMLElement) {
         super();
         this.content = content;
-        let wm = this.winMan = kernel.winMan;
-        wm.addEventListener("windowOpen", () => this.programOpen());
-        wm.addEventListener("windowClose", () => this.programClose());
-        wm.addEventListener("windowSelect", () => this.programSelect());
+        let winMan: WindowManager = this.winMan = kernel.winMan;
+        winMan.addEventListener("windowOpen", () => this.programOpen());
+        winMan.addEventListener("windowClose", () => this.programClose());
+        winMan.addEventListener("windowSelect", () => this.programSelect());
         this.addWindows();
     }
 
     addWindows(): void {
         this.content.innerHTML = "";
 
-        for (let i = 0; i < this.winMan.windows.length; i++) {
-            let cur = this.winMan.windows[i];
-            let ctrl = document.createElement("div");
+        for (let i: number = 0; i < this.winMan.windows.length; i++) {
+            let cur: AppWindow = this.winMan.windows[i];
+            let ctrl: HTMLDivElement = document.createElement("div");
             ctrl.innerHTML = cur.title;
             ctrl.classList.add("taskbar-button-text");
             if (cur === this.winMan.activeWindow) {
@@ -55,11 +55,11 @@ class MainMenu extends Applet {
     constructor(content: HTMLElement) {
         super();
         this.content = content;
-        let mk = new HtmlHelper();
+        let mk: HtmlHelper = new HtmlHelper();
         this.content.appendChild(mk.tag(
             "div"
             , "taskbar-button-text"
-            , [{ event: "click", func: (e: Event) => this.click_menu(<MouseEvent>e) }]
+            , [{ event: "click", func: (e: Event): void => this.click_menu(<MouseEvent>e) }]
             , "Menu"
         ));
         this.menuHandle = new MenuWindow(document.body);
@@ -67,11 +67,11 @@ class MainMenu extends Applet {
 
     fillMenu(): void {
         this.menuHandle.clear();
-        let all = kernel.appMan.launchers;
-        let keys = Object.keys(all);
-        for (let i = 0; i < keys.length; i++) {
-            let cur = all[keys[i]];
-            for (let j = 0; j < cur.length; j++) {
+        let all: { [category: string]: Launcher[] } = kernel.appMan.launchers;
+        let keys: string[] = Object.keys(all);
+        for (let i: number = 0; i < keys.length; i++) {
+            let cur: Launcher[] = all[keys[i]];
+            for (let j: number = 0; j < cur.length; j++) {
                 this.menuHandle.add(cur[j], keys[i]);
             }
         }

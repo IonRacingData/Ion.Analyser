@@ -1,4 +1,4 @@
-﻿var selectedSpan = null;
+﻿var selectedSpan: HTMLSpanElement = null;
 
 interface IEventTag {
     event: string;
@@ -16,11 +16,11 @@ class HtmlHelper {
     }
 
     static tag(tag: string, className: any = "", events: IEventTag[] = null, innerHTML: string = ""): HTMLElement {
-        let temp = document.createElement(tag);
+        let temp: HTMLElement = document.createElement(tag);
         temp.className = className;
         temp.innerHTML = innerHTML;
         if (events != null) {
-            for (var i = 0; i < events.length; i++) {
+            for (var i: number = 0; i < events.length; i++) {
                 temp.addEventListener(events[i].event, events[i].func);
             }
         }
@@ -51,17 +51,17 @@ class HtmlTableGen {
         this.rows.push(row);
     }
 
-    addArray<T>(data: T[], keys: string[] = null, check: (value: T) => boolean = null) {
+    addArray<T>(data: T[], keys: string[] = null, check: (value: T) => boolean = null): void {
         if (check == null) {
             check = (value: T) => { return true; };
         }
-        for (var i = 0; i < data.length; i++) {
+        for (var i: number = 0; i < data.length; i++) {
             let row: string[] = [];
             if (keys == null) {
                 keys = Object.keys(data[i]);
             }
             if (check(data[i])) {
-                for (let j = 0; j < keys.length; j++) {
+                for (let j: number = 0; j < keys.length; j++) {
                     row.push(data[i][keys[j]]);
                 }
                 this.addArrayRow(row);
@@ -70,20 +70,20 @@ class HtmlTableGen {
     }
 
     generate(): HTMLElement {
-        var table = document.createElement("table");
+        var table: HTMLElement = document.createElement("table");
         if (this.className != null) {
             table.className = this.className;
         }
 
         if (this.header.length > 0) {
-            var thead = document.createElement("thead");
-            var headerRow = document.createElement("tr");
-            for (var i = 0; i < this.header.length; i++) {
-                var header = document.createElement("th");
+            var thead: HTMLElement = document.createElement("thead");
+            var headerRow: HTMLTableRowElement = document.createElement("tr");
+            for (var i: number = 0; i < this.header.length; i++) {
+                var header: HTMLTableHeaderCellElement = document.createElement("th");
                 header.innerHTML = this.header[i];
                 headerRow.appendChild(header);
                 if (this.resizeable) {
-                    let span = document.createElement("span");
+                    let span: HTMLSpanElement = document.createElement("span");
                     span.className = "table-resize";
                     span.addEventListener("mousedown", (e: MouseEvent) => {
                         span.deltaX = span.parentElement.offsetWidth - e.pageX;
@@ -95,13 +95,13 @@ class HtmlTableGen {
             thead.appendChild(headerRow);
             table.appendChild(thead);
         }
-        var rows = this.rows;
-        for (var row = 0; row < rows.length; row++) {
-            var curRow = rows[row];
-            var rowEle = document.createElement("tr");
-            for (var col = 0; col < curRow.length; col++) {
+        var rows: any[][] = this.rows;
+        for (var row: number = 0; row < rows.length; row++) {
+            var curRow: any[] = rows[row];
+            var rowEle: HTMLTableRowElement = document.createElement("tr");
+            for (var col: number = 0; col < curRow.length; col++) {
                 if (Array.isArray(this.rows[row][col])) {
-                    for (var i = 0; i < this.rows[row][col].length; i++) {
+                    for (var i: number = 0; i < this.rows[row][col].length; i++) {
                         if (this.rows[row][col][i].event != null) {
                             rowEle.addEventListener(this.rows[row][col][i].event, this.rows[row][col][i].func);
                         }
@@ -111,7 +111,7 @@ class HtmlTableGen {
                     }
                 }
                 else {
-                    var colEle = document.createElement("td");
+                    var colEle: HTMLTableDataCellElement = document.createElement("td");
                     colEle.innerHTML = this.rows[row][col];
                     rowEle.appendChild(colEle);
                 }

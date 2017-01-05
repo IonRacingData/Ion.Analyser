@@ -4,9 +4,13 @@
     height: 8px;
 }
 
-.window-top-left, .window-top, .window-top-right { top: 0px; }
+.window-top-left, .window-top, .window-top-right { 
+    top: 0;
+}
 
-.window-bottom-left, .window-bottom, .window-bottom-right { bottom: 0px; }
+.window-bottom-left, .window-bottom, .window-bottom-right { 
+    bottom: 0; 
+}
 
 .window-left, .window-right {
     top: 8px;
@@ -39,6 +43,12 @@
     cursor: nwse-resize;
 }
 
-.window-left { left: 0; }
+.window-left { 
+    left: 0; 
 
-.window-right { right: 0px; }
+}
+
+.window-right { 
+    right: 0; 
+
+}

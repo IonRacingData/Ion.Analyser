@@ -25,9 +25,10 @@ function addEvents() {
     });
     bar1.addEventListener("mousedown", function(event) {
         /**
-         * @param {MouseEvent} event
+         * @param {MouseEvent} event Mouse event
          */
-        editFunction = function(event){
+        editFunction = function (event) {
+            
             window1.style.height = (window.innerHeight - (event.clientY) - 4) + "px";
             window1.style.flexGrow = "0";
         }
@@ -36,7 +37,7 @@ function addEvents() {
     });
     bar2.addEventListener("mousedown", function(event){
         /**
-         * @param {MouseEvent} event
+         * @param {MouseEvent} event Mouse event
          */
         editFunction = function handle(event){
             window2.style.width = (window.innerWidth - (event.clientX) - 4) + "px";

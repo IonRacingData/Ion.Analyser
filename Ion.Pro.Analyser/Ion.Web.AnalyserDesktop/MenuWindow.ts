@@ -16,7 +16,7 @@
     }
 
     globalClick(e: MouseEvent): void {
-        let ele = <HTMLElement>e.target;
+        let ele: HTMLElement = <HTMLElement>e.target;
         while (ele.parentElement != null) {
             if (ele === this.content) {
                 return;
@@ -30,14 +30,14 @@
     }
 
     add(item: any, category: string = ""): void {
-        let name = (item instanceof Launcher) ? (<Launcher>item).name : item.toString();
-        if (category == "") {
+        let name: string = (item instanceof Launcher) ? (<Launcher>item).name : item.toString();
+        if (category === "") {
             this.items.push(new MenuItem(name, item));
         }
         else {
             if (!this.categories[category]) {
-                let miAr = []
-                let mi = new MenuItem(category, miAr);
+                let miAr: MenuItem[] = [];
+                let mi: MenuItem = new MenuItem(category, miAr);
                 this.items.push(mi);
                 this.categories[category] = miAr;
             }
@@ -52,8 +52,8 @@
 
     show(): void {
         if (!this.visible) {
-            let mk = new HtmlHelper();
-            let div = this.content = mk.tag("div", "menu-window");
+            let mk: HtmlHelper = new HtmlHelper();
+            let div: HTMLElement = this.content = mk.tag("div", "menu-window");
             div.style.left = this.x + "px";
             div.style.top = this.y + "px";
 
@@ -64,13 +64,13 @@
     }
 
     makeList(list: MenuItem[], mk: HtmlHelper): HTMLElement {
-        let ul = mk.tag("ul");
-        for (let i = 0; i < list.length; i++) {
-            let curItem = list[i];
-            let li = mk.tag("li");
+        let ul: HTMLElement = mk.tag("ul");
+        for (let i: number = 0; i < list.length; i++) {
+            let curItem: MenuItem = list[i];
+            let li: HTMLElement = mk.tag("li");
 
-            let a = <HTMLAnchorElement>mk.tag("a", "", [{
-                event: "click", func: (e: Event) => {
+            let a: HTMLAnchorElement = <HTMLAnchorElement>mk.tag("a", "", [{
+                event: "click", func: (e: Event): void => {
                     e.preventDefault();
                     if (curItem.value instanceof Launcher) {
                         (<Launcher>curItem.value).createInstance();

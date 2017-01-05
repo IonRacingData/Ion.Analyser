@@ -3,7 +3,7 @@ var AppWindow = (function () {
         var _this = this;
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
-        //kernel.winMan.registerWindow(this);
+        // kernel.winMan.registerWindow(this);
         handle.addEventListener("mousedown", function (e) { return _this.mouseDown_main(e); });
         this.moveHandle = handle;
         this.sizeHandle = handle.getElementsByClassName("window-body")[0];

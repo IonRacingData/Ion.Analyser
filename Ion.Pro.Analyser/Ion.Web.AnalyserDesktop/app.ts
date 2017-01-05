@@ -1,17 +1,16 @@
 ﻿interface Kernel {
-    winMan: WindowManager
-    appMan: ApplicationManager
+    winMan: WindowManager;
+    appMan: ApplicationManager;
 }
 
-interface HTMLElement
-{
-    window: AppWindow
+interface HTMLElement {
+    window: AppWindow;
 }
 
 var kernel: Kernel;
 
 window.onload = () => {
-    var logViewer = new Launcher(TestViewer, "LogViewer");
+    var logViewer: Launcher = new Launcher(TestViewer, "Test Window");
 
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
@@ -19,18 +18,18 @@ window.onload = () => {
     };
 
 
-    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
-    let mk = new HtmlHelper();
+    let mk: HtmlHelper = new HtmlHelper();
 
-    let content = mk.tag("div", "taskbar-applet");
-    let menuContent = mk.tag("div", "taskbar-applet");
+    let content: HTMLElement = mk.tag("div", "taskbar-applet");
+    let menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
 
-    let wl = new WindowList(content);
-    let menu = new MainMenu(menuContent);
+    let wl: WindowList = new WindowList(content);
+    let menu: MainMenu = new MainMenu(menuContent);
 
-    let taskbar = document.getElementsByClassName("taskbar")[0];
+    let taskbar: Element = document.getElementsByClassName("taskbar")[0];
 
     taskbar.appendChild(menu.content);
     taskbar.appendChild(wl.content);
@@ -40,8 +39,7 @@ window.onload = () => {
     });
 };
 
-class WindowManager
-{
+class WindowManager {
     body: HTMLElement;
     template: HTMLTemplateElement;
 
@@ -58,8 +56,7 @@ class WindowManager
     tileZone = 20;
     topBar = 40;
 
-    constructor(container: HTMLElement)
-    {
+    constructor(container: HTMLElement) {
         this.body = container;
 
         this.template = <HTMLTemplateElement>document.getElementById("temp-window");
@@ -71,8 +68,8 @@ class WindowManager
     mouseMove(e: MouseEvent): void {
         if (this.dragging) {
             this.activeWindow.setRelativePos(e.pageX, e.pageY);
-            var tileZone = this.tileZone;
-            var topBar = this.topBar;
+            var tileZone: number = this.tileZone;
+            var topBar: number = this.topBar;
 
             if (e.pageX < tileZone && e.pageY < topBar + tileZone) {
                 this.activeWindow.tile(TileState.TOPLEFT);
@@ -108,21 +105,19 @@ class WindowManager
         this.resizing = false;
     }
 
-    createWindow(app: Application, title: string): AppWindow
-    {
-        var window = this.makeWindow(app);
+    createWindow(app: Application, title: string): AppWindow {
+        var window: AppWindow = this.makeWindow(app);
         window.setTitle(title);
         this.registerWindow(window);
         return window;
     }
 
     makeWindow(app: Application): AppWindow {
-        var tempWindow = new AppWindow(app);
+        var tempWindow: AppWindow = new AppWindow(app);
         return tempWindow;
     }
 
-    registerWindow(app: AppWindow): void
-    {
+    registerWindow(app: AppWindow): void {
         app.winMan = this;
         this.body.appendChild(app.handle);
         this.windows.push(app);
@@ -133,14 +128,14 @@ class WindowManager
     }
 
     makeWindowHandle(appWindow: AppWindow): HTMLElement {
-        var div = document.createElement("div");
+        var div: HTMLElement = document.createElement("div");
         div.className = "window-wrapper";
-        var clone = <HTMLElement>document.importNode(this.template.content, true);
+        var clone: HTMLElement = <HTMLElement>document.importNode(this.template.content, true);
         div.appendChild(clone);
         return div;
     }
 
-    selectWindow(appWindow: AppWindow) {
+    selectWindow(appWindow: AppWindow): void {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
@@ -148,7 +143,7 @@ class WindowManager
     }
 
     makeTopMost(appWindow: AppWindow): void {
-        let index = this.order.indexOf(appWindow);
+        let index: number = this.order.indexOf(appWindow);
         this.order.splice(index, 1);
         this.order.push(appWindow);
         this.reorderWindows();
@@ -162,7 +157,7 @@ class WindowManager
     }
 
     reorderWindows(): void {
-        for (let i = 0; i < this.order.length; i++) {
+        for (let i: number = 0; i < this.order.length; i++) {
             this.order[i].handle.style.zIndex = ((i + 1) * 100).toString();
         }
     }
@@ -176,7 +171,7 @@ class WindowManager
 
     raiseEvent(type: string): void {
         if (this.events[type]) {
-            for (let i = 0; i < this.events[type].length; i++) {
+            for (let i: number = 0; i < this.events[type].length; i++) {
                 this.events[type][i]();
             }
         }
@@ -187,19 +182,16 @@ class WindowManager
 
 }
 
-class ApplicationManager
-{
+class ApplicationManager {
     appList: Application[] = [];
     launchers: { [category: string]: Launcher[] } = { };
 
-    laucneApplication(launcher: Launcher) {
-
-        var temp = new launcher.mainFunction();
+    launceApplication(launcher: Launcher): void {
+        var temp: IApplication = new launcher.mainFunction();
         this.appList.push(new Application(temp));
     }
 
-    registerApplication(category: string, launcher: Launcher)
-    {
+    registerApplication(category: string, launcher: Launcher): void {
         if (!this.launchers[category]) {
             this.launchers[category] = [];
         }
@@ -207,8 +199,7 @@ class ApplicationManager
     }
 }
 
-class Application
-{
+class Application {
     application: IApplication;
     name: string;
 
@@ -218,45 +209,39 @@ class Application
         app.main();
     }
 
-    onClose()
-    {
-
+    onClose(): void {
+        console.log("Empty close function");
     }
 }
 
 
 
-class Launcher
-{
-    mainFunction: new () => IApplication
+class Launcher {
+    mainFunction: new () => IApplication;
     name: string;
 
-    constructor(mainFunction: new () => IApplication, name: string)
-    {
+    constructor(mainFunction: new () => IApplication, name: string) {
         this.mainFunction = mainFunction;
         this.name = name;
     }
 
-    createInstance()
-    {
-        kernel.appMan.laucneApplication(this);
+    createInstance(): void {
+        kernel.appMan.launceApplication(this);
     }
 }
 
-interface IApplication
-{
+interface IApplication {
     application: Application;
     main(): void;
 }
 
-class TestViewer implements IApplication
-{
+class TestViewer implements IApplication {
     application: Application;
     window: AppWindow;
     window2: AppWindow;
-    main()
-    {
-        var mk = new HtmlHelper();
+
+    main(): void {
+        var mk: HtmlHelper = new HtmlHelper();
         this.window = kernel.winMan.createWindow(this.application, "Test Window");
         this.window.content.appendChild(mk.tag("h1", "", null, "Hello World"));
     }
@@ -264,19 +249,17 @@ class TestViewer implements IApplication
 
 
 
-class GridViewer implements IApplication
-{
+class GridViewer implements IApplication {
     application: Application;
     window: AppWindow;
 
-    main()
-    {
+    main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
 
-        var template = <HTMLTemplateElement>document.getElementById("temp-grid");
-        var clone = document.importNode(template.content, true);
-        //console.log(clone);
+        var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
+        var clone: Node = document.importNode(template.content, true);
+        // console.log(clone);
         this.window.content.appendChild(clone);
-        //addEvents();
+        // addEvents();
     }
 }

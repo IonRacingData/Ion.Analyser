@@ -1,11 +1,11 @@
 var kernel;
 window.onload = function () {
-    var logViewer = new Launcher(TestViewer, "LogViewer");
+    var logViewer = new Launcher(TestViewer, "Test Window");
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager()
     };
-    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
@@ -141,7 +141,7 @@ var ApplicationManager = (function () {
         this.appList = [];
         this.launchers = {};
     }
-    ApplicationManager.prototype.laucneApplication = function (launcher) {
+    ApplicationManager.prototype.launceApplication = function (launcher) {
         var temp = new launcher.mainFunction();
         this.appList.push(new Application(temp));
     };
@@ -160,6 +160,7 @@ var Application = (function () {
         app.main();
     }
     Application.prototype.onClose = function () {
+        console.log("Empty close function");
     };
     return Application;
 }());
@@ -169,7 +170,7 @@ var Launcher = (function () {
         this.name = name;
     }
     Launcher.prototype.createInstance = function () {
-        kernel.appMan.laucneApplication(this);
+        kernel.appMan.launceApplication(this);
     };
     return Launcher;
 }());
@@ -190,9 +191,9 @@ var GridViewer = (function () {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
         var template = document.getElementById("temp-grid");
         var clone = document.importNode(template.content, true);
-        //console.log(clone);
+        // console.log(clone);
         this.window.content.appendChild(clone);
-        //addEvents();
+        // addEvents();
     };
     return GridViewer;
 }());

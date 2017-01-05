@@ -19,10 +19,10 @@ var WindowList = (function (_super) {
         var _this = this;
         _super.call(this);
         this.content = content;
-        var wm = this.winMan = kernel.winMan;
-        wm.addEventListener("windowOpen", function () { return _this.programOpen(); });
-        wm.addEventListener("windowClose", function () { return _this.programClose(); });
-        wm.addEventListener("windowSelect", function () { return _this.programSelect(); });
+        var winMan = this.winMan = kernel.winMan;
+        winMan.addEventListener("windowOpen", function () { return _this.programOpen(); });
+        winMan.addEventListener("windowClose", function () { return _this.programClose(); });
+        winMan.addEventListener("windowSelect", function () { return _this.programSelect(); });
         this.addWindows();
     }
     WindowList.prototype.addWindows = function () {

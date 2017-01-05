@@ -13,27 +13,26 @@
 
     width: number;
     height: number;
-    
+
     state: WindowState;
     prevState: WindowState;
 
     content: HTMLElement;
 
-    constructor(app: Application)
-    {
+    constructor(app: Application) {
         this.app = app;
-        var handle = this.handle = kernel.winMan.makeWindowHandle(this);
-        //kernel.winMan.registerWindow(this);
+        var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
+        // kernel.winMan.registerWindow(this);
 
         handle.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_main(e));
         this.moveHandle = handle;
         this.sizeHandle = <HTMLElement>handle.getElementsByClassName("window-body")[0];
 
-        var headerBar = handle.getElementsByClassName("window-header")[0];
-        var min = handle.getElementsByClassName("window-control-min")[0];
-        var max = handle.getElementsByClassName("window-control-max")[0];
-        var exit = handle.getElementsByClassName("window-control-exit")[0];
-        var resize = <HTMLElement>handle.getElementsByClassName("window-bottom-right")[0];
+        var headerBar: Element = handle.getElementsByClassName("window-header")[0];
+        var min: Element = handle.getElementsByClassName("window-control-min")[0];
+        var max: Element = handle.getElementsByClassName("window-control-max")[0];
+        var exit: Element = handle.getElementsByClassName("window-control-exit")[0];
+        var resize: HTMLElement = <HTMLElement>handle.getElementsByClassName("window-bottom-right")[0];
 
         headerBar.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_header(e));
         resize.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_resize(e));
@@ -50,8 +49,7 @@
         this.content = <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
     }
 
-    setTitle(title: string)
-    {
+    setTitle(title: string): void {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
     }
@@ -124,16 +122,16 @@
     }
 
     tile(state: TileState): void {
-        var topBar = 40;
-        var windowTitle = 30;
+        var topBar: number = 40;
+        var windowTitle: number = 30;
 
-        var windowWidth = window.innerWidth;
-        var windowHeight = window.innerHeight - topBar;
+        var windowWidth: number = window.innerWidth;
+        var windowHeight: number = window.innerHeight - topBar;
 
-        var newX = 0;
-        var newY = 40;
-        var newWidth = windowWidth / 2 - 1;
-        var newHeight = windowHeight / 2 - windowTitle;
+        var newX: number = 0;
+        var newY: number = 40;
+        var newWidth: number = windowWidth / 2 - 1;
+        var newHeight: number = windowHeight / 2 - windowTitle;
         switch (state) {
             case TileState.LEFT:
                 newHeight = windowHeight - windowTitle;
@@ -167,7 +165,7 @@
     }
 
     setPos(x: number, y: number, storePos: boolean = true): void {
-        var outerBoxMargin = 8;
+        var outerBoxMargin: number = 8;
         this.moveHandle.style.left = (x - outerBoxMargin).toString() + "px";
         this.moveHandle.style.top = (y - outerBoxMargin).toString() + "px";
         if (storePos) {
@@ -213,8 +211,7 @@
     }
 }
 
-enum TileState
-{
+enum TileState {
     LEFT = 0,
     RIGHT = 1,
     TOPLEFT = 2,
@@ -223,8 +220,7 @@ enum TileState
     BOTTOMRIGHT = 5
 }
 
-enum WindowState
-{
+enum WindowState {
     RESTORED = 0,
     MINIMIZED = 1,
     MAXIMIZED = 2,
