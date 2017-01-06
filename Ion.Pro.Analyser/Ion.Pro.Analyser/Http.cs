@@ -519,7 +519,7 @@ namespace Ion.Pro.Analyser
         private bool moreLeft => left > 0;
         //private bool locked = false;
         public bool BlockWhenEmpty { get; set; } = false;
-
+        public bool EndOfFile { get; private set; } = false;
         
 
         public ProtocolReader(Stream baseStream)
@@ -532,6 +532,10 @@ namespace Ion.Pro.Analyser
         {
             available = BaseStream.Read(buffer, 0, bufferSize);
             position = 0;
+            if (available == 0)
+            {
+                EndOfFile = true;
+            }
         }
 
         private int FillBuffer(byte[] buffer, int offset, int length, bool allowIncomplete)
@@ -601,7 +605,7 @@ namespace Ion.Pro.Analyser
         {
             StringBuilder builder = new StringBuilder();
             char current = ' ';
-            while (true)
+            while (!EndOfFile)
             {
                 current = ReadChar();
                 if (current == '\r' || current == '\n')

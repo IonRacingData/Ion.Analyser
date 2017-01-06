@@ -45,7 +45,7 @@ body {
     box-shadow: 0 0 8px 2px #111111;
     background-color: white;
     border-radius: 4px 4px 0 0;
-    cursor: default;
+    /*cursor: default;*/
 }
 
 .window-title {

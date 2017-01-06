@@ -4,17 +4,17 @@
 <head>
     <meta charset="utf-8" />
     <title>Desktop V2</title>
-    <link rel="stylesheet" href="app.css" type="text/css" />
-    <link rel="stylesheet" href="window.css" type="text/css" />
-    <link rel="stylesheet" href="Grid/main.css" type="text/css" />
+    <link rel="stylesheet" href="/app.css" type="text/css" />
+    <link rel="stylesheet" href="/window.css" type="text/css" />
+    <link rel="stylesheet" href="/Grid/main.css" type="text/css" />
 
-    <script src="Grid/grid.js"></script>
+    <script src="/Grid/gridsystem.js"></script>
 
-    <script src="htmlhelper.js"></script>
-    <script src="MenuWindow.js"></script>
-    <script src="TaskBar.js"></script>
-    <script src="windowsystem.js"></script>
-    <script src="app.js"></script>
+    <script src="/htmlhelper.js"></script>
+    <script src="/MenuWindow.js"></script>
+    <script src="/TaskBar.js"></script>
+    <script src="/windowsystem.js"></script>
+    <script src="/app.js"></script>
 </head>
 <body>
     <div class="background"></div>
@@ -68,7 +68,7 @@
             </ul>
         </div>
     </template>
-
+    <div id="dropbox" style="display: inline-block; position: fixed; left: 500px; top: 300px; background-color: yellow; width: 100px; height: 100px; z-index: 1000000; border: 1px solid black;"></div>
     <template id="temp-grid">
         <div class="grid-hcon">
             <div class="grid-box">
@@ -85,6 +85,7 @@
 
                         <div class="grid-window">
                             Right box
+                            
                         </div>
 
                     </div>

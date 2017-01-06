@@ -1,5 +1,16 @@
 var kernel;
-window.onload = function () {
+function requestAction(action, callback) {
+    var request = new XMLHttpRequest();
+    request.responseType = "json";
+    request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+            callback(request.response);
+        }
+    };
+    request.open("GET", "/test/" + action, true);
+    request.send();
+}
+window.addEventListener("load", function () {
     var logViewer = new Launcher(TestViewer, "Test Window");
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
@@ -18,7 +29,7 @@ window.onload = function () {
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
     });
-};
+});
 var WindowManager = (function () {
     function WindowManager(container) {
         var _this = this;
@@ -178,9 +189,17 @@ var TestViewer = (function () {
     function TestViewer() {
     }
     TestViewer.prototype.main = function () {
-        var mk = new HtmlHelper();
+        var _this = this;
+        this.mk = new HtmlHelper();
         this.window = kernel.winMan.createWindow(this.application, "Test Window");
-        this.window.content.appendChild(mk.tag("h1", "", null, "Hello World"));
+        requestAction("hello", function (data) {
+            _this.helloData = data;
+            _this.draw();
+        });
+    };
+    TestViewer.prototype.draw = function () {
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
     };
     return TestViewer;
 }());

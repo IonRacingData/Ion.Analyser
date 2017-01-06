@@ -9,7 +9,21 @@ interface HTMLElement {
 
 var kernel: Kernel;
 
-window.onload = () => {
+function requestAction(action: string, callback: (data: any) => void): void {
+    var request = new XMLHttpRequest();
+    request.responseType = "json";
+    request.onreadystatechange = () => {
+        if (request.readyState == 4 && request.status == 200) {
+            callback(request.response);
+        }
+    }
+    request.open("GET", "/test/" + action, true);
+    request.send();
+}
+
+
+
+window.addEventListener("load", () => {
     var logViewer: Launcher = new Launcher(TestViewer, "Test Window");
 
     kernel = {
@@ -37,7 +51,7 @@ window.onload = () => {
     document.addEventListener("contextmenu", (e: PointerEvent) => {
         e.preventDefault();
     });
-};
+});
 
 class WindowManager {
     body: HTMLElement;
@@ -235,15 +249,30 @@ interface IApplication {
     main(): void;
 }
 
+interface IHelloPackage {
+    Text: string;
+}
+
 class TestViewer implements IApplication {
     application: Application;
     window: AppWindow;
     window2: AppWindow;
+    helloData: IHelloPackage;
+    mk: HtmlHelper;
 
     main(): void {
-        var mk: HtmlHelper = new HtmlHelper();
+        this.mk = new HtmlHelper();
         this.window = kernel.winMan.createWindow(this.application, "Test Window");
-        this.window.content.appendChild(mk.tag("h1", "", null, "Hello World"));
+
+        requestAction("hello", (data: IHelloPackage) => {
+            this.helloData = data;
+            this.draw();
+        });
+    }
+
+    draw(): void {
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
     }
 }
 
