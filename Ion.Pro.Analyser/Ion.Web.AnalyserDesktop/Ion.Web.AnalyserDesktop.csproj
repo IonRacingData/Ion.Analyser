@@ -39,6 +39,7 @@
     <TypeScriptCompile Include="Applications\LogViewer.ts" />
     <TypeScriptCompile Include="Applications\ServerInfo.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
+    <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />

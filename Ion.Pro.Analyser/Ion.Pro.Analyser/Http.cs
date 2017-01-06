@@ -516,8 +516,11 @@ namespace Ion.Pro.Analyser
         private int available;
         private int position;
         private int left => available - position;
+        private bool moreLeft => left > 0;
         //private bool locked = false;
         public bool BlockWhenEmpty { get; set; } = false;
+
+        
 
         public ProtocolReader(Stream baseStream)
         {
@@ -537,7 +540,7 @@ namespace Ion.Pro.Analyser
             bool breakLoop = false;
             while (curIndex < length)
             {
-                if (left == 0)
+                if (!moreLeft)
                     ReadBuffer();
                 int read = 0;
                 if (left > length - curIndex)
@@ -571,14 +574,14 @@ namespace Ion.Pro.Analyser
 
         public byte Read()
         {
-            if (left == 0)
+            if (!moreLeft)
                 ReadBuffer();
             return buffer[position++];
         }
 
         public byte Peek()
         {
-            if (left == 0)
+            if (!moreLeft)
                 ReadBuffer();
             return buffer[position];
         }
