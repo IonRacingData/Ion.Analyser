@@ -234,11 +234,19 @@ class EventManager {
 
 class ApplicationManager {
     appList: Application[] = [];
-    launchers: { [category: string]: Launcher[] } = {};    
+    launchers: { [category: string]: Launcher[] } = {};
+    eventManager: EventManager = new EventManager(); 
+    nextPID: number = 0;
 
-    launceApplication(launcher: Launcher): void {
+    launchApplication(launcher: Launcher): void {
         var temp: IApplication = new launcher.mainFunction();
-        this.appList.push(new Application(temp));
+        var appTemp = new Application(temp);
+        appTemp.name = launcher.name;
+        appTemp.pid = this.nextPID++;
+        this.appList.push(appTemp);
+
+        appTemp.start();
+        this.eventManager.raiseEvent("launchApp", null); 
     }
 
     registerApplication(category: string, launcher: Launcher): void {
@@ -247,16 +255,24 @@ class ApplicationManager {
         }
         this.launchers[category].push(launcher);
     }
+
+    addEventListener(type: string, listener: any): void {
+        this.eventManager.addEventListener(type, listener);           
+    }
 }
 
 class Application {
     application: IApplication;
     name: string;
+    pid: number;
 
     constructor(app: IApplication) {
         this.application = app;
         app.application = this;
-        app.main();
+    }
+
+    start(): void {
+        this.application.main();
     }
 
     onClose(): void {
@@ -276,7 +292,7 @@ class Launcher {
     }
 
     createInstance(): void {
-        kernel.appMan.launceApplication(this);
+        kernel.appMan.launchApplication(this);
     }
 }
 

@@ -178,10 +178,17 @@ var ApplicationManager = (function () {
     function ApplicationManager() {
         this.appList = [];
         this.launchers = {};
+        this.eventManager = new EventManager();
+        this.nextPID = 0;
     }
-    ApplicationManager.prototype.launceApplication = function (launcher) {
+    ApplicationManager.prototype.launchApplication = function (launcher) {
         var temp = new launcher.mainFunction();
-        this.appList.push(new Application(temp));
+        var appTemp = new Application(temp);
+        appTemp.name = launcher.name;
+        appTemp.pid = this.nextPID++;
+        this.appList.push(appTemp);
+        appTemp.start();
+        this.eventManager.raiseEvent("launchApp", null);
     };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {
         if (!this.launchers[category]) {
@@ -189,14 +196,19 @@ var ApplicationManager = (function () {
         }
         this.launchers[category].push(launcher);
     };
+    ApplicationManager.prototype.addEventListener = function (type, listener) {
+        this.eventManager.addEventListener(type, listener);
+    };
     return ApplicationManager;
 }());
 var Application = (function () {
     function Application(app) {
         this.application = app;
         app.application = this;
-        app.main();
     }
+    Application.prototype.start = function () {
+        this.application.main();
+    };
     Application.prototype.onClose = function () {
         console.log("Empty close function");
     };
@@ -208,7 +220,7 @@ var Launcher = (function () {
         this.name = name;
     }
     Launcher.prototype.createInstance = function () {
-        kernel.appMan.launceApplication(this);
+        kernel.appMan.launchApplication(this);
     };
     return Launcher;
 }());
