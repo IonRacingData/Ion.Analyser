@@ -209,6 +209,67 @@
         this.prevState = this.state;
         this.state = state;
     }
+
+    restoreSize(): void {
+        this.setSize(this.width, this.height, false);
+        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
+
+        this.sizeHandle.parentElement.style.width = null;
+        this.sizeHandle.parentElement.style.height = null;
+        this.sizeHandle.parentElement.parentElement.style.width = null;
+        this.sizeHandle.parentElement.parentElement.style.height = null;
+    }
+
+    restorePos(): void {
+        this.handle.style.left = this.x.toString() + "px";
+        this.handle.style.top = this.y.toString() + "px";
+    }
+
+    removeSize(): void {
+        this.sizeHandle.style.width = "100%";
+        this.sizeHandle.style.height = "100%";
+        this.sizeHandle.parentElement.style.width = "100%";
+        this.sizeHandle.parentElement.style.height = "100%";
+        this.sizeHandle.parentElement.parentElement.style.width = "100%";
+        this.sizeHandle.parentElement.parentElement.style.height = "100%";
+        this.sizeHandle.parentElement.parentElement.style.padding = "0";
+        
+    }
+
+    removeHeader() {
+        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = "none";
+    }
+
+    restoreHeader() {
+        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = null;
+    }
+
+    removePos(): void {
+        this.handle.style.left = null;
+        this.handle.style.top = null;
+    }
+
+    changeWindowMode(mode: WindowMode): void {
+        switch (mode) {
+            case WindowMode.BORDERLESS:
+                this.removeSize();
+                this.removePos();
+                this.removeHeader();
+                break;
+            case WindowMode.WINDOWED:
+                this.restoreSize();
+                this.restorePos();
+                this.restoreHeader();
+                break;
+        }
+    }
+
+
+}
+
+enum WindowMode {
+    WINDOWED = 0,
+    BORDERLESS = 1,
 }
 
 enum TileState {

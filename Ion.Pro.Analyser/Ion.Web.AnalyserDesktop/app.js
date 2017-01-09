@@ -42,9 +42,14 @@ var WindowManager = (function () {
         this.template = document.getElementById("temp-window");
         window.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
         window.addEventListener("mouseup", function (e) { return _this.mouseUp(e); });
+        this.eventManager = new EventManager();
+        //this.addEventListener = this.eventManager.addEventListener;
+        //this.addEventListener2 = this.eventManager.addEventListener;
+        //addEventListener
     }
     WindowManager.prototype.mouseMove = function (e) {
         if (this.dragging) {
+            this.raiseEvent("globaldrag", { window: this.activeWindow, mouse: e });
             this.activeWindow.setRelativePos(e.pageX, e.pageY);
             var tileZone = this.tileZone;
             var topBar = this.topBar;
@@ -79,6 +84,7 @@ var WindowManager = (function () {
         console.log(e);
         this.dragging = false;
         this.resizing = false;
+        this.raiseEvent("globalup", { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
@@ -96,7 +102,7 @@ var WindowManager = (function () {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent("windowOpen");
+        this.raiseEvent("windowOpen", null);
         this.selectWindow(app);
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
@@ -110,7 +116,7 @@ var WindowManager = (function () {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent("windowSelect");
+        this.raiseEvent("windowSelect", null);
     };
     WindowManager.prototype.makeTopMost = function (appWindow) {
         var index = this.order.indexOf(appWindow);
@@ -122,7 +128,7 @@ var WindowManager = (function () {
         this.body.removeChild(app.handle);
         this.windows.splice(this.windows.indexOf(app), 1);
         this.order.splice(this.order.indexOf(app), 1);
-        this.raiseEvent("windowClose");
+        this.raiseEvent("windowClose", null);
     };
     WindowManager.prototype.reorderWindows = function () {
         for (var i = 0; i < this.order.length; i++) {
@@ -130,22 +136,42 @@ var WindowManager = (function () {
         }
     };
     WindowManager.prototype.addEventListener = function (type, listner) {
+        console.log("firstStep");
+        this.eventManager.addEventListener(type, listner);
+    };
+    WindowManager.prototype.raiseEvent = function (type, data) {
+        this.eventManager.raiseEvent(type, data);
+    };
+    return WindowManager;
+}());
+var EventData = (function () {
+    function EventData() {
+    }
+    return EventData;
+}());
+var EventManager = (function () {
+    function EventManager() {
+        this.events = {};
+    }
+    EventManager.prototype.addEventListener = function (type, listner) {
+        console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }
         this.events[type].push(listner);
     };
-    WindowManager.prototype.raiseEvent = function (type) {
+    EventManager.prototype.raiseEvent = function (type, data) {
         if (this.events[type]) {
-            for (var i = 0; i < this.events[type].length; i++) {
-                this.events[type][i]();
+            var temp = this.events[type];
+            for (var i = 0; i < temp.length; i++) {
+                temp[i](data);
             }
+            return true;
         }
-        else {
-            console.error("event of type: " + type + " does not exist!");
-        }
+        //console.error("event of type: " + type + " does not exist!");
+        return false;
     };
-    return WindowManager;
+    return EventManager;
 }());
 var ApplicationManager = (function () {
     function ApplicationManager() {
