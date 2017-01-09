@@ -2,14 +2,60 @@
     application: Application;
     window: AppWindow;
 
+
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
-
+        kernel.winMan.addEventListener("globaldrag", (data: IWindowEvent) => this.globalDrag(data));
+        kernel.winMan.addEventListener("globalup", (data: IWindowEvent) => this.globalUp(data));
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         var clone: Node = document.importNode(template.content, true);
         // console.log(clone);
         this.window.content.appendChild(clone);
         addEvents();
+    }
+
+    globalDrag(e: IWindowEvent) {
+
+        //console.log(e);
+        var windowX = e.mouse.clientX - this.window.x - 9;
+        var windowY = e.mouse.clientY - this.window.y - 39;
+        if (windowX > 0
+            && windowY > 0
+            && windowX < this.window.width
+            && windowY < this.window.height
+            && e.window != this.window) {
+            console.log("X: " + windowX + " Y: " + windowY);
+        }
+    }
+    globalUp(e: IWindowEvent) {
+        var windowX = e.mouse.clientX - this.window.x - 9;
+        var windowY = e.mouse.clientY - this.window.y - 39;
+        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window != this.window) {
+            var gridWindows = this.window.handle.getElementsByClassName("grid-window");
+            var foundGridWindow: HTMLElement = null;
+            for (var i = 0; i < gridWindows.length; i++) {
+                var cur = <HTMLElement>gridWindows[i];
+                console.log("X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
+                if (windowX > cur.offsetLeft
+                    && windowY > cur.offsetTop
+                    && windowX < cur.offsetLeft + cur.offsetWidth
+                    && windowY < cur.offsetTop + cur.offsetHeight) {
+                    foundGridWindow = cur;
+                    break;
+                    //console.log("Found :D X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
+                }
+                
+            }
+            console.log("X: " + windowX + " Y: " + windowY);
+
+            console.log("Release");
+            foundGridWindow.innerHTML = "";
+            var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
+            kernel.winMan.activeWindow.changeWindowMode(WindowMode.BORDERLESS);
+            //windowBody.style.width = "100%";
+            //windowBody.style.height = "100%";
+            foundGridWindow.appendChild(windowBody);
+        }
     }
 }
 
@@ -36,15 +82,16 @@ function addEvents() {
 
     var innerGrid = window1.getElementsByClassName("grid-window")[0];
 
-    var firstGrid = document.getElementById("dropbox");
+    /*var firstGrid = document.getElementById("dropbox");
     firstGrid.addEventListener("mouseup", function (event: MouseEvent) {
         console.log("Release");
         innerGrid.innerHTML = "";
-        var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle.getElementsByClassName("window-body")[0];
-        windowBody.style.width = "100%";
-        windowBody.style.height = "100%";
+        var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
+        kernel.winMan.activeWindow.changeWindowMode(WindowMode.BORDERLESS);
+        //windowBody.style.width = "100%";
+        //windowBody.style.height = "100%";
         innerGrid.appendChild(windowBody);
-    });
+    });*/
 
 
     bar1.addEventListener("mousedown", function (event: MouseEvent) {

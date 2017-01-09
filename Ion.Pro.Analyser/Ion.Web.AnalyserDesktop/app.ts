@@ -66,10 +66,14 @@ class WindowManager {
     windows: AppWindow[] = [];
     order: AppWindow[] = [];
 
+    eventManager: EventManager;
+
     events: any = {};
 
     tileZone = 20;
     topBar = 40;
+
+    addEventListener2: (type: string, listner: any) => void;
 
     constructor(container: HTMLElement) {
         this.body = container;
@@ -78,10 +82,16 @@ class WindowManager {
 
         window.addEventListener("mousemove", (e: MouseEvent) => this.mouseMove(e));
         window.addEventListener("mouseup", (e: MouseEvent) => this.mouseUp(e));
+        this.eventManager = new EventManager();
+        //this.addEventListener = this.eventManager.addEventListener;
+        //this.addEventListener2 = this.eventManager.addEventListener;
+        //addEventListener
+
     }
 
     mouseMove(e: MouseEvent): void {
         if (this.dragging) {
+            this.raiseEvent("globaldrag", { window: this.activeWindow, mouse: e });
             this.activeWindow.setRelativePos(e.pageX, e.pageY);
             var tileZone: number = this.tileZone;
             var topBar: number = this.topBar;
@@ -118,6 +128,7 @@ class WindowManager {
         console.log(e);
         this.dragging = false;
         this.resizing = false;
+        this.raiseEvent("globalup", { window: this.activeWindow, mouse: e });
     }
 
     createWindow(app: Application, title: string): AppWindow {
@@ -138,7 +149,7 @@ class WindowManager {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent("windowOpen");
+        this.raiseEvent("windowOpen", null);
         this.selectWindow(app);
     }
 
@@ -154,7 +165,7 @@ class WindowManager {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent("windowSelect");
+        this.raiseEvent("windowSelect", null);
     }
 
     makeTopMost(appWindow: AppWindow): void {
@@ -168,7 +179,7 @@ class WindowManager {
         this.body.removeChild(app.handle);
         this.windows.splice(this.windows.indexOf(app), 1);
         this.order.splice(this.order.indexOf(app), 1);
-        this.raiseEvent("windowClose");
+        this.raiseEvent("windowClose", null);
     }
 
     reorderWindows(): void {
@@ -178,23 +189,47 @@ class WindowManager {
     }
 
     addEventListener(type: string, listner: any): void {
+        console.log("firstStep");
+        this.eventManager.addEventListener(type, listner);
+    }
+
+    raiseEvent(type: string, data: any): void {
+        this.eventManager.raiseEvent(type, data);
+    }
+
+}
+
+class EventData {
+    
+}
+
+interface IWindowEvent {
+    window: AppWindow;
+    mouse: MouseEvent;
+}
+
+class EventManager {
+    events: { [type: string]: ((e: any) => void)[] } = { };
+
+    addEventListener(type: string, listner: any): void {
+        console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }
         this.events[type].push(listner);
     }
 
-    raiseEvent(type: string): void {
+    raiseEvent(type: string, data: EventData): boolean {
         if (this.events[type]) {
-            for (let i: number = 0; i < this.events[type].length; i++) {
-                this.events[type][i]();
+            var temp = this.events[type];
+            for (var i = 0; i < temp.length; i++){
+                temp[i](data);
             }
+            return true;
         }
-        else {
-            console.error("event of type: " + type + " does not exist!");
-        }
+        //console.error("event of type: " + type + " does not exist!");
+        return false;
     }
-
 }
 
 class ApplicationManager {

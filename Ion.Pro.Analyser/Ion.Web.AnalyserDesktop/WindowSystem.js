@@ -166,8 +166,58 @@ var AppWindow = (function () {
         this.prevState = this.state;
         this.state = state;
     };
+    AppWindow.prototype.restoreSize = function () {
+        this.setSize(this.width, this.height, false);
+        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
+        this.sizeHandle.parentElement.style.width = null;
+        this.sizeHandle.parentElement.style.height = null;
+        this.sizeHandle.parentElement.parentElement.style.width = null;
+        this.sizeHandle.parentElement.parentElement.style.height = null;
+    };
+    AppWindow.prototype.restorePos = function () {
+        this.handle.style.left = this.x.toString() + "px";
+        this.handle.style.top = this.y.toString() + "px";
+    };
+    AppWindow.prototype.removeSize = function () {
+        this.sizeHandle.style.width = "100%";
+        this.sizeHandle.style.height = "100%";
+        this.sizeHandle.parentElement.style.width = "100%";
+        this.sizeHandle.parentElement.style.height = "100%";
+        this.sizeHandle.parentElement.parentElement.style.width = "100%";
+        this.sizeHandle.parentElement.parentElement.style.height = "100%";
+        this.sizeHandle.parentElement.parentElement.style.padding = "0";
+    };
+    AppWindow.prototype.removeHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = "none";
+    };
+    AppWindow.prototype.restoreHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = null;
+    };
+    AppWindow.prototype.removePos = function () {
+        this.handle.style.left = null;
+        this.handle.style.top = null;
+    };
+    AppWindow.prototype.changeWindowMode = function (mode) {
+        switch (mode) {
+            case WindowMode.BORDERLESS:
+                this.removeSize();
+                this.removePos();
+                this.removeHeader();
+                break;
+            case WindowMode.WINDOWED:
+                this.restoreSize();
+                this.restorePos();
+                this.restoreHeader();
+                break;
+        }
+    };
     return AppWindow;
 }());
+var WindowMode;
+(function (WindowMode) {
+    WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";
+    WindowMode[WindowMode["BORDERLESS"] = 1] = "BORDERLESS";
+})(WindowMode || (WindowMode = {}));
 var TileState;
 (function (TileState) {
     TileState[TileState["LEFT"] = 0] = "LEFT";
