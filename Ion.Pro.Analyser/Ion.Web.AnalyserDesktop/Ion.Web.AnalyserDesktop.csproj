@@ -44,6 +44,7 @@
     <TypeScriptCompile Include="Applications\FileExplorer.ts" />
     <TypeScriptCompile Include="Applications\LogViewer.ts" />
     <TypeScriptCompile Include="Applications\ServerInfo.ts" />
+    <TypeScriptCompile Include="Applications\TaskManager.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />

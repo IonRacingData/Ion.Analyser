@@ -34,6 +34,7 @@ window.addEventListener("load", () => {
 
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 
     let mk: HtmlHelper = new HtmlHelper();
 
@@ -198,7 +199,7 @@ class WindowManager {
 
 class ApplicationManager {
     appList: Application[] = [];
-    launchers: { [category: string]: Launcher[] } = { };
+    launchers: { [category: string]: Launcher[] } = {};    
 
     launceApplication(launcher: Launcher): void {
         var temp: IApplication = new launcher.mainFunction();

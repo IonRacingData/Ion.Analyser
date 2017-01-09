@@ -18,6 +18,7 @@ window.addEventListener("load", function () {
     };
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
