@@ -11,8 +11,14 @@
     deltaX: number;
     deltaY: number;
 
+    storeX: number;
+    storeY: number;
+
     width: number;
     height: number;
+
+    storeWidth: number;
+    storeHeight: number;
 
     state: WindowState;
     prevState: WindowState;
@@ -110,8 +116,8 @@
     }
 
     restore(): void {
-        this.setPos(this.x, this.y);
-        this.setSize(this.width, this.height);
+        this.setPos(this.storeX, this.storeY);
+        this.setSize(this.storeWidth, this.storeHeight);
         this.changeStateTo(WindowState.RESTORED);
     }
 
@@ -168,18 +174,22 @@
         var outerBoxMargin: number = 8;
         this.moveHandle.style.left = (x - outerBoxMargin).toString() + "px";
         this.moveHandle.style.top = (y - outerBoxMargin).toString() + "px";
+        this.x = x;
+        this.y = y;
         if (storePos) {
-            this.x = x;
-            this.y = y;
+            this.storeX = x;
+            this.storeY = y;
         }
     }
 
     setSize(width: number, height: number, storeSize: boolean = true): void {
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
+        this.width = width;
+        this.height = height;
         if (storeSize) {
-            this.width = width;
-            this.height = height;
+            this.storeWidth = width;
+            this.storeHeight = height;
         }
     }
 
@@ -190,18 +200,22 @@
         }
         this.handle.style.left = (x + this.deltaX).toString() + "px";
         this.handle.style.top = (y + this.deltaY).toString() + "px";
+        this.x = x + this.deltaX;
+        this.y = y + this.deltaY;
         if (storePos) {
-            this.x = x + this.deltaX;
-            this.y = y + this.deltaY;
+            this.storeX = x + this.deltaX;
+            this.storeY = y + this.deltaY;
         }
     }
 
     setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
         this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
         this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
+        this.width = width + this.deltaX;
+        this.height = height + this.deltaY;
         if (storeSize) {
-            this.width = width + this.deltaX;
-            this.height = height + this.deltaY;
+            this.storeWidth = width + this.deltaX;
+            this.storeHeight = height + this.deltaY;
         }
     }
 
