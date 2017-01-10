@@ -1,28 +1,43 @@
 ﻿class TaskManager implements IApplication {
     application: Application;
-    window: AppWindow;
+    mainWindow: AppWindow;
+    infoWindows: AppWindow[] = [];
     mk: HtmlHelper;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "Task Manager");
-        kernel.winMan.addEventListener("windowOpen", () => this.update());
-        kernel.winMan.addEventListener("windowClose", () => this.update());
-        kernel.appMan.addEventListener("launchApp", () => this.update());
-        this.update();
+        this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
+        kernel.winMan.addEventListener("windowOpen", () => this.draw());
+        kernel.winMan.addEventListener("windowClose", () => this.draw());
+        kernel.appMan.addEventListener("launchApp", () => this.draw());
+        kernel.appMan.addEventListener("closeApplication", () => this.draw());
+        this.draw();
     }
 
-    update() {
-        this.window.content.innerHTML = "";
-        var windows = kernel.winMan.windows;
 
+    draw() {
+        this.mainWindow.content.innerHTML = "";
         var tg = new HtmlTableGen("table", true);
-        tg.addHeader("Title");
-        tg.addArray(windows, ["title"]);
-        this.window.content.appendChild(tg.generate());
+        tg.addHeader("PID", "Application", "# of Windows");
+        var apps = kernel.appMan.appList;
+        for (var i = 0; i < apps.length; i++) {
+            tg.addRow([{ event: "click", func: (e: MouseEvent) => this.onAppClick((<HTMLElement>e.target).parentElement) }], apps[i].pid, apps[i].name, apps[i].windows.length);
+        }        
+        var table = tg.generate()
+        this.mainWindow.content.appendChild(table);       
+    }
 
-        var tg2 = new HtmlTableGen("table", true);
-        tg2.addHeader("PID", "Title");
-        tg2.addArray(kernel.appMan.appList, ["pid", "name"] );
-        this.window.content.appendChild(tg2.generate());
+    onAppClick(tr: HTMLElement) {
+        var pid = parseInt(tr.firstChild.textContent);        
+        for (var i = 0; i < kernel.appMan.appList.length; i++) {            
+            var app = kernel.appMan.appList[i];
+            if (app.pid == pid) {
+                var win = kernel.winMan.createWindow(this.application, "Task Manager - " + app.name);
+                this.infoWindows.push(win);                
+            }
+        }                
+    }
+
+    drawInfoWindow() {
+
     }
 }

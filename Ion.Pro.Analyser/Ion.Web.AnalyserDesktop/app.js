@@ -90,6 +90,7 @@ var WindowManager = (function () {
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
         window.setTitle(title);
+        app.windows.push(window);
         this.registerWindow(window);
         return window;
     };
@@ -125,10 +126,11 @@ var WindowManager = (function () {
         this.order.push(appWindow);
         this.reorderWindows();
     };
-    WindowManager.prototype.closeWindow = function (app) {
-        this.body.removeChild(app.handle);
-        this.windows.splice(this.windows.indexOf(app), 1);
-        this.order.splice(this.order.indexOf(app), 1);
+    WindowManager.prototype.closeWindow = function (appWindow) {
+        this.body.removeChild(appWindow.handle);
+        this.windows.splice(this.windows.indexOf(appWindow), 1);
+        this.order.splice(this.order.indexOf(appWindow), 1);
+        appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
         this.raiseEvent("windowClose", null);
     };
     WindowManager.prototype.reorderWindows = function () {
@@ -154,12 +156,12 @@ var EventManager = (function () {
     function EventManager() {
         this.events = {};
     }
-    EventManager.prototype.addEventListener = function (type, listner) {
+    EventManager.prototype.addEventListener = function (type, listener) {
         console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }
-        this.events[type].push(listner);
+        this.events[type].push(listener);
     };
     EventManager.prototype.raiseEvent = function (type, data) {
         if (this.events[type]) {
@@ -199,10 +201,15 @@ var ApplicationManager = (function () {
     ApplicationManager.prototype.addEventListener = function (type, listener) {
         this.eventManager.addEventListener(type, listener);
     };
+    ApplicationManager.prototype.closeApplication = function (app) {
+        this.appList.splice(this.appList.indexOf(app), 1);
+        this.eventManager.raiseEvent("closeApplication", null);
+    };
     return ApplicationManager;
 }());
 var Application = (function () {
     function Application(app) {
+        this.windows = [];
         this.application = app;
         app.application = this;
     }
@@ -210,7 +217,9 @@ var Application = (function () {
         this.application.main();
     };
     Application.prototype.onClose = function () {
-        console.log("Empty close function");
+        if (this.windows.length == 1) {
+            kernel.appMan.closeApplication(this);
+        }
     };
     return Application;
 }());
