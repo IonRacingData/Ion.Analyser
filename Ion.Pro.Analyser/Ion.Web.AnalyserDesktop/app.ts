@@ -34,6 +34,7 @@ window.addEventListener("load", () => {
 
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
 
     let mk: HtmlHelper = new HtmlHelper();
 
@@ -311,5 +312,29 @@ class TestViewer implements IApplication {
     }
 }
 
+interface ISensorPackage {
+    ID: number;
+    Value: number;
+    TimeStamp: number;
+}
+
+class DataViewer implements IApplication {
+    application: Application;
+    window: AppWindow;
+
+    main(): void {
+        this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
+        requestAction("GetData", (data: ISensorPackage[]) => this.draw(data));
+    }
 
 
+
+    draw(data: ISensorPackage[]): void {
+        var gen = new HtmlTableGen("table");
+        gen.addHeader("ID", "Value", "Timestamp");
+
+        gen.addArray(data, ["ID", "Value", "TimeStamp"]);
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(gen.generate());
+    }
+}

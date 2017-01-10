@@ -7,11 +7,12 @@ using Net = System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Ion.Pro.Analyser.Data;
 
 namespace Ion.Pro.Analyser
 {
     class Program
-    {
+    {        
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
 
         static string DefaultAction = "index";
@@ -21,10 +22,26 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
+            InsertSensorTestData();
             InitControllers();
             HttpServer server = new HttpServer();
             server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
             Console.Read();
+        }
+
+        static void InsertSensorTestData()
+        {
+            SensorDataStore store = SensorDataStore.GetDefault();
+            store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
+            store.Add(new SensorPackage() { ID = 2, Value = 5, TimeStamp = 1 });
+            store.Add(new SensorPackage() { ID = 3, Value = 10, TimeStamp = 1 });
+            store.Add(new SensorPackage() { ID = 1, Value = 6, TimeStamp = 2 });
+            store.Add(new SensorPackage() { ID = 2, Value = 10, TimeStamp = 2 });
+            store.Add(new SensorPackage() { ID = 3, Value = 100, TimeStamp = 2 });
+            store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
+            store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
+            store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+
         }
 
         static HttpAction testAction = null;
@@ -190,6 +207,32 @@ namespace Ion.Pro.Analyser
                     }
                 }
             }
+        }
+    }
+
+    public class SensorDataStore
+    {
+        List<SensorPackage> allPackages = new List<SensorPackage>();
+
+        static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
+        public static SensorDataStore GetDefault()
+        {
+            return instance.Value;
+        }
+
+        public void Add(SensorPackage data)
+        {
+            allPackages.Add(data);
+        }
+
+        public SensorPackageViewModel[] GetViews()
+        {
+            List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
+            foreach(SensorPackage sp in allPackages)
+            {
+                allViews.Add(sp.GetObject());
+            }
+            return allViews.ToArray();
         }
     }
 }

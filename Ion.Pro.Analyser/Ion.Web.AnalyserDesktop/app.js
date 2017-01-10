@@ -18,6 +18,7 @@ window.addEventListener("load", function () {
     };
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
@@ -228,5 +229,22 @@ var TestViewer = (function () {
         this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
     };
     return TestViewer;
+}());
+var DataViewer = (function () {
+    function DataViewer() {
+    }
+    DataViewer.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
+        requestAction("GetData", function (data) { return _this.draw(data); });
+    };
+    DataViewer.prototype.draw = function (data) {
+        var gen = new HtmlTableGen("table");
+        gen.addHeader("ID", "Value", "Timestamp");
+        gen.addArray(data, ["ID", "Value", "TimeStamp"]);
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(gen.generate());
+    };
+    return DataViewer;
 }());
 //# sourceMappingURL=app.js.map

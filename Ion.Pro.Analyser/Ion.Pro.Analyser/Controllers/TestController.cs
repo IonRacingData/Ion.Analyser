@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ion.Pro.Analyser.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,12 @@ namespace Ion.Pro.Analyser.Controllers
         public IActionResult Hello()
         {
             return Json(new { Text = "Hello World" });
+        }
+
+        public IActionResult GetData()
+        {
+            SensorPackageViewModel[] sensorData = SensorDataStore.GetDefault().GetViews();
+            return Json(sensorData);
         }
     }
 }
