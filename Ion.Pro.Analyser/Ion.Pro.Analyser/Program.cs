@@ -34,7 +34,7 @@ namespace Ion.Pro.Analyser
             LegacySensorReader reader = new LegacySensorReader(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DataLog", "126_usart_data.log"));
 
             SensorDataStore store = SensorDataStore.GetDefault();
-            if (true)
+            if (false)
             {
                 store.AddRange(reader.ReadPackages());
             }
