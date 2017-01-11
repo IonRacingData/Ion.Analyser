@@ -57,6 +57,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Content\testpdf.pdf" />
+    <None Include="Data\126_usart_data.iondata" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\image.jpg" />

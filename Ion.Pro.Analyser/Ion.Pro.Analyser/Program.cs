@@ -31,10 +31,10 @@ namespace Ion.Pro.Analyser
 
         static void InsertSensorTestData()
         {
-            LegacySensorReader reader = new LegacySensorReader(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DataLog", "126_usart_data.log"));
+            LegacySensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
 
             SensorDataStore store = SensorDataStore.GetDefault();
-            if (false)
+            if (true)
             {
                 store.AddRange(reader.ReadPackages());
             }
