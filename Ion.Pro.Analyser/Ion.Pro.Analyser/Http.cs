@@ -244,6 +244,11 @@ namespace Ion.Pro.Analyser
         {
             HttpHeaderRequest request = new HttpHeaderRequest();
             string requestField = reader.ReadLine();
+            if (requestField.Length < 3)
+            {
+                Console.WriteLine("Error parsing header");
+                return request;
+            }
             request.ParseRequestField(requestField);
             string curLine = "";
             while ((curLine = reader.ReadLine()).Length > 0)
