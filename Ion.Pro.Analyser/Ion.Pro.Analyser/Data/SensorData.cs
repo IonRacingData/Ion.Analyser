@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,9 +9,10 @@ namespace Ion.Pro.Analyser.Data
 {
     public struct SensorPackage
     {
-        public short ID { get; set; }
-        public int Value { get; set; }
-        public int TimeStamp { get; set; }
+        public int ID { get; set; }
+        public long Value { get; set; }
+        public long TimeStamp { get; set; }
+        public long AbsoluteTimeStamp { get; set; }
 
         public SensorPackageViewModel GetObject()
         {
@@ -20,9 +22,10 @@ namespace Ion.Pro.Analyser.Data
 
     public class SensorPackageViewModel
     {
-        public short ID { get; set; }
-        public int Value { get; set; }
-        public int TimeStamp { get; set; }
+        public int ID { get; set; }
+        public long Value { get; set; }
+        public long TimeStamp { get; set; }
+        public long AbsoluteTimeStamp { get; set; }
     }
 
 
@@ -31,14 +34,27 @@ namespace Ion.Pro.Analyser.Data
     /// </summary>
     public class LegacySensorReader
     {
+        string sensorFile;
+
         public LegacySensorReader(string file)
         {
-
+            this.sensorFile = file;
         }
 
         public SensorPackage[] ReadPackages()
         {
-            return null;
+            BinaryReader reader = new BinaryReader(new FileStream(sensorFile, FileMode.Open));
+            List<SensorPackage> packages = new List<SensorPackage>();
+            while(reader.BaseStream.Position < reader.BaseStream.Length - 10)
+            {
+                SensorPackage package = new SensorPackage();
+                package.ID = reader.ReadUInt16();
+                package.Value = reader.ReadUInt32();
+                package.TimeStamp = reader.ReadUInt32();
+                packages.Add(package);
+            }
+            reader.Close();
+            return packages.ToArray();
         }
     }
 

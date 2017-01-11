@@ -31,17 +31,25 @@ namespace Ion.Pro.Analyser
 
         static void InsertSensorTestData()
         {
-            SensorDataStore store = SensorDataStore.GetDefault();
-            store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
-            store.Add(new SensorPackage() { ID = 2, Value = 5, TimeStamp = 1 });
-            store.Add(new SensorPackage() { ID = 3, Value = 10, TimeStamp = 1 });
-            store.Add(new SensorPackage() { ID = 1, Value = 6, TimeStamp = 2 });
-            store.Add(new SensorPackage() { ID = 2, Value = 10, TimeStamp = 2 });
-            store.Add(new SensorPackage() { ID = 3, Value = 100, TimeStamp = 2 });
-            store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
-            store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
-            store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+            LegacySensorReader reader = new LegacySensorReader(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DataLog", "126_usart_data.log"));
 
+            SensorDataStore store = SensorDataStore.GetDefault();
+            if (true)
+            {
+                store.AddRange(reader.ReadPackages());
+            }
+            else
+            {
+                store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
+                store.Add(new SensorPackage() { ID = 2, Value = 5, TimeStamp = 1 });
+                store.Add(new SensorPackage() { ID = 3, Value = 10, TimeStamp = 1 });
+                store.Add(new SensorPackage() { ID = 1, Value = 6, TimeStamp = 2 });
+                store.Add(new SensorPackage() { ID = 2, Value = 10, TimeStamp = 2 });
+                store.Add(new SensorPackage() { ID = 3, Value = 100, TimeStamp = 2 });
+                store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
+                store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
+                store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+            }
         }
 
         static HttpAction testAction = null;
@@ -233,6 +241,11 @@ namespace Ion.Pro.Analyser
                 allViews.Add(sp.GetObject());
             }
             return allViews.ToArray();
+        }
+
+        public void AddRange(IEnumerable<SensorPackage> sensorPackage)
+        {
+            allPackages.AddRange(sensorPackage);
         }
     }
 }

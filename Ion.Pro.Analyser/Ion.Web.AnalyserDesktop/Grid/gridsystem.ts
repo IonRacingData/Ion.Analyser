@@ -24,37 +24,46 @@
             && windowX < this.window.width
             && windowY < this.window.height
             && e.window != this.window) {
-            console.log("X: " + windowX + " Y: " + windowY);
+            console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
         }
     }
     globalUp(e: IWindowEvent) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
         if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window != this.window) {
+            console.log("grid-window Droped over");
             var gridWindows = this.window.handle.getElementsByClassName("grid-window");
             var foundGridWindow: HTMLElement = null;
             for (var i = 0; i < gridWindows.length; i++) {
                 var cur = <HTMLElement>gridWindows[i];
-                console.log("X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
+                
                 if (windowX > cur.offsetLeft
                     && windowY > cur.offsetTop
                     && windowX < cur.offsetLeft + cur.offsetWidth
                     && windowY < cur.offsetTop + cur.offsetHeight) {
                     foundGridWindow = cur;
+                    console.log("grid-window Found grid window X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
                     break;
                     //console.log("Found :D X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
                 }
+                else {
+                    console.log("grid-window X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
+                }
                 
             }
-            console.log("X: " + windowX + " Y: " + windowY);
+            console.log("grid-window dropped at: X: " + windowX + " Y: " + windowY);
 
-            console.log("Release");
-            foundGridWindow.innerHTML = "";
-            var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
-            kernel.winMan.activeWindow.changeWindowMode(WindowMode.BORDERLESS);
-            //windowBody.style.width = "100%";
-            //windowBody.style.height = "100%";
-            foundGridWindow.appendChild(windowBody);
+            if (foundGridWindow) {
+                foundGridWindow.innerHTML = "";
+                var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
+                kernel.winMan.activeWindow.changeWindowMode(WindowMode.BORDERLESS);
+                //windowBody.style.width = "100%";
+                //windowBody.style.height = "100%";
+                foundGridWindow.appendChild(windowBody);
+            }
+            else {
+                console.log("grid-window could not find any window, this is a problem");
+            }
         }
     }
 }
