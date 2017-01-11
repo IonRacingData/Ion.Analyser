@@ -19,9 +19,19 @@ namespace Ion.Pro.Analyser.Controllers
             return Json(new { Text = "Hello World" });
         }
 
-        public IActionResult GetData()
+        public IActionResult GetIds()
         {
-            SensorPackageViewModel[] sensorData = SensorDataStore.GetDefault().GetViews();
+            return Json(SensorDataStore.GetDefault().GetIds().OrderBy(x => x));
+        }
+
+        public IActionResult GetData(string number)
+        {
+            SensorPackageViewModel[] sensorData = new SensorPackageViewModel[0];
+            int id;
+            if (number.Length > 0 && int.TryParse(number, out id))
+            {
+                sensorData = SensorDataStore.GetDefault().GetViews(id);
+            }
             return Json(sensorData);
         }
     }

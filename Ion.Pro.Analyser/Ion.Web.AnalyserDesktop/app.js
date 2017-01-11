@@ -19,6 +19,7 @@ window.addEventListener("load", function () {
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
+    kernel.appMan.registerApplication("Car", new Launcher(PlotViewer, "Plot Viewer"));
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
@@ -230,21 +231,83 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
+var google;
 var DataViewer = (function () {
     function DataViewer() {
     }
     DataViewer.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        requestAction("GetData", function (data) { return _this.draw(data); });
+        requestAction("GetIds", function (data) { return _this.draw(data); });
     };
     DataViewer.prototype.draw = function (data) {
+        var _this = this;
+        var mk = new HtmlHelper();
+        var _loop_1 = function() {
+            var curValue = data[i];
+            a = mk.tag("span", "taskbar-button-text", null, curValue.toString());
+            a.onclick = function () {
+                requestAction("GetData?number=" + curValue.toString(), function (data) { return _this.drawInner(data); });
+            };
+            this_1.window.content.appendChild(a);
+        };
+        var this_1 = this;
+        var a;
+        for (var i = 0; i < data.length; i++) {
+            _loop_1();
+        }
+        this.innerTable = mk.tag("div");
+        this.window.content.appendChild(this.innerTable);
+    };
+    DataViewer.prototype.drawInner = function (data) {
+        this.innerTable.innerHTML = "";
         var gen = new HtmlTableGen("table");
         gen.addHeader("ID", "Value", "Timestamp");
-        gen.addArray(data, ["ID", "Value", "TimeStamp"]);
-        this.window.content.innerHTML = "";
-        this.window.content.appendChild(gen.generate());
+        this.data = data;
+        for (var i = 0; i < 10; i++) {
+            gen.addRow(data[i].ID, data[i].Value, data[i].TimeStamp);
+        }
+        //gen.addArray(data, ["ID", "Value", "TimeStamp"]);
+        this.innerTable.appendChild(gen.generate());
     };
     return DataViewer;
+}());
+var PlotViewer = (function () {
+    function PlotViewer() {
+    }
+    PlotViewer.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "Plot window");
+        this.innerChart = document.createElement("div");
+        this.window.content.appendChild(this.innerChart);
+        google.charts.load("current", { "packages": ["corechart"] });
+        google.charts.setOnLoadCallback(function () { return _this.loadData(); });
+    };
+    PlotViewer.prototype.loadData = function () {
+        var _this = this;
+        requestAction("getdata?number=61457", function (data) { return _this.drawChart(data); });
+    };
+    PlotViewer.prototype.drawChart = function (sensorData) {
+        var preData = [["Time stamp", "Value"]];
+        for (var i = 1; i < 30; i++) {
+            preData[i] = [(sensorData[i].TimeStamp / 1000).toString() + "s", sensorData[i].Value];
+        }
+        var data = google.visualization.arrayToDataTable(preData);
+        /*var data = google.visualization.arrayToDataTable([
+            ["Year", "Sales", "Expenses"],
+            ["2004", 1000, 400],
+            ['2005', 1170, 460],
+            ['2006', 660, 1120],
+            ['2007', 1030, 540]
+        ]);*/
+        var options = {
+            title: "Sensor package 61457",
+            curveType: "function",
+            legende: { position: "bottom" }
+        };
+        var chart = new google.visualization.LineChart(this.innerChart);
+        chart.draw(data, options);
+    };
+    return PlotViewer;
 }());
 //# sourceMappingURL=app.js.map

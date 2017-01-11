@@ -122,7 +122,15 @@ namespace Ion.Pro.Analyser
         private static IActionResult HandleResult(HttpContext context, TimingService Watch)
         {
             string requestPath = context.Request.RelativePath;
-            FileInfo fi = new FileInfo(Path.Combine(ContentPath, context.Request.RelativePath.Remove(0, 1)));
+            FileInfo fi = null;
+            try
+            {
+                fi = new FileInfo(Path.Combine(ContentPath, context.Request.RelativePath.Remove(0, 1)));
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
             IActionResult result;
             Watch.Mark("Prepared variables");
             if (fi.Exists)
@@ -220,7 +228,8 @@ namespace Ion.Pro.Analyser
 
     public class SensorDataStore
     {
-        List<SensorPackage> allPackages = new List<SensorPackage>();
+        //List<SensorPackage> allPackages = new List<SensorPackage>();
+        Dictionary<int, List<SensorPackage>> indexedPackages = new Dictionary<int, List<SensorPackage>>();
 
         static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
         public static SensorDataStore GetDefault()
@@ -230,22 +239,41 @@ namespace Ion.Pro.Analyser
 
         public void Add(SensorPackage data)
         {
-            allPackages.Add(data);
-        }
-
-        public SensorPackageViewModel[] GetViews()
-        {
-            List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
-            foreach(SensorPackage sp in allPackages)
+            if (!indexedPackages.ContainsKey(data.ID))
             {
-                allViews.Add(sp.GetObject());
+                indexedPackages[data.ID] = new List<SensorPackage>();
             }
-            return allViews.ToArray();
+            indexedPackages[data.ID].Add(data);
         }
 
         public void AddRange(IEnumerable<SensorPackage> sensorPackage)
         {
-            allPackages.AddRange(sensorPackage);
+            foreach (SensorPackage package in sensorPackage)
+            {
+                Add(package);
+            }
+        }
+
+        public SensorPackageViewModel[] GetViews(int id)
+        {
+            if (!indexedPackages.ContainsKey(id))
+                return null;
+            List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
+            foreach(SensorPackage sp in indexedPackages[id])
+            {
+                allViews.Add(sp.GetObject());
+            }
+            return allViews.ToArray();
+        }        
+
+        public SensorPackage[] GetPackages(int id)
+        {
+            return indexedPackages[id].ToArray();
+        }
+
+        public int[] GetIds()
+        {
+            return indexedPackages.Keys.ToArray();
         }
     }
 }
