@@ -227,7 +227,7 @@
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
-        this.height = height;
+        this.height = height; 
         if (storeSize) {
             this.storeWidth = width;
             this.storeHeight = height;

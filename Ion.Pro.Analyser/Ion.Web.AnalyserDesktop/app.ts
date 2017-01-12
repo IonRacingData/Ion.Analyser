@@ -471,6 +471,7 @@ class PlotterTester implements IApplication {
     application: Application;
     window: AppWindow;
     plotter: Plotter;
+    data: ISensorPackage[];
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
@@ -480,7 +481,7 @@ class PlotterTester implements IApplication {
             this.plotter.canvas.height = this.window.height;
             this.plotter.draw();
         });        
-
+        /*
         var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -488,12 +489,21 @@ class PlotterTester implements IApplication {
             { ID: 111, TimeStamp: 2300, Value: 12 },
             { ID: 111, TimeStamp: 2400, Value: 15 },
             { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];
+        ];*/
 
+        this.loadData();
+    }
+
+    loadData() {
+        requestAction("getdata?number=61457", (data: ISensorPackage[]) => this.drawChart(data));
+    }
+
+    drawChart(data: ISensorPackage[]) {
+        this.data = data;
         this.plotter = new Plotter();
         this.window.content.appendChild(this.plotter.generatePlot(data));
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();        
+        this.plotter.draw();    
     }
 }
