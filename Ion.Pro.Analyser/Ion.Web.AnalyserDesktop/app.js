@@ -20,6 +20,7 @@ window.addEventListener("load", function () {
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Car", new Launcher(PlotViewer, "Plot Viewer"));
+    kernel.appMan.registerApplication("Plotting", new Launcher(PlotterTester, "Plotter Tester"));
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
@@ -331,5 +332,26 @@ var PlotViewer = (function () {
         chart.draw(data, options);
     };
     return PlotViewer;
+}());
+var PlotterTester = (function () {
+    function PlotterTester() {
+    }
+    PlotterTester.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+        this.window.content.style.overflow = "hidden";
+        var data = [
+            { ID: 111, TimeStamp: 2000, Value: 54 },
+            { ID: 111, TimeStamp: 2100, Value: 67 },
+            { ID: 111, TimeStamp: 2200, Value: 21 },
+            { ID: 111, TimeStamp: 2300, Value: 12 },
+            { ID: 111, TimeStamp: 2400, Value: 15 },
+            { ID: 111, TimeStamp: 2500, Value: 87 }];
+        this.plotter = new Plotter();
+        this.window.content.appendChild(this.plotter.generatePlot(data));
+        this.plotter.canvas.width = this.window.width;
+        this.plotter.canvas.height = this.window.height;
+        this.plotter.draw();
+    };
+    return PlotterTester;
 }());
 //# sourceMappingURL=app.js.map

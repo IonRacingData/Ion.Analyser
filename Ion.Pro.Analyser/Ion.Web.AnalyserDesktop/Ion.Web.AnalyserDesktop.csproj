@@ -49,6 +49,7 @@
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
+    <TypeScriptCompile Include="Plotter.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />
     <TypeScriptCompile Include="WindowSystem.ts" />
   </ItemGroup>
