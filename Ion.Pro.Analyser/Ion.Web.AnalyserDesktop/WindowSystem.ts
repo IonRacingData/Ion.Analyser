@@ -5,9 +5,16 @@
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
+    eventMan: EventManager = new EventManager();
+
+    static event_move = "move";
+    static event_resize = "resize";
+    static event_minimize = "minimize";
+    static event_maximize = "maximize";
 
     x: number;
     y: number;
+
     deltaX: number;
     deltaY: number;
 
@@ -30,7 +37,7 @@
         var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
 
-        handle.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_main(e));
+        handle.addEventListener("mousedown", (e: MouseEvent) => this.main_mouseDown(e));
         this.moveHandle = handle;
         this.sizeHandle = <HTMLElement>handle.getElementsByClassName("window-body")[0];
 
@@ -40,12 +47,12 @@
         var exit: Element = handle.getElementsByClassName("window-control-exit")[0];
         var resize: HTMLElement = <HTMLElement>handle.getElementsByClassName("window-bottom-right")[0];
 
-        headerBar.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_header(e));
-        resize.addEventListener("mousedown", (e: MouseEvent) => this.mouseDown_resize(e));
+        headerBar.addEventListener("mousedown", (e: MouseEvent) => this.header_mouseDown(e));
+        resize.addEventListener("mousedown", (e: MouseEvent) => this.resize_mouseDown(e));
 
-        min.addEventListener("mousedown", (e: MouseEvent) => this.onMinimize(e));
-        max.addEventListener("mousedown", (e: MouseEvent) => this.onMaximize(e));
-        exit.addEventListener("mousedown", (e: MouseEvent) => this.onClose(e));
+        min.addEventListener("mousedown", (e: MouseEvent) => this.minimize_click(e));
+        max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
+        exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
 
         this.handle.window = this;
 
@@ -60,11 +67,13 @@
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
     }
 
-    mouseDown_main(e: MouseEvent): void {
+
+    /* Event handlers */
+    main_mouseDown(e: MouseEvent): void {
         this.winMan.selectWindow(this);
     }
 
-    mouseDown_header(e: MouseEvent): void {
+    header_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
         console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX;
@@ -74,7 +83,7 @@
         this.winMan.selectWindow(this);
     }
 
-    mouseDown_resize(e: MouseEvent): void {
+    resize_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
@@ -85,18 +94,14 @@
         this.winMan.selectWindow(this);
     }
 
-    onMinimize(e: MouseEvent): void {
+    minimize_click(e: MouseEvent): void {
         e.stopPropagation();
         console.log("minimize");
         this.hide();
         this.changeStateTo(WindowState.MINIMIZED);
     }
 
-    hide(): void {
-        this.handle.style.display = "none";
-    }
-
-    onMaximize(e: MouseEvent): void {
+    maximize_click(e: MouseEvent): void {
         e.stopPropagation();
         this.winMan.selectWindow(this);
         if (this.state === WindowState.MAXIMIZED) {
@@ -108,11 +113,32 @@
         console.log("maximize");
     }
 
+    close_click(e: MouseEvent): void {
+        e.stopPropagation();
+        this.app.onClose();
+        this.winMan.closeWindow(this);
+    }
+
+    /*Events*/
+    onResize(): void {
+        this.eventMan.raiseEvent(AppWindow.event_resize, null);
+    }
+
+    onMove(): void {
+        this.eventMan.raiseEvent(AppWindow.event_move, null);
+    }
+
+    
+
     show(): void {
         this.handle.style.display = "";
         if (this.state === WindowState.MINIMIZED) {
             this.changeStateTo(this.prevState);
         }
+    }
+
+    hide(): void {
+        this.handle.style.display = "none";
     }
 
     restore(): void {
@@ -164,11 +190,7 @@
         this.changeStateTo(WindowState.TILED);
     }
 
-    onClose(e: MouseEvent): void {
-        e.stopPropagation();
-        this.app.onClose();
-        this.winMan.closeWindow(this);
-    }
+    
 
     setPos(x: number, y: number, storePos: boolean = true): void {
         var outerBoxMargin: number = 8;
@@ -180,20 +202,11 @@
             this.storeX = x;
             this.storeY = y;
         }
-    }
-
-    setSize(width: number, height: number, storeSize: boolean = true): void {
-        this.sizeHandle.style.width = width.toString() + "px";
-        this.sizeHandle.style.height = height.toString() + "px";
-        this.width = width;
-        this.height = height;
-        if (storeSize) {
-            this.storeWidth = width;
-            this.storeHeight = height;
-        }
+        this.onMove();
     }
 
     setRelativePos(x: number, y: number, storePos: boolean = true): void {
+        this.onMove();
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
@@ -208,7 +221,21 @@
         }
     }
 
+
+    setSize(width: number, height: number, storeSize: boolean = true): void {
+        this.onResize();
+        this.sizeHandle.style.width = width.toString() + "px";
+        this.sizeHandle.style.height = height.toString() + "px";
+        this.width = width;
+        this.height = height;
+        if (storeSize) {
+            this.storeWidth = width;
+            this.storeHeight = height;
+        }
+    }    
+
     setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
+        this.onResize();
         this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
         this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
         this.width = width + this.deltaX;
@@ -219,10 +246,13 @@
         }
     }
 
+
     changeStateTo(state: WindowState): void {
         this.prevState = this.state;
         this.state = state;
     }
+
+
 
     restoreSize(): void {
         this.setSize(this.width, this.height, false);
@@ -277,8 +307,6 @@
                 break;
         }
     }
-
-
 }
 
 enum WindowMode {
