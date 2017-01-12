@@ -7,6 +7,7 @@
     winMan: WindowManager;
     eventMan: EventManager = new EventManager();
 
+
     static event_move = "move";
     static event_resize = "resize";
     static event_minimize = "minimize";

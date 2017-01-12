@@ -466,6 +466,11 @@ class PlotterTester implements IApplication {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.plotter.canvas.width = this.window.width;
+            this.plotter.canvas.height = this.window.height;
+            this.plotter.draw();
+        });        
 
         var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -473,7 +478,8 @@ class PlotterTester implements IApplication {
             { ID: 111, TimeStamp: 2200, Value: 21 },
             { ID: 111, TimeStamp: 2300, Value: 12 },
             { ID: 111, TimeStamp: 2400, Value: 15 },
-            { ID: 111, TimeStamp: 2500, Value: 87 }];
+            { ID: 111, TimeStamp: 2500, Value: 87 }
+        ];
 
         this.plotter = new Plotter();
         this.window.content.appendChild(this.plotter.generatePlot(data));
