@@ -4,8 +4,8 @@ var GridViewer = (function () {
     GridViewer.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
-        kernel.winMan.addEventListener("globaldrag", function (data) { return _this.globalDrag(data); });
-        kernel.winMan.addEventListener("globalup", function (data) { return _this.globalUp(data); });
+        kernel.winMan.addEventListener(WindowManager.event_globalDrag, function (data) { return _this.globalDrag(data); });
+        kernel.winMan.addEventListener(WindowManager.event_globalUp, function (data) { return _this.globalUp(data); });
         var template = document.getElementById("temp-grid");
         var clone = document.importNode(template.content, true);
         // console.log(clone);
