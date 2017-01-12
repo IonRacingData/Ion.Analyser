@@ -7,14 +7,13 @@ class Plotter {
     canvas: HTMLCanvasElement;
     data: ISensorPackage[];
     movePoint: Point = {x: 0, y: 0};
-    scalePoint: Point = { x: 0.0005, y: 10 };
+    scalePoint: Point = { x: 0.005, y: 0.5 };
     mouseMod: Point;
     dragging: boolean;
     generatePlot(data: ISensorPackage[]): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
             this.mouseMod = { x: this.movePoint.x - e.layerX, y: this.movePoint.y - (this.canvas.height - e.layerY) };
-            console.log(this.mouseMod);
             this.dragging = true;
         });
 
@@ -22,7 +21,6 @@ class Plotter {
             if (this.dragging) {
                 this.movePoint = { x: e.layerX + this.mouseMod.x, y: (this.canvas.height - e.layerY) + this.mouseMod.y };
                 this.draw();
-                console.log(this.movePoint);
             }
         });
         this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
@@ -37,8 +35,8 @@ class Plotter {
     draw() {                
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.lineWidth = 2;
-        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.beginPath();        
         var lastPoint: Point;
         for (var i = 0; i < this.data.length; i++) {
             var point = this.transform(this.createPoint(this.data[i]));

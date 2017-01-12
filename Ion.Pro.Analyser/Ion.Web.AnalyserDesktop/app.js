@@ -363,7 +363,7 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
-        requestAction("getdata?number=61457", function (data) { return _this.drawChart(data); });
+        requestAction("getdata?number=841", function (data) { return _this.drawChart(data); });
     };
     PlotterTester.prototype.drawChart = function (data) {
         this.data = data;

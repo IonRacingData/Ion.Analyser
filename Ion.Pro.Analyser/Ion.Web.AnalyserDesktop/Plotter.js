@@ -1,21 +1,19 @@
 var Plotter = (function () {
     function Plotter() {
         this.movePoint = { x: 0, y: 0 };
-        this.scalePoint = { x: 0.0005, y: 10 };
+        this.scalePoint = { x: 0.005, y: 0.5 };
     }
     Plotter.prototype.generatePlot = function (data) {
         var _this = this;
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", function (e) {
             _this.mouseMod = { x: _this.movePoint.x - e.layerX, y: _this.movePoint.y - (_this.canvas.height - e.layerY) };
-            console.log(_this.mouseMod);
             _this.dragging = true;
         });
         this.canvas.addEventListener("mousemove", function (e) {
             if (_this.dragging) {
                 _this.movePoint = { x: e.layerX + _this.mouseMod.x, y: (_this.canvas.height - e.layerY) + _this.mouseMod.y };
                 _this.draw();
-                console.log(_this.movePoint);
             }
         });
         this.canvas.addEventListener("mouseup", function (e) {
@@ -28,7 +26,7 @@ var Plotter = (function () {
     Plotter.prototype.draw = function () {
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
         ctx.beginPath();
         var lastPoint;
         for (var i = 0; i < this.data.length; i++) {

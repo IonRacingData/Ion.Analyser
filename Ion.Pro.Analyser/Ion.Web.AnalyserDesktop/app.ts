@@ -495,7 +495,7 @@ class PlotterTester implements IApplication {
     }
 
     loadData() {
-        requestAction("getdata?number=61457", (data: ISensorPackage[]) => this.drawChart(data));
+        requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(data: ISensorPackage[]) {
