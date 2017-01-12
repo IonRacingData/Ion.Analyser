@@ -23,19 +23,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.css" />
-    <Content Include="app.js" />
     <Content Include="Grid\grid.js" />
-    <Content Include="Grid\gridsystem.js" />
     <Content Include="Grid\index.html" />
     <Content Include="Grid\main.css" />
-    <Content Include="HtmlHelper.js" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
-    <Content Include="MenuWindow.js" />
-    <Content Include="TaskBar.js" />
     <Content Include="web.config" />
     <Content Include="window.css" />
-    <Content Include="WindowSystem.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
