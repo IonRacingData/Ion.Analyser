@@ -206,7 +206,6 @@
     }
 
     setRelativePos(x: number, y: number, storePos: boolean = true): void {
-        this.onMove();
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
@@ -219,11 +218,11 @@
             this.storeX = x + this.deltaX;
             this.storeY = y + this.deltaY;
         }
+        this.onMove();
     }
 
 
     setSize(width: number, height: number, storeSize: boolean = true): void {
-        this.onResize();
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
@@ -232,10 +231,10 @@
             this.storeWidth = width;
             this.storeHeight = height;
         }
+        this.onResize();
     }    
 
     setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
-        this.onResize();
         this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
         this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
         this.width = width + this.deltaX;
@@ -244,6 +243,7 @@
             this.storeWidth = width + this.deltaX;
             this.storeHeight = height + this.deltaY;
         }
+        this.onResize();
     }
 
 

@@ -145,7 +145,6 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.setRelativePos = function (x, y, storePos) {
         if (storePos === void 0) { storePos = true; }
-        this.onMove();
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
@@ -158,10 +157,10 @@ var AppWindow = (function () {
             this.storeX = x + this.deltaX;
             this.storeY = y + this.deltaY;
         }
+        this.onMove();
     };
     AppWindow.prototype.setSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
-        this.onResize();
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
@@ -170,10 +169,10 @@ var AppWindow = (function () {
             this.storeWidth = width;
             this.storeHeight = height;
         }
+        this.onResize();
     };
     AppWindow.prototype.setRelativeSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
-        this.onResize();
         this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
         this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
         this.width = width + this.deltaX;
@@ -182,6 +181,7 @@ var AppWindow = (function () {
             this.storeWidth = width + this.deltaX;
             this.storeHeight = height + this.deltaY;
         }
+        this.onResize();
     };
     AppWindow.prototype.changeStateTo = function (state) {
         this.prevState = this.state;
