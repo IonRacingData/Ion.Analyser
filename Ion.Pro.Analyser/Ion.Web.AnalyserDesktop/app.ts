@@ -34,6 +34,7 @@ window.addEventListener("load", () => {
 
     kernel.appMan.registerApplication("Test", logViewer);
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 
     let mk: HtmlHelper = new HtmlHelper();
 
@@ -133,7 +134,9 @@ class WindowManager {
     createWindow(app: Application, title: string): AppWindow {
         var window: AppWindow = this.makeWindow(app);
         window.setTitle(title);
+        app.windows.push(window);
         this.registerWindow(window);
+        
         return window;
     }
 
@@ -174,10 +177,11 @@ class WindowManager {
         this.reorderWindows();
     }
 
-    closeWindow(app: AppWindow): void {
-        this.body.removeChild(app.handle);
-        this.windows.splice(this.windows.indexOf(app), 1);
-        this.order.splice(this.order.indexOf(app), 1);
+    closeWindow(appWindow: AppWindow): void {
+        this.body.removeChild(appWindow.handle);
+        this.windows.splice(this.windows.indexOf(appWindow), 1);
+        this.order.splice(this.order.indexOf(appWindow), 1);
+        appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
         this.raiseEvent("windowClose", null);
     }
 
@@ -210,12 +214,12 @@ interface IWindowEvent {
 class EventManager {
     events: { [type: string]: ((e: any) => void)[] } = { };
 
-    addEventListener(type: string, listner: any): void {
+    addEventListener(type: string, listener: any): void {
         console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }
-        this.events[type].push(listner);
+        this.events[type].push(listener);
     }
 
     raiseEvent(type: string, data: EventData): boolean {
@@ -233,11 +237,19 @@ class EventManager {
 
 class ApplicationManager {
     appList: Application[] = [];
-    launchers: { [category: string]: Launcher[] } = { };
+    launchers: { [category: string]: Launcher[] } = {};
+    eventManager: EventManager = new EventManager(); 
+    nextPID: number = 0;
 
-    launceApplication(launcher: Launcher): void {
+    launchApplication(launcher: Launcher): void {
         var temp: IApplication = new launcher.mainFunction();
-        this.appList.push(new Application(temp));
+        var appTemp = new Application(temp);
+        appTemp.name = launcher.name;
+        appTemp.pid = this.nextPID++;
+        this.appList.push(appTemp);
+
+        appTemp.start();
+        this.eventManager.raiseEvent("launchApp", null); 
     }
 
     registerApplication(category: string, launcher: Launcher): void {
@@ -246,21 +258,38 @@ class ApplicationManager {
         }
         this.launchers[category].push(launcher);
     }
+
+    addEventListener(type: string, listener: any): void {
+        this.eventManager.addEventListener(type, listener);           
+    }
+
+    closeApplication(app: Application): void {
+        this.appList.splice(this.appList.indexOf(app), 1);        
+        this.eventManager.raiseEvent("closeApplication", null);       
+    }
 }
 
 class Application {
     application: IApplication;
     name: string;
+    pid: number;
+    windows: AppWindow[] = [];
 
     constructor(app: IApplication) {
         this.application = app;
         app.application = this;
-        app.main();
+    }
+
+    start(): void {
+        this.application.main();
     }
 
     onClose(): void {
-        console.log("Empty close function");
+        if (this.windows.length == 1) {
+            kernel.appMan.closeApplication(this);
+        }
     }
+
 }
 
 
@@ -275,7 +304,7 @@ class Launcher {
     }
 
     createInstance(): void {
-        kernel.appMan.launceApplication(this);
+        kernel.appMan.launchApplication(this);
     }
 }
 
