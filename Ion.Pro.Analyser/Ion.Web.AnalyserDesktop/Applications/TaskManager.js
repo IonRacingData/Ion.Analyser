@@ -5,10 +5,10 @@ var TaskManager = (function () {
     TaskManager.prototype.main = function () {
         var _this = this;
         this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        kernel.winMan.addEventListener("windowOpen", function () { return _this.draw(); });
-        kernel.winMan.addEventListener("windowClose", function () { return _this.draw(); });
-        kernel.appMan.addEventListener("launchApp", function () { return _this.draw(); });
-        kernel.appMan.addEventListener("closeApplication", function () { return _this.draw(); });
+        kernel.winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.draw(); });
+        kernel.winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.draw(); });
+        kernel.appMan.addEventListener(ApplicationManager.event_appLaunch, function () { return _this.draw(); });
+        kernel.appMan.addEventListener(ApplicationManager.event_appClose, function () { return _this.draw(); });
         this.draw();
     };
     TaskManager.prototype.draw = function () {

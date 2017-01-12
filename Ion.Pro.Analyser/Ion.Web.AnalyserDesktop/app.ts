@@ -79,6 +79,13 @@ class WindowManager {
 
     addEventListener2: (type: string, listner: any) => void;
 
+    static event_globalDrag = "globalDrag";
+    static event_globalUp = "globalUp;"
+
+    static event_windowOpen = "windowOpen";
+    static event_windowSelect = "windowSelect";
+    static event_windowClose = "windowClose";
+
     constructor(container: HTMLElement) {
         this.body = container;
 
@@ -90,12 +97,11 @@ class WindowManager {
         //this.addEventListener = this.eventManager.addEventListener;
         //this.addEventListener2 = this.eventManager.addEventListener;
         //addEventListener
-
     }
 
     mouseMove(e: MouseEvent): void {
         if (this.dragging) {
-            this.raiseEvent("globaldrag", { window: this.activeWindow, mouse: e });
+            
             this.activeWindow.setRelativePos(e.pageX, e.pageY);
             var tileZone: number = this.tileZone;
             var topBar: number = this.topBar;
@@ -121,6 +127,8 @@ class WindowManager {
             else if (e.pageX > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
+
+            this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
         }
         else if (this.resizing) {
             this.activeWindow.setRelativeSize(e.pageX, e.pageY);
@@ -128,11 +136,10 @@ class WindowManager {
     }
 
     mouseUp(e: MouseEvent): void {
-        console.log("Global MouseUp");
         console.log(e);
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent("globalup", { window: this.activeWindow, mouse: e });
+        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
     createWindow(app: Application, title: string): AppWindow {
@@ -155,7 +162,7 @@ class WindowManager {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent("windowOpen", null);
+        this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     }
 
@@ -171,7 +178,7 @@ class WindowManager {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent("windowSelect", null);
+        this.raiseEvent(WindowManager.event_windowSelect, null);
     }
 
     makeTopMost(appWindow: AppWindow): void {
@@ -186,7 +193,7 @@ class WindowManager {
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.raiseEvent("windowClose", null);
+        this.raiseEvent(WindowManager.event_windowClose, null);
     }
 
     reorderWindows(): void {
@@ -196,7 +203,6 @@ class WindowManager {
     }
 
     addEventListener(type: string, listner: any): void {
-        console.log("firstStep");
         this.eventManager.addEventListener(type, listner);
     }
 
@@ -245,6 +251,9 @@ class ApplicationManager {
     eventManager: EventManager = new EventManager(); 
     nextPID: number = 0;
 
+    static event_appLaunch = "appLaunch";
+    static event_appClose = "appClose";
+
     launchApplication(launcher: Launcher): void {
         var temp: IApplication = new launcher.mainFunction();
         var appTemp = new Application(temp);
@@ -253,7 +262,7 @@ class ApplicationManager {
         this.appList.push(appTemp);
 
         appTemp.start();
-        this.eventManager.raiseEvent("launchApp", null); 
+        this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null); 
     }
 
     registerApplication(category: string, launcher: Launcher): void {
@@ -268,8 +277,8 @@ class ApplicationManager {
     }
 
     closeApplication(app: Application): void {
-        this.appList.splice(this.appList.indexOf(app), 1);        
-        this.eventManager.raiseEvent("closeApplication", null);       
+        this.appList.splice(this.appList.indexOf(app), 1);
+        this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);       
     }
 }
 

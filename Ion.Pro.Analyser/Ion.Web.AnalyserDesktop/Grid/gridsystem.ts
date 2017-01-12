@@ -5,8 +5,8 @@
 
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
-        kernel.winMan.addEventListener("globaldrag", (data: IWindowEvent) => this.globalDrag(data));
-        kernel.winMan.addEventListener("globalup", (data: IWindowEvent) => this.globalUp(data));
+        kernel.winMan.addEventListener(WindowManager.event_globalDrag, (data: IWindowEvent) => this.globalDrag(data));
+        kernel.winMan.addEventListener(WindowManager.event_globalUp, (data: IWindowEvent) => this.globalUp(data));
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         var clone: Node = document.importNode(template.content, true);
         // console.log(clone);

@@ -6,10 +6,10 @@
 
     main() {
         this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        kernel.winMan.addEventListener("windowOpen", () => this.draw());
-        kernel.winMan.addEventListener("windowClose", () => this.draw());
-        kernel.appMan.addEventListener("launchApp", () => this.draw());
-        kernel.appMan.addEventListener("closeApplication", () => this.draw());
+        kernel.winMan.addEventListener(WindowManager.event_windowOpen, () => this.draw());
+        kernel.winMan.addEventListener(WindowManager.event_windowClose, () => this.draw());
+        kernel.appMan.addEventListener(ApplicationManager.event_appLaunch, () => this.draw());
+        kernel.appMan.addEventListener(ApplicationManager.event_appClose, () => this.draw());
         this.draw();
     }
 
