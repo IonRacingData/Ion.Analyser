@@ -52,7 +52,6 @@ var WindowManager = (function () {
     }
     WindowManager.prototype.mouseMove = function (e) {
         if (this.dragging) {
-            this.raiseEvent("globaldrag", { window: this.activeWindow, mouse: e });
             this.activeWindow.setRelativePos(e.pageX, e.pageY);
             var tileZone = this.tileZone;
             var topBar = this.topBar;
@@ -77,17 +76,17 @@ var WindowManager = (function () {
             else if (e.pageX > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
+            this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
         }
         else if (this.resizing) {
             this.activeWindow.setRelativeSize(e.pageX, e.pageY);
         }
     };
     WindowManager.prototype.mouseUp = function (e) {
-        console.log("Global MouseUp");
         console.log(e);
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent("globalup", { window: this.activeWindow, mouse: e });
+        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
@@ -106,7 +105,7 @@ var WindowManager = (function () {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent("windowOpen", null);
+        this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
@@ -120,7 +119,7 @@ var WindowManager = (function () {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent("windowSelect", null);
+        this.raiseEvent(WindowManager.event_windowSelect, null);
     };
     WindowManager.prototype.makeTopMost = function (appWindow) {
         var index = this.order.indexOf(appWindow);
@@ -133,7 +132,7 @@ var WindowManager = (function () {
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.raiseEvent("windowClose", null);
+        this.raiseEvent(WindowManager.event_windowClose, null);
     };
     WindowManager.prototype.reorderWindows = function () {
         for (var i = 0; i < this.order.length; i++) {
@@ -141,12 +140,16 @@ var WindowManager = (function () {
         }
     };
     WindowManager.prototype.addEventListener = function (type, listner) {
-        console.log("firstStep");
         this.eventManager.addEventListener(type, listner);
     };
     WindowManager.prototype.raiseEvent = function (type, data) {
         this.eventManager.raiseEvent(type, data);
     };
+    WindowManager.event_globalDrag = "globalDrag";
+    WindowManager.event_globalUp = "globalUp;";
+    WindowManager.event_windowOpen = "windowOpen";
+    WindowManager.event_windowSelect = "windowSelect";
+    WindowManager.event_windowClose = "windowClose";
     return WindowManager;
 }());
 var EventData = (function () {
@@ -192,7 +195,7 @@ var ApplicationManager = (function () {
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
         appTemp.start();
-        this.eventManager.raiseEvent("launchApp", null);
+        this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
     };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {
         if (!this.launchers[category]) {
@@ -205,8 +208,10 @@ var ApplicationManager = (function () {
     };
     ApplicationManager.prototype.closeApplication = function (app) {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.eventManager.raiseEvent("closeApplication", null);
+        this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     };
+    ApplicationManager.event_appLaunch = "appLaunch";
+    ApplicationManager.event_appClose = "appClose";
     return ApplicationManager;
 }());
 var Application = (function () {

@@ -11,9 +11,9 @@ class WindowList extends Applet {
         super();
         this.content = content;
         let winMan: WindowManager = this.winMan = kernel.winMan;
-        winMan.addEventListener("windowOpen", () => this.programOpen());
-        winMan.addEventListener("windowClose", () => this.programClose());
-        winMan.addEventListener("windowSelect", () => this.programSelect());
+        winMan.addEventListener(WindowManager.event_windowOpen, () => this.programOpen());
+        winMan.addEventListener(WindowManager.event_windowOpen, () => this.programClose());
+        winMan.addEventListener(WindowManager.event_windowSelect, () => this.programSelect());
         this.addWindows();
     }
 

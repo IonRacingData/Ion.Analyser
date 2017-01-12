@@ -20,9 +20,9 @@ var WindowList = (function (_super) {
         _super.call(this);
         this.content = content;
         var winMan = this.winMan = kernel.winMan;
-        winMan.addEventListener("windowOpen", function () { return _this.programOpen(); });
-        winMan.addEventListener("windowClose", function () { return _this.programClose(); });
-        winMan.addEventListener("windowSelect", function () { return _this.programSelect(); });
+        winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programOpen(); });
+        winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programClose(); });
+        winMan.addEventListener(WindowManager.event_windowSelect, function () { return _this.programSelect(); });
         this.addWindows();
     }
     WindowList.prototype.addWindows = function () {
