@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CacheService.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\Socket.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Data\SensorData.cs" />
     <Compile Include="Http.cs" />

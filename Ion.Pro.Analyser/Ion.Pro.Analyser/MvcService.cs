@@ -51,6 +51,11 @@ namespace Ion.Pro.Analyser
         {
             return new StringResult(data, contentType);
         }
+
+        public IActionResult Error(string data, HttpStatus code)
+        {
+            return new ErrorResult(code, data);
+        }
     }
 
     public interface IActionResult

@@ -17,6 +17,7 @@ window.addEventListener("load", function () {
         appMan: new ApplicationManager()
     };
     kernel.appMan.registerApplication("Test", logViewer);
+    kernel.appMan.registerApplication("Test", new Launcher(WebSocketTest, "Web Socket Test"));
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Car", new Launcher(PlotViewer, "Plot Viewer"));
@@ -336,5 +337,21 @@ var PlotViewer = (function () {
         chart.draw(data, options);
     };
     return PlotViewer;
+}());
+var WebSocketTest = (function () {
+    function WebSocketTest() {
+    }
+    WebSocketTest.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
+        var socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+        socket.onmessage = function (ev) {
+            console.log(ev);
+            console.log(ev.data);
+        };
+        socket.onopen = function (ev) {
+            socket.send("Hello World from a web socket :D");
+        };
+    };
+    return WebSocketTest;
 }());
 //# sourceMappingURL=app.js.map

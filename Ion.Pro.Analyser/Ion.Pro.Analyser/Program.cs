@@ -103,20 +103,27 @@ namespace Ion.Pro.Analyser
 
             byte[] data = context.Response.GetBytes();
             s.Write(data, 0, data.Length);
-
+            
             s.Flush();
-            s.Close();
-            context.Wrapper.Client.Close();
-
             Watch.Stop();
-
-            Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
-
-            bool printTimes = true;
-            if (printTimes)
+            if (context.Wrapper.PreventClose)
             {
-                PrintTimes(Watch);
+                context.SocketHandler?.Invoke(context);
             }
+            else
+            {
+                s.Close();
+                context.Wrapper.Client.Close();
+
+                Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
+
+                bool printTimes = true;
+                if (printTimes)
+                {
+                    PrintTimes(Watch);
+                }
+            }
+
         }
 
         private static IActionResult HandleResult(HttpContext context, TimingService Watch)

@@ -33,6 +33,7 @@ window.addEventListener("load", () => {
 
 
     kernel.appMan.registerApplication("Test", logViewer);
+    kernel.appMan.registerApplication("Test", new Launcher(WebSocketTest, "Web Socket Test"));
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
@@ -464,4 +465,25 @@ class PlotViewer implements IApplication {
         var chart = new google.visualization.LineChart(this.innerChart);
         chart.draw(data, options);
     }
+}
+
+class WebSocketTest implements IApplication{
+    application: Application;
+    window: AppWindow;
+
+    main(): void {
+        this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
+
+        let socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+
+        socket.onmessage = (ev: MessageEvent) => {
+            console.log(ev);
+            console.log(ev.data);
+        }
+
+        socket.onopen = (ev: Event) => {
+            socket.send("Hello World from a web socket :D");
+        }
+    }
+
 }

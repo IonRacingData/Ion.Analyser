@@ -79,8 +79,28 @@ namespace Ion.Pro.Analyser
 
     public enum HttpStatus : int
     {
+        /*Informational 1xx*/
+        Continue100 = 100,
+        SwitchingProtocols101 = 101,
+
+        /*Success 2xx*/
         OK200 = 200,
+        Created201 = 201,
+        Accepted202 = 202,
+        NoContent204 = 204,
+
+
+        /*Client Error 4xx*/
+        BadRequest400 = 400,
+        Unauthorized401 = 401,
+        PaymentRequired402 = 402,
+        Forbidden403 = 403,
         NotFound404 = 404,
+        MethodNotAllowed405 = 405,
+        NotAcceptable406 = 406
+
+
+        /*Server Error 5xx*/
     }
 
     public abstract class HttpHeader
