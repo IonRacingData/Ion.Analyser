@@ -482,7 +482,7 @@ class WebSocketTest implements IApplication{
         }
 
         socket.onopen = (ev: Event) => {
-            socket.send("Hello World from a web socket :D");
+            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
         }
     }
 

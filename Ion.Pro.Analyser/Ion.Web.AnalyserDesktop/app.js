@@ -349,7 +349,7 @@ var WebSocketTest = (function () {
             console.log(ev.data);
         };
         socket.onopen = function (ev) {
-            socket.send("Hello World from a web socket :D");
+            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
         };
     };
     return WebSocketTest;
