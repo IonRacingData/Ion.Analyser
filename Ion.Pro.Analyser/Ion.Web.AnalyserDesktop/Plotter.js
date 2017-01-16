@@ -2,6 +2,7 @@ var Plotter = (function () {
     function Plotter() {
         this.movePoint = { x: 50, y: 50 };
         this.scalePoint = { x: 1, y: 1 };
+        this.zoomSpeed = 500;
     }
     Plotter.prototype.generatePlot = function (data) {
         var _this = this;
@@ -28,9 +29,22 @@ var Plotter = (function () {
         return this.canvas;
     };
     Plotter.prototype.zoom = function (e) {
-        this.movePoint.x = e.layerX;
-        //this.scalePoint.x -= e.deltaY/10;
-        //this.scalePoint.y -= e.deltaY/10;
+        var zoomX = this.scalePoint.x - e.deltaY / this.zoomSpeed;
+        var zoomY = this.scalePoint.y - e.deltaY / this.zoomSpeed;
+        if (zoomX > 0) {
+            this.scalePoint.x = zoomX;
+        }
+        if (zoomY > 0) {
+            this.scalePoint.y = zoomY;
+        }
+        if (e.deltaY > 0) {
+            this.movePoint.x += (e.layerX - this.movePoint.x) / 1000;
+            this.movePoint.y += ((this.canvas.height - e.layerY) - this.movePoint.y) / 1000;
+        }
+        else {
+            this.movePoint.x -= (e.layerX - this.movePoint.x) / 1000;
+            this.movePoint.y -= ((this.canvas.height - e.layerY) - this.movePoint.y) / 1000;
+        }
         this.draw();
     };
     Plotter.prototype.draw = function () {
@@ -41,9 +55,11 @@ var Plotter = (function () {
         var lastPoint;
         for (var i = 0; i < this.data.length; i++) {
             var point = this.transform(this.createPoint(this.data[i]));
-            ctx.moveTo(point.x, point.y);
-            if (i > 0) {
-                ctx.lineTo(lastPoint.x, lastPoint.y);
+            if (point.x > 0 && point.x < this.canvas.width) {
+                ctx.moveTo(point.x, point.y);
+                if (i > 0) {
+                    ctx.lineTo(lastPoint.x, lastPoint.y);
+                }
             }
             lastPoint = point;
         }

@@ -482,17 +482,17 @@ class PlotterTester implements IApplication {
             this.plotter.draw();
         });        
                 
-        var data: ISensorPackage[] = [
+        /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
             { ID: 111, TimeStamp: 2200, Value: 21 },
             { ID: 111, TimeStamp: 2300, Value: 12 },
             { ID: 111, TimeStamp: 2400, Value: 15 },
             { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];
+        ];*/
 
-        // this.loadData();
-        this.drawChart(data);
+        this.loadData();
+        //this.drawChart(data);
     }
 
     loadData() {

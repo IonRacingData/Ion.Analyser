@@ -9,7 +9,8 @@ class Plotter {
     movePoint: Point = {x: 50, y: 50};
     scalePoint: Point = { x: 1, y: 1 };
     mouseMod: Point;    
-    dragging: boolean;
+    dragging: boolean;    
+    zoomSpeed: number = 500;
     
     generatePlot(data: ISensorPackage[]): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
@@ -41,9 +42,25 @@ class Plotter {
     }
 
     zoom(e: WheelEvent) {
-        this.movePoint.x = e.layerX;        
-        //this.scalePoint.x -= e.deltaY/10;
-        //this.scalePoint.y -= e.deltaY/10;
+        var zoomX = this.scalePoint.x - e.deltaY / this.zoomSpeed;
+        var zoomY = this.scalePoint.y - e.deltaY / this.zoomSpeed;
+        if (zoomX > 0) {
+            this.scalePoint.x = zoomX;
+        }
+        if (zoomY > 0) {
+            this.scalePoint.y = zoomY;
+        }
+
+        if (e.deltaY > 0) {
+            this.movePoint.x += (e.layerX - this.movePoint.x) / 1000;
+            this.movePoint.y += ((this.canvas.height - e.layerY) - this.movePoint.y) / 1000;
+        }
+        else {
+            this.movePoint.x -= (e.layerX - this.movePoint.x) / 1000;
+            this.movePoint.y -= ((this.canvas.height - e.layerY) - this.movePoint.y) / 1000;
+        }
+         
+        
         this.draw();        
     }
 
@@ -54,11 +71,13 @@ class Plotter {
         ctx.beginPath();        
         var lastPoint: Point;
         for (var i = 0; i < this.data.length; i++) {
-            var point = this.transform(this.createPoint(this.data[i]));            
-            ctx.moveTo(point.x, point.y);
-            if (i > 0) {
-                ctx.lineTo(lastPoint.x, lastPoint.y);
-            }                        
+            var point = this.transform(this.createPoint(this.data[i]));
+            if (point.x > 0 && point.x < this.canvas.width) {
+                ctx.moveTo(point.x, point.y);
+                if (i > 0) {
+                    ctx.lineTo(lastPoint.x, lastPoint.y);
+                }
+            }
             lastPoint = point;       
         }
         // x-axis
