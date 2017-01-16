@@ -438,7 +438,7 @@ class PlotViewer implements IApplication {
     }
 
     loadData() {
-        requestAction("getdata?number=61457", (data: ISensorPackage[]) => this.drawChart(data));
+        requestAction("getdata?number=61445", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(sensorData: ISensorPackage[]): void {
@@ -481,7 +481,7 @@ class PlotterTester implements IApplication {
             this.plotter.canvas.height = this.window.height;
             this.plotter.draw();
         });        
-        /*
+                
         var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -489,9 +489,10 @@ class PlotterTester implements IApplication {
             { ID: 111, TimeStamp: 2300, Value: 12 },
             { ID: 111, TimeStamp: 2400, Value: 15 },
             { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];*/
+        ];
 
-        this.loadData();
+        // this.loadData();
+        this.drawChart(data);
     }
 
     loadData() {

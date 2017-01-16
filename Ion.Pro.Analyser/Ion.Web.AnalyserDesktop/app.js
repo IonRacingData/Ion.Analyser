@@ -313,7 +313,7 @@ var PlotViewer = (function () {
     };
     PlotViewer.prototype.loadData = function () {
         var _this = this;
-        requestAction("getdata?number=61457", function (data) { return _this.drawChart(data); });
+        requestAction("getdata?number=61445", function (data) { return _this.drawChart(data); });
     };
     PlotViewer.prototype.drawChart = function (sensorData) {
         var preData = [["Time stamp", "Value"]];
@@ -350,16 +350,16 @@ var PlotterTester = (function () {
             _this.plotter.canvas.height = _this.window.height;
             _this.plotter.draw();
         });
-        /*
-        var data: ISensorPackage[] = [
+        var data = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
             { ID: 111, TimeStamp: 2200, Value: 21 },
             { ID: 111, TimeStamp: 2300, Value: 12 },
             { ID: 111, TimeStamp: 2400, Value: 15 },
             { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];*/
-        this.loadData();
+        ];
+        // this.loadData();
+        this.drawChart(data);
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
