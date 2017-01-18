@@ -1,29 +1,25 @@
-﻿interface Point {
-    x: number;
-    y: number;
-}
-
-class Plotter {
+﻿class Plotter {
     canvas: HTMLCanvasElement;
     data: ISensorPackage[];
-    movePoint: Point = {x: 50, y: 50};
-    scalePoint: Point = { x: 1, y: 1 };
+    movePoint = new Point(50, 50);
+    scalePoint = new Point(1, 1);
     mouseMod: Point;    
     dragging: boolean;    
-    zoomSpeed: number = 1.2;
+    zoomSpeed: number = 1.1;
+    origo: Point;
     
     generatePlot(data: ISensorPackage[]): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
-            this.mouseMod = { x: this.movePoint.x - e.layerX, y: this.movePoint.y - (this.canvas.height - e.layerY) };
-            console.log(this.mouseMod);
+            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));
+            console.log(this.mouseMod); 
             this.dragging = true;
         });
 
         this.canvas.addEventListener("mousemove", (e: MouseEvent) => {            
             if (this.dragging) {
-                this.movePoint = { x: e.layerX + this.mouseMod.x, y: (this.canvas.height - e.layerY) + this.mouseMod.y };
-                console.log(this.getRelative({ x: e.layerX, y: e.layerY }));
+                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);
+                console.log(this.getRelative(new Point(e.layerX, e.layerY)));
                 this.draw();
             }
         });
@@ -43,29 +39,42 @@ class Plotter {
 
 
 
-    zoom(e: WheelEvent) {                
-
+    zoom(e: WheelEvent) {
+        e.preventDefault();
+        console.log(e);
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
 
         if (e.deltaY < 0) {
-            this.scalePoint.x *= this.zoomSpeed;
-            this.scalePoint.y *= this.zoomSpeed;
+            if (e.ctrlKey == true)
+                this.scalePoint.x *= this.zoomSpeed;            
+            else if (e.shiftKey == true)
+                this.scalePoint.y *= this.zoomSpeed;            
+            else {
+                this.scalePoint.x *= this.zoomSpeed;
+                this.scalePoint.y *= this.zoomSpeed;
+            }
         }
         else {
-            this.scalePoint.x /= this.zoomSpeed;
-            this.scalePoint.y /= this.zoomSpeed;
+            if (e.ctrlKey == true)
+                this.scalePoint.x /= this.zoomSpeed;
+            else if (e.shiftKey == true)
+                this.scalePoint.y /= this.zoomSpeed;
+            else {
+                this.scalePoint.x /= this.zoomSpeed;
+                this.scalePoint.y /= this.zoomSpeed;
+            }
         }
         var newRel = this.getRelative(mousePoint);
 
-        var move: Point = { x: (newRel.x - curRel.x) * this.scalePoint.x, y: (newRel.y - curRel.y) * this.scalePoint.y };
-        this.movePoint = { x: this.movePoint.x + move.x, y: this.movePoint.y + move.y };
+        var move = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
+        this.movePoint = this.movePoint.add(move);        
         this.draw();        
     }
 
     getMousePoint(e: MouseEvent): Point {
-        return { x: e.layerX, y: e.layerY };
-    } 
+        return new Point( e.layerX, e.layerY );
+    }
 
     draw() {                
         var ctx = this.canvas.getContext("2d");
@@ -74,10 +83,11 @@ class Plotter {
         ctx.beginPath();        
         var lastPoint: Point;
         for (var i = 0; i < this.data.length; i++) {
-            var point = this.transform(this.createPoint(this.data[i]));
+            var point = this.getAbsolute(this.createPoint(this.data[i]));
             if (point.x > 0) {
-                ctx.moveTo(point.x, point.y);
-                if (i > 0) {
+                
+                if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
+                    ctx.moveTo(point.x, point.y);
                     ctx.lineTo(lastPoint.x, lastPoint.y);
                 }
                 if (point.x > this.canvas.width) {
@@ -85,57 +95,149 @@ class Plotter {
                 }
             }
             lastPoint = point;       
-        }
+        }               
 
-        var origo = this.transform({ x: 0, y: 0 });
-        // x-axis
-        ctx.moveTo(0, origo.y);
-        ctx.lineTo(this.canvas.width, origo.y);        
+        this.drawXAxis(ctx);
+        this.drawYAxis(ctx);
 
-        // y-axis
-        ctx.moveTo(origo.x, 0);
-        ctx.lineTo(origo.x, this.canvas.height);
-
-        //var relWidth = this.canvas.width / this.scalePoint.x;
-        //var relHeight = this.canvas.height / this.scalePoint.y;
-
-        for (var i = 0; i < this.canvas.width; i++) {
-            var num = this.getRelative({ x: i, y: origo.y }).x;
-            num = Math.round(num);            
-            if (num % 10 == 0) {
-                ctx.fillText(num.toString(), i, origo.y + 10);                
-            }
-        }
-        
-        var steps = 50;
-        /*
-        for (var i = -steps; i < this.canvas.width; i += steps) {
-            var transformer = this.getRelative({ x: i + this.movePoint.x % steps, y: origo.y });
-            ctx.fillText(transformer.x.toFixed(2), i + this.movePoint.x % steps, origo.y + 10);
-        }
-        */
-        for (var i = 0; i < this.canvas.width; i += 100) {
-
-        }
-        
         ctx.stroke();      
         
     }
 
+    drawXAxis(ctx: CanvasRenderingContext2D) {
+        var origo = this.getAbsolute(new Point(0, 0));
+
+        ctx.moveTo(0, origo.y);
+        ctx.lineTo(this.canvas.width, origo.y);    
+
+        var stepping = this.calculateSteps(this.scalePoint.x);
+        var steps = stepping.steps;
+        var decimalPlaces = stepping.decimalPlaces;
+        var scale = stepping.scale;
+
+        for (var i = -steps; i < this.canvas.width; i += steps) {
+            var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
+            var number: string;
+            var numWidth: number;
+            if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
+                number = "     0";
+            }
+            else if (Math.abs(scale) > 5) {
+                number = transformer.x.toExponential(2);
+            }
+            else {
+                number = transformer.x.toFixed(decimalPlaces);
+            }
+            numWidth = ctx.measureText(number).width;
+            ctx.fillText(number, i + this.movePoint.x % steps - (numWidth / 2), origo.y + 15);
+            ctx.moveTo(i + this.movePoint.x % steps, origo.y);
+            ctx.lineTo(i + this.movePoint.x % steps, origo.y + 4);
+        }
+    }
+
+    drawYAxis(ctx: CanvasRenderingContext2D) {
+        var origo = this.getAbsolute(new Point(0, 0));
+        
+        ctx.moveTo(origo.x, 0);
+        ctx.lineTo(origo.x, this.canvas.height);
+
+        var stepping = this.calculateSteps(this.scalePoint.y);
+        var steps = stepping.steps;
+        var decimalPlaces = stepping.decimalPlaces;
+        var scale = stepping.scale;
+        
+        for (var i = -steps; i < this.canvas.height; i += steps) {
+            var transformer = this.getRelative(new Point(origo.x, this.canvas.height - (i + this.movePoint.y % steps)));
+            var number: string;
+            var numWidth: number;
+            if (Math.abs(transformer.y).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
+                number = "";
+            }
+            else if (Math.abs(scale) > 5) {
+                number = transformer.y.toExponential(2);
+            }
+            else {
+                number = transformer.y.toFixed(decimalPlaces);
+            }
+            numWidth = ctx.measureText(number).width;            
+            ctx.fillText(number, origo.x - (numWidth + 7), this.canvas.height - (i + this.movePoint.y % steps) + 3);
+            ctx.moveTo(origo.x, this.canvas.height - (i + this.movePoint.y % steps));
+            ctx.lineTo(origo.x - 4, this.canvas.height - (i + this.movePoint.y % steps));
+        }
+    }
+
+    calculateSteps(scaling: number): Stepping {
+        var log10 = function log10(val: number): number {
+            return Math.log(val) / Math.LN10;
+        };
+
+        var maxR: number = 100 / scaling;
+        var scale = Math.floor(log10(maxR));
+        var step = Math.floor(maxR / Math.pow(10, scale));
+        if (step < 2) {
+            step = 1;
+        }
+        else if (step < 5) {
+            step = 2;
+        }
+        else {
+            step = 5;
+        }
+        var newstep = step * Math.pow(10, scale) * scaling;
+        var decimalPlaces = 0;
+        if (scale < 0)
+            decimalPlaces = scale * -1;
+
+        return {steps: newstep, decimalPlaces: decimalPlaces, scale: scale}
+    }
+
     createPoint(data: ISensorPackage): Point {
-        return {x: data.TimeStamp, y: data.Value};
+        return new Point( data.TimeStamp, data.Value );
     }
 
     getRelative(p: Point): Point {
-        var moved: Point = { x: p.x - this.movePoint.x, y: this.canvas.height - p.y - this.movePoint.y };
-        var scaled: Point = { x: moved.x / this.scalePoint.x, y: moved.y / this.scalePoint.y };
+        var moved = new Point(p.x - this.movePoint.x, this.canvas.height - p.y - this.movePoint.y);
+        var scaled = moved.divide(this.scalePoint);        
         return scaled;
     }
 
-    transform(p: Point): Point {
-        var scaled: Point = { x: p.x * this.scalePoint.x, y: p.y * this.scalePoint.y };
-        var moved: Point = { x: scaled.x + this.movePoint.x, y: scaled.y + this.movePoint.y };        
-        return { x: moved.x, y: this.canvas.height - moved.y };
+    getAbsolute(p: Point): Point {
+        var scaled = p.multiply(this.scalePoint);
+        var moved = scaled.add(this.movePoint);                
+        return new Point( moved.x, this.canvas.height - moved.y );
     }
 
+}
+
+class Point {
+
+    x: number;
+    y: number;
+
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+
+    add(p: Point): Point {
+        return new Point(this.x + p.x, this.y + p.y);
+    }
+
+    sub(p: Point): Point {
+        return new Point(this.x - p.x, this.y - p.y);
+    }
+
+    multiply(p: Point): Point {
+        return new Point(this.x * p.x, this.y * p.y);
+    }
+
+    divide(p: Point): Point {
+        return new Point(this.x / p.x, this.y / p.y);
+    }
+}
+
+interface Stepping {
+    steps: number;
+    decimalPlaces: number;
+    scale: number;
 }
