@@ -43,6 +43,7 @@
     margin: 0;
     border: 1px solid black;
     flex-grow: 1;
+    flex-basis: 0;
 }
 .grid-hcon, .grid-vcon{
     display: flex;

@@ -52,7 +52,7 @@ class PlotViewer implements IApplication {
     }
 
     loadData() {
-        requestAction("getdata?number=61457", (data: ISensorPackage[]) => this.drawChart(data));
+        requestAction("getdata?number=61445", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(sensorData: ISensorPackage[]): void {
@@ -78,6 +78,48 @@ class PlotViewer implements IApplication {
 
         var chart = new google.visualization.LineChart(this.innerChart);
         chart.draw(data, options);
+    }
+}
+
+class PlotterTester implements IApplication {
+    application: Application;
+    window: AppWindow;
+    plotter: Plotter;
+    data: ISensorPackage[];
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+        this.window.content.style.overflow = "hidden";
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.plotter.canvas.width = this.window.width;
+            this.plotter.canvas.height = this.window.height;
+            this.plotter.draw();
+        });
+
+        /*var data: ISensorPackage[] = [
+            { ID: 111, TimeStamp: 2000, Value: 54 },
+            { ID: 111, TimeStamp: 2100, Value: 67 },
+            { ID: 111, TimeStamp: 2200, Value: 21 },
+            { ID: 111, TimeStamp: 2300, Value: 12 },
+            { ID: 111, TimeStamp: 2400, Value: 15 },
+            { ID: 111, TimeStamp: 2500, Value: 87 }
+        ];*/
+
+        this.loadData();
+        //this.drawChart(data);
+    }
+
+    loadData() {
+        requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
+    }
+
+    drawChart(data: ISensorPackage[]) {
+        this.data = data;
+        this.plotter = new Plotter();
+        this.window.content.appendChild(this.plotter.generatePlot(data));
+        this.plotter.canvas.width = this.window.width;
+        this.plotter.canvas.height = this.window.height;
+        this.plotter.draw();
     }
 }
 
