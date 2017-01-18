@@ -88,39 +88,22 @@ var Plotter = (function () {
         var origo = this.getAbsolute(new Point(0, 0));
         ctx.moveTo(0, origo.y);
         ctx.lineTo(this.canvas.width, origo.y);
-        var log10 = function log10(val) {
-            return Math.log(val) / Math.LN10;
-        };
-        var maxR = 100 / this.scalePoint.x;
-        var scale = Math.floor(log10(maxR));
-        var step = Math.floor(maxR / Math.pow(10, scale));
-        if (step < 2) {
-            step = 1;
-        }
-        else if (step < 5) {
-            step = 2;
-        }
-        else {
-            step = 5;
-        }
-        var newstep = step * Math.pow(10, scale) * this.scalePoint.x;
-        var fixer = 0;
-        if (scale < 0)
-            fixer = scale * -1;
-        var correct = newstep;
-        var steps = correct;
+        var stepping = this.calculateSteps(this.scalePoint.x);
+        var steps = stepping.steps;
+        var decimalPlaces = stepping.decimalPlaces;
+        var scale = stepping.scale;
         for (var i = -steps; i < this.canvas.width; i += steps) {
             var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
             var number;
             var numWidth;
-            if (Math.abs(transformer.x).toFixed(fixer) == (0).toFixed(fixer)) {
+            if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
                 number = "     0";
             }
             else if (Math.abs(scale) > 5) {
                 number = transformer.x.toExponential(2);
             }
             else {
-                number = transformer.x.toFixed(fixer);
+                number = transformer.x.toFixed(decimalPlaces);
             }
             numWidth = ctx.measureText(number).width;
             ctx.fillText(number, i + this.movePoint.x % steps - (numWidth / 2), origo.y + 15);
