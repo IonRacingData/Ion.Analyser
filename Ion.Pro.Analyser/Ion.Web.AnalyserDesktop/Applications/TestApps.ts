@@ -5,7 +5,7 @@
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        requestAction("GetIds", (data: number[]) => this.draw(data));
+        kernel.senMan.getIds((data: number[]) => this.draw(data));
     }
 
     draw(data: number[]): void {
@@ -15,12 +15,15 @@
             var a = <HTMLAnchorElement>mk.tag("span", "taskbar-button-text", null, curValue.toString());
 
             a.onclick = () => {
-                requestAction("GetData?number=" + curValue.toString(), (data: ISensorPackage[]) => this.drawInner(data))
+                kernel.senMan.setGlobal(curValue);
+                //kernel.senMan.getData(curValue, (data: ISensorPackage[]) => this.drawInner(data));
+                //requestAction("GetData?number=" + curValue.toString(), (data: ISensorPackage[]) => this.drawInner(data))
             };
             this.window.content.appendChild(a);
         }
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
     }
 
     drawInner(data: ISensorPackage[]): void {
@@ -110,7 +113,8 @@ class PlotterTester implements IApplication {
     }
 
     loadData() {
-        requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
+        kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
+        //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(data: ISensorPackage[]) {

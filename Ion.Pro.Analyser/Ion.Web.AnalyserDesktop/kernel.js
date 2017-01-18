@@ -3,8 +3,10 @@ function startUp() {
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
-        netMan: new NetworkManager()
+        netMan: new NetworkManager(),
+        senMan: new SensorManager()
     };
+    kernel.senMan.setGlobal(841);
     registerLaunchers();
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");

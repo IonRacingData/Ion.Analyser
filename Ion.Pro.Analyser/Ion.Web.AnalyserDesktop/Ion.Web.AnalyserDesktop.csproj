@@ -52,6 +52,7 @@
     <TypeScriptCompile Include="MenuWindow.ts" />
     <TypeScriptCompile Include="models.ts" />
     <TypeScriptCompile Include="Plotter.ts" />
+    <TypeScriptCompile Include="sensys.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />
     <TypeScriptCompile Include="AppWindow.ts" />
     <TypeScriptCompile Include="winsys.ts" />

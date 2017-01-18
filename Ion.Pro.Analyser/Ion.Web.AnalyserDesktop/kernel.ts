@@ -4,6 +4,7 @@ interface Kernel {
     winMan: WindowManager;
     appMan: ApplicationManager;
     netMan: NetworkManager;
+    senMan: SensorManager;
 }
 
 function startUp() {
@@ -12,8 +13,11 @@ function startUp() {
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
-        netMan: new NetworkManager()
+        netMan: new NetworkManager(),
+        senMan: new SensorManager()
     };
+
+    kernel.senMan.setGlobal(841);
 
     registerLaunchers();
 
