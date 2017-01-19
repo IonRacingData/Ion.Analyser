@@ -1,22 +1,26 @@
 ﻿class GridViewer implements IApplication {
     application: Application;
     window: AppWindow;
-
+    eh: EventHandler = new EventHandler();
 
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
-        kernel.winMan.addEventListener(WindowManager.event_globalDrag, (data: IWindowEvent) => this.globalDrag(data));
-        kernel.winMan.addEventListener(WindowManager.event_globalUp, (data: IWindowEvent) => this.globalUp(data));
+
+        this.registerEvents(this.eh);
+
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         var clone: Node = document.importNode(template.content, true);
-        // console.log(clone);
         this.window.content.appendChild(clone);
         addEvents();
     }
 
-    globalDrag(e: IWindowEvent) {
+    registerEvents(eh: EventHandler) {
+        eh.on(kernel.winMan, WindowManager.event_globalDrag, (data: IWindowEvent) => this.globalDrag(data));
+        eh.on(kernel.winMan, WindowManager.event_globalUp, (data: IWindowEvent) => this.globalUp(data));
+        eh.on(this.window, AppWindow.event_close, () => this.eh.close());
+    }
 
-        //console.log(e);
+    globalDrag(e: IWindowEvent) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
         if (windowX > 0
@@ -27,6 +31,7 @@
             console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
         }
     }
+
     globalUp(e: IWindowEvent) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
@@ -84,6 +89,7 @@ function addEvents() {
             editFunction(event);
         }
     });
+
     window.addEventListener("mouseup", function (event: MouseEvent) {
         moving = false;
         document.body.style.cursor = null;

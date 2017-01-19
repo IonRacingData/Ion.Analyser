@@ -1,15 +1,23 @@
 var TaskManager = (function () {
     function TaskManager() {
         this.infoWindows = [];
+        this.eh = new EventHandler();
     }
     TaskManager.prototype.main = function () {
-        var _this = this;
         this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        kernel.winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.draw(); });
-        kernel.winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.draw(); });
-        kernel.appMan.addEventListener(ApplicationManager.event_appLaunch, function () { return _this.draw(); });
-        kernel.appMan.addEventListener(ApplicationManager.event_appClose, function () { return _this.draw(); });
+        this.addEvents(this.eh);
         this.draw();
+    };
+    TaskManager.prototype.addEvents = function (eh) {
+        var _this = this;
+        eh.on(kernel.winMan, WindowManager.event_windowOpen, function () { return _this.draw(); });
+        eh.on(kernel.winMan, WindowManager.event_windowClose, function () { return _this.draw(); });
+        eh.on(kernel.appMan, ApplicationManager.event_appLaunch, function () { return _this.draw(); });
+        eh.on(kernel.appMan, ApplicationManager.event_appClose, function () { return _this.draw(); });
+        eh.on(this.mainWindow, AppWindow.event_close, function () { return _this.close(); });
+    };
+    TaskManager.prototype.close = function () {
+        this.eh.close();
     };
     TaskManager.prototype.draw = function () {
         var _this = this;

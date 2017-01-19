@@ -1,19 +1,22 @@
 var GridViewer = (function () {
     function GridViewer() {
+        this.eh = new EventHandler();
     }
     GridViewer.prototype.main = function () {
-        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
-        kernel.winMan.addEventListener(WindowManager.event_globalDrag, function (data) { return _this.globalDrag(data); });
-        kernel.winMan.addEventListener(WindowManager.event_globalUp, function (data) { return _this.globalUp(data); });
+        this.registerEvents(this.eh);
         var template = document.getElementById("temp-grid");
         var clone = document.importNode(template.content, true);
-        // console.log(clone);
         this.window.content.appendChild(clone);
         addEvents();
     };
+    GridViewer.prototype.registerEvents = function (eh) {
+        var _this = this;
+        eh.on(kernel.winMan, WindowManager.event_globalDrag, function (data) { return _this.globalDrag(data); });
+        eh.on(kernel.winMan, WindowManager.event_globalUp, function (data) { return _this.globalUp(data); });
+        eh.on(this.window, AppWindow.event_close, function () { return _this.eh.close(); });
+    };
     GridViewer.prototype.globalDrag = function (e) {
-        //console.log(e);
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
         if (windowX > 0

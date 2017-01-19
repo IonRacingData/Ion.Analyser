@@ -27,6 +27,12 @@ var AppWindow = (function () {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
     };
+    AppWindow.prototype.addEventListener = function (type, listener) {
+        this.eventMan.addEventListener(type, listener);
+    };
+    AppWindow.prototype.removeEventListener = function (type, listener) {
+        this.eventMan.removeEventListener(type, listener);
+    };
     /* Event handlers */
     AppWindow.prototype.main_mouseDown = function (e) {
         this.winMan.selectWindow(this);
@@ -67,6 +73,7 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.close_click = function (e) {
         e.stopPropagation();
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
     };
@@ -76,6 +83,9 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.onMove = function () {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
+    };
+    AppWindow.prototype.onClose = function () {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
     };
     AppWindow.prototype.show = function () {
         this.handle.style.display = "";
@@ -236,6 +246,7 @@ var AppWindow = (function () {
     AppWindow.event_resize = "resize";
     AppWindow.event_minimize = "minimize";
     AppWindow.event_maximize = "maximize";
+    AppWindow.event_close = "close";
     return AppWindow;
 }());
 var WindowMode;

@@ -48,7 +48,6 @@ class PlotViewer implements IApplication {
 
         google.charts.load("current", { "packages": ["corechart"] });
         google.charts.setOnLoadCallback(() => this.loadData());
-
     }
 
     loadData() {
@@ -86,15 +85,12 @@ class PlotterTester implements IApplication {
     window: AppWindow;
     plotter: Plotter;
     data: ISensorPackage[];
+    eh: EventHandler = new EventHandler();
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.plotter.canvas.width = this.window.width;
-            this.plotter.canvas.height = this.window.height;
-            this.plotter.draw();
-        });
+        this.createEvents(this.eh);
 
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -107,6 +103,21 @@ class PlotterTester implements IApplication {
 
         this.loadData();
         //this.drawChart(data);
+    }
+
+    createEvents(eh: EventHandler) {
+        eh.on(this.window, AppWindow.event_resize, () => {
+            this.plotter.canvas.width = this.window.width;
+            this.plotter.canvas.height = this.window.height;
+            this.plotter.draw();
+        });
+        eh.on(this.window, AppWindow.event_close, () => {
+            this.close();
+        });
+    }
+
+    close() {
+        this.eh.close();
     }
 
     loadData() {

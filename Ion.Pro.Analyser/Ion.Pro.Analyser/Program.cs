@@ -17,21 +17,32 @@ namespace Ion.Pro.Analyser
 
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
-        //static string ContentPath = "../../Content/";
-        static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "../../Content/";
+        public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "html/";
 
         static void Main(string[] args)
         {
-            InsertSensorTestData();
-            InitControllers();
-            HttpServer server = new HttpServer();
-            server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            Console.WriteLine("Ion Analyser Server");
+            try
+            {
+                InsertSensorTestData();
+                InitControllers();
+                HttpServer server = new HttpServer();
+                server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ohh no, something horrible went wrong");
+                Console.WriteLine(e);
+            }
             Console.Read();
         }
 
         static void InsertSensorTestData()
         {
             LegacySensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
 
             SensorDataStore store = SensorDataStore.GetDefault();
             if (true)

@@ -1,17 +1,19 @@
-﻿class AppWindow {
+﻿class AppWindow implements IEventManager {
     app: Application;
     title: string;
     handle: HTMLElement;
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
-    eventMan: EventManager = new EventManager();
 
+    eventMan: EventManager = new EventManager();
 
     static event_move = "move";
     static event_resize = "resize";
     static event_minimize = "minimize";
     static event_maximize = "maximize";
+
+    static event_close = "close";
 
     x: number;
     y: number;
@@ -35,6 +37,7 @@
 
     constructor(app: Application) {
         this.app = app;
+
         var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
 
@@ -66,6 +69,14 @@
     setTitle(title: string): void {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
+    }
+
+    addEventListener(type: string, listener: any) {
+        this.eventMan.addEventListener(type, listener);
+    }
+
+    removeEventListener(type: string, listener: any) {
+        this.eventMan.removeEventListener(type, listener);
     }
 
 
@@ -116,6 +127,7 @@
 
     close_click(e: MouseEvent): void {
         e.stopPropagation();
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
     }
@@ -127,6 +139,10 @@
 
     onMove(): void {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
+    }
+
+    onClose(): void {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
     }
 
     

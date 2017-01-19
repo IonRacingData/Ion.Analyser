@@ -1,4 +1,4 @@
-﻿class WindowManager {
+﻿class WindowManager implements IEventManager {
     body: HTMLElement;
     template: HTMLTemplateElement;
 
@@ -144,6 +144,10 @@
 
     addEventListener(type: string, listner: any): void {
         this.eventManager.addEventListener(type, listner);
+    }
+
+    removeEventListener(type: string, listener: any): void {
+        this.eventManager.removeEventListener(type, listener);
     }
 
     raiseEvent(type: string, data: any): void {

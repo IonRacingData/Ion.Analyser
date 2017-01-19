@@ -78,16 +78,12 @@ var PlotViewer = (function () {
 }());
 var PlotterTester = (function () {
     function PlotterTester() {
+        this.eh = new EventHandler();
     }
     PlotterTester.prototype.main = function () {
-        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.plotter.canvas.width = _this.window.width;
-            _this.plotter.canvas.height = _this.window.height;
-            _this.plotter.draw();
-        });
+        this.createEvents(this.eh);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -98,6 +94,20 @@ var PlotterTester = (function () {
         ];*/
         this.loadData();
         //this.drawChart(data);
+    };
+    PlotterTester.prototype.createEvents = function (eh) {
+        var _this = this;
+        eh.on(this.window, AppWindow.event_resize, function () {
+            _this.plotter.canvas.width = _this.window.width;
+            _this.plotter.canvas.height = _this.window.height;
+            _this.plotter.draw();
+        });
+        eh.on(this.window, AppWindow.event_close, function () {
+            _this.close();
+        });
+    };
+    PlotterTester.prototype.close = function () {
+        this.eh.close();
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;

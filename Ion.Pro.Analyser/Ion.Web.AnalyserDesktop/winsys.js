@@ -107,6 +107,9 @@ var WindowManager = (function () {
     WindowManager.prototype.addEventListener = function (type, listner) {
         this.eventManager.addEventListener(type, listner);
     };
+    WindowManager.prototype.removeEventListener = function (type, listener) {
+        this.eventManager.removeEventListener(type, listener);
+    };
     WindowManager.prototype.raiseEvent = function (type, data) {
         this.eventManager.raiseEvent(type, data);
     };

@@ -49,6 +49,11 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 }
 
+interface EventTarget extends IEventManager
+{
+
+}
+
 interface HTMLElement {
     window: AppWindow;
 }
