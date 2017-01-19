@@ -113,13 +113,15 @@ class PlotterTester implements IApplication {
     }
 
     loadData() {
-        kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawChart(data));
+        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
         //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(data: ISensorPackage[]) {
         this.data = data;
         this.plotter = new Plotter();
+        this.window.content.innerHTML = "";
         this.window.content.appendChild(this.plotter.generatePlot(data));
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;

@@ -1,6 +1,7 @@
 ﻿class Plotter {
     canvas: HTMLCanvasElement;
     data: ISensorPackage[];
+    data2: IPlotData;
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
     mouseMod: Point;    
@@ -29,8 +30,10 @@
         });
 
         this.canvas.addEventListener("mouseleave", () => { this.dragging = false });
-
         this.canvas.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
+        this.canvas.addEventListener("click", (e: MouseEvent) => {            
+            console.log(this.getRelative(new Point(e.layerX, e.layerY)));
+        });
         
         this.data = data;
         this.draw();
@@ -80,7 +83,7 @@
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.lineWidth = 1;
-        ctx.beginPath();        
+        ctx.beginPath();              
         var lastPoint: Point;
         for (var i = 0; i < this.data.length; i++) {
             var point = this.getAbsolute(this.createPoint(this.data[i]));
@@ -166,7 +169,7 @@
         }
     }
 
-    calculateSteps(scaling: number): Stepping {
+    calculateSteps(scaling: number): IStepInfo {
         var log10 = function log10(val: number): number {
             return Math.log(val) / Math.LN10;
         };
@@ -236,8 +239,13 @@ class Point {
     }
 }
 
-interface Stepping {
+interface IStepInfo {
     steps: number;
     decimalPlaces: number;
     scale: number;
+}
+
+interface IPlotData {
+    xVal: number[];
+    yVal: number[];
 }

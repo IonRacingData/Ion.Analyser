@@ -24,6 +24,9 @@ var Plotter = (function () {
         });
         this.canvas.addEventListener("mouseleave", function () { _this.dragging = false; });
         this.canvas.addEventListener("wheel", function (e) { return _this.zoom(e); });
+        this.canvas.addEventListener("click", function (e) {
+            console.log(_this.getRelative(new Point(e.layerX, e.layerY)));
+        });
         this.data = data;
         this.draw();
         return this.canvas;

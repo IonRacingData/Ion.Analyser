@@ -104,12 +104,14 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
-        kernel.senMan.getData(841, function (data) { return _this.drawChart(data); });
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawChart(data); });
+        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
         //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     };
     PlotterTester.prototype.drawChart = function (data) {
         this.data = data;
         this.plotter = new Plotter();
+        this.window.content.innerHTML = "";
         this.window.content.appendChild(this.plotter.generatePlot(data));
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;
