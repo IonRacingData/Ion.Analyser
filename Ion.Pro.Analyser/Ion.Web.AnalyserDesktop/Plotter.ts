@@ -16,8 +16,9 @@
             this.mouseDown = true;
         });
 
-        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {            
-            if (this.mouseDown) {
+        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+
+            if (this.mouseDown && e.movementX != 0 && e.movementY != 0) {
                 this.dragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);
                 this.draw();
@@ -96,24 +97,71 @@
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.lineWidth = 1;
         ctx.beginPath();              
-        var lastPoint: Point;
+        
         var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
+
         if (firstVisibleIdx > 0)
             firstVisibleIdx--
+        var lastPoint: Point;
+        lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
+        /*
+        for (var i = 0; i < this.canvas.width; i++) {
+            var point = this.getAbsolute(this.data.getClosest(this.getRelative(new Point(i, 0))));
+            if (i > 0) {                
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(lastPoint.x, lastPoint.y);
+            }
+            lastPoint = point;
+        }*/
+        var totalLength = this.data.points.length;
+        var points = this.data.points;
+        //console.log(totalLength);
+        var samePoint = 0;
+        var drawPoint = 0;
+        var checkPoint = lastPoint;
 
+        for (var i = firstVisibleIdx; i < totalLength; i++) {
+            var point = this.getAbsolute(points[i]);
+            if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(lastPoint.x, lastPoint.y);
+                drawPoint++;
+                checkPoint = point;
+            } else {
+                samePoint++;
+            } 
+
+            if (point.x > this.canvas.width) {
+                break;
+            }
+
+            /*if (point.x > 0) {
+                if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
+                    //ctx.moveTo(point.x, point.y);
+                    //ctx.lineTo(lastPoint.x, lastPoint.y);
+                }
+                if (point.x > this.canvas.width) {
+                    break;
+                }
+            }*/
+            lastPoint = point;
+
+        }
+        //console.log("Draw point: " + drawPoint.toString() + " same Point: " + samePoint.toString());;
+        /*
         for (var i = firstVisibleIdx; i < this.data.points.length; i++) {            
             var point = this.getAbsolute(this.data.points[i]);
             if (point.x > 0) {                
                 if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
-                    ctx.moveTo(point.x, point.y);
-                    ctx.lineTo(lastPoint.x, lastPoint.y);
+                    //ctx.moveTo(point.x, point.y);
+                    //ctx.lineTo(lastPoint.x, lastPoint.y);
                 }
                 if (point.x > this.canvas.width) {
                     break;
                 }
             }
             lastPoint = point;       
-        }               
+        }       */        
 
         this.drawXAxis(ctx);
         this.drawYAxis(ctx);       
