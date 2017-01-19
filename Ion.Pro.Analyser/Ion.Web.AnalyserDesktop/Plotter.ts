@@ -1,38 +1,41 @@
 ﻿class Plotter {
-    canvas: HTMLCanvasElement;
-    data: ISensorPackage[];
-    data2: IPlotData;
+    canvas: HTMLCanvasElement;    
+    data: IPlotData;
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
     mouseMod: Point;    
-    dragging: boolean;    
+    mouseDown: boolean;    
+    dragging = false;
     zoomSpeed: number = 1.1;
-    origo: Point;
-    
-    generatePlot(data: ISensorPackage[]): HTMLCanvasElement {
+    highlightPoint: Point = null;    
+
+    generatePlot(data: IPlotData): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
-            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));
-            console.log(this.mouseMod); 
-            this.dragging = true;
+            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));            
+            this.mouseDown = true;
         });
 
         this.canvas.addEventListener("mousemove", (e: MouseEvent) => {            
-            if (this.dragging) {
+            if (this.mouseDown) {
+                this.dragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);
-                console.log(this.getRelative(new Point(e.layerX, e.layerY)));
                 this.draw();
-            }
+            }                        
         });
 
         this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
-            this.dragging = false;
+            this.mouseDown = false;
+            if (this.dragging)
+                this.dragging = false;
+            else
+                this.markPoint(e);
         });
 
-        this.canvas.addEventListener("mouseleave", () => { this.dragging = false });
+        this.canvas.addEventListener("mouseleave", () => { this.mouseDown = false });
         this.canvas.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
-        this.canvas.addEventListener("click", (e: MouseEvent) => {            
-            console.log(this.getRelative(new Point(e.layerX, e.layerY)));
+        this.canvas.addEventListener("click", (e: MouseEvent) => {
+            
         });
         
         this.data = data;
@@ -40,11 +43,29 @@
         return this.canvas;
     }
 
+    markPoint(e) {
+        var mp = this.getMousePoint(e);
+        var nextPoint: Point;
+        var curPoint: Point;
+        var prevPoint = this.data.points[0];
+        for (var i = 0; i < this.data.points.length; i++) {
+            curPoint = this.getAbsolute(this.data.points[i]);
+            if (i < this.data.points.length - 1)
+                nextPoint = this.getAbsolute(this.data.points[i + 1]);
 
+            if (mp.x < nextPoint.x && mp.x > prevPoint.x) {
+                this.highlightPoint = this.data.points[i];
+                console.log("Point: " + this.data.points[i].x + ", " + this.data.points[i].y);
+                break;
+            }
+            prevPoint = curPoint;
+        }
+        this.draw();
+    }
 
     zoom(e: WheelEvent) {
         e.preventDefault();
-        console.log(e);
+        //console.log(e);
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
 
@@ -79,14 +100,14 @@
         return new Point( e.layerX, e.layerY );
     }
 
-    draw() {                
+    draw() {                        
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.lineWidth = 1;
         ctx.beginPath();              
-        var lastPoint: Point;
-        for (var i = 0; i < this.data.length; i++) {
-            var point = this.getAbsolute(this.createPoint(this.data[i]));
+        var lastPoint: Point;               
+        for (var i = 0; i < this.data.points.length; i++) {            
+            var point = this.getAbsolute(this.data.points[i]);
             if (point.x > 0) {
                 
                 if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
@@ -101,9 +122,21 @@
         }               
 
         this.drawXAxis(ctx);
-        this.drawYAxis(ctx);
+        this.drawYAxis(ctx);       
 
         ctx.stroke();      
+
+        if (this.highlightPoint !== null) {
+            var abs = this.getAbsolute(this.highlightPoint);
+            ctx.beginPath();
+            //ctx.moveTo(abs.x, abs.y);
+            ctx.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+            var pointString = this.highlightPoint.toString();
+            ctx.fillText(this.highlightPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
+            ctx.stroke();
+        }            
+
+        
         
     }
 
@@ -192,11 +225,7 @@
             decimalPlaces = scale * -1;
 
         return {steps: newstep, decimalPlaces: decimalPlaces, scale: scale}
-    }
-
-    createPoint(data: ISensorPackage): Point {
-        return new Point( data.TimeStamp, data.Value );
-    }
+    }    
 
     getRelative(p: Point): Point {
         var moved = new Point(p.x - this.movePoint.x, this.canvas.height - p.y - this.movePoint.y);
@@ -237,6 +266,10 @@ class Point {
     divide(p: Point): Point {
         return new Point(this.x / p.x, this.y / p.y);
     }
+
+    toString(): string {
+        return "x: " + this.x.toString() + "  y: " + this.y.toString();
+    }
 }
 
 interface IStepInfo {
@@ -246,6 +279,5 @@ interface IStepInfo {
 }
 
 interface IPlotData {
-    xVal: number[];
-    yVal: number[];
+    points: Point[];
 }

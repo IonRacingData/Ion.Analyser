@@ -122,7 +122,11 @@ class PlotterTester implements IApplication {
         this.data = data;
         this.plotter = new Plotter();
         this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.plotter.generatePlot(data));
+        var plotData: IPlotData = { points: [] };
+        for (var i = 0; i < data.length; i++) {
+            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
+        }
+        this.window.content.appendChild(this.plotter.generatePlot(plotData));
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;
         this.plotter.draw();

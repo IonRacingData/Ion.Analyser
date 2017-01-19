@@ -2,38 +2,60 @@ var Plotter = (function () {
     function Plotter() {
         this.movePoint = new Point(50, 50);
         this.scalePoint = new Point(1, 1);
+        this.dragging = false;
         this.zoomSpeed = 1.1;
+        this.highlightPoint = null;
     }
     Plotter.prototype.generatePlot = function (data) {
         var _this = this;
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", function (e) {
             _this.mouseMod = new Point(_this.movePoint.x - e.layerX, _this.movePoint.y - (_this.canvas.height - e.layerY));
-            console.log(_this.mouseMod);
-            _this.dragging = true;
+            _this.mouseDown = true;
         });
         this.canvas.addEventListener("mousemove", function (e) {
-            if (_this.dragging) {
+            if (_this.mouseDown) {
+                _this.dragging = true;
                 _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.canvas.height - e.layerY) + _this.mouseMod.y);
-                console.log(_this.getRelative(new Point(e.layerX, e.layerY)));
                 _this.draw();
             }
         });
         this.canvas.addEventListener("mouseup", function (e) {
-            _this.dragging = false;
+            _this.mouseDown = false;
+            if (_this.dragging)
+                _this.dragging = false;
+            else
+                _this.markPoint(e);
         });
-        this.canvas.addEventListener("mouseleave", function () { _this.dragging = false; });
+        this.canvas.addEventListener("mouseleave", function () { _this.mouseDown = false; });
         this.canvas.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.canvas.addEventListener("click", function (e) {
-            console.log(_this.getRelative(new Point(e.layerX, e.layerY)));
         });
         this.data = data;
         this.draw();
         return this.canvas;
     };
+    Plotter.prototype.markPoint = function (e) {
+        var mp = this.getMousePoint(e);
+        var nextPoint;
+        var curPoint;
+        var prevPoint = this.data.points[0];
+        for (var i = 0; i < this.data.points.length; i++) {
+            curPoint = this.getAbsolute(this.data.points[i]);
+            if (i < this.data.points.length - 1)
+                nextPoint = this.getAbsolute(this.data.points[i + 1]);
+            if (mp.x < nextPoint.x && mp.x > prevPoint.x) {
+                this.highlightPoint = this.data.points[i];
+                console.log("Point: " + this.data.points[i].x + ", " + this.data.points[i].y);
+                break;
+            }
+            prevPoint = curPoint;
+        }
+        this.draw();
+    };
     Plotter.prototype.zoom = function (e) {
         e.preventDefault();
-        console.log(e);
+        //console.log(e);
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
         if (e.deltaY < 0) {
@@ -70,8 +92,8 @@ var Plotter = (function () {
         ctx.lineWidth = 1;
         ctx.beginPath();
         var lastPoint;
-        for (var i = 0; i < this.data.length; i++) {
-            var point = this.getAbsolute(this.createPoint(this.data[i]));
+        for (var i = 0; i < this.data.points.length; i++) {
+            var point = this.getAbsolute(this.data.points[i]);
             if (point.x > 0) {
                 if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
                     ctx.moveTo(point.x, point.y);
@@ -86,6 +108,15 @@ var Plotter = (function () {
         this.drawXAxis(ctx);
         this.drawYAxis(ctx);
         ctx.stroke();
+        if (this.highlightPoint !== null) {
+            var abs = this.getAbsolute(this.highlightPoint);
+            ctx.beginPath();
+            //ctx.moveTo(abs.x, abs.y);
+            ctx.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+            var pointString = this.highlightPoint.toString();
+            ctx.fillText(this.highlightPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
+            ctx.stroke();
+        }
     };
     Plotter.prototype.drawXAxis = function (ctx) {
         var origo = this.getAbsolute(new Point(0, 0));
@@ -163,9 +194,6 @@ var Plotter = (function () {
             decimalPlaces = scale * -1;
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
     };
-    Plotter.prototype.createPoint = function (data) {
-        return new Point(data.TimeStamp, data.Value);
-    };
     Plotter.prototype.getRelative = function (p) {
         var moved = new Point(p.x - this.movePoint.x, this.canvas.height - p.y - this.movePoint.y);
         var scaled = moved.divide(this.scalePoint);
@@ -194,6 +222,9 @@ var Point = (function () {
     };
     Point.prototype.divide = function (p) {
         return new Point(this.x / p.x, this.y / p.y);
+    };
+    Point.prototype.toString = function () {
+        return "x: " + this.x.toString() + "  y: " + this.y.toString();
     };
     return Point;
 }());
