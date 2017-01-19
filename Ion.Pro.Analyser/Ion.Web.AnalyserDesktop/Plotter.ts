@@ -1,6 +1,6 @@
 ﻿class Plotter {
     canvas: HTMLCanvasElement;    
-    data: IPlotData;
+    data: PlotData;
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
     mouseMod: Point;    
@@ -9,7 +9,7 @@
     zoomSpeed: number = 1.1;
     highlightPoint: Point = null;    
 
-    generatePlot(data: IPlotData): HTMLCanvasElement {
+    generatePlot(data: PlotData): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
             this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));            
@@ -45,21 +45,12 @@
 
     markPoint(e) {
         var mp = this.getMousePoint(e);
-        var nextPoint: Point;
-        var curPoint: Point;
-        var prevPoint = this.data.points[0];
-        for (var i = 0; i < this.data.points.length; i++) {
-            curPoint = this.getAbsolute(this.data.points[i]);
-            if (i < this.data.points.length - 1)
-                nextPoint = this.getAbsolute(this.data.points[i + 1]);
+        var closest = this.data.getClosest(this.getRelative(mp));
+        if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
+            this.highlightPoint = closest;            
+        else
+            this.highlightPoint = null;
 
-            if (mp.x < nextPoint.x && mp.x > prevPoint.x) {
-                this.highlightPoint = this.data.points[i];
-                console.log("Point: " + this.data.points[i].x + ", " + this.data.points[i].y);
-                break;
-            }
-            prevPoint = curPoint;
-        }
         this.draw();
     }
 
@@ -105,11 +96,14 @@
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.lineWidth = 1;
         ctx.beginPath();              
-        var lastPoint: Point;               
-        for (var i = 0; i < this.data.points.length; i++) {            
+        var lastPoint: Point;
+        var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
+        if (firstVisibleIdx > 0)
+            firstVisibleIdx--
+
+        for (var i = firstVisibleIdx; i < this.data.points.length; i++) {            
             var point = this.getAbsolute(this.data.points[i]);
-            if (point.x > 0) {
-                
+            if (point.x > 0) {                
                 if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
                     ctx.moveTo(point.x, point.y);
                     ctx.lineTo(lastPoint.x, lastPoint.y);
@@ -151,7 +145,7 @@
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
 
-        for (var i = -steps; i < this.canvas.width; i += steps) {
+        for (var i = -steps; i < this.canvas.width + steps; i += steps) {
             var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
             var number: string;
             var numWidth: number;
@@ -182,7 +176,7 @@
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         
-        for (var i = -steps; i < this.canvas.height; i += steps) {
+        for (var i = -steps; i < this.canvas.height + steps; i += steps) {
             var transformer = this.getRelative(new Point(origo.x, this.canvas.height - (i + this.movePoint.y % steps)));
             var number: string;
             var numWidth: number;
@@ -241,43 +235,8 @@
 
 }
 
-class Point {
-
-    x: number;
-    y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-
-    add(p: Point): Point {
-        return new Point(this.x + p.x, this.y + p.y);
-    }
-
-    sub(p: Point): Point {
-        return new Point(this.x - p.x, this.y - p.y);
-    }
-
-    multiply(p: Point): Point {
-        return new Point(this.x * p.x, this.y * p.y);
-    }
-
-    divide(p: Point): Point {
-        return new Point(this.x / p.x, this.y / p.y);
-    }
-
-    toString(): string {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();
-    }
-}
-
 interface IStepInfo {
     steps: number;
     decimalPlaces: number;
     scale: number;
-}
-
-interface IPlotData {
-    points: Point[];
 }

@@ -37,20 +37,11 @@ var Plotter = (function () {
     };
     Plotter.prototype.markPoint = function (e) {
         var mp = this.getMousePoint(e);
-        var nextPoint;
-        var curPoint;
-        var prevPoint = this.data.points[0];
-        for (var i = 0; i < this.data.points.length; i++) {
-            curPoint = this.getAbsolute(this.data.points[i]);
-            if (i < this.data.points.length - 1)
-                nextPoint = this.getAbsolute(this.data.points[i + 1]);
-            if (mp.x < nextPoint.x && mp.x > prevPoint.x) {
-                this.highlightPoint = this.data.points[i];
-                console.log("Point: " + this.data.points[i].x + ", " + this.data.points[i].y);
-                break;
-            }
-            prevPoint = curPoint;
-        }
+        var closest = this.data.getClosest(this.getRelative(mp));
+        if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
+            this.highlightPoint = closest;
+        else
+            this.highlightPoint = null;
         this.draw();
     };
     Plotter.prototype.zoom = function (e) {
@@ -92,7 +83,10 @@ var Plotter = (function () {
         ctx.lineWidth = 1;
         ctx.beginPath();
         var lastPoint;
-        for (var i = 0; i < this.data.points.length; i++) {
+        var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
+        if (firstVisibleIdx > 0)
+            firstVisibleIdx--;
+        for (var i = firstVisibleIdx; i < this.data.points.length; i++) {
             var point = this.getAbsolute(this.data.points[i]);
             if (point.x > 0) {
                 if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
@@ -126,7 +120,7 @@ var Plotter = (function () {
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
-        for (var i = -steps; i < this.canvas.width; i += steps) {
+        for (var i = -steps; i < this.canvas.width + steps; i += steps) {
             var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
             var number;
             var numWidth;
@@ -153,7 +147,7 @@ var Plotter = (function () {
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
-        for (var i = -steps; i < this.canvas.height; i += steps) {
+        for (var i = -steps; i < this.canvas.height + steps; i += steps) {
             var transformer = this.getRelative(new Point(origo.x, this.canvas.height - (i + this.movePoint.y % steps)));
             var number;
             var numWidth;
@@ -205,27 +199,5 @@ var Plotter = (function () {
         return new Point(moved.x, this.canvas.height - moved.y);
     };
     return Plotter;
-}());
-var Point = (function () {
-    function Point(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    Point.prototype.add = function (p) {
-        return new Point(this.x + p.x, this.y + p.y);
-    };
-    Point.prototype.sub = function (p) {
-        return new Point(this.x - p.x, this.y - p.y);
-    };
-    Point.prototype.multiply = function (p) {
-        return new Point(this.x * p.x, this.y * p.y);
-    };
-    Point.prototype.divide = function (p) {
-        return new Point(this.x / p.x, this.y / p.y);
-    };
-    Point.prototype.toString = function () {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();
-    };
-    return Point;
 }());
 //# sourceMappingURL=Plotter.js.map

@@ -112,7 +112,7 @@ var PlotterTester = (function () {
         this.data = data;
         this.plotter = new Plotter();
         this.window.content.innerHTML = "";
-        var plotData = { points: [] };
+        var plotData = new PlotData([]);
         for (var i = 0; i < data.length; i++) {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
