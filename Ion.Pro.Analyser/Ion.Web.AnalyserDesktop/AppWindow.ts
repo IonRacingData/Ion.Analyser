@@ -127,6 +127,10 @@
 
     close_click(e: MouseEvent): void {
         e.stopPropagation();
+        this.close();
+    }
+
+    close() {
         this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);

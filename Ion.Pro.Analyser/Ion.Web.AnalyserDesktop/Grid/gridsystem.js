@@ -1,20 +1,42 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var GridViewer = (function () {
     function GridViewer() {
         this.eh = new EventHandler();
+        this.mk = new HtmlHelper();
+        this.childWindows = [];
     }
     GridViewer.prototype.main = function () {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+        var mk = this.mk;
         this.registerEvents(this.eh);
         var template = document.getElementById("temp-grid");
-        var clone = document.importNode(template.content, true);
+        //var clone: Node = document.importNode(template.content, true);
+        var test = new GridHContainer();
+        var clone = test.baseNode;
         this.window.content.appendChild(clone);
-        addEvents();
+        //addEvents();
     };
     GridViewer.prototype.registerEvents = function (eh) {
         var _this = this;
         eh.on(kernel.winMan, WindowManager.event_globalDrag, function (data) { return _this.globalDrag(data); });
         eh.on(kernel.winMan, WindowManager.event_globalUp, function (data) { return _this.globalUp(data); });
-        eh.on(this.window, AppWindow.event_close, function () { return _this.eh.close(); });
+        eh.on(this.window, AppWindow.event_close, function () { return _this.handleClose(); });
+        eh.on(this.window, AppWindow.event_resize, function () { return _this.handleResize(); });
+    };
+    GridViewer.prototype.handleClose = function () {
+        for (var i in this.childWindows) {
+            this.childWindows[i].close();
+        }
+        this.eh.close();
+    };
+    GridViewer.prototype.handleResize = function () {
+        for (var i in this.childWindows) {
+            this.childWindows[i].onResize();
+        }
     };
     GridViewer.prototype.globalDrag = function (e) {
         var windowX = e.mouse.clientX - this.window.x - 9;
@@ -52,7 +74,9 @@ var GridViewer = (function () {
             if (foundGridWindow) {
                 foundGridWindow.innerHTML = "";
                 var windowBody = kernel.winMan.activeWindow.handle; //.getElementsByClassName("window-body")[0];
-                kernel.winMan.activeWindow.changeWindowMode(WindowMode.BORDERLESS);
+                var window = kernel.winMan.activeWindow;
+                window.changeWindowMode(WindowMode.BORDERLESS);
+                this.childWindows.push(window);
                 //windowBody.style.width = "100%";
                 //windowBody.style.height = "100%";
                 foundGridWindow.appendChild(windowBody);
@@ -64,6 +88,41 @@ var GridViewer = (function () {
     };
     return GridViewer;
 }());
+var GridContainer = (function () {
+    function GridContainer() {
+        this.mk = new HtmlHelper();
+        this.create("");
+    }
+    GridContainer.prototype.create = function (cls) {
+        this.baseNode = this.mk.tag("div", "grid-" + cls);
+        var box = this.mk.tag("div", "grid-box");
+        var win = this.mk.tag("div", "grid-window");
+        box.appendChild(win);
+        this.baseNode.appendChild(box);
+        return this.baseNode;
+    };
+    return GridContainer;
+}());
+var GridHContainer = (function (_super) {
+    __extends(GridHContainer, _super);
+    function GridHContainer() {
+        _super.apply(this, arguments);
+    }
+    GridHContainer.prototype.create = function () {
+        return _super.prototype.create.call(this, "hcon");
+    };
+    return GridHContainer;
+}(GridContainer));
+var GridVContainer = (function (_super) {
+    __extends(GridVContainer, _super);
+    function GridVContainer() {
+        _super.apply(this, arguments);
+    }
+    GridVContainer.prototype.create = function () {
+        return _super.prototype.create.call(this, "vcon");
+    };
+    return GridVContainer;
+}(GridContainer));
 function addEvents() {
     var bar1 = document.getElementById("bar1");
     var bar2 = document.getElementById("bar2");

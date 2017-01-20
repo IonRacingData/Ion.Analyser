@@ -73,6 +73,9 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.close_click = function (e) {
         e.stopPropagation();
+        this.close();
+    };
+    AppWindow.prototype.close = function () {
         this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
