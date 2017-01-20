@@ -4,6 +4,7 @@ interface Kernel {
     winMan: WindowManager;
     appMan: ApplicationManager;
     netMan: NetworkManager;
+    senMan: SensorManager;
 }
 
 function startUp() {
@@ -12,8 +13,11 @@ function startUp() {
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
-        netMan: new NetworkManager()
+        netMan: new NetworkManager(),
+        senMan: new SensorManager()
     };
+
+    kernel.senMan.setGlobal(841);
 
     registerLaunchers();
 
@@ -45,6 +49,8 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Car", new Launcher(PlotViewer, "Plot Viewer"));
+
+    kernel.appMan.registerApplication("Plot", new Launcher(PlotterTester, "Plot Tester"));
 
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 }

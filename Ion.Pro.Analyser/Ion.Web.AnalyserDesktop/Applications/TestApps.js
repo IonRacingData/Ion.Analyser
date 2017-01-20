@@ -4,7 +4,7 @@ var DataViewer = (function () {
     DataViewer.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        requestAction("GetIds", function (data) { return _this.draw(data); });
+        kernel.senMan.getIds(function (data) { return _this.draw(data); });
     };
     DataViewer.prototype.draw = function (data) {
         var _this = this;
@@ -13,7 +13,9 @@ var DataViewer = (function () {
             var curValue = data[i];
             a = mk.tag("span", "taskbar-button-text", null, curValue.toString());
             a.onclick = function () {
-                requestAction("GetData?number=" + curValue.toString(), function (data) { return _this.drawInner(data); });
+                kernel.senMan.setGlobal(curValue);
+                //kernel.senMan.getData(curValue, (data: ISensorPackage[]) => this.drawInner(data));
+                //requestAction("GetData?number=" + curValue.toString(), (data: ISensorPackage[]) => this.drawInner(data))
             };
             this_1.window.content.appendChild(a);
         };
@@ -24,6 +26,7 @@ var DataViewer = (function () {
         }
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawInner(data); });
     };
     DataViewer.prototype.drawInner = function (data) {
         this.innerTable.innerHTML = "";
@@ -111,12 +114,19 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
-        requestAction("getdata?number=841", function (data) { return _this.drawChart(data); });
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawChart(data); });
+        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
+        //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     };
     PlotterTester.prototype.drawChart = function (data) {
         this.data = data;
         this.plotter = new Plotter();
-        this.window.content.appendChild(this.plotter.generatePlot(data));
+        this.window.content.innerHTML = "";
+        var plotData = new PlotData([]);
+        for (var i = 0; i < data.length; i++) {
+            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
+        }
+        this.window.content.appendChild(this.plotter.generatePlot(plotData));
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;
         this.plotter.draw();
