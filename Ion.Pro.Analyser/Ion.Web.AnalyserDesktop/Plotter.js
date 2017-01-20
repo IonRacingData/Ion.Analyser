@@ -2,30 +2,46 @@ var Plotter = (function () {
     function Plotter() {
         this.movePoint = new Point(50, 50);
         this.scalePoint = new Point(1, 1);
-        this.dragging = false;
+        this.isDragging = false;
         this.zoomSpeed = 1.1;
-        this.highlightPoint = null;
+        this.selectedPoint = null;
+        this.isMarking = false;
     }
     Plotter.prototype.generatePlot = function (data) {
         var _this = this;
         this.canvas = document.createElement("canvas");
         this.canvas.addEventListener("mousedown", function (e) {
+            e.preventDefault();
             _this.mouseMod = new Point(_this.movePoint.x - e.layerX, _this.movePoint.y - (_this.canvas.height - e.layerY));
             _this.mouseDown = true;
+            if (e.altKey) {
+                _this.isMarking = true;
+                var mousePoint = _this.getMousePoint(e);
+                _this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            }
         });
         this.canvas.addEventListener("mousemove", function (e) {
-            if (_this.mouseDown && e.movementX != 0 && e.movementY != 0) {
-                _this.dragging = true;
-                _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.canvas.height - e.layerY) + _this.mouseMod.y);
+            if (_this.mouseDown && (e.movementX != 0 || e.movementY != 0)) {
+                if (_this.isMarking) {
+                    _this.marking.secondPoint = _this.getMousePoint(e);
+                }
+                else {
+                    _this.isDragging = true;
+                    _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.canvas.height - e.layerY) + _this.mouseMod.y);
+                }
+                console.log(_this.movePoint);
                 _this.draw();
             }
         });
         this.canvas.addEventListener("mouseup", function (e) {
             _this.mouseDown = false;
-            if (_this.dragging)
-                _this.dragging = false;
-            else
-                _this.markPoint(e);
+            if (_this.isDragging)
+                _this.isDragging = false;
+            else if (_this.isMarking) {
+                _this.isMarking = false;
+                _this.zoomByMarking();
+            }
+            _this.selectPoint(e);
         });
         this.canvas.addEventListener("mouseleave", function () { _this.mouseDown = false; });
         this.canvas.addEventListener("wheel", function (e) { return _this.zoom(e); });
@@ -35,13 +51,13 @@ var Plotter = (function () {
         this.draw();
         return this.canvas;
     };
-    Plotter.prototype.markPoint = function (e) {
+    Plotter.prototype.selectPoint = function (e) {
         var mp = this.getMousePoint(e);
         var closest = this.data.getClosest(this.getRelative(mp));
         if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
-            this.highlightPoint = closest;
+            this.selectedPoint = closest;
         else
-            this.highlightPoint = null;
+            this.selectedPoint = null;
         this.draw();
     };
     Plotter.prototype.zoom = function (e) {
@@ -93,14 +109,16 @@ var Plotter = (function () {
         for (var i = firstVisibleIdx; i < totalLength; i++) {
             var point = this.getAbsolute(points[i]);
             if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                ctx.moveTo(point.x, point.y);
-                ctx.lineTo(lastPoint.x, lastPoint.y);
+                ctx.moveTo(Math.floor(point.x), Math.floor(point.y));
+                ctx.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
+                //ctx.moveTo(point.x, point.y);
+                //ctx.lineTo(lastPoint.x, lastPoint.y);
                 drawPoint++;
                 checkPoint = point;
             }
-            else {
-                samePoint++;
-            }
+            //else {
+            //    samePoint++;
+            //} 
             if (point.x > this.canvas.width) {
                 break;
             }
@@ -109,14 +127,21 @@ var Plotter = (function () {
         this.drawXAxis(ctx);
         this.drawYAxis(ctx);
         ctx.stroke();
-        if (this.highlightPoint !== null) {
-            var abs = this.getAbsolute(this.highlightPoint);
+        if (this.selectedPoint !== null) {
+            var abs = this.getAbsolute(this.selectedPoint);
             ctx.beginPath();
             //ctx.moveTo(abs.x, abs.y);
             ctx.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-            var pointString = this.highlightPoint.toString();
-            ctx.fillText(this.highlightPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
             ctx.stroke();
+            var pointString = this.selectedPoint.toString();
+            ctx.fillText(this.selectedPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
+        }
+        if (this.isMarking) {
+            ctx.fillStyle = "rgba(0,184,200,0.2)";
+            this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
+            this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
+            ctx.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
+            ctx.fillStyle = "black";
         }
     };
     Plotter.prototype.drawXAxis = function (ctx) {
@@ -204,6 +229,20 @@ var Plotter = (function () {
         var scaled = p.multiply(this.scalePoint);
         var moved = scaled.add(this.movePoint);
         return new Point(moved.x, this.canvas.height - moved.y);
+    };
+    Plotter.prototype.zoomByMarking = function () {
+        var width = this.marking.width;
+        var height = this.marking.height;
+        var xRatio = this.canvas.width / width;
+        var yRatio = this.canvas.height / height;
+        var downLeft = new Point(Math.min(this.marking.firstPoint.x, this.marking.secondPoint.x), Math.max(this.marking.firstPoint.y, this.marking.secondPoint.y));
+        var first = this.getRelative(downLeft);
+        this.scalePoint.x = Math.abs(this.scalePoint.x * xRatio);
+        this.scalePoint.y = Math.abs(this.scalePoint.y * yRatio);
+        var sec = this.getAbsolute(first);
+        sec.y = this.canvas.height - sec.y;
+        this.movePoint = this.movePoint.sub(sec);
+        this.draw();
     };
     return Plotter;
 }());
