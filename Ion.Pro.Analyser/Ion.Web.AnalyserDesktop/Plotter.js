@@ -6,10 +6,13 @@ var Plotter = (function () {
         this.zoomSpeed = 1.1;
         this.selectedPoint = null;
         this.isMarking = false;
+        this.displayGrid = false;
     }
     Plotter.prototype.generatePlot = function (data) {
         var _this = this;
         this.canvas = document.createElement("canvas");
+        this.canvas.setAttribute("tabindex", "0");
+        this.context = new ContextFixer(this.canvas);
         this.canvas.addEventListener("mousedown", function (e) {
             e.preventDefault();
             _this.mouseMod = new Point(_this.movePoint.x - e.layerX, _this.movePoint.y - (_this.canvas.height - e.layerY));
@@ -29,11 +32,11 @@ var Plotter = (function () {
                     _this.isDragging = true;
                     _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.canvas.height - e.layerY) + _this.mouseMod.y);
                 }
-                console.log(_this.movePoint);
                 _this.draw();
             }
         });
         this.canvas.addEventListener("mouseup", function (e) {
+            _this.canvas.focus();
             _this.mouseDown = false;
             if (_this.isDragging)
                 _this.isDragging = false;
@@ -45,7 +48,12 @@ var Plotter = (function () {
         });
         this.canvas.addEventListener("mouseleave", function () { _this.mouseDown = false; });
         this.canvas.addEventListener("wheel", function (e) { return _this.zoom(e); });
-        this.canvas.addEventListener("click", function (e) {
+        this.canvas.addEventListener("keydown", function (e) {
+            if (e.key === "g") {
+                _this.displayGrid = _this.displayGrid === true ? false : true;
+                _this.draw();
+                console.log(_this.displayGrid);
+            }
         });
         this.data = data;
         this.draw();
@@ -93,67 +101,63 @@ var Plotter = (function () {
         return new Point(e.layerX, e.layerY);
     };
     Plotter.prototype.draw = function () {
-        var ctx = this.canvas.getContext("2d");
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
+        this.context.clear();
+        this.context.beginPath();
         var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
         if (firstVisibleIdx > 0)
             firstVisibleIdx--;
         var lastPoint = lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
         var totalLength = this.data.points.length;
         var points = this.data.points;
-        var samePoint = 0;
         var drawPoint = 0;
         var checkPoint = lastPoint;
         for (var i = firstVisibleIdx; i < totalLength; i++) {
             var point = this.getAbsolute(points[i]);
             if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                ctx.moveTo(Math.floor(point.x), Math.floor(point.y));
-                ctx.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                //ctx.moveTo(point.x, point.y);
-                //ctx.lineTo(lastPoint.x, lastPoint.y);
+                this.context.moveTo(Math.floor(point.x), Math.floor(point.y));
+                this.context.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
                 drawPoint++;
                 checkPoint = point;
             }
-            //else {
-            //    samePoint++;
-            //} 
             if (point.x > this.canvas.width) {
                 break;
             }
             lastPoint = point;
         }
-        this.drawXAxis(ctx);
-        this.drawYAxis(ctx);
-        ctx.stroke();
+        this.context.stroke();
+        this.drawXAxis();
+        this.drawYAxis();
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
-            ctx.beginPath();
-            //ctx.moveTo(abs.x, abs.y);
-            ctx.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-            ctx.stroke();
             var pointString = this.selectedPoint.toString();
-            ctx.fillText(this.selectedPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
+            this.context.beginPath();
+            this.context.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+            this.context.stroke();
+            this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 3, 10);
         }
         if (this.isMarking) {
-            ctx.fillStyle = "rgba(0,184,200,0.2)";
+            this.context.fillStyle = "rgba(0,184,220,0.2)";
             this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
             this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-            ctx.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
-            ctx.fillStyle = "black";
+            this.context.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
+            this.context.fillStyle = "black";
         }
     };
-    Plotter.prototype.drawXAxis = function (ctx) {
+    Plotter.prototype.drawXAxis = function () {
         var origo = this.getAbsolute(new Point(0, 0));
-        ctx.moveTo(0, origo.y);
-        ctx.lineTo(this.canvas.width, origo.y);
+        this.context.beginPath();
+        this.context.moveTo(0, origo.y);
+        this.context.lineTo(this.canvas.width, origo.y);
+        this.context.stroke();
         var stepping = this.calculateSteps(this.scalePoint.x);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         for (var i = -steps; i < this.canvas.width + steps; i += steps) {
-            var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
+            this.context.beginPath();
+            var absX = i + this.movePoint.x % steps;
+            var transformer = this.getRelative(new Point(absX, origo.y));
+            var isAxis = false;
             var number;
             var numWidth;
             if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
@@ -165,22 +169,38 @@ var Plotter = (function () {
             else {
                 number = transformer.x.toFixed(decimalPlaces);
             }
-            numWidth = ctx.measureText(number).width;
-            ctx.fillText(number, i + this.movePoint.x % steps - (numWidth / 2), origo.y + 15);
-            ctx.moveTo(i + this.movePoint.x % steps, origo.y);
-            ctx.lineTo(i + this.movePoint.x % steps, origo.y + 4);
+            numWidth = this.context.measureText(number);
+            this.context.fillText(number, absX - (numWidth / 2), origo.y + 15);
+            this.context.stroke();
+            this.context.beginPath();
+            if (this.displayGrid) {
+                this.context.moveTo(absX, 0);
+                this.context.lineTo(absX, this.canvas.height);
+                this.context.strokeStyle = "rgba(100,100,100,0.3)";
+                this.context.stroke();
+                this.context.strokeStyle = "black";
+            }
+            else {
+                this.context.moveTo(absX, origo.y);
+                this.context.lineTo(absX, origo.y + 4);
+                this.context.stroke();
+            }
         }
     };
-    Plotter.prototype.drawYAxis = function (ctx) {
+    Plotter.prototype.drawYAxis = function () {
         var origo = this.getAbsolute(new Point(0, 0));
-        ctx.moveTo(origo.x, 0);
-        ctx.lineTo(origo.x, this.canvas.height);
+        this.context.beginPath();
+        this.context.moveTo(origo.x, 0);
+        this.context.lineTo(origo.x, this.canvas.height);
+        this.context.stroke();
         var stepping = this.calculateSteps(this.scalePoint.y);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         for (var i = -steps; i < this.canvas.height + steps; i += steps) {
-            var transformer = this.getRelative(new Point(origo.x, this.canvas.height - (i + this.movePoint.y % steps)));
+            this.context.beginPath();
+            var absY = this.canvas.height - (i + this.movePoint.y % steps);
+            var transformer = this.getRelative(new Point(origo.x, absY));
             var number;
             var numWidth;
             if (Math.abs(transformer.y).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
@@ -192,10 +212,22 @@ var Plotter = (function () {
             else {
                 number = transformer.y.toFixed(decimalPlaces);
             }
-            numWidth = ctx.measureText(number).width;
-            ctx.fillText(number, origo.x - (numWidth + 7), this.canvas.height - (i + this.movePoint.y % steps) + 3);
-            ctx.moveTo(origo.x, this.canvas.height - (i + this.movePoint.y % steps));
-            ctx.lineTo(origo.x - 4, this.canvas.height - (i + this.movePoint.y % steps));
+            numWidth = this.context.measureText(number);
+            this.context.fillText(number, origo.x - (numWidth + 7), absY + 3);
+            this.context.stroke();
+            this.context.beginPath();
+            if (this.displayGrid) {
+                this.context.moveTo(0, absY);
+                this.context.lineTo(this.canvas.width, absY);
+                this.context.strokeStyle = "rgba(100,100,100,0.3)";
+                this.context.stroke();
+                this.context.strokeStyle = "black";
+            }
+            else {
+                this.context.moveTo(origo.x, absY);
+                this.context.lineTo(origo.x - 4, absY);
+                this.context.stroke();
+            }
         }
     };
     Plotter.prototype.calculateSteps = function (scaling) {
@@ -245,5 +277,48 @@ var Plotter = (function () {
         this.draw();
     };
     return Plotter;
+}());
+var ContextFixer = (function () {
+    function ContextFixer(canvas) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext("2d");
+        this.fillStyle = "black";
+        this.strokeStyle = "black";
+    }
+    ContextFixer.prototype.moveTo = function (x, y) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.moveTo(newX, newY);
+    };
+    ContextFixer.prototype.lineTo = function (x, y) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.lineTo(newX, newY);
+    };
+    ContextFixer.prototype.clear = function () {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    };
+    ContextFixer.prototype.beginPath = function () {
+        this.ctx.beginPath();
+    };
+    ContextFixer.prototype.stroke = function () {
+        this.ctx.strokeStyle = this.strokeStyle;
+        this.ctx.stroke();
+    };
+    ContextFixer.prototype.fillText = function (text, x, y) {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillText(text, x, y);
+    };
+    ContextFixer.prototype.fillRect = function (x, y, width, height) {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x, y, width, height);
+    };
+    ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
+        this.ctx.arc(x, y, radius, startAngle, endAngle);
+    };
+    ContextFixer.prototype.measureText = function (text) {
+        return this.ctx.measureText(text).width;
+    };
+    return ContextFixer;
 }());
 //# sourceMappingURL=Plotter.js.map
