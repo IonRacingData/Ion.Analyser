@@ -141,16 +141,7 @@ class WebSocketTest implements IApplication {
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
 
-        let socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
 
-        socket.onmessage = (ev: MessageEvent) => {
-            console.log(ev);
-            console.log(ev.data);
-        }
-
-        socket.onopen = (ev: Event) => {
-            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
-        }
     }
 }
 

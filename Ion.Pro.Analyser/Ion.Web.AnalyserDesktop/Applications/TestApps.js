@@ -128,14 +128,6 @@ var WebSocketTest = (function () {
     }
     WebSocketTest.prototype.main = function () {
         this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
-        var socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
-        socket.onmessage = function (ev) {
-            console.log(ev);
-            console.log(ev.data);
-        };
-        socket.onopen = function (ev) {
-            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
-        };
     };
     return WebSocketTest;
 }());
