@@ -16,6 +16,11 @@ var GridViewer = (function () {
         var template = document.getElementById("temp-grid");
         //var clone: Node = document.importNode(template.content, true);
         var test = new GridHContainer();
+        test.addChild();
+        test.addChild();
+        test.addChild();
+        test.addChild();
+        test.addChild();
         var clone = test.baseNode;
         this.window.content.appendChild(clone);
         //addEvents();
@@ -35,6 +40,7 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.handleResize = function () {
         for (var i in this.childWindows) {
+            this.childWindows[i].recalculateSize();
             this.childWindows[i].onResize();
         }
     };
@@ -71,7 +77,7 @@ var GridViewer = (function () {
                 }
             }
             console.log("grid-window dropped at: X: " + windowX + " Y: " + windowY);
-            if (foundGridWindow) {
+            if (foundGridWindow && foundGridWindow.innerHTML.length == 0) {
                 foundGridWindow.innerHTML = "";
                 var windowBody = kernel.winMan.activeWindow.handle; //.getElementsByClassName("window-body")[0];
                 var window = kernel.winMan.activeWindow;
@@ -80,6 +86,8 @@ var GridViewer = (function () {
                 //windowBody.style.width = "100%";
                 //windowBody.style.height = "100%";
                 foundGridWindow.appendChild(windowBody);
+                window.recalculateSize();
+                window.onResize();
             }
             else {
                 console.log("grid-window could not find any window, this is a problem");
@@ -91,35 +99,51 @@ var GridViewer = (function () {
 var GridContainer = (function () {
     function GridContainer() {
         this.mk = new HtmlHelper();
-        this.create("");
+        this.baseNode = this.create("");
     }
     GridContainer.prototype.create = function (cls) {
-        this.baseNode = this.mk.tag("div", "grid-" + cls);
+        var base = this.mk.tag("div", "grid-" + cls);
+        base.appendChild(this.createChild());
+        return base;
+    };
+    GridContainer.prototype.createSeperator = function () {
+        return null;
+    };
+    GridContainer.prototype.addChild = function () {
+        this.baseNode.appendChild(this.createSeperator());
+        this.baseNode.appendChild(this.createChild());
+    };
+    GridContainer.prototype.createChild = function () {
         var box = this.mk.tag("div", "grid-box");
         var win = this.mk.tag("div", "grid-window");
         box.appendChild(win);
-        this.baseNode.appendChild(box);
-        return this.baseNode;
+        return box;
     };
     return GridContainer;
 }());
 var GridHContainer = (function (_super) {
     __extends(GridHContainer, _super);
     function GridHContainer() {
-        _super.apply(this, arguments);
+        _super.call(this);
     }
     GridHContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "hcon");
+    };
+    GridHContainer.prototype.createSeperator = function () {
+        return this.mk.tag("div", "grid-hdiv", null, "&nbsp;");
     };
     return GridHContainer;
 }(GridContainer));
 var GridVContainer = (function (_super) {
     __extends(GridVContainer, _super);
     function GridVContainer() {
-        _super.apply(this, arguments);
+        _super.call(this);
     }
     GridVContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "vcon");
+    };
+    GridVContainer.prototype.createSeperator = function () {
+        return this.mk.tag("div", "grid-vdiv", null, "&nbsp;");
     };
     return GridVContainer;
 }(GridContainer));

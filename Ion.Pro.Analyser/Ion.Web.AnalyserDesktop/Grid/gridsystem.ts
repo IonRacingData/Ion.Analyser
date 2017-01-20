@@ -13,6 +13,11 @@
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         //var clone: Node = document.importNode(template.content, true);
         var test = new GridHContainer();
+        test.addChild();
+        test.addChild();
+        test.addChild();
+        test.addChild();
+        test.addChild();
         var clone = test.baseNode;
         this.window.content.appendChild(clone);
         
@@ -36,6 +41,7 @@
 
     handleResize() {
         for (var i in this.childWindows) {
+            this.childWindows[i].recalculateSize();
             this.childWindows[i].onResize();
         }
     }
@@ -78,15 +84,20 @@
             }
             console.log("grid-window dropped at: X: " + windowX + " Y: " + windowY);
 
-            if (foundGridWindow) {
+            if (foundGridWindow && foundGridWindow.innerHTML.length == 0) {
+
                 foundGridWindow.innerHTML = "";
                 var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
                 var window = kernel.winMan.activeWindow;
                 window.changeWindowMode(WindowMode.BORDERLESS);
+                
                 this.childWindows.push(window);
                 //windowBody.style.width = "100%";
                 //windowBody.style.height = "100%";
                 foundGridWindow.appendChild(windowBody);
+
+                window.recalculateSize();
+                window.onResize();
             }
             else {
                 console.log("grid-window could not find any window, this is a problem");
@@ -100,30 +111,57 @@ class GridContainer {
     mk: HtmlHelper = new HtmlHelper();
 
     constructor() {
-        this.create("");
+        this.baseNode = this.create("");
     }
 
     create(cls: string): HTMLElement {
+        var base = this.mk.tag("div", "grid-" + cls);
+        base.appendChild(this.createChild());
+        return base;
+    }
 
-        this.baseNode = this.mk.tag("div", "grid-" + cls);
+    createSeperator(): HTMLElement {
+        return null;
+    }
+
+    addChild() {
+        this.baseNode.appendChild(this.createSeperator());
+        this.baseNode.appendChild(this.createChild());
+    }
+
+    createChild(): HTMLElement {
         var box = this.mk.tag("div", "grid-box");
         var win = this.mk.tag("div", "grid-window");
         box.appendChild(win);
-        this.baseNode.appendChild(box);
-        return this.baseNode;
+        return box;
     }
 }
 
 class GridHContainer extends GridContainer {
+    constructor() {
+        super();
+    }
 
     create(): HTMLElement {
         return super.create("hcon");
     }
+
+    createSeperator(): HTMLElement {
+        return this.mk.tag("div", "grid-hdiv", null, "&nbsp;");
+    }
 }
 
 class GridVContainer extends GridContainer {
+    constructor() {
+        super();
+    }
+
     create(): HTMLElement {
         return super.create("vcon");
+    }
+
+    createSeperator(): HTMLElement {
+        return this.mk.tag("div", "grid-vdiv", null, "&nbsp;");
     }
 }
 

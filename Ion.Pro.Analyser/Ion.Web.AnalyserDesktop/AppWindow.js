@@ -143,6 +143,10 @@ var AppWindow = (function () {
         this.setSize(newWidth, newHeight, false);
         this.changeStateTo(WindowState.TILED);
     };
+    AppWindow.prototype.recalculateSize = function () {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
+    };
     AppWindow.prototype.setPos = function (x, y, storePos) {
         if (storePos === void 0) { storePos = true; }
         var outerBoxMargin = 8;
@@ -237,6 +241,8 @@ var AppWindow = (function () {
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();

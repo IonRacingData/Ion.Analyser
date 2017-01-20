@@ -211,7 +211,10 @@
         this.changeStateTo(WindowState.TILED);
     }
 
-    
+    recalculateSize() {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
+    }
 
     setPos(x: number, y: number, storePos: boolean = true): void {
         var outerBoxMargin: number = 8;
@@ -320,6 +323,8 @@
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
