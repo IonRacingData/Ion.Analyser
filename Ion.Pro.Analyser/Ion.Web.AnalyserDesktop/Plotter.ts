@@ -57,7 +57,6 @@
 
     zoom(e: WheelEvent) {
         e.preventDefault();
-        //console.log(e);
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
 
@@ -99,23 +98,12 @@
         ctx.beginPath();              
         
         var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
-
         if (firstVisibleIdx > 0)
             firstVisibleIdx--
-        var lastPoint: Point;
-        lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
-        /*
-        for (var i = 0; i < this.canvas.width; i++) {
-            var point = this.getAbsolute(this.data.getClosest(this.getRelative(new Point(i, 0))));
-            if (i > 0) {                
-                ctx.moveTo(point.x, point.y);
-                ctx.lineTo(lastPoint.x, lastPoint.y);
-            }
-            lastPoint = point;
-        }*/
+
+        var lastPoint = lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
         var totalLength = this.data.points.length;
         var points = this.data.points;
-        //console.log(totalLength);
         var samePoint = 0;
         var drawPoint = 0;
         var checkPoint = lastPoint;
@@ -134,35 +122,9 @@
             if (point.x > this.canvas.width) {
                 break;
             }
-
-            /*if (point.x > 0) {
-                if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
-                    //ctx.moveTo(point.x, point.y);
-                    //ctx.lineTo(lastPoint.x, lastPoint.y);
-                }
-                if (point.x > this.canvas.width) {
-                    break;
-                }
-            }*/
             lastPoint = point;
-
         }
-        //console.log("Draw point: " + drawPoint.toString() + " same Point: " + samePoint.toString());;
-        /*
-        for (var i = firstVisibleIdx; i < this.data.points.length; i++) {            
-            var point = this.getAbsolute(this.data.points[i]);
-            if (point.x > 0) {                
-                if (i > 0 && (point.x !== lastPoint.x || point.y !== lastPoint.y)) {
-                    //ctx.moveTo(point.x, point.y);
-                    //ctx.lineTo(lastPoint.x, lastPoint.y);
-                }
-                if (point.x > this.canvas.width) {
-                    break;
-                }
-            }
-            lastPoint = point;       
-        }       */        
-
+        
         this.drawXAxis(ctx);
         this.drawYAxis(ctx);       
 
@@ -177,9 +139,6 @@
             ctx.fillText(this.highlightPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);
             ctx.stroke();
         }            
-
-        
-        
     }
 
     drawXAxis(ctx: CanvasRenderingContext2D) {
