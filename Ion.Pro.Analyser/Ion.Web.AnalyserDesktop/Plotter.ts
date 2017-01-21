@@ -11,7 +11,7 @@
     selectedPoint: Point = null;    
     isMarking = false;
     marking: IMarking;    
-    displayGrid = false;
+    displayGrid = true;
 
     generatePlot(data: PlotData): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
@@ -52,18 +52,22 @@
                 this.isMarking = false;
                 this.zoomByMarking();            
             }
-
-            this.selectPoint(e);
+            else
+                this.selectPoint(e);
         });
 
         this.canvas.addEventListener("mouseleave", () => { this.mouseDown = false });
         this.canvas.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
 
-        this.canvas.addEventListener("keydown", (e: KeyboardEvent) => {                      
+        this.canvas.addEventListener("keydown", (e: KeyboardEvent) => {              
+            console.log("key pressed");        
             if (e.key === "g") {
                 this.displayGrid = this.displayGrid === true ? false : true;
                 this.draw();
-                console.log(this.displayGrid);
+            } else if (e.key === "r") {
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                this.draw();
             }
         });
         
@@ -159,7 +163,7 @@
             this.context.beginPath();
             this.context.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
             this.context.stroke();            
-            this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 3, 10);            
+            this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 6, 13);            
         }            
 
         if (this.isMarking) {
@@ -173,9 +177,19 @@
 
     drawXAxis() {
         var origo = this.getAbsolute(new Point(0, 0));
+        var visible = origo.y >= 0 && origo.y <= this.canvas.height ? true : false;
+
+        var y = origo.y;
+        if (!visible) {
+            if (origo.y < 0)
+                y = 0;
+            else
+                y = this.canvas.height;
+        }
+        
         this.context.beginPath();
-        this.context.moveTo(0, origo.y);
-        this.context.lineTo(this.canvas.width, origo.y);    
+        this.context.moveTo(0, y);
+        this.context.lineTo(this.canvas.width, y);    
         this.context.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.x);
@@ -186,10 +200,11 @@
         for (var i = -steps; i < this.canvas.width + steps; i += steps) {
             this.context.beginPath();
             var absX = i + this.movePoint.x % steps;
-            var transformer = this.getRelative(new Point(absX, origo.y));
-            var isAxis = false;
+            var transformer = this.getRelative(new Point(absX, y));            
             var number: string;
             var numWidth: number;
+            var numOffset: number; 
+
             if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
                 number = "     0";
             }
@@ -199,8 +214,10 @@
             else {
                 number = transformer.x.toFixed(decimalPlaces);
             }
+           
             numWidth = this.context.measureText(number);
-            this.context.fillText(number, absX - (numWidth / 2), origo.y + 15);            
+            numOffset = y === this.canvas.height ? y - 15 : y + 15
+            this.context.fillText(number, absX - (numWidth / 2), numOffset);            
 
             this.context.stroke();
             this.context.beginPath();
@@ -211,21 +228,30 @@
                 this.context.strokeStyle = "rgba(100,100,100,0.3)";
                 this.context.stroke();                
                 this.context.strokeStyle = "black";
-            }
+            }/*
             else {
-                this.context.moveTo(absX, origo.y);
-                this.context.lineTo(absX, origo.y + 4);
+                this.context.moveTo(absX, y);
+                this.context.lineTo(absX, y + 4);
                 this.context.stroke();
-            }
+            }*/
         }        
     }
 
     drawYAxis() {
         var origo = this.getAbsolute(new Point(0, 0));
+        var visible = origo.x >= 0 && origo.x <= this.canvas.width ? true : false;
+
+        var x = origo.x;
+        if (!visible) {
+            if (origo.x < 0)
+                x = 0;
+            else
+                x = this.canvas.width;
+        }
 
         this.context.beginPath();
-        this.context.moveTo(origo.x, 0);
-        this.context.lineTo(origo.x, this.canvas.height);
+        this.context.moveTo(x, 0);
+        this.context.lineTo(x, this.canvas.height);
         this.context.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.y);
@@ -236,9 +262,11 @@
         for (var i = -steps; i < this.canvas.height + steps; i += steps) {
             this.context.beginPath();
             var absY = this.canvas.height - (i + this.movePoint.y % steps);
-            var transformer = this.getRelative(new Point(origo.x, absY));
+            var transformer = this.getRelative(new Point(x, absY));
             var number: string;
-            var numWidth: number;
+            var numWidth: number;            
+            var numOffset: number;
+
             if (Math.abs(transformer.y).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
                 number = "";
             }
@@ -249,8 +277,9 @@
                 number = transformer.y.toFixed(decimalPlaces);
             }
 
-            numWidth = this.context.measureText(number);            
-            this.context.fillText(number, origo.x - (numWidth + 7), absY + 3);           
+            numWidth = this.context.measureText(number);
+            numOffset = x === 0 ? x + 8 : x - (numWidth + 7); 
+            this.context.fillText(number, numOffset, absY + 3);           
 
             this.context.stroke();
             this.context.beginPath();
@@ -261,12 +290,12 @@
                 this.context.strokeStyle = "rgba(100,100,100,0.3)";
                 this.context.stroke();
                 this.context.strokeStyle = "black";
-            }
+            }/*
             else {
                 this.context.moveTo(origo.x, absY);
                 this.context.lineTo(origo.x - 4, absY);
                 this.context.stroke();
-            }
+            }*/ 
         }                     
     }
 
