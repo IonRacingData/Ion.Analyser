@@ -1,7 +1,7 @@
 ﻿class Plotter {
     canvas: HTMLCanvasElement;
     context: ContextFixer;
-    data: PlotData;
+    data: PlotData[];
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
     mouseMod: Point;    
@@ -13,7 +13,11 @@
     marking: IMarking;    
     displayGrid = true;
 
-    generatePlot(data: PlotData): HTMLCanvasElement {
+    constructor(data: PlotData[]) {
+        this.data = data;
+    }
+
+    generatePlot(): HTMLCanvasElement {
         this.canvas = document.createElement("canvas");
         this.canvas.setAttribute("tabindex", "0");        
         this.context = new ContextFixer(this.canvas);
@@ -70,17 +74,22 @@
                 this.draw();
             }
         });
-        
-        this.data = data;
+                
         this.draw();
         return this.canvas;
     }
 
     selectPoint(e: MouseEvent) {
         var mp = this.getMousePoint(e);
-        var closest = this.data.getClosest(this.getRelative(mp));
-        if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
-            this.selectedPoint = closest;            
+        var p: Point = null;
+        for (var i = 0; i < this.data.length; i++) {
+            var closest = this.data[i].getClosest(this.getRelative(mp));
+            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
+                p = closest;            
+        }               
+
+        if (p !== null) 
+            this.selectedPoint = p;                    
         else
             this.selectedPoint = null;
 
@@ -125,34 +134,36 @@
 
     draw() {                                
         this.context.clear();        
-        this.context.beginPath();              
-        
-        var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
-        if (firstVisibleIdx > 0)
-            firstVisibleIdx--
+        this.context.beginPath();          
 
-        var lastPoint = lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
-        var totalLength = this.data.points.length;
-        var points = this.data.points;        
-        var drawPoint = 0;
-        var checkPoint = lastPoint;
+        for (var d = 0; d < this.data.length; d++) {
+            var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            if (firstVisibleIdx > 0)
+                firstVisibleIdx--
 
-        for (var i = firstVisibleIdx; i < totalLength; i++) {
-            var point = this.getAbsolute(points[i]);
-            if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                this.context.moveTo(Math.floor(point.x), Math.floor(point.y));
-                this.context.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                drawPoint++;
-                checkPoint = point;
-            } 
+            var lastPoint = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
+            var totalLength = this.data[d].points.length;
+            var points = this.data[d].points;
+            var drawPoint = 0;
+            var checkPoint = lastPoint;
 
-            if (point.x > this.canvas.width) {
-                break;
+            for (var i = firstVisibleIdx; i < totalLength; i++) {
+                var point = this.getAbsolute(points[i]);
+                if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
+                    this.context.moveTo(Math.floor(point.x), Math.floor(point.y));
+                    this.context.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
+                    drawPoint++;
+                    checkPoint = point;
+                }
+
+                if (point.x > this.canvas.width) {
+                    break;
+                }
+                lastPoint = point;
             }
-            lastPoint = point;
-        }
 
-        this.context.stroke();
+            this.context.stroke();
+        }
         
         this.drawXAxis();
         this.drawYAxis();                     
