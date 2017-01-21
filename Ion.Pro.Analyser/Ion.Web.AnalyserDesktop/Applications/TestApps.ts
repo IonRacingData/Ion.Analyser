@@ -119,14 +119,14 @@ class PlotterTester implements IApplication {
     }
 
     drawChart(data: ISensorPackage[]) {
-        this.data = data;
-        this.plotter = new Plotter();
+        this.data = data;        
         this.window.content.innerHTML = "";
         var plotData = new PlotData([]);
         for (var i = 0; i < data.length; i++) {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
-        this.window.content.appendChild(this.plotter.generatePlot(plotData));
+        this.plotter = new Plotter([plotData]);
+        this.window.content.appendChild(this.plotter.generatePlot());
         this.plotter.canvas.width = this.window.width;
         this.plotter.canvas.height = this.window.height;
         this.plotter.draw();
