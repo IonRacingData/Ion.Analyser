@@ -169,12 +169,8 @@ var Plotter = (function () {
             }
             this.ctxMain.stroke();
         }
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
         this.drawXAxis();
         this.drawYAxis();
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
             var pointString = this.selectedPoint.toString();
@@ -187,6 +183,8 @@ var Plotter = (function () {
         this.ctxBackground.fillRect(0, 0, this.width, this.height);
     };
     Plotter.prototype.drawXAxis = function () {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
         var y = origo.y;
@@ -237,8 +235,12 @@ var Plotter = (function () {
                 this.ctxMain.stroke();
             }*/
         }
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;
     };
     Plotter.prototype.drawYAxis = function () {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
         var x = origo.x;
@@ -289,6 +291,8 @@ var Plotter = (function () {
                 this.ctxMain.stroke();
             }*/
         }
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;
     };
     Plotter.prototype.calculateSteps = function (scaling) {
         var log10 = function log10(val) {

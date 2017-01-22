@@ -201,13 +201,9 @@
 
             this.ctxMain.stroke();
         }
-
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
+      
         this.drawXAxis();
         this.drawYAxis();
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
 
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
@@ -224,6 +220,9 @@
     }
 
     drawXAxis() {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
+
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
 
@@ -282,9 +281,15 @@
                 this.ctxMain.stroke();
             }*/
         }
+
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;
     }
 
     drawYAxis() {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
+
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
 
@@ -342,7 +347,10 @@
                 this.ctxMain.lineTo(origo.x - 4, absY);
                 this.ctxMain.stroke();
             }*/ 
-        }                     
+        }       
+
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;              
     }
 
     calculateSteps(scaling: number): IStepInfo {
