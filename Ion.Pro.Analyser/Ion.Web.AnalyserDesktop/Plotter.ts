@@ -1,9 +1,11 @@
 ﻿class Plotter {
     wrapper: HTMLDivElement;
-    canvas: HTMLCanvasElement;
-    markingCanvas: HTMLCanvasElement;    
-    context: ContextFixer;
-    markingContext: ContextFixer;
+    canvas: ILayeredCanvas;
+    //markingCanvas: HTMLCanvasElement;    
+    context: ILayeredCanvasContext;
+    //markingContext: ContextFixer;
+    width: number;
+    height: number;
     data: PlotData[];
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
@@ -21,12 +23,14 @@
     }
 
     generatePlot(): HTMLDivElement {
+        var canvas: ILayeredCanvas = {};
         this.wrapper = document.createElement("div");  
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";       
-        this.canvas = document.createElement("canvas");        
-        this.canvas.className = "plot-canvas";
-        this.markingCanvas = <HTMLCanvasElement>this.canvas.cloneNode();
+        var mainCanvas = document.createElement("canvas");        
+        mainCanvas.className = "plot-canvas";
+        var markingCanvas = <HTMLCanvasElement>mainCanvas.cloneNode();
+        
         this.wrapper.appendChild(this.canvas);
         this.wrapper.appendChild(this.markingCanvas);
 
@@ -461,4 +465,16 @@ class ContextFixer {
     measureText(text: string) {
         return this.ctx.measureText(text).width;
     }
+}
+
+interface ILayeredCanvas {
+    main: HTMLCanvasElement;
+    marking: HTMLCanvasElement;
+    background: HTMLCanvasElement;
+}
+
+interface ILayeredCanvasContext {
+    main: CanvasRenderingContext2D;
+    marking: CanvasRenderingContext2D;
+    background: CanvasRenderingContext2D;
 }
