@@ -94,7 +94,7 @@ class PlotterTester implements IApplication {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.plotter.resize(this.window.width, this.window.height);
+            this.plotter.setSize(this.window.width, this.window.height);
             //this.plotter.draw();
         });
 
@@ -126,7 +126,7 @@ class PlotterTester implements IApplication {
         }
         this.plotter = new Plotter([plotData]);
         this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.resize(this.window.width, this.window.height);        
+        this.plotter.setSize(this.window.width, this.window.height);        
         //this.plotter.draw();
     }
 }

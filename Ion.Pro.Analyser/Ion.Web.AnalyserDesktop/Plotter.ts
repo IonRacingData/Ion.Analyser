@@ -1,9 +1,9 @@
 ﻿class Plotter {
     wrapper: HTMLDivElement;
-    canvas: ILayeredCanvas;
-    //markingCanvas: HTMLCanvasElement;    
-    context: ILayeredCanvasContext;
-    //markingContext: ContextFixer;
+    canvas: LayeredCanvas;
+    ctxMain: ContextFixer;       
+    ctxMarking: ContextFixer;  
+    ctxBackground: ContextFixer;  
     width: number;
     height: number;
     data: PlotData[];
@@ -17,29 +17,32 @@
     isMarking = false;
     marking: IMarking;    
     displayGrid = true;
+    backgroundColor = "black";
+    gridColor = "rgba(100,100,100,0.3)";
+    axisColor = "grey"; //"black";
+    mainColor = "white";
+
 
     constructor(data: PlotData[]) {
         this.data = data;
     }
 
-    generatePlot(): HTMLDivElement {
-        var canvas: ILayeredCanvas = {};
+    generatePlot(): HTMLDivElement {        
         this.wrapper = document.createElement("div");  
         this.wrapper.setAttribute("tabindex", "0");
-        this.wrapper.className = "plot-wrapper";       
-        var mainCanvas = document.createElement("canvas");        
-        mainCanvas.className = "plot-canvas";
-        var markingCanvas = <HTMLCanvasElement>mainCanvas.cloneNode();
-        
-        this.wrapper.appendChild(this.canvas);
-        this.wrapper.appendChild(this.markingCanvas);
+        this.wrapper.className = "plot-wrapper";      
 
-        this.context = new ContextFixer(this.canvas);
-        this.markingContext = new ContextFixer(this.markingCanvas);
+        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
+        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);       
+        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
+        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.width = this.canvas.getWidth();
+        this.height = this.canvas.getHeight();     
+        this.ctxMain.strokeStyle = this.mainColor;
         
         this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
             e.preventDefault();
-            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));            
+            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));            
             this.mouseDown = true;
             if (e.altKey) {
                 this.isMarking = true;
@@ -56,7 +59,7 @@
                 }
                 else {
                     this.isDragging = true;
-                    this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);                    
+                    this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);                    
                     this.draw();
                 }                
                 
@@ -79,7 +82,7 @@
         this.wrapper.addEventListener("mouseleave", () => {
             this.mouseDown = false;
             this.isMarking = false;
-            this.markingContext.clear();            
+            this.ctxMarking.clear();            
         });
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {              
@@ -99,18 +102,17 @@
     }   
 
     drawMarking() {
-        this.markingContext.clear();        
-        this.markingContext.fillStyle = "rgba(0,184,220,0.2)";
+        this.ctxMarking.clear();        
+        this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-        this.markingContext.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                           
-    }
+        this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                           
+    }    
 
-    resize(width: number, height: number) {        
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.markingCanvas.width = width;
-        this.markingCanvas.height = height;
+    setSize(width: number, height: number) {        
+        this.width = width;
+        this.height = height;
+        this.canvas.setSize(width, height);
         this.draw();
     }
 
@@ -168,8 +170,8 @@
     }
 
     draw() {                                
-        this.context.clear();        
-        this.context.beginPath();          
+        this.ctxMain.clear();        
+        this.ctxMain.beginPath();          
 
         for (var d = 0; d < this.data.length; d++) {
             var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
@@ -185,59 +187,66 @@
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                    this.context.moveTo(Math.floor(point.x), Math.floor(point.y));
-                    this.context.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
+                    this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
+                    this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
                     drawPoint++;
                     checkPoint = point;
                 }
 
-                if (point.x > this.canvas.width) {
+                if (point.x > this.width) {
                     break;
                 }
                 lastPoint = point;
             }
 
-            this.context.stroke();
+            this.ctxMain.stroke();
         }
-        
+
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
         this.drawXAxis();
-        this.drawYAxis();                     
+        this.drawYAxis();
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;
 
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
             var pointString = this.selectedPoint.toString();
-            this.context.beginPath();
-            this.context.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-            this.context.stroke();            
-            this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 6, 13);            
-        }            
+            this.ctxMain.beginPath();
+            this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+            this.ctxMain.stroke();            
+            this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);            
+        }    
+
+        this.ctxBackground.fillStyle = this.backgroundColor;
+        this.ctxBackground.fillRect(0, 0, this.width, this.height);
         
     }
 
     drawXAxis() {
         var origo = this.getAbsolute(new Point(0, 0));
-        var visible = origo.y >= 0 && origo.y <= this.canvas.height ? true : false;
+        var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
 
         var y = origo.y;
         if (!visible) {
             if (origo.y < 0)
                 y = 0;
             else
-                y = this.canvas.height;
+                y = this.height;
         }
         
-        this.context.beginPath();
-        this.context.moveTo(0, y);
-        this.context.lineTo(this.canvas.width, y);    
-        this.context.stroke();
+        this.ctxMain.beginPath();
+        this.ctxMain.moveTo(0, y);
+        this.ctxMain.lineTo(this.width, y);            
+        this.ctxMain.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.x);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
 
-        for (var i = -steps; i < this.canvas.width + steps; i += steps) {
-            this.context.beginPath();
+        for (var i = -steps; i < this.width + steps; i += steps) {
+            this.ctxMain.beginPath();
             var absX = i + this.movePoint.x % steps;
             var transformer = this.getRelative(new Point(absX, y));            
             var number: string;
@@ -254,53 +263,52 @@
                 number = transformer.x.toFixed(decimalPlaces);
             }
            
-            numWidth = this.context.measureText(number);
-            numOffset = y === this.canvas.height ? y - 15 : y + 15
-            this.context.fillText(number, absX - (numWidth / 2), numOffset);            
+            numWidth = this.ctxMain.measureText(number);
+            numOffset = y === this.height ? y - 15 : y + 15
+            this.ctxMain.fillText(number, absX - (numWidth / 2), numOffset);            
 
-            this.context.stroke();
-            this.context.beginPath();
+            this.ctxMain.stroke();
+            this.ctxMain.beginPath();
 
             if (this.displayGrid) {                
-                this.context.moveTo(absX, 0);
-                this.context.lineTo(absX, this.canvas.height);
-                this.context.strokeStyle = "rgba(100,100,100,0.3)";
-                this.context.stroke();                
-                this.context.strokeStyle = "black";
+                this.ctxMain.moveTo(absX, 0);
+                this.ctxMain.lineTo(absX, this.height);
+                this.ctxMain.strokeStyle = this.gridColor;
+                this.ctxMain.stroke();                                
             }/*
             else {
-                this.context.moveTo(absX, y);
-                this.context.lineTo(absX, y + 4);
-                this.context.stroke();
+                this.ctxMain.moveTo(absX, y);
+                this.ctxMain.lineTo(absX, y + 4);
+                this.ctxMain.stroke();
             }*/
-        }        
+        }
     }
 
     drawYAxis() {
         var origo = this.getAbsolute(new Point(0, 0));
-        var visible = origo.x >= 0 && origo.x <= this.canvas.width ? true : false;
+        var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
 
         var x = origo.x;
         if (!visible) {
             if (origo.x < 0)
                 x = 0;
             else
-                x = this.canvas.width;
+                x = this.width;
         }
 
-        this.context.beginPath();
-        this.context.moveTo(x, 0);
-        this.context.lineTo(x, this.canvas.height);
-        this.context.stroke();
+        this.ctxMain.beginPath();
+        this.ctxMain.moveTo(x, 0);
+        this.ctxMain.lineTo(x, this.height);
+        this.ctxMain.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.y);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         
-        for (var i = -steps; i < this.canvas.height + steps; i += steps) {
-            this.context.beginPath();
-            var absY = this.canvas.height - (i + this.movePoint.y % steps);
+        for (var i = -steps; i < this.height + steps; i += steps) {
+            this.ctxMain.beginPath();
+            var absY = this.height - (i + this.movePoint.y % steps);
             var transformer = this.getRelative(new Point(x, absY));
             var number: string;
             var numWidth: number;            
@@ -316,24 +324,23 @@
                 number = transformer.y.toFixed(decimalPlaces);
             }
 
-            numWidth = this.context.measureText(number);
+            numWidth = this.ctxMain.measureText(number);
             numOffset = x === 0 ? x + 8 : x - (numWidth + 7); 
-            this.context.fillText(number, numOffset, absY + 3);           
+            this.ctxMain.fillText(number, numOffset, absY + 3);           
 
-            this.context.stroke();
-            this.context.beginPath();
+            this.ctxMain.stroke();
+            this.ctxMain.beginPath();
 
             if (this.displayGrid) {
-                this.context.moveTo(0, absY);
-                this.context.lineTo(this.canvas.width, absY);
-                this.context.strokeStyle = "rgba(100,100,100,0.3)";
-                this.context.stroke();
-                this.context.strokeStyle = "black";
+                this.ctxMain.moveTo(0, absY);
+                this.ctxMain.lineTo(this.width, absY);
+                this.ctxMain.strokeStyle = this.gridColor;
+                this.ctxMain.stroke();
             }/*
             else {
-                this.context.moveTo(origo.x, absY);
-                this.context.lineTo(origo.x - 4, absY);
-                this.context.stroke();
+                this.ctxMain.moveTo(origo.x, absY);
+                this.ctxMain.lineTo(origo.x - 4, absY);
+                this.ctxMain.stroke();
             }*/ 
         }                     
     }
@@ -364,7 +371,7 @@
     }    
 
     getRelative(p: Point): Point {
-        var moved = new Point(p.x - this.movePoint.x, this.canvas.height - p.y - this.movePoint.y);
+        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
         var scaled = moved.divide(this.scalePoint);        
         return scaled;
     }
@@ -372,16 +379,16 @@
     getAbsolute(p: Point): Point {
         var scaled = p.multiply(this.scalePoint);
         var moved = scaled.add(this.movePoint);                
-        return new Point( moved.x, this.canvas.height - moved.y );
+        return new Point( moved.x, this.height - moved.y );
     }
 
     zoomByMarking() {
-        this.markingContext.clear();
+        this.ctxMarking.clear();
 
         var width = this.marking.width;
         var height = this.marking.height;        
-        var xRatio = this.canvas.width / width;
-        var yRatio = this.canvas.height / height;
+        var xRatio = this.width / width;
+        var yRatio = this.height / height;
 
         var downLeft = new Point(
             Math.min(
@@ -398,7 +405,7 @@
         this.scalePoint.y = Math.abs(this.scalePoint.y * yRatio);        
 
         var sec = this.getAbsolute(first);
-        sec.y = this.canvas.height - sec.y;
+        sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
 
@@ -467,14 +474,33 @@ class ContextFixer {
     }
 }
 
-interface ILayeredCanvas {
-    main: HTMLCanvasElement;
-    marking: HTMLCanvasElement;
-    background: HTMLCanvasElement;
-}
+class LayeredCanvas {
+    canvases: { [name: string]: HTMLCanvasElement } = {};
 
-interface ILayeredCanvasContext {
-    main: CanvasRenderingContext2D;
-    marking: CanvasRenderingContext2D;
-    background: CanvasRenderingContext2D;
+    constructor(wrapper: HTMLDivElement, names: string[]) {        
+        var canvas = document.createElement("canvas");
+        canvas.className = "plot-canvas";
+        for (let name of names) {
+            this.canvases[name] = <HTMLCanvasElement>canvas.cloneNode();
+            wrapper.appendChild(this.canvases[name]);
+        }
+    }
+
+    getContext(name: string): CanvasRenderingContext2D {
+        var ctx = this.canvases[name].getContext("2d");
+        return ctx;
+    }
+
+    getWidth() {
+        return this.canvases["main"].width;
+    }
+    getHeight() {
+        return this.canvases["main"].height;
+    }
+    setSize(width: number, height: number) {
+        for (let name in this.canvases) {
+            this.canvases[name].width = width;
+            this.canvases[name].height = height;
+        }
+    }
 }
