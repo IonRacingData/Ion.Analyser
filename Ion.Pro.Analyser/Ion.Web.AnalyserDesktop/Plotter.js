@@ -13,8 +13,9 @@ var Plotter = (function () {
         var _this = this;
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
+        this.wrapper.className = "plot-wrapper";
         this.canvas = document.createElement("canvas");
-        this.canvas.className = "plotCanvas";
+        this.canvas.className = "plot-canvas";
         this.markingCanvas = this.canvas.cloneNode();
         this.wrapper.appendChild(this.canvas);
         this.wrapper.appendChild(this.markingCanvas);
@@ -28,6 +29,7 @@ var Plotter = (function () {
                 _this.isMarking = true;
                 var mousePoint = _this.getMousePoint(e);
                 _this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+                console.log(_this.marking.firstPoint);
             }
         });
         this.wrapper.addEventListener("mousemove", function (e) {
@@ -50,12 +52,17 @@ var Plotter = (function () {
                 _this.isDragging = false;
             else if (_this.isMarking) {
                 _this.isMarking = false;
-                _this.zoomByMarking();
+                if (_this.marking.width !== 0 && _this.marking.height !== 0)
+                    _this.zoomByMarking();
             }
             else
                 _this.selectPoint(e);
         });
-        this.wrapper.addEventListener("mouseleave", function () { _this.mouseDown = false; });
+        this.wrapper.addEventListener("mouseleave", function () {
+            _this.mouseDown = false;
+            _this.isMarking = false;
+            _this.markingContext.clear();
+        });
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.wrapper.addEventListener("keydown", function (e) {
             console.log("key pressed");

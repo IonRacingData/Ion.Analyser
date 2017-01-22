@@ -205,6 +205,9 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.plotCanvas {    
+.plot-canvas {    
     position: absolute;    
+}
+.plot-wrapper {
+    position: relative;
 }

@@ -22,9 +22,10 @@
 
     generatePlot(): HTMLDivElement {
         this.wrapper = document.createElement("div");  
-        this.wrapper.setAttribute("tabindex", "0");      
+        this.wrapper.setAttribute("tabindex", "0");
+        this.wrapper.className = "plot-wrapper";       
         this.canvas = document.createElement("canvas");        
-        this.canvas.className = "plotCanvas";
+        this.canvas.className = "plot-canvas";
         this.markingCanvas = <HTMLCanvasElement>this.canvas.cloneNode();
         this.wrapper.appendChild(this.canvas);
         this.wrapper.appendChild(this.markingCanvas);
@@ -40,6 +41,7 @@
                 this.isMarking = true;
                 var mousePoint = this.getMousePoint(e);
                 this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 }             
+                console.log(this.marking.firstPoint);
             }
         });
         this.wrapper.addEventListener("mousemove", (e: MouseEvent) => {
@@ -64,12 +66,17 @@
                 this.isDragging = false;
             else if (this.isMarking) {
                 this.isMarking = false;
-                this.zoomByMarking();            
+                if (this.marking.width !== 0 && this.marking.height !== 0) 
+                    this.zoomByMarking();            
             }
             else
                 this.selectPoint(e);
         });
-        this.wrapper.addEventListener("mouseleave", () => { this.mouseDown = false });
+        this.wrapper.addEventListener("mouseleave", () => {
+            this.mouseDown = false;
+            this.isMarking = false;
+            this.markingContext.clear();            
+        });
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {              
             console.log("key pressed");        
