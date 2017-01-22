@@ -50,6 +50,7 @@
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
+    <TypeScriptCompile Include="MeterPlot.ts" />
     <TypeScriptCompile Include="models.ts" />
     <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Plotter.ts" />

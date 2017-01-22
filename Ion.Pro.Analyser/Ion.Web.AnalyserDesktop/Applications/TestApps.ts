@@ -173,3 +173,21 @@ class TestViewer implements IApplication {
         this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
     }
 }
+
+class MeterTester implements IApplication {
+    application: Application;
+    window: AppWindow;
+    meterPlot: MeterPlot;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.window.content.style.overflow = "hidden";
+        this.drawMeter();
+    }
+
+    drawMeter() {
+        this.window.content.innerHTML = "";
+        this.meterPlot = new MeterPlot(200);
+        this.window.content.appendChild(this.meterPlot.generate());
+    }
+}

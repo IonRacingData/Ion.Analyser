@@ -155,4 +155,19 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
+var MeterTester = (function () {
+    function MeterTester() {
+    }
+    MeterTester.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.window.content.style.overflow = "hidden";
+        this.drawMeter();
+    };
+    MeterTester.prototype.drawMeter = function () {
+        this.window.content.innerHTML = "";
+        this.meterPlot = new MeterPlot(200);
+        this.window.content.appendChild(this.meterPlot.generate());
+    };
+    return MeterTester;
+}());
 //# sourceMappingURL=TestApps.js.map
