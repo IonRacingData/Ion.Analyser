@@ -94,9 +94,8 @@ class PlotterTester implements IApplication {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.plotter.canvas.width = this.window.width;
-            this.plotter.canvas.height = this.window.height;
-            this.plotter.draw();
+            this.plotter.resize(this.window.width, this.window.height);
+            //this.plotter.draw();
         });
 
         /*var data: ISensorPackage[] = [
@@ -127,9 +126,8 @@ class PlotterTester implements IApplication {
         }
         this.plotter = new Plotter([plotData]);
         this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.plotter.resize(this.window.width, this.window.height);        
+        //this.plotter.draw();
     }
 }
 

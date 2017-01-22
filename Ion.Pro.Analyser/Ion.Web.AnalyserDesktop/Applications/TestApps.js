@@ -87,9 +87,8 @@ var PlotterTester = (function () {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.plotter.canvas.width = _this.window.width;
-            _this.plotter.canvas.height = _this.window.height;
-            _this.plotter.draw();
+            _this.plotter.resize(_this.window.width, _this.window.height);
+            //this.plotter.draw();
         });
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -117,9 +116,8 @@ var PlotterTester = (function () {
         }
         this.plotter = new Plotter([plotData]);
         this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.plotter.resize(this.window.width, this.window.height);
+        //this.plotter.draw();
     };
     return PlotterTester;
 }());

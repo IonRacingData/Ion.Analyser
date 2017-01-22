@@ -1,6 +1,9 @@
 ﻿class Plotter {
+    wrapper: HTMLDivElement;
     canvas: HTMLCanvasElement;
+    markingCanvas: HTMLCanvasElement;    
     context: ContextFixer;
+    markingContext: ContextFixer;
     data: PlotData[];
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
@@ -17,12 +20,19 @@
         this.data = data;
     }
 
-    generatePlot(): HTMLCanvasElement {
-        this.canvas = document.createElement("canvas");
-        this.canvas.setAttribute("tabindex", "0");        
+    generatePlot(): HTMLDivElement {
+        this.wrapper = document.createElement("div");  
+        this.wrapper.setAttribute("tabindex", "0");      
+        this.canvas = document.createElement("canvas");        
+        this.canvas.className = "plotCanvas";
+        this.markingCanvas = <HTMLCanvasElement>this.canvas.cloneNode();
+        this.wrapper.appendChild(this.canvas);
+        this.wrapper.appendChild(this.markingCanvas);
+
         this.context = new ContextFixer(this.canvas);
+        this.markingContext = new ContextFixer(this.markingCanvas);
         
-        this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
+        this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
             e.preventDefault();
             this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));            
             this.mouseDown = true;
@@ -32,23 +42,23 @@
                 this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 }             
             }
         });
-
-        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+        this.wrapper.addEventListener("mousemove", (e: MouseEvent) => {
             if (this.mouseDown && (e.movementX != 0 || e.movementY != 0)) {    
                 if (this.isMarking) {
-                    this.marking.secondPoint = this.getMousePoint(e);                                                        
+                    this.marking.secondPoint = this.getMousePoint(e);
+                    this.drawMarking();                                                    
                 }
                 else {
                     this.isDragging = true;
                     this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);                    
+                    this.draw();
                 }                
-                this.draw();
+                
             }
 
         });
-
-        this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
-            this.canvas.focus();
+        this.wrapper.addEventListener("mouseup", (e: MouseEvent) => {
+            this.wrapper.focus();
             this.mouseDown = false;
             if (this.isDragging)
                 this.isDragging = false;
@@ -59,11 +69,9 @@
             else
                 this.selectPoint(e);
         });
-
-        this.canvas.addEventListener("mouseleave", () => { this.mouseDown = false });
-        this.canvas.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
-
-        this.canvas.addEventListener("keydown", (e: KeyboardEvent) => {              
+        this.wrapper.addEventListener("mouseleave", () => { this.mouseDown = false });
+        this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
+        this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {              
             console.log("key pressed");        
             if (e.key === "g") {
                 this.displayGrid = this.displayGrid === true ? false : true;
@@ -76,7 +84,23 @@
         });
                 
         this.draw();
-        return this.canvas;
+        return this.wrapper;
+    }   
+
+    drawMarking() {
+        this.markingContext.clear();        
+        this.markingContext.fillStyle = "rgba(0,184,220,0.2)";
+        this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
+        this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
+        this.markingContext.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                           
+    }
+
+    resize(width: number, height: number) {        
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.markingCanvas.width = width;
+        this.markingCanvas.height = height;
+        this.draw();
     }
 
     selectPoint(e: MouseEvent) {
@@ -91,7 +115,7 @@
         if (p !== null) 
             this.selectedPoint = p;                    
         else
-            this.selectedPoint = null;
+            this.selectedPoint = null;        
 
         this.draw();
     }
@@ -176,14 +200,7 @@
             this.context.stroke();            
             this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 6, 13);            
         }            
-
-        if (this.isMarking) {
-            this.context.fillStyle = "rgba(0,184,220,0.2)";
-            this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
-            this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-            this.context.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                    
-            this.context.fillStyle = "black";            
-        }
+        
     }
 
     drawXAxis() {
@@ -348,11 +365,12 @@
     }
 
     zoomByMarking() {
+        this.markingContext.clear();
+
         var width = this.marking.width;
         var height = this.marking.height;        
         var xRatio = this.canvas.width / width;
         var yRatio = this.canvas.height / height;
-
 
         var downLeft = new Point(
             Math.min(
@@ -375,7 +393,6 @@
 
         this.draw();
     }
-
 }
 
 interface IStepInfo {
@@ -438,4 +455,3 @@ class ContextFixer {
         return this.ctx.measureText(text).width;
     }
 }
-

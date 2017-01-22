@@ -11,10 +11,16 @@ var Plotter = (function () {
     }
     Plotter.prototype.generatePlot = function () {
         var _this = this;
+        this.wrapper = document.createElement("div");
+        this.wrapper.setAttribute("tabindex", "0");
         this.canvas = document.createElement("canvas");
-        this.canvas.setAttribute("tabindex", "0");
+        this.canvas.className = "plotCanvas";
+        this.markingCanvas = this.canvas.cloneNode();
+        this.wrapper.appendChild(this.canvas);
+        this.wrapper.appendChild(this.markingCanvas);
         this.context = new ContextFixer(this.canvas);
-        this.canvas.addEventListener("mousedown", function (e) {
+        this.markingContext = new ContextFixer(this.markingCanvas);
+        this.wrapper.addEventListener("mousedown", function (e) {
             e.preventDefault();
             _this.mouseMod = new Point(_this.movePoint.x - e.layerX, _this.movePoint.y - (_this.canvas.height - e.layerY));
             _this.mouseDown = true;
@@ -24,20 +30,21 @@ var Plotter = (function () {
                 _this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
             }
         });
-        this.canvas.addEventListener("mousemove", function (e) {
+        this.wrapper.addEventListener("mousemove", function (e) {
             if (_this.mouseDown && (e.movementX != 0 || e.movementY != 0)) {
                 if (_this.isMarking) {
                     _this.marking.secondPoint = _this.getMousePoint(e);
+                    _this.drawMarking();
                 }
                 else {
                     _this.isDragging = true;
                     _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.canvas.height - e.layerY) + _this.mouseMod.y);
+                    _this.draw();
                 }
-                _this.draw();
             }
         });
-        this.canvas.addEventListener("mouseup", function (e) {
-            _this.canvas.focus();
+        this.wrapper.addEventListener("mouseup", function (e) {
+            _this.wrapper.focus();
             _this.mouseDown = false;
             if (_this.isDragging)
                 _this.isDragging = false;
@@ -48,9 +55,9 @@ var Plotter = (function () {
             else
                 _this.selectPoint(e);
         });
-        this.canvas.addEventListener("mouseleave", function () { _this.mouseDown = false; });
-        this.canvas.addEventListener("wheel", function (e) { return _this.zoom(e); });
-        this.canvas.addEventListener("keydown", function (e) {
+        this.wrapper.addEventListener("mouseleave", function () { _this.mouseDown = false; });
+        this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
+        this.wrapper.addEventListener("keydown", function (e) {
             console.log("key pressed");
             if (e.key === "g") {
                 _this.displayGrid = _this.displayGrid === true ? false : true;
@@ -63,7 +70,21 @@ var Plotter = (function () {
             }
         });
         this.draw();
-        return this.canvas;
+        return this.wrapper;
+    };
+    Plotter.prototype.drawMarking = function () {
+        this.markingContext.clear();
+        this.markingContext.fillStyle = "rgba(0,184,220,0.2)";
+        this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
+        this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
+        this.markingContext.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
+    };
+    Plotter.prototype.resize = function (width, height) {
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.markingCanvas.width = width;
+        this.markingCanvas.height = height;
+        this.draw();
     };
     Plotter.prototype.selectPoint = function (e) {
         var mp = this.getMousePoint(e);
@@ -147,13 +168,6 @@ var Plotter = (function () {
             this.context.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
             this.context.stroke();
             this.context.fillText(this.selectedPoint.toString(), this.canvas.width - this.context.measureText(pointString) - 6, 13);
-        }
-        if (this.isMarking) {
-            this.context.fillStyle = "rgba(0,184,220,0.2)";
-            this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
-            this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-            this.context.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
-            this.context.fillStyle = "black";
         }
     };
     Plotter.prototype.drawXAxis = function () {
@@ -295,6 +309,7 @@ var Plotter = (function () {
         return new Point(moved.x, this.canvas.height - moved.y);
     };
     Plotter.prototype.zoomByMarking = function () {
+        this.markingContext.clear();
         var width = this.marking.width;
         var height = this.marking.height;
         var xRatio = this.canvas.width / width;
