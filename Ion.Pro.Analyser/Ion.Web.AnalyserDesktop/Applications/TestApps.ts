@@ -94,9 +94,8 @@ class PlotterTester implements IApplication {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.plotter.canvas.width = this.window.width;
-            this.plotter.canvas.height = this.window.height;
-            this.plotter.draw();
+            this.plotter.setSize(this.window.width, this.window.height);
+            //this.plotter.draw();
         });
 
         /*var data: ISensorPackage[] = [
@@ -113,17 +112,22 @@ class PlotterTester implements IApplication {
     }
 
     loadData() {
-        kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawChart(data));
+        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
         //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     }
 
     drawChart(data: ISensorPackage[]) {
-        this.data = data;
-        this.plotter = new Plotter();
-        this.window.content.appendChild(this.plotter.generatePlot(data));
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.data = data;        
+        this.window.content.innerHTML = "";
+        var plotData = new PlotData([]);
+        for (var i = 0; i < data.length; i++) {
+            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
+        }
+        this.plotter = new Plotter([plotData]);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);        
+        //this.plotter.draw();
     }
 }
 

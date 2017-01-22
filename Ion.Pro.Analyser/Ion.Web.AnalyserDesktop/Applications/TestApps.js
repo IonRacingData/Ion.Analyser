@@ -87,9 +87,8 @@ var PlotterTester = (function () {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.plotter.canvas.width = _this.window.width;
-            _this.plotter.canvas.height = _this.window.height;
-            _this.plotter.draw();
+            _this.plotter.setSize(_this.window.width, _this.window.height);
+            //this.plotter.draw();
         });
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -104,16 +103,21 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
-        kernel.senMan.getData(841, function (data) { return _this.drawChart(data); });
+        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawChart(data); });
+        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
         //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     };
     PlotterTester.prototype.drawChart = function (data) {
         this.data = data;
-        this.plotter = new Plotter();
-        this.window.content.appendChild(this.plotter.generatePlot(data));
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.window.content.innerHTML = "";
+        var plotData = new PlotData([]);
+        for (var i = 0; i < data.length; i++) {
+            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
+        }
+        this.plotter = new Plotter([plotData]);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);
+        //this.plotter.draw();
     };
     return PlotterTester;
 }());
