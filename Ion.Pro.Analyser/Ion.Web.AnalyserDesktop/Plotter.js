@@ -7,10 +7,11 @@ var Plotter = (function () {
         this.selectedPoint = null;
         this.isMarking = false;
         this.displayGrid = true;
-        this.backgroundColor = "black";
+        this.stickyAxes = true;
+        this.backgroundColor = "white";
         this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "grey"; //"black";
-        this.mainColor = "white";
+        this.axisColor = "black"; //"black";
+        this.mainColor = "black";
         this.data = data;
     }
     Plotter.prototype.generatePlot = function () {
@@ -77,6 +78,10 @@ var Plotter = (function () {
             else if (e.key === "r") {
                 _this.scalePoint = new Point(1, 1);
                 _this.movePoint = new Point(50, 50);
+                _this.draw();
+            }
+            else if (e.key === "a") {
+                _this.stickyAxes = _this.stickyAxes === true ? false : true;
                 _this.draw();
             }
         });
@@ -188,7 +193,7 @@ var Plotter = (function () {
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
         var y = origo.y;
-        if (!visible) {
+        if (!visible && this.stickyAxes) {
             if (origo.y < 0)
                 y = 0;
             else
@@ -244,7 +249,7 @@ var Plotter = (function () {
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
         var x = origo.x;
-        if (!visible) {
+        if (!visible && this.stickyAxes) {
             if (origo.x < 0)
                 x = 0;
             else

@@ -17,10 +17,11 @@
     isMarking = false;
     marking: IMarking;    
     displayGrid = true;
-    backgroundColor = "black";
+    stickyAxes = true;
+    backgroundColor = "white";
     gridColor = "rgba(100,100,100,0.3)";
-    axisColor = "grey"; //"black";
-    mainColor = "white";
+    axisColor = "black"; //"black";
+    mainColor = "black";
 
 
     constructor(data: PlotData[]) {
@@ -93,6 +94,9 @@
             } else if (e.key === "r") {
                 this.scalePoint = new Point(1, 1);
                 this.movePoint = new Point(50, 50);
+                this.draw();
+            } else if (e.key === "a") {
+                this.stickyAxes = this.stickyAxes === true ? false : true;
                 this.draw();
             }
         });
@@ -227,7 +231,7 @@
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
 
         var y = origo.y;
-        if (!visible) {
+        if (!visible && this.stickyAxes) {
             if (origo.y < 0)
                 y = 0;
             else
@@ -294,7 +298,7 @@
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
 
         var x = origo.x;
-        if (!visible) {
+        if (!visible && this.stickyAxes) {
             if (origo.x < 0)
                 x = 0;
             else
