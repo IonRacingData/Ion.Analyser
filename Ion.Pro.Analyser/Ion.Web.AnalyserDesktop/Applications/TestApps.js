@@ -184,4 +184,17 @@ var MeterTester = (function () {
     };
     return MeterTester;
 }());
+var DashboardTester = (function () {
+    function DashboardTester() {
+    }
+    DashboardTester.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Dashboard Tester");
+        this.window.content.style.overflow = "hidden";
+        this.drawBarGraph();
+    };
+    DashboardTester.prototype.drawBarGraph = function () {
+        //Fredrik was here.
+    };
+    return DashboardTester;
+}());
 //# sourceMappingURL=TestApps.js.map
