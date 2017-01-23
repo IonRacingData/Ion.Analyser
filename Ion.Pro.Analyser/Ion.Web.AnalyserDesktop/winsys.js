@@ -113,11 +113,11 @@ var WindowManager = (function () {
     WindowManager.prototype.raiseEvent = function (type, data) {
         this.eventManager.raiseEvent(type, data);
     };
-    WindowManager.event_globalDrag = "globalDrag";
-    WindowManager.event_globalUp = "globalUp;";
-    WindowManager.event_windowOpen = "windowOpen";
-    WindowManager.event_windowSelect = "windowSelect";
-    WindowManager.event_windowClose = "windowClose";
     return WindowManager;
 }());
+WindowManager.event_globalDrag = "globalDrag";
+WindowManager.event_globalUp = "globalUp;";
+WindowManager.event_windowOpen = "windowOpen";
+WindowManager.event_windowSelect = "windowSelect";
+WindowManager.event_windowClose = "windowClose";
 //# sourceMappingURL=winsys.js.map

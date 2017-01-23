@@ -12,15 +12,11 @@
 
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         //var clone: Node = document.importNode(template.content, true);
-        var test = new GridHContainer();
-        test.addChild();
-        test.addChild();
-        test.addChild();
-        test.addChild();
-        test.addChild();
+        var test = new GridHContainer(this.window);
+        //test.addChild();
         var clone = test.baseNode;
-        this.window.content.appendChild(clone);
-        
+        this.window.content.appendChild(this.mk.tag("button", "", [{ func: (e: Event) => { test.addChild(); }, event: "click" }], "Hello world"));
+        this.window.content.appendChild(clone); 
         //addEvents();
     }
 
@@ -109,14 +105,28 @@
 class GridContainer {
     baseNode: HTMLElement;
     mk: HtmlHelper = new HtmlHelper();
+    moving: boolean;
+    editFunction: (e: MouseEvent) => void;
+    appWindow: AppWindow;
+    last: HTMLElement;
 
-    constructor() {
+    constructor(appWindow: AppWindow) {
         this.baseNode = this.create("");
+        this.appWindow = appWindow;
+        this.baseNode.addEventListener("mousemove", (e: MouseEvent) => {
+            if (this.moving) {
+                this.editFunction(e);
+            }
+        });
+        this.baseNode.addEventListener("mouseup", (e: MouseEvent) => {
+            this.moving = false;
+        });
     }
 
     create(cls: string): HTMLElement {
         var base = this.mk.tag("div", "grid-" + cls);
-        base.appendChild(this.createChild());
+        this.last = this.createChild();
+        base.appendChild(this.last);
         return base;
     }
 
@@ -125,8 +135,29 @@ class GridContainer {
     }
 
     addChild() {
-        this.baseNode.appendChild(this.createSeperator());
-        this.baseNode.appendChild(this.createChild());
+        let seperator = this.createSeperator();
+        let child = this.createChild();
+        let last = this.last;
+        this.last = child;
+        this.baseNode.appendChild(seperator);
+        this.baseNode.appendChild(child);
+        seperator.addEventListener("mousedown", (e: MouseEvent) => {
+            this.editFunction = (e: MouseEvent) => {
+                this.resize(last, e, this.appWindow);
+            };
+            this.moving = true;
+        });
+
+    }
+
+    
+    resize(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
+
+    }
+
+    resizeCommon(gridWindow: HTMLElement, event: MouseEvent): void{
+        gridWindow.style.flexGrow = "0";
+        gridWindow.style.flexBasis = "unset";
     }
 
     createChild(): HTMLElement {
@@ -138,8 +169,8 @@ class GridContainer {
 }
 
 class GridHContainer extends GridContainer {
-    constructor() {
-        super();
+    constructor(appWindow: AppWindow) {
+        super(appWindow);
     }
 
     create(): HTMLElement {
@@ -149,11 +180,17 @@ class GridHContainer extends GridContainer {
     createSeperator(): HTMLElement {
         return this.mk.tag("div", "grid-hdiv", null, "&nbsp;");
     }
+
+    resize(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
+        console.log(event);
+        gridWindow.style.width = (appWindow.width - (event.clientX - appWindow.x) - 4) + "px";
+        super.resizeCommon(gridWindow, event);
+    }
 }
 
 class GridVContainer extends GridContainer {
-    constructor() {
-        super();
+    constructor(appWindow: AppWindow) {
+        super(appWindow);
     }
 
     create(): HTMLElement {
@@ -162,6 +199,11 @@ class GridVContainer extends GridContainer {
 
     createSeperator(): HTMLElement {
         return this.mk.tag("div", "grid-vdiv", null, "&nbsp;");
+    }
+
+    resize(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
+        gridWindow.style.height = (appWindow.height - (event.clientY - appWindow.y) - 4 + 30) + "px";
+        super.resizeCommon(gridWindow, event);
     }
 }
 
