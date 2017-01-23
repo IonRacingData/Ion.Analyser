@@ -443,6 +443,8 @@ class ContextFixer {
     ctx: CanvasRenderingContext2D;
     fillStyle: string;
     strokeStyle: string;
+    textAlign: string;
+    textBaseline: string;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -472,6 +474,8 @@ class ContextFixer {
     }
     fillText(text: string, x: number, y: number) {
         this.ctx.fillStyle = this.fillStyle;
+        this.ctx.textAlign = this.textAlign;
+        this.ctx.textBaseline = this.textBaseline;
         this.ctx.fillText(text, x, y);        
     }
     fillRect(x: number, y: number, width: number, height: number) {
@@ -483,6 +487,12 @@ class ContextFixer {
     }
     measureText(text: string) {
         return this.ctx.measureText(text).width;
+    }
+    translate(x: number, y: number) {
+        this.ctx.translate(x, y);
+    }
+    rotate(angle: number) {
+        this.ctx.rotate(angle);
     }
 }
 

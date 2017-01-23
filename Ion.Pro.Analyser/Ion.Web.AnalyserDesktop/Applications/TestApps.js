@@ -151,7 +151,7 @@ var TestViewer = (function () {
     };
     TestViewer.prototype.draw = function () {
         this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
+        this.window.content.appendChild(this.mk.tag("h1", "", null, "He llo World"));
     };
     return TestViewer;
 }());
@@ -159,13 +159,27 @@ var MeterTester = (function () {
     function MeterTester() {
     }
     MeterTester.prototype.main = function () {
+        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
         this.drawMeter();
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.meterPlot.setSize(_this.window.height);
+            //this.plotter.draw();
+        });
+        var slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", function () {
+            var val = slider.value;
+            _this.meterPlot.drawNeedle(parseInt(val));
+        });
     };
     MeterTester.prototype.drawMeter = function () {
         this.window.content.innerHTML = "";
-        this.meterPlot = new MeterPlot(200);
+        this.meterPlot = new MeterPlot(200, ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]);
         this.window.content.appendChild(this.meterPlot.generate());
     };
     return MeterTester;

@@ -377,6 +377,8 @@ var ContextFixer = (function () {
     };
     ContextFixer.prototype.fillText = function (text, x, y) {
         this.ctx.fillStyle = this.fillStyle;
+        this.ctx.textAlign = this.textAlign;
+        this.ctx.textBaseline = this.textBaseline;
         this.ctx.fillText(text, x, y);
     };
     ContextFixer.prototype.fillRect = function (x, y, width, height) {
@@ -388,6 +390,12 @@ var ContextFixer = (function () {
     };
     ContextFixer.prototype.measureText = function (text) {
         return this.ctx.measureText(text).width;
+    };
+    ContextFixer.prototype.translate = function (x, y) {
+        this.ctx.translate(x, y);
+    };
+    ContextFixer.prototype.rotate = function (angle) {
+        this.ctx.rotate(angle);
     };
     return ContextFixer;
 }());
