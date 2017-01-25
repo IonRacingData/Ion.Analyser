@@ -553,6 +553,14 @@ namespace NicroWare.Pro.DmxControl.JSON
             char curChar = doc.Peek();
             while (true)
             {
+                if (curChar == '/' && doc.Peek() == '/')
+                {
+                    while (curChar != '\n')
+                    {
+                        curChar = doc.Get();
+                    }
+                    curChar = doc.NextNonWhiteSpace();
+                }
                 if (curChar == '"')
                 {
                     JSONField jsonField = (JSONField)new JSONField().Parse(doc);
@@ -609,6 +617,14 @@ namespace NicroWare.Pro.DmxControl.JSON
             char c = doc.Peek();
             while (true)
             {
+                if (c == '/' && doc.Peek() == '/')
+                {
+                    while (c != '\n')
+                    {
+                        c = doc.Get();
+                    }
+                    c = doc.NextNonWhiteSpace();
+                }
                 if (c == ']')
                     break;
                 Nodes.Add(JSONObject.ParseNodeStart(c, doc));

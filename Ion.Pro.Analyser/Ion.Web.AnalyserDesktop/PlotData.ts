@@ -1,6 +1,7 @@
 ﻿class PlotData {
-    points: Point[];
     ID: number;
+
+    points: Point[];
 
     constructor(p: Point[]) {
         this.points = p;

@@ -6,6 +6,9 @@ var SensorManager = (function () {
     SensorManager.prototype.getIds = function (callback) {
         requestAction("GetIds", callback);
     };
+    SensorManager.prototype.getLoadedIds = function (callback) {
+        requestAction("GetLoadedIds", callback);
+    };
     SensorManager.prototype.getData = function (id, callback) {
         if (!this.dataCache[id]) {
             this.loadData(id, callback);
@@ -37,5 +40,10 @@ var SensorManager = (function () {
     };
     SensorManager.event_globalPlot = "globalPlot";
     return SensorManager;
+}());
+var SensorInformation = (function () {
+    function SensorInformation() {
+    }
+    return SensorInformation;
 }());
 //# sourceMappingURL=sensys.js.map
