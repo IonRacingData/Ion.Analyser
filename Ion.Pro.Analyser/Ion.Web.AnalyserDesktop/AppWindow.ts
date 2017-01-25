@@ -5,6 +5,7 @@
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
+    topMost: boolean = false;
 
     eventMan: EventManager = new EventManager();
 
@@ -319,17 +320,22 @@
 
     changeWindowMode(mode: WindowMode): void {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
                 this.recalculateSize();
                 this.onResize();
                 break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
+                break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
         }
     }
@@ -337,7 +343,8 @@
 
 enum WindowMode {
     WINDOWED = 0,
-    BORDERLESS = 1,
+    BORDERLESSFULL = 1,
+    BORDERLESS = 2,
 }
 
 enum TileState {

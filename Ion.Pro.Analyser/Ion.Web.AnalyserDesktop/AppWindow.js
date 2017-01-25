@@ -1,6 +1,7 @@
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
+        this.topMost = false;
         this.eventMan = new EventManager();
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
@@ -237,17 +238,22 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.changeWindowMode = function (mode) {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
                 this.recalculateSize();
                 this.onResize();
                 break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
+                break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
         }
     };
@@ -261,7 +267,8 @@ var AppWindow = (function () {
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";
-    WindowMode[WindowMode["BORDERLESS"] = 1] = "BORDERLESS";
+    WindowMode[WindowMode["BORDERLESSFULL"] = 1] = "BORDERLESSFULL";
+    WindowMode[WindowMode["BORDERLESS"] = 2] = "BORDERLESS";
 })(WindowMode || (WindowMode = {}));
 var TileState;
 (function (TileState) {

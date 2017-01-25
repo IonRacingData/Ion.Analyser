@@ -4,29 +4,138 @@
     eh: EventHandler = new EventHandler();
     mk: HtmlHelper = new HtmlHelper();
     childWindows: AppWindow[] = [];
+    selectorWindow: AppWindow;
 
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+        this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.selectorWindow.setSize(92, 92);
+        this.selectorWindow.content.style.overflow = "hidden";
+        this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
+        this.selectorWindow.topMost = true;
+        this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
+        this.selectorWindow.hide();
+
         var mk = this.mk;
         this.registerEvents(this.eh);
 
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
-        //var clone: Node = document.importNode(template.content, true);
         var test = new GridHContainer(this);
-        //test.addChild();
         var clone = test.baseNode;
-        this.window.content.appendChild(this.mk.tag("button", "", [{ func: (e: Event) => { test.addChild(); }, event: "click" }], "Hello world"));
-        this.window.content.appendChild(this.mk.tag("button", "", [{
-            func: (e: Event) => {
-                var g = test.addChild();
-                var tester2 = new GridVContainer(this);
-                g.box.innerHTML = "";
-                g.box.appendChild(tester2.baseNode);
-                tester2.addChild();
-            }, event: "click"
-        }], "Hello world 2"));
-        this.window.content.appendChild(clone); 
-        //addEvents();
+
+        this.window.content.appendChild(clone);
+        this.generateSelector();
+        this.selectedContainer = test;
+    }
+
+    handle_releaseUp() {
+        this.handle_release("up");
+    }
+
+    handle_releaseDown() {
+        this.handle_release("down");
+    }
+
+    handle_releaseRight() {
+        this.handle_release("right");
+    }
+
+    handle_releaseLeft() {
+        this.handle_release("left");
+    }
+
+    handle_release(dir: string) {
+        let box = null;
+        if (this.selectedContainer.gridBoxes.length == 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length == 0) {
+            box = this.selectedContainer.gridBoxes[0];
+        }
+        else {
+            if (dir == "left") {
+                if (this.selectedContainer instanceof GridHContainer) {
+                    box = this.selectedContainer.insertChildBefore(this.selectedBox);
+                }
+                else {
+                    let newGridbox = new GridHContainer(this);
+                    let child = this.selectedBox.content;
+                    box = newGridbox.gridBoxes[0];
+                    let newChild = newGridbox.insertChildAfter(box);
+                    newChild.setContent(child);
+                    this.selectedBox.setContent(newGridbox.baseNode);
+                }
+            }
+            else if (dir == "right") {
+                if (this.selectedContainer instanceof GridHContainer) {
+                    box = this.selectedContainer.insertChildAfter(this.selectedBox);
+                }
+                else {
+                    let newGridbox = new GridHContainer(this);
+                    let child = this.selectedBox.content;
+                    box = newGridbox.gridBoxes[0];
+                    let newChild = newGridbox.insertChildBefore(box);
+                    newChild.setContent(child);
+                    this.selectedBox.setContent(newGridbox.baseNode);
+                }
+            }
+            else if (dir == "up") {
+                if (this.selectedContainer instanceof GridVContainer) {
+                    box = this.selectedContainer.insertChildBefore(this.selectedBox);
+                }
+                else {
+                    let newGridbox = new GridVContainer(this);
+                    let child = this.selectedBox.content;
+                    box = newGridbox.gridBoxes[0];
+                    let newChild = newGridbox.insertChildAfter(box);
+                    newChild.setContent(child);
+                    this.selectedBox.setContent(newGridbox.baseNode);
+                }
+            }
+            else if (dir == "down") {
+                if (this.selectedContainer instanceof GridVContainer) {
+                    box = this.selectedContainer.insertChildAfter(this.selectedBox);
+                }
+                else {
+                    let newGridbox = new GridVContainer(this);
+                    let child = this.selectedBox.content;
+                    box = newGridbox.gridBoxes[0];
+                    let newChild = newGridbox.insertChildBefore(box);
+                    newChild.setContent(child);
+                    this.selectedBox.setContent(newGridbox.baseNode);
+                }
+            }
+        }
+        var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;
+        var window = kernel.winMan.activeWindow;
+        window.changeWindowMode(WindowMode.BORDERLESSFULL);
+
+        this.childWindows.push(window);
+        box.content.appendChild(windowBody);
+
+        window.recalculateSize();
+        window.onResize();
+    }
+
+    generateSelector() {
+        let mk = this.mk;
+        let selector = mk.tag("div", "dock-selector");
+        let up = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseUp() }]);
+        up.appendChild(mk.tag("div", "dock-up")); 
+        let left = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseLeft() }]);
+        left.appendChild(mk.tag("div", "dock-left"));
+        let right = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseRight() }]);
+        right.appendChild(mk.tag("div", "dock-right"));
+        let down = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseDown() }]);
+        down.appendChild(mk.tag("div", "dock-down"));
+
+        selector.appendChild(mk.tag("div", "dock-item"));
+        selector.appendChild(up);
+        selector.appendChild(mk.tag("div", "dock-item"));
+        selector.appendChild(left);
+        selector.appendChild(mk.tag("div", "dock-item"));
+        selector.appendChild(right);
+        selector.appendChild(mk.tag("div", "dock-item"));
+        selector.appendChild(down);
+        selector.appendChild(mk.tag("div", "dock-item"));
+        this.selectorWindow.content.appendChild(selector);
     }
 
     registerEvents(eh: EventHandler) {
@@ -35,6 +144,7 @@
         eh.on(this.window, AppWindow.event_close, () => this.handleClose());
 
         eh.on(this.window, AppWindow.event_resize, () => this.handleResize());
+        eh.on(this.window, AppWindow.event_move, () => this.handleMove());
     }
 
     handleClose() {
@@ -42,13 +152,19 @@
             this.childWindows[i].close();
         }
         this.eh.close();
+        this.selectorWindow.close();
     }
 
     handleResize() {
+        this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         for (var i in this.childWindows) {
             this.childWindows[i].recalculateSize();
             this.childWindows[i].onResize();
         }
+    }
+
+    handleMove() {
+        
     }
 
     globalDrag(e: IWindowEvent) {
@@ -59,54 +175,53 @@
             && windowX < this.window.width
             && windowY < this.window.height
             && e.window != this.window) {
-            console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
+
+            var containers = this.window.handle.getElementsByClassName("grid-con");
+            for (let i = containers.length - 1; i >= 0; i--) {
+                let cur = <HTMLElement>containers[i];
+                if (windowX > cur.offsetLeft
+                    && windowY > cur.offsetTop
+                    && windowX < cur.offsetLeft + cur.offsetWidth
+                    && windowY < cur.offsetTop + cur.offsetHeight) {
+                    console.log(cur);
+                    this.selectedContainer = cur.gridContainer;
+                    break;
+                }
+            }
+
+            var gridBoxes = this.window.handle.getElementsByClassName("grid-box");
+            var foundGridWindow: HTMLElement = null;
+            for (let i = gridBoxes.length - 1; i >= 0; i--) {
+                let cur = <HTMLElement>gridBoxes[i];
+
+                if (windowX > cur.offsetLeft
+                    && windowY > cur.offsetTop
+                    && windowX < cur.offsetLeft + cur.offsetWidth
+                    && windowY < cur.offsetTop + cur.offsetHeight) {
+                    this.selectedBox = cur.gridBox;
+                    this.selectorWindow.setPos(
+                        this.selectedBox.box.offsetLeft + (<HTMLElement>this.selectedBox.box.offsetParent).offsetLeft + this.selectedBox.box.offsetWidth / 2 - 45
+                        , this.selectedBox.box.offsetTop + (<HTMLElement>this.selectedBox.box.offsetParent).offsetTop + this.selectedBox.box.offsetHeight / 2 - 45);
+                    break;
+                }
+            }
+            this.selectorWindow.show();
+
+            //console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
+        }
+        else {
+            this.selectorWindow.hide();
         }
     }
+
+    selectedContainer: GridContainer;
+    selectedBox: GridBox;
 
     globalUp(e: IWindowEvent) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
         if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window != this.window) {
-            console.log("grid-window Droped over");
-            var gridWindows = this.window.handle.getElementsByClassName("grid-window");
-            var foundGridWindow: HTMLElement = null;
-            for (var i = 0; i < gridWindows.length; i++) {
-                var cur = <HTMLElement>gridWindows[i];
-                
-                if (windowX > cur.offsetLeft
-                    && windowY > cur.offsetTop
-                    && windowX < cur.offsetLeft + cur.offsetWidth
-                    && windowY < cur.offsetTop + cur.offsetHeight) {
-                    foundGridWindow = cur;
-                    console.log("grid-window Found grid window X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
-                    break;
-                    //console.log("Found :D X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
-                }
-                else {
-                    console.log("grid-window X: " + cur.offsetLeft + " Y: " + cur.offsetTop + " Width: " + cur.offsetWidth + " Height: " + cur.offsetHeight);
-                }
-                
-            }
-            console.log("grid-window dropped at: X: " + windowX + " Y: " + windowY);
-
-            if (foundGridWindow && foundGridWindow.innerHTML.length == 0) {
-
-                foundGridWindow.innerHTML = "";
-                var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;//.getElementsByClassName("window-body")[0];
-                var window = kernel.winMan.activeWindow;
-                window.changeWindowMode(WindowMode.BORDERLESS);
-                
-                this.childWindows.push(window);
-                //windowBody.style.width = "100%";
-                //windowBody.style.height = "100%";
-                foundGridWindow.appendChild(windowBody);
-
-                window.recalculateSize();
-                window.onResize();
-            }
-            else {
-                console.log("grid-window could not find any window, this is a problem");
-            }
+            this.selectorWindow.hide();
         }
     }
 }
@@ -142,9 +257,8 @@ class GridContainer {
     }
 
     create(cls: string): HTMLElement {
-
-        var base = this.mk.tag("div", "grid-" + cls);
-        
+        var base = this.mk.tag("div", "grid-con grid-" + cls);
+        base.gridContainer = this;
         base.appendChild(this.createChild());
         return base;
     }
@@ -153,8 +267,57 @@ class GridContainer {
         return null;
     }
 
-    addChild(): GridBox {
+    insertChildBefore(box: GridBox): GridBox {
+        return this.insertChild(box, "before");
+    }
 
+    insertChildAfter(box: GridBox): GridBox {
+        return this.insertChild(box, "after");
+    }
+
+    insertChild(box: GridBox, dir: string): GridBox {
+        let seperator = this.createSeperator();
+        let newTotal = this.gridBoxes.length + 1;
+        for (let i = 0; i < this.gridBoxes.length; i++) {
+            let cur: number = this.gridBoxes[i][this.dir2];
+            let newVal = cur * (newTotal - 1) / newTotal;
+            this.gridBoxes[i][this.set](newVal, 6);
+        }
+        let child = null;
+        let insertString = "";
+        if (dir == "before") {
+            child = this.createChildBefore(box);
+            insertString = "beforebegin";
+        }
+        else {
+            child = this.createChildAfter(box);
+            insertString = "afterend";
+        }
+
+        box.box.insertAdjacentElement(insertString, child);
+        box.box.insertAdjacentElement(insertString, seperator);
+
+        child.gridBox[this.set](1 / newTotal, 6);
+
+        //this.baseNode.appendChild(seperator);
+        //this.baseNode.appendChild(child);
+        seperator.addEventListener("mousedown", (e: MouseEvent) => {
+            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos]);
+
+            seperator.parentElement.onmousemove = (e: MouseEvent) => {
+                this.appWindow.handleResize();
+                container.adjustSize(e);
+            };
+            seperator.parentElement.onmouseup = (e: MouseEvent) => {
+                seperator.parentElement.onmousemove = null;
+                seperator.parentElement.onmouseup = null
+            }
+        });
+        return child.gridBox;
+    }
+
+
+    addChild(): GridBox {
         let seperator = this.createSeperator();
         let newTotal = this.gridBoxes.length + 1;
         for (let i = 0; i < this.gridBoxes.length; i++) {
@@ -177,11 +340,6 @@ class GridContainer {
                 seperator.parentElement.onmousemove = null;
                 seperator.parentElement.onmouseup = null
             }
-
-            //this.editFunction = (e: MouseEvent) => {
-            //    this.resize(child, e, this.appWindow);
-            //};
-            //this.moving = true;
         });
         return child.gridBox;
     }
@@ -195,6 +353,25 @@ class GridContainer {
         gridWindow.style.flexBasis = "unset";
     }
 
+    createChildAfter(box: GridBox): HTMLElement {
+        return this.createRelativeChild(box, 1);
+    }
+
+    createChildBefore(box: GridBox): HTMLElement {
+        return this.createRelativeChild(box, 0);
+    }
+
+    createRelativeChild(box: GridBox, rel: number) {
+        var nBox = new GridBox();
+        for (let i = 0; i < this.gridBoxes.length; i++) {
+            if (this.gridBoxes[i] == box) {
+                this.gridBoxes.splice(i + rel, 0, nBox);
+                break;
+            }
+        }
+        return nBox.box;
+    }
+
     createChild(): HTMLElement {
         var box = new GridBox();
         this.gridBoxes.push(box);
@@ -204,6 +381,7 @@ class GridContainer {
 
 interface HTMLElement {
     gridBox: GridBox;
+    gridContainer: GridContainer;
 }
 
 class GridBox {
@@ -216,7 +394,14 @@ class GridBox {
         let mk = this.mk = new HtmlHelper();
         this.box = mk.tag("div", "grid-box");
         this.box.gridBox = this;
-        this.box.appendChild(mk.tag("div", "grid-window"));
+        this.content = mk.tag("div", "grid-window");
+        this.box.appendChild(this.content);
+    }
+
+    setContent(element: HTMLElement) {
+        this.box.innerHTML = "";
+        this.content = element;
+        this.box.appendChild(element);
     }
 
     setWidth(percent: number, correction: number = 0) {

@@ -101,7 +101,12 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.reorderWindows = function () {
         for (var i = 0; i < this.order.length; i++) {
-            this.order[i].handle.style.zIndex = ((i + 1) * 100).toString();
+            if (this.order[i].topMost) {
+                this.order[i].handle.style.zIndex = ((i + 1) * 100000).toString();
+            }
+            else {
+                this.order[i].handle.style.zIndex = ((i + 1) * 100).toString();
+            }
         }
     };
     WindowManager.prototype.addEventListener = function (type, listner) {
