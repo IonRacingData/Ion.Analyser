@@ -93,6 +93,7 @@ class PlotterTester implements IApplication {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
+
         this.createEvents(this.eh);
 
         /*var data: ISensorPackage[] = [
@@ -110,9 +111,10 @@ class PlotterTester implements IApplication {
 
     createEvents(eh: EventHandler) {
         eh.on(this.window, AppWindow.event_resize, () => {
-            this.plotter.canvas.width = this.window.width;
-            this.plotter.canvas.height = this.window.height;
-            this.plotter.draw();
+            this.plotter.setSize(this.window.width, this.window.height);
+            //this.plotter.canvas.width = this.window.width;
+            //this.plotter.canvas.height = this.window.height;
+            //this.plotter.draw();
         });
         eh.on(this.window, AppWindow.event_close, () => {
             this.close();
@@ -130,17 +132,16 @@ class PlotterTester implements IApplication {
     }
 
     drawChart(data: ISensorPackage[]) {
-        this.data = data;
-        this.plotter = new Plotter();
+        this.data = data;        
         this.window.content.innerHTML = "";
         var plotData = new PlotData([]);
         for (var i = 0; i < data.length; i++) {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
-        this.window.content.appendChild(this.plotter.generatePlot(plotData));
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.plotter = new Plotter([plotData]);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);        
+        //this.plotter.draw();
     }
 }
 

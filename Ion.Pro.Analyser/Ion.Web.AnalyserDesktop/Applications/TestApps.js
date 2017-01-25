@@ -101,9 +101,10 @@ var PlotterTester = (function () {
     PlotterTester.prototype.createEvents = function (eh) {
         var _this = this;
         eh.on(this.window, AppWindow.event_resize, function () {
-            _this.plotter.canvas.width = _this.window.width;
-            _this.plotter.canvas.height = _this.window.height;
-            _this.plotter.draw();
+            _this.plotter.setSize(_this.window.width, _this.window.height);
+            //this.plotter.canvas.width = this.window.width;
+            //this.plotter.canvas.height = this.window.height;
+            //this.plotter.draw();
         });
         eh.on(this.window, AppWindow.event_close, function () {
             _this.close();
@@ -120,16 +121,15 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.drawChart = function (data) {
         this.data = data;
-        this.plotter = new Plotter();
         this.window.content.innerHTML = "";
         var plotData = new PlotData([]);
         for (var i = 0; i < data.length; i++) {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
-        this.window.content.appendChild(this.plotter.generatePlot(plotData));
-        this.plotter.canvas.width = this.window.width;
-        this.plotter.canvas.height = this.window.height;
-        this.plotter.draw();
+        this.plotter = new Plotter([plotData]);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);
+        //this.plotter.draw();
     };
     return PlotterTester;
 }());

@@ -1,7 +1,12 @@
 ﻿class Plotter {
-    canvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D;
-    data: PlotData;
+    wrapper: HTMLDivElement;
+    canvas: LayeredCanvas;
+    ctxMain: ContextFixer;       
+    ctxMarking: ContextFixer;  
+    ctxBackground: ContextFixer;  
+    width: number;
+    height: number;
+    data: PlotData[];
     movePoint = new Point(50, 50);
     scalePoint = new Point(1, 1);
     mouseMod: Point;    
@@ -11,65 +16,123 @@
     selectedPoint: Point = null;    
     isMarking = false;
     marking: IMarking;    
+    displayGrid = true;
+    stickyAxes = true;
+    backgroundColor = "white";
+    gridColor = "rgba(100,100,100,0.3)";
+    axisColor = "black"; //"black";
+    mainColor = "black";
 
-    generatePlot(data: PlotData): HTMLCanvasElement {
-        this.canvas = document.createElement("canvas");        
-        this.canvas.addEventListener("mousedown", (e: MouseEvent) => {
+
+    constructor(data: PlotData[]) {
+        this.data = data;
+    }
+
+    generatePlot(): HTMLDivElement {        
+        this.wrapper = document.createElement("div");  
+        this.wrapper.setAttribute("tabindex", "0");
+        this.wrapper.className = "plot-wrapper";      
+
+        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
+        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);       
+        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
+        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.width = this.canvas.getWidth();
+        this.height = this.canvas.getHeight();     
+        this.ctxMain.strokeStyle = this.mainColor;
+        
+        this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
             e.preventDefault();
-            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.canvas.height - e.layerY));            
+            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));            
             this.mouseDown = true;
             if (e.altKey) {
                 this.isMarking = true;
                 var mousePoint = this.getMousePoint(e);
                 this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 }             
+                console.log(this.marking.firstPoint);
             }
         });
-
-        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+        this.wrapper.addEventListener("mousemove", (e: MouseEvent) => {
             if (this.mouseDown && (e.movementX != 0 || e.movementY != 0)) {    
                 if (this.isMarking) {
-                    this.marking.secondPoint = this.getMousePoint(e);                                                        
+                    this.marking.secondPoint = this.getMousePoint(e);
+                    this.drawMarking();                                                    
                 }
                 else {
                     this.isDragging = true;
-                    this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.canvas.height - e.layerY) + this.mouseMod.y);                    
-                }
-                console.log(this.movePoint);
-                this.draw();
+                    this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);                    
+                    this.draw();
+                }                
+                
             }
 
         });
-
-        this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
+        this.wrapper.addEventListener("mouseup", (e: MouseEvent) => {
+            this.wrapper.focus();
             this.mouseDown = false;
             if (this.isDragging)
                 this.isDragging = false;
             else if (this.isMarking) {
                 this.isMarking = false;
-                this.zoomByMarking();            
+                if (this.marking.width !== 0 && this.marking.height !== 0) 
+                    this.zoomByMarking();            
             }
-
-            this.selectPoint(e);
+            else
+                this.selectPoint(e);
         });
-
-        this.canvas.addEventListener("mouseleave", () => { this.mouseDown = false });
-        this.canvas.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
-        this.canvas.addEventListener("click", (e: MouseEvent) => {
-            
+        this.wrapper.addEventListener("mouseleave", () => {
+            this.mouseDown = false;
+            this.isMarking = false;
+            this.ctxMarking.clear();            
         });
-        
-        this.data = data;
+        this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
+        this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {              
+            console.log("key pressed");        
+            if (e.key === "g") {
+                this.displayGrid = this.displayGrid === true ? false : true;
+                this.draw();
+            } else if (e.key === "r") {
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                this.draw();
+            } else if (e.key === "a") {
+                this.stickyAxes = this.stickyAxes === true ? false : true;
+                this.draw();
+            }
+        });
+                
         this.draw();
-        return this.canvas;
+        return this.wrapper;
+    }   
+
+    drawMarking() {
+        this.ctxMarking.clear();        
+        this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
+        this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
+        this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
+        this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                           
+    }    
+
+    setSize(width: number, height: number) {        
+        this.width = width;
+        this.height = height;
+        this.canvas.setSize(width, height);
+        this.draw();
     }
 
     selectPoint(e: MouseEvent) {
         var mp = this.getMousePoint(e);
-        var closest = this.data.getClosest(this.getRelative(mp));
-        if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
-            this.selectedPoint = closest;            
+        var p: Point = null;
+        for (var i = 0; i < this.data.length; i++) {
+            var closest = this.data[i].getClosest(this.getRelative(mp));
+            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
+                p = closest;            
+        }               
+
+        if (p !== null) 
+            this.selectedPoint = p;                    
         else
-            this.selectedPoint = null;
+            this.selectedPoint = null;        
 
         this.draw();
     }
@@ -110,82 +173,89 @@
         return new Point( e.layerX, e.layerY );
     }
 
-    draw() {                        
-        var ctx = this.canvas.getContext("2d");
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.lineWidth = 1;
-        ctx.beginPath();              
-        
-        var firstVisibleIdx = this.data.getIndexOf(this.getRelative(new Point(0, 0)));
-        if (firstVisibleIdx > 0)
-            firstVisibleIdx--
+    draw() {                                
+        this.ctxMain.clear();        
+        this.ctxMain.beginPath();          
 
-        var lastPoint = lastPoint = this.getAbsolute(this.data.points[firstVisibleIdx]);
-        var totalLength = this.data.points.length;
-        var points = this.data.points;
-        var samePoint = 0;
-        var drawPoint = 0;
-        var checkPoint = lastPoint;
+        for (var d = 0; d < this.data.length; d++) {
+            var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            if (firstVisibleIdx > 0)
+                firstVisibleIdx--
 
-        for (var i = firstVisibleIdx; i < totalLength; i++) {
-            var point = this.getAbsolute(points[i]);
-            if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                ctx.moveTo(Math.floor(point.x), Math.floor(point.y));
-                ctx.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-            //ctx.moveTo(point.x, point.y);
-            //ctx.lineTo(lastPoint.x, lastPoint.y);
-                drawPoint++;
-                checkPoint = point;
-            } 
-            //else {
-            //    samePoint++;
-            //} 
+            var lastPoint = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
+            var totalLength = this.data[d].points.length;
+            var points = this.data[d].points;
+            var drawPoint = 0;
+            var checkPoint = lastPoint;
 
-            if (point.x > this.canvas.width) {
-                break;
+            for (var i = firstVisibleIdx; i < totalLength; i++) {
+                var point = this.getAbsolute(points[i]);
+                if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
+                    this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
+                    this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
+                    drawPoint++;
+                    checkPoint = point;
+                }
+
+                if (point.x > this.width) {
+                    break;
+                }
+                lastPoint = point;
             }
-            lastPoint = point;
-        }
-        
-        this.drawXAxis(ctx);
-        this.drawYAxis(ctx);       
 
-        ctx.stroke();      
+            this.ctxMain.stroke();
+        }
+      
+        this.drawXAxis();
+        this.drawYAxis();
 
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
-            ctx.beginPath();
-            //ctx.moveTo(abs.x, abs.y);
-            ctx.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-            ctx.stroke();
             var pointString = this.selectedPoint.toString();
-            ctx.fillText(this.selectedPoint.toString(), this.canvas.width - ctx.measureText(pointString).width - 3, 10);            
-        }            
+            this.ctxMain.beginPath();
+            this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+            this.ctxMain.stroke();            
+            this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);            
+        }    
 
-        if (this.isMarking) {
-            ctx.fillStyle = "rgba(0,184,200,0.2)";
-            this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
-            this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-            ctx.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);                                    
-            ctx.fillStyle = "black";            
-        }
+        this.ctxBackground.fillStyle = this.backgroundColor;
+        this.ctxBackground.fillRect(0, 0, this.width, this.height);
+        
     }
 
-    drawXAxis(ctx: CanvasRenderingContext2D) {
-        var origo = this.getAbsolute(new Point(0, 0));        
+    drawXAxis() {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
 
-        ctx.moveTo(0, origo.y);
-        ctx.lineTo(this.canvas.width, origo.y);    
+        var origo = this.getAbsolute(new Point(0, 0));
+        var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
+
+        var y = origo.y;
+        if (!visible && this.stickyAxes) {
+            if (origo.y < 0)
+                y = 0;
+            else
+                y = this.height;
+        }
+        
+        this.ctxMain.beginPath();
+        this.ctxMain.moveTo(0, y);
+        this.ctxMain.lineTo(this.width, y);            
+        this.ctxMain.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.x);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
 
-        for (var i = -steps; i < this.canvas.width + steps; i += steps) {
-            var transformer = this.getRelative(new Point(i + this.movePoint.x % steps, origo.y));
+        for (var i = -steps; i < this.width + steps; i += steps) {
+            this.ctxMain.beginPath();
+            var absX = i + this.movePoint.x % steps;
+            var transformer = this.getRelative(new Point(absX, y));            
             var number: string;
             var numWidth: number;
+            var numOffset: number; 
+
             if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
                 number = "     0";
             }
@@ -195,28 +265,64 @@
             else {
                 number = transformer.x.toFixed(decimalPlaces);
             }
-            numWidth = ctx.measureText(number).width;
-            ctx.fillText(number, i + this.movePoint.x % steps - (numWidth / 2), origo.y + 15);
-            ctx.moveTo(i + this.movePoint.x % steps, origo.y);
-            ctx.lineTo(i + this.movePoint.x % steps, origo.y + 4);
+           
+            numWidth = this.ctxMain.measureText(number);
+            numOffset = y === this.height ? y - 15 : y + 15
+            this.ctxMain.fillText(number, absX - (numWidth / 2), numOffset);            
+
+            this.ctxMain.stroke();
+            this.ctxMain.beginPath();
+
+            if (this.displayGrid) {                
+                this.ctxMain.moveTo(absX, 0);
+                this.ctxMain.lineTo(absX, this.height);
+                this.ctxMain.strokeStyle = this.gridColor;
+                this.ctxMain.stroke();                                
+            }/*
+            else {
+                this.ctxMain.moveTo(absX, y);
+                this.ctxMain.lineTo(absX, y + 4);
+                this.ctxMain.stroke();
+            }*/
         }
+
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;
     }
 
-    drawYAxis(ctx: CanvasRenderingContext2D) {
+    drawYAxis() {
+        this.ctxMain.strokeStyle = this.axisColor;
+        this.ctxMain.fillStyle = this.axisColor;
+
         var origo = this.getAbsolute(new Point(0, 0));
-        
-        ctx.moveTo(origo.x, 0);
-        ctx.lineTo(origo.x, this.canvas.height);
+        var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
+
+        var x = origo.x;
+        if (!visible && this.stickyAxes) {
+            if (origo.x < 0)
+                x = 0;
+            else
+                x = this.width;
+        }
+
+        this.ctxMain.beginPath();
+        this.ctxMain.moveTo(x, 0);
+        this.ctxMain.lineTo(x, this.height);
+        this.ctxMain.stroke();
 
         var stepping = this.calculateSteps(this.scalePoint.y);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         
-        for (var i = -steps; i < this.canvas.height + steps; i += steps) {
-            var transformer = this.getRelative(new Point(origo.x, this.canvas.height - (i + this.movePoint.y % steps)));
+        for (var i = -steps; i < this.height + steps; i += steps) {
+            this.ctxMain.beginPath();
+            var absY = this.height - (i + this.movePoint.y % steps);
+            var transformer = this.getRelative(new Point(x, absY));
             var number: string;
-            var numWidth: number;
+            var numWidth: number;            
+            var numOffset: number;
+
             if (Math.abs(transformer.y).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
                 number = "";
             }
@@ -226,11 +332,29 @@
             else {
                 number = transformer.y.toFixed(decimalPlaces);
             }
-            numWidth = ctx.measureText(number).width;            
-            ctx.fillText(number, origo.x - (numWidth + 7), this.canvas.height - (i + this.movePoint.y % steps) + 3);
-            ctx.moveTo(origo.x, this.canvas.height - (i + this.movePoint.y % steps));
-            ctx.lineTo(origo.x - 4, this.canvas.height - (i + this.movePoint.y % steps));
-        }
+
+            numWidth = this.ctxMain.measureText(number);
+            numOffset = x === 0 ? x + 8 : x - (numWidth + 7); 
+            this.ctxMain.fillText(number, numOffset, absY + 3);           
+
+            this.ctxMain.stroke();
+            this.ctxMain.beginPath();
+
+            if (this.displayGrid) {
+                this.ctxMain.moveTo(0, absY);
+                this.ctxMain.lineTo(this.width, absY);
+                this.ctxMain.strokeStyle = this.gridColor;
+                this.ctxMain.stroke();
+            }/*
+            else {
+                this.ctxMain.moveTo(origo.x, absY);
+                this.ctxMain.lineTo(origo.x - 4, absY);
+                this.ctxMain.stroke();
+            }*/ 
+        }       
+
+        this.ctxMain.strokeStyle = this.mainColor;
+        this.ctxMain.fillStyle = this.mainColor;              
     }
 
     calculateSteps(scaling: number): IStepInfo {
@@ -259,7 +383,7 @@
     }    
 
     getRelative(p: Point): Point {
-        var moved = new Point(p.x - this.movePoint.x, this.canvas.height - p.y - this.movePoint.y);
+        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
         var scaled = moved.divide(this.scalePoint);        
         return scaled;
     }
@@ -267,15 +391,16 @@
     getAbsolute(p: Point): Point {
         var scaled = p.multiply(this.scalePoint);
         var moved = scaled.add(this.movePoint);                
-        return new Point( moved.x, this.canvas.height - moved.y );
+        return new Point( moved.x, this.height - moved.y );
     }
 
     zoomByMarking() {
+        this.ctxMarking.clear();
+
         var width = this.marking.width;
         var height = this.marking.height;        
-        var xRatio = this.canvas.width / width;
-        var yRatio = this.canvas.height / height;
-
+        var xRatio = this.width / width;
+        var yRatio = this.height / height;
 
         var downLeft = new Point(
             Math.min(
@@ -292,13 +417,12 @@
         this.scalePoint.y = Math.abs(this.scalePoint.y * yRatio);        
 
         var sec = this.getAbsolute(first);
-        sec.y = this.canvas.height - sec.y;
+        sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
 
         this.draw();
     }
-
 }
 
 interface IStepInfo {
@@ -312,4 +436,83 @@ interface IMarking {
     secondPoint: Point;
     width: number;
     height: number;
+}
+
+class ContextFixer {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    fillStyle: string;
+    strokeStyle: string;
+
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.ctx = this.canvas.getContext("2d");
+        this.fillStyle = "black";
+        this.strokeStyle = "black";
+    }
+    moveTo(x: number, y: number) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.moveTo(newX, newY);
+    }
+    lineTo(x: number, y: number) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.lineTo(newX, newY);
+    }    
+    clear() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    beginPath() {
+        this.ctx.beginPath();
+    }
+    stroke() {
+        this.ctx.strokeStyle = this.strokeStyle;       
+        this.ctx.stroke();
+    }
+    fillText(text: string, x: number, y: number) {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillText(text, x, y);        
+    }
+    fillRect(x: number, y: number, width: number, height: number) {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fillRect(x, y, width, height);
+    }
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
+        this.ctx.arc(x, y, radius, startAngle, endAngle);
+    }
+    measureText(text: string) {
+        return this.ctx.measureText(text).width;
+    }
+}
+
+class LayeredCanvas {
+    canvases: { [name: string]: HTMLCanvasElement } = {};
+
+    constructor(wrapper: HTMLDivElement, names: string[]) {        
+        var canvas = document.createElement("canvas");
+        canvas.className = "plot-canvas";
+        for (let name of names) {
+            this.canvases[name] = <HTMLCanvasElement>canvas.cloneNode();
+            wrapper.appendChild(this.canvases[name]);
+        }
+    }
+
+    getContext(name: string): CanvasRenderingContext2D {
+        var ctx = this.canvases[name].getContext("2d");
+        return ctx;
+    }
+
+    getWidth() {
+        return this.canvases["main"].width;
+    }
+    getHeight() {
+        return this.canvases["main"].height;
+    }
+    setSize(width: number, height: number) {
+        for (let name in this.canvases) {
+            this.canvases[name].width = width;
+            this.canvases[name].height = height;
+        }
+    }
 }

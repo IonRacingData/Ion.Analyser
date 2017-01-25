@@ -205,3 +205,10 @@ span.table-resize{
 .menu-window ul li a:hover{
     background-color: #29292D;
 }
+
+.plot-canvas {    
+    position: absolute;    
+}
+.plot-wrapper {
+    position: relative;
+}
