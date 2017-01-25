@@ -108,7 +108,7 @@ class GridContainer {
     moving: boolean;
     editFunction: (e: MouseEvent) => void;
     appWindow: AppWindow;
-    last: HTMLElement;
+    //last: HTMLElement;
 
     constructor(appWindow: AppWindow) {
         this.baseNode = this.create("");
@@ -125,8 +125,7 @@ class GridContainer {
 
     create(cls: string): HTMLElement {
         var base = this.mk.tag("div", "grid-" + cls);
-        this.last = this.createChild();
-        base.appendChild(this.last);
+        base.appendChild(this.createChild());
         return base;
     }
 
@@ -137,13 +136,11 @@ class GridContainer {
     addChild() {
         let seperator = this.createSeperator();
         let child = this.createChild();
-        let last = this.last;
-        this.last = child;
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
             this.editFunction = (e: MouseEvent) => {
-                this.resize(last, e, this.appWindow);
+                this.resize(child, e, this.appWindow);
             };
             this.moving = true;
         });

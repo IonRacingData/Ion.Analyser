@@ -94,6 +94,7 @@ var GridViewer = (function () {
     return GridViewer;
 }());
 var GridContainer = (function () {
+    //last: HTMLElement;
     function GridContainer(appWindow) {
         var _this = this;
         this.mk = new HtmlHelper();
@@ -110,8 +111,7 @@ var GridContainer = (function () {
     }
     GridContainer.prototype.create = function (cls) {
         var base = this.mk.tag("div", "grid-" + cls);
-        this.last = this.createChild();
-        base.appendChild(this.last);
+        base.appendChild(this.createChild());
         return base;
     };
     GridContainer.prototype.createSeperator = function () {
@@ -121,13 +121,11 @@ var GridContainer = (function () {
         var _this = this;
         var seperator = this.createSeperator();
         var child = this.createChild();
-        var last = this.last;
-        this.last = child;
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", function (e) {
             _this.editFunction = function (e) {
-                _this.resize(last, e, _this.appWindow);
+                _this.resize(child, e, _this.appWindow);
             };
             _this.moving = true;
         });
