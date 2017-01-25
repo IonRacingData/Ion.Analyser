@@ -21,7 +21,7 @@ var WindowList = (function (_super) {
         this.content = content;
         var winMan = this.winMan = kernel.winMan;
         winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programOpen(); });
-        winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programClose(); });
+        winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.programClose(); });
         winMan.addEventListener(WindowManager.event_windowSelect, function () { return _this.programSelect(); });
         this.addWindows();
     }

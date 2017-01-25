@@ -89,6 +89,7 @@ namespace Ion.Pro.Analyser
         public DateTime Received { get; set; }
         public TimingService Watch { get; set; }
         public TcpClient Client { get; set; }
+        public bool PreventClose { get; set; }
 
         public HttpWrapper(TcpClient client)
         {
@@ -136,6 +137,7 @@ namespace Ion.Pro.Analyser
         public HttpHeaderResponse Response { get; set; }
         public Session Session { get; set; }
         public HttpWrapper Wrapper { get; set; }
+        public Action<HttpContext> SocketHandler { get; set; }
     }
 }
 

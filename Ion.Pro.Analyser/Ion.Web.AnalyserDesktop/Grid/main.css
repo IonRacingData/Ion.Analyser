@@ -16,15 +16,15 @@
 
 /*Application window*/
 .grid-window{
-    width: calc(100% - 2px);
-    height: calc(100% - 2px);
-    border:1px solid red;
+    width: calc(100%);
+    height: calc(100%);
+    /*border:1px solid red;*/
     position: relative;
 }
 
 /* Dividers*/
 .grid-hdiv, .grid-vdiv{
-    background-color: lightgray;
+    background-color: #ff9103;
 }
 .grid-vdiv{
     width: 100%;
@@ -41,17 +41,73 @@
 /*Containers*/
 .grid-box{
     margin: 0;
-    border: 1px solid black;
-    flex-grow: 1;
+    height: 100%;
+    width: 100%;
+    /*position: relative;*/
+    overflow: hidden;
 }
 .grid-hcon, .grid-vcon{
     display: flex;
     width: calc(100% - 0px);
     height: calc(100% - 0px);
+    /*position: relative;*/
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 .grid-hcon{
     flex-direction: row;
 }
 .grid-vcon{
     flex-direction: column;
-}    
+}
+
+.dock-selector{
+    display: flex;
+    border: 1px solid black;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    flex-flow: wrap;
+    border-radius: 30px;
+    background: lightgrey;
+}
+.dock-item{
+    width: 30px;
+    height: 30px;
+}
+.dock-active{
+    width: 28px;
+    height: 28px;
+    border: 1px solid black;
+    background-color: cadetblue;
+}
+.dock-active:hover .dock-up, 
+.dock-active:hover .dock-down,
+.dock-active:hover .dock-left,
+.dock-active:hover .dock-right{
+    background: #333333;
+}
+.dock-up, 
+.dock-down, 
+.dock-left, 
+.dock-right{
+    background-color: #636363;
+    position: relative;
+}
+.dock-up, .dock-down{
+    width: 100%;
+    height: 30%;
+}
+.dock-down{
+    top: 70%;
+}
+.dock-left, .dock-right{
+    width: 30%;
+    height: 100%;
+}
+.dock-right{
+    left: 70%;
+}

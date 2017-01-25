@@ -112,6 +112,7 @@ body {
     width: 100%;
     color: white;
     z-index: 10000;
+    overflow-x: auto;
 }
 
 .taskbar-applet {
@@ -203,4 +204,11 @@ span.table-resize{
 
 .menu-window ul li a:hover{
     background-color: #29292D;
+}
+
+.plot-canvas {    
+    position: absolute;    
+}
+.plot-wrapper {
+    position: relative;
 }

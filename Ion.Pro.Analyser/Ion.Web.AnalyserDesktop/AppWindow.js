@@ -1,107 +1,67 @@
-﻿class AppWindow {
-    app: Application;
-    title: string;
-    handle: HTMLElement;
-    moveHandle: HTMLElement;
-    sizeHandle: HTMLElement;
-    winMan: WindowManager;
-    eventMan: EventManager = new EventManager();
-
-    static event_move = "move";
-    static event_resize = "resize";
-    static event_minimize = "minimize";
-    static event_maximize = "maximize";
-
-    x: number;
-    y: number;
-
-    deltaX: number;
-    deltaY: number;
-
-    storeX: number;
-    storeY: number;
-
-    width: number;
-    height: number;
-
-    storeWidth: number;
-    storeHeight: number;
-
-    state: WindowState;
-    prevState: WindowState;
-
-    content: HTMLElement;
-
-    constructor(app: Application) {
+var AppWindow = (function () {
+    function AppWindow(app) {
+        var _this = this;
+        this.topMost = false;
+        this.eventMan = new EventManager();
         this.app = app;
-        var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
+        var handle = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
-
-        handle.addEventListener("mousedown", (e: MouseEvent) => this.main_mouseDown(e));
+        handle.addEventListener("mousedown", function (e) { return _this.main_mouseDown(e); });
         this.moveHandle = handle;
-        this.sizeHandle = <HTMLElement>handle.getElementsByClassName("window-body")[0];
-
-        var headerBar: Element = handle.getElementsByClassName("window-header")[0];
-        var min: Element = handle.getElementsByClassName("window-control-min")[0];
-        var max: Element = handle.getElementsByClassName("window-control-max")[0];
-        var exit: Element = handle.getElementsByClassName("window-control-exit")[0];
-        var resize: HTMLElement = <HTMLElement>handle.getElementsByClassName("window-bottom-right")[0];
-
-        headerBar.addEventListener("mousedown", (e: MouseEvent) => this.header_mouseDown(e));
-        resize.addEventListener("mousedown", (e: MouseEvent) => this.resize_mouseDown(e));
-
-        min.addEventListener("mousedown", (e: MouseEvent) => this.minimize_click(e));
-        max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
-        exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
-
+        this.sizeHandle = handle.getElementsByClassName("window-body")[0];
+        var headerBar = handle.getElementsByClassName("window-header")[0];
+        var min = handle.getElementsByClassName("window-control-min")[0];
+        var max = handle.getElementsByClassName("window-control-max")[0];
+        var exit = handle.getElementsByClassName("window-control-exit")[0];
+        var resize = handle.getElementsByClassName("window-bottom-right")[0];
+        headerBar.addEventListener("mousedown", function (e) { return _this.header_mouseDown(e); });
+        resize.addEventListener("mousedown", function (e) { return _this.resize_mouseDown(e); });
+        min.addEventListener("mousedown", function (e) { return _this.minimize_click(e); });
+        max.addEventListener("mousedown", function (e) { return _this.maximize_click(e); });
+        exit.addEventListener("mousedown", function (e) { return _this.close_click(e); });
         this.handle.window = this;
-
         this.setPos(300, 50);
         this.setSize(500, 400);
-
-        this.content = <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content = this.handle.getElementsByClassName("window-body")[0];
     }
-
-    setTitle(title: string): void {
+    AppWindow.prototype.setTitle = function (title) {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
-    }
-
-
+    };
+    AppWindow.prototype.addEventListener = function (type, listener) {
+        this.eventMan.addEventListener(type, listener);
+    };
+    AppWindow.prototype.removeEventListener = function (type, listener) {
+        this.eventMan.removeEventListener(type, listener);
+    };
     /* Event handlers */
-    main_mouseDown(e: MouseEvent): void {
+    AppWindow.prototype.main_mouseDown = function (e) {
         this.winMan.selectWindow(this);
-    }
-
-    header_mouseDown(e: MouseEvent): void {
+    };
+    AppWindow.prototype.header_mouseDown = function (e) {
         e.stopPropagation();
         console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX;
         this.deltaY = this.handle.offsetTop - e.pageY;
-
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
-    }
-
-    resize_mouseDown(e: MouseEvent): void {
+    };
+    AppWindow.prototype.resize_mouseDown = function (e) {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
         this.deltaY = this.height - e.pageY;
         // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
-
         this.winMan.resizing = true;
         this.winMan.selectWindow(this);
-    }
-
-    minimize_click(e: MouseEvent): void {
+    };
+    AppWindow.prototype.minimize_click = function (e) {
         e.stopPropagation();
         console.log("minimize");
         this.hide();
         this.changeStateTo(WindowState.MINIMIZED);
-    }
-
-    maximize_click(e: MouseEvent): void {
+    };
+    AppWindow.prototype.maximize_click = function (e) {
         e.stopPropagation();
         this.winMan.selectWindow(this);
         if (this.state === WindowState.MAXIMIZED) {
@@ -111,59 +71,54 @@
             this.maximize();
         }
         console.log("maximize");
-    }
-
-    close_click(e: MouseEvent): void {
+    };
+    AppWindow.prototype.close_click = function (e) {
         e.stopPropagation();
+        this.close();
+    };
+    AppWindow.prototype.close = function () {
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
-    }
-
+    };
     /*Events*/
-    onResize(): void {
+    AppWindow.prototype.onResize = function () {
         this.eventMan.raiseEvent(AppWindow.event_resize, null);
-    }
-
-    onMove(): void {
+    };
+    AppWindow.prototype.onMove = function () {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
-    }
-
-    
-
-    show(): void {
+    };
+    AppWindow.prototype.onClose = function () {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
+    };
+    AppWindow.prototype.show = function () {
         this.handle.style.display = "";
         if (this.state === WindowState.MINIMIZED) {
             this.changeStateTo(this.prevState);
         }
-    }
-
-    hide(): void {
+    };
+    AppWindow.prototype.hide = function () {
         this.handle.style.display = "none";
-    }
-
-    restore(): void {
+    };
+    AppWindow.prototype.restore = function () {
         this.setPos(this.storeX, this.storeY);
         this.setSize(this.storeWidth, this.storeHeight);
         this.changeStateTo(WindowState.RESTORED);
-    }
-
-    maximize(): void {
+    };
+    AppWindow.prototype.maximize = function () {
         this.setPos(0, 40, false);
         this.setSize(window.innerWidth - 1, window.innerHeight - 40 - 30, false);
         this.changeStateTo(WindowState.MAXIMIZED);
-    }
-
-    tile(state: TileState): void {
-        var topBar: number = 40;
-        var windowTitle: number = 30;
-
-        var windowWidth: number = window.innerWidth;
-        var windowHeight: number = window.innerHeight - topBar;
-
-        var newX: number = 0;
-        var newY: number = 40;
-        var newWidth: number = windowWidth / 2 - 1;
-        var newHeight: number = windowHeight / 2 - windowTitle;
+    };
+    AppWindow.prototype.tile = function (state) {
+        var topBar = 40;
+        var windowTitle = 30;
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight - topBar;
+        var newX = 0;
+        var newY = 40;
+        var newWidth = windowWidth / 2 - 1;
+        var newHeight = windowHeight / 2 - windowTitle;
         switch (state) {
             case TileState.LEFT:
                 newHeight = windowHeight - windowTitle;
@@ -188,12 +143,14 @@
         this.setPos(newX, newY, false);
         this.setSize(newWidth, newHeight, false);
         this.changeStateTo(WindowState.TILED);
-    }
-
-    
-
-    setPos(x: number, y: number, storePos: boolean = true): void {
-        var outerBoxMargin: number = 8;
+    };
+    AppWindow.prototype.recalculateSize = function () {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
+    };
+    AppWindow.prototype.setPos = function (x, y, storePos) {
+        if (storePos === void 0) { storePos = true; }
+        var outerBoxMargin = 8;
         this.moveHandle.style.left = (x - outerBoxMargin).toString() + "px";
         this.moveHandle.style.top = (y - outerBoxMargin).toString() + "px";
         this.x = x;
@@ -203,9 +160,9 @@
             this.storeY = y;
         }
         this.onMove();
-    }
-
-    setRelativePos(x: number, y: number, storePos: boolean = true): void {
+    };
+    AppWindow.prototype.setRelativePos = function (x, y, storePos) {
+        if (storePos === void 0) { storePos = true; }
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
@@ -219,10 +176,9 @@
             this.storeY = y + this.deltaY;
         }
         this.onMove();
-    }
-
-
-    setSize(width: number, height: number, storeSize: boolean = true): void {
+    };
+    AppWindow.prototype.setSize = function (width, height, storeSize) {
+        if (storeSize === void 0) { storeSize = true; }
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
@@ -232,9 +188,9 @@
             this.storeHeight = height;
         }
         this.onResize();
-    }    
-
-    setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
+    };
+    AppWindow.prototype.setRelativeSize = function (width, height, storeSize) {
+        if (storeSize === void 0) { storeSize = true; }
         this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
         this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
         this.width = width + this.deltaX;
@@ -244,32 +200,24 @@
             this.storeHeight = height + this.deltaY;
         }
         this.onResize();
-    }
-
-
-    changeStateTo(state: WindowState): void {
+    };
+    AppWindow.prototype.changeStateTo = function (state) {
         this.prevState = this.state;
         this.state = state;
-    }
-
-
-
-    restoreSize(): void {
+    };
+    AppWindow.prototype.restoreSize = function () {
         this.setSize(this.width, this.height, false);
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
-
         this.sizeHandle.parentElement.style.width = null;
         this.sizeHandle.parentElement.style.height = null;
         this.sizeHandle.parentElement.parentElement.style.width = null;
         this.sizeHandle.parentElement.parentElement.style.height = null;
-    }
-
-    restorePos(): void {
+    };
+    AppWindow.prototype.restorePos = function () {
         this.handle.style.left = this.x.toString() + "px";
         this.handle.style.top = this.y.toString() + "px";
-    }
-
-    removeSize(): void {
+    };
+    AppWindow.prototype.removeSize = function () {
         this.sizeHandle.style.width = "100%";
         this.sizeHandle.style.height = "100%";
         this.sizeHandle.parentElement.style.width = "100%";
@@ -277,55 +225,65 @@
         this.sizeHandle.parentElement.parentElement.style.width = "100%";
         this.sizeHandle.parentElement.parentElement.style.height = "100%";
         this.sizeHandle.parentElement.parentElement.style.padding = "0";
-        
-    }
-
-    removeHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = "none";
-    }
-
-    restoreHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = null;
-    }
-
-    removePos(): void {
+    };
+    AppWindow.prototype.removeHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = "none";
+    };
+    AppWindow.prototype.restoreHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = null;
+    };
+    AppWindow.prototype.removePos = function () {
         this.handle.style.left = null;
         this.handle.style.top = null;
-    }
-
-    changeWindowMode(mode: WindowMode): void {
+    };
+    AppWindow.prototype.changeWindowMode = function (mode) {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
+                break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
         }
-    }
-}
-
-enum WindowMode {
-    WINDOWED = 0,
-    BORDERLESS = 1,
-}
-
-enum TileState {
-    LEFT = 0,
-    RIGHT = 1,
-    TOPLEFT = 2,
-    TOPRIGHT = 3,
-    BOTTOMLEFT = 4,
-    BOTTOMRIGHT = 5
-}
-
-enum WindowState {
-    RESTORED = 0,
-    MINIMIZED = 1,
-    MAXIMIZED = 2,
-    TILED = 3
-}
+    };
+    AppWindow.event_move = "move";
+    AppWindow.event_resize = "resize";
+    AppWindow.event_minimize = "minimize";
+    AppWindow.event_maximize = "maximize";
+    AppWindow.event_close = "close";
+    return AppWindow;
+}());
+var WindowMode;
+(function (WindowMode) {
+    WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";
+    WindowMode[WindowMode["BORDERLESSFULL"] = 1] = "BORDERLESSFULL";
+    WindowMode[WindowMode["BORDERLESS"] = 2] = "BORDERLESS";
+})(WindowMode || (WindowMode = {}));
+var TileState;
+(function (TileState) {
+    TileState[TileState["LEFT"] = 0] = "LEFT";
+    TileState[TileState["RIGHT"] = 1] = "RIGHT";
+    TileState[TileState["TOPLEFT"] = 2] = "TOPLEFT";
+    TileState[TileState["TOPRIGHT"] = 3] = "TOPRIGHT";
+    TileState[TileState["BOTTOMLEFT"] = 4] = "BOTTOMLEFT";
+    TileState[TileState["BOTTOMRIGHT"] = 5] = "BOTTOMRIGHT";
+})(TileState || (TileState = {}));
+var WindowState;
+(function (WindowState) {
+    WindowState[WindowState["RESTORED"] = 0] = "RESTORED";
+    WindowState[WindowState["MINIMIZED"] = 1] = "MINIMIZED";
+    WindowState[WindowState["MAXIMIZED"] = 2] = "MAXIMIZED";
+    WindowState[WindowState["TILED"] = 3] = "TILED";
+})(WindowState || (WindowState = {}));
+//# sourceMappingURL=AppWindow.js.map

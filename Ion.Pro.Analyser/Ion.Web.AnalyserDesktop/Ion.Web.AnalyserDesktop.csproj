@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -33,18 +33,30 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="application.ts" />
     <TypeScriptCompile Include="Applications\CanDataViewer.ts" />
     <TypeScriptCompile Include="Applications\DataViewer.ts" />
     <TypeScriptCompile Include="Applications\FileExplorer.ts" />
     <TypeScriptCompile Include="Applications\LogViewer.ts" />
     <TypeScriptCompile Include="Applications\ServerInfo.ts" />
     <TypeScriptCompile Include="Applications\TaskManager.ts" />
+    <TypeScriptCompile Include="Applications\TestApps.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
+    <TypeScriptCompile Include="appsys.ts" />
+    <TypeScriptCompile Include="comsys.ts" />
+    <TypeScriptCompile Include="event.ts" />
+    <TypeScriptCompile Include="GoogleChart.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />
+    <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
+    <TypeScriptCompile Include="models.ts" />
+    <TypeScriptCompile Include="PlotData.ts" />
+    <TypeScriptCompile Include="Plotter.ts" />
+    <TypeScriptCompile Include="sensys.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />
-    <TypeScriptCompile Include="WindowSystem.ts" />
+    <TypeScriptCompile Include="AppWindow.ts" />
+    <TypeScriptCompile Include="winsys.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
@@ -83,6 +95,17 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>

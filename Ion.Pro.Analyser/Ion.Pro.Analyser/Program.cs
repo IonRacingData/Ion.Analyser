@@ -17,21 +17,32 @@ namespace Ion.Pro.Analyser
 
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
-        //static string ContentPath = "../../Content/";
-        static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "../../Content/";
+        public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "html/";
 
         static void Main(string[] args)
         {
-            InsertSensorTestData();
-            InitControllers();
-            HttpServer server = new HttpServer();
-            server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            Console.WriteLine("Ion Analyser Server");
+            try
+            {
+                InsertSensorTestData();
+                InitControllers();
+                HttpServer server = new HttpServer();
+                server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ohh no, something horrible went wrong");
+                Console.WriteLine(e);
+            }
             Console.Read();
         }
 
         static void InsertSensorTestData()
         {
             LegacySensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
 
             SensorDataStore store = SensorDataStore.GetDefault();
             if (true)
@@ -103,20 +114,27 @@ namespace Ion.Pro.Analyser
 
             byte[] data = context.Response.GetBytes();
             s.Write(data, 0, data.Length);
-
+            
             s.Flush();
-            s.Close();
-            context.Wrapper.Client.Close();
-
             Watch.Stop();
-
-            Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
-
-            bool printTimes = true;
-            if (printTimes)
+            if (context.Wrapper.PreventClose)
             {
-                PrintTimes(Watch);
+                context.SocketHandler?.Invoke(context);
             }
+            else
+            {
+                s.Close();
+                context.Wrapper.Client.Close();
+
+                Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
+
+                bool printTimes = true;
+                if (printTimes)
+                {
+                    PrintTimes(Watch);
+                }
+            }
+
         }
 
         private static IActionResult HandleResult(HttpContext context, TimingService Watch)

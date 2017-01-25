@@ -15,7 +15,7 @@ namespace Ion.Pro.Analyser
     {
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
         public HttpContext HttpContext { get; set; }
-        public string BasePath = "../../../Ion.Web.AnalyserDesktop/";
+        public string BasePath = Program.ContentPath;
 
         public Controller()
         {
@@ -50,6 +50,11 @@ namespace Ion.Pro.Analyser
         public IActionResult String(string data, string contentType)
         {
             return new StringResult(data, contentType);
+        }
+
+        public IActionResult Error(string data, HttpStatus code)
+        {
+            return new ErrorResult(code, data);
         }
     }
 
