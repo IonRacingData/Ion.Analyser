@@ -18,6 +18,7 @@ var GridViewer = (function () {
         this.selectorWindow.topMost = true;
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         this.selectorWindow.hide();
+        //(<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
         var mk = this.mk;
         this.registerEvents(this.eh);
         var template = document.getElementById("temp-grid");
