@@ -10,15 +10,25 @@ var GridViewer = (function () {
         this.childWindows = [];
     }
     GridViewer.prototype.main = function () {
+        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
         var mk = this.mk;
         this.registerEvents(this.eh);
         var template = document.getElementById("temp-grid");
         //var clone: Node = document.importNode(template.content, true);
-        var test = new GridHContainer(this.window);
+        var test = new GridHContainer(this);
         //test.addChild();
         var clone = test.baseNode;
         this.window.content.appendChild(this.mk.tag("button", "", [{ func: function (e) { test.addChild(); }, event: "click" }], "Hello world"));
+        this.window.content.appendChild(this.mk.tag("button", "", [{
+                func: function (e) {
+                    var g = test.addChild();
+                    var tester2 = new GridVContainer(_this);
+                    g.box.innerHTML = "";
+                    g.box.appendChild(tester2.baseNode);
+                    tester2.addChild();
+                }, event: "click"
+            }], "Hello world 2"));
         this.window.content.appendChild(clone);
         //addEvents();
     };
@@ -98,6 +108,13 @@ var GridContainer = (function () {
     function GridContainer(appWindow) {
         var _this = this;
         this.mk = new HtmlHelper();
+        this.gridBoxes = [];
+        this.set = "setWidth";
+        this.dir = "clientWidth";
+        this.offset = "offsetLeft";
+        this.mouse = "clientX";
+        this.dir2 = "width";
+        this.pos = "x";
         this.baseNode = this.create("");
         this.appWindow = appWindow;
         this.baseNode.addEventListener("mousemove", function (e) {
@@ -120,15 +137,32 @@ var GridContainer = (function () {
     GridContainer.prototype.addChild = function () {
         var _this = this;
         var seperator = this.createSeperator();
+        var newTotal = this.gridBoxes.length + 1;
+        for (var i = 0; i < this.gridBoxes.length; i++) {
+            var cur = this.gridBoxes[i][this.dir2];
+            var newVal = cur * (newTotal - 1) / newTotal;
+            this.gridBoxes[i][this.set](newVal, 6);
+        }
         var child = this.createChild();
+        child.gridBox[this.set](1 / newTotal, 6);
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", function (e) {
-            _this.editFunction = function (e) {
-                _this.resize(child, e, _this.appWindow);
+            var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos]);
+            seperator.parentElement.onmousemove = function (e) {
+                _this.appWindow.handleResize();
+                container.adjustSize(e);
             };
-            _this.moving = true;
+            seperator.parentElement.onmouseup = function (e) {
+                seperator.parentElement.onmousemove = null;
+                seperator.parentElement.onmouseup = null;
+            };
+            //this.editFunction = (e: MouseEvent) => {
+            //    this.resize(child, e, this.appWindow);
+            //};
+            //this.moving = true;
         });
+        return child.gridBox;
     };
     GridContainer.prototype.resize = function (gridWindow, event, appWindow) {
     };
@@ -137,17 +171,72 @@ var GridContainer = (function () {
         gridWindow.style.flexBasis = "unset";
     };
     GridContainer.prototype.createChild = function () {
-        var box = this.mk.tag("div", "grid-box");
-        var win = this.mk.tag("div", "grid-window");
-        box.appendChild(win);
-        return box;
+        var box = new GridBox();
+        this.gridBoxes.push(box);
+        return box.box;
     };
     return GridContainer;
+}());
+var GridBox = (function () {
+    function GridBox() {
+        this.width = 1;
+        this.height = 1;
+        var mk = this.mk = new HtmlHelper();
+        this.box = mk.tag("div", "grid-box");
+        this.box.gridBox = this;
+        this.box.appendChild(mk.tag("div", "grid-window"));
+    }
+    GridBox.prototype.setWidth = function (percent, correction) {
+        if (correction === void 0) { correction = 0; }
+        this.width = percent;
+        this.box.style.width = "calc(" + (percent * 100).toString() + "% - " + correction.toString() + "px)";
+    };
+    GridBox.prototype.setHeight = function (percent, correction) {
+        if (correction === void 0) { correction = 0; }
+        this.height = percent;
+        this.box.style.height = "calc(" + (percent * 100).toString() + "% - " + correction.toString() + "px)";
+    };
+    return GridBox;
+}());
+var ResizeContainer = (function () {
+    function ResizeContainer(seperator, dir, offset, style, mouse, windowPos) {
+        this.cur = seperator;
+        this.offset = offset;
+        this.style = style;
+        this.dir = dir;
+        this.mouse = mouse;
+        this.windowPos = windowPos;
+        this.initialize();
+    }
+    ResizeContainer.prototype.initialize = function () {
+        this.prev = this.cur.previousElementSibling;
+        this.next = this.cur.nextElementSibling;
+        this.total = this.cur.parentElement[this.dir];
+        this.part = this.prev[this.dir] + this.next[this.dir] + 12;
+        this.start = this.cur[this.offset] + this.windowPos;
+        this.correction = this.prev[this.offset] + this.windowPos;
+        this.startPercent = (this.start - this.correction) / this.total;
+    };
+    ResizeContainer.prototype.adjustSize = function (e) {
+        var curMovement = e[this.mouse] - this.start;
+        var curPercentMove = curMovement / this.total;
+        var prevWidth = this.startPercent + curPercentMove;
+        var nextWidth = (this.part / this.total) - prevWidth;
+        this.prev.gridBox[this.style](prevWidth, 6);
+        this.next.gridBox[this.style](nextWidth, 6);
+    };
+    return ResizeContainer;
 }());
 var GridHContainer = (function (_super) {
     __extends(GridHContainer, _super);
     function GridHContainer(appWindow) {
-        return _super.call(this, appWindow) || this;
+        _super.call(this, appWindow);
+        this.set = "setWidth";
+        this.dir = "clientWidth";
+        this.offset = "offsetLeft";
+        this.mouse = "clientX";
+        this.dir2 = "width";
+        this.pos = "x";
     }
     GridHContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "hcon");
@@ -165,7 +254,13 @@ var GridHContainer = (function (_super) {
 var GridVContainer = (function (_super) {
     __extends(GridVContainer, _super);
     function GridVContainer(appWindow) {
-        return _super.call(this, appWindow) || this;
+        _super.call(this, appWindow);
+        this.set = "setHeight";
+        this.dir = "clientHeight";
+        this.offset = "offsetTop";
+        this.mouse = "clientY";
+        this.dir2 = "height";
+        this.pos = "y";
     }
     GridVContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "vcon");

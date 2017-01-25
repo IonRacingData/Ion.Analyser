@@ -12,10 +12,19 @@
 
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         //var clone: Node = document.importNode(template.content, true);
-        var test = new GridHContainer(this.window);
+        var test = new GridHContainer(this);
         //test.addChild();
         var clone = test.baseNode;
         this.window.content.appendChild(this.mk.tag("button", "", [{ func: (e: Event) => { test.addChild(); }, event: "click" }], "Hello world"));
+        this.window.content.appendChild(this.mk.tag("button", "", [{
+            func: (e: Event) => {
+                var g = test.addChild();
+                var tester2 = new GridVContainer(this);
+                g.box.innerHTML = "";
+                g.box.appendChild(tester2.baseNode);
+                tester2.addChild();
+            }, event: "click"
+        }], "Hello world 2"));
         this.window.content.appendChild(clone); 
         //addEvents();
     }
@@ -107,10 +116,19 @@ class GridContainer {
     mk: HtmlHelper = new HtmlHelper();
     moving: boolean;
     editFunction: (e: MouseEvent) => void;
-    appWindow: AppWindow;
+    appWindow: GridViewer;
+    gridBoxes: GridBox[] = [];
+
+    set: string = "setWidth";
+    dir: string = "clientWidth";
+    
+    offset: string = "offsetLeft";
+    mouse: string = "clientX";
+    dir2: string = "width";
+    pos: string = "x";
     //last: HTMLElement;
 
-    constructor(appWindow: AppWindow) {
+    constructor(appWindow: GridViewer) {
         this.baseNode = this.create("");
         this.appWindow = appWindow;
         this.baseNode.addEventListener("mousemove", (e: MouseEvent) => {
@@ -124,7 +142,9 @@ class GridContainer {
     }
 
     create(cls: string): HTMLElement {
+
         var base = this.mk.tag("div", "grid-" + cls);
+        
         base.appendChild(this.createChild());
         return base;
     }
@@ -133,20 +153,38 @@ class GridContainer {
         return null;
     }
 
-    addChild() {
+    addChild(): GridBox {
+
         let seperator = this.createSeperator();
+        let newTotal = this.gridBoxes.length + 1;
+        for (let i = 0; i < this.gridBoxes.length; i++) {
+            let cur: number = this.gridBoxes[i][this.dir2];
+            let newVal = cur * (newTotal - 1) / newTotal;
+            this.gridBoxes[i][this.set](newVal, 6);
+        }
         let child = this.createChild();
+        child.gridBox[this.set](1 / newTotal, 6);
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
-            this.editFunction = (e: MouseEvent) => {
-                this.resize(child, e, this.appWindow);
+            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos]);
+
+            seperator.parentElement.onmousemove = (e: MouseEvent) => {
+                this.appWindow.handleResize();
+                container.adjustSize(e);
             };
-            this.moving = true;
+            seperator.parentElement.onmouseup = (e: MouseEvent) => {
+                seperator.parentElement.onmousemove = null;
+                seperator.parentElement.onmouseup = null
+            }
+
+            //this.editFunction = (e: MouseEvent) => {
+            //    this.resize(child, e, this.appWindow);
+            //};
+            //this.moving = true;
         });
-
+        return child.gridBox;
     }
-
     
     resize(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
 
@@ -158,15 +196,102 @@ class GridContainer {
     }
 
     createChild(): HTMLElement {
-        var box = this.mk.tag("div", "grid-box");
-        var win = this.mk.tag("div", "grid-window");
-        box.appendChild(win);
-        return box;
+        var box = new GridBox();
+        this.gridBoxes.push(box);
+        return box.box;
+    }
+}
+
+interface HTMLElement {
+    gridBox: GridBox;
+}
+
+class GridBox {
+    box: HTMLElement;
+    content: HTMLElement;
+    mk: HtmlHelper;
+    width: number = 1;
+    height: number = 1;
+    constructor() {
+        let mk = this.mk = new HtmlHelper();
+        this.box = mk.tag("div", "grid-box");
+        this.box.gridBox = this;
+        this.box.appendChild(mk.tag("div", "grid-window"));
+    }
+
+    setWidth(percent: number, correction: number = 0) {
+        this.width = percent;
+        this.box.style.width = "calc(" + (percent * 100).toString() + "% - " + correction.toString() + "px)";
+    }
+
+    setHeight(percent: number, correction: number = 0) {
+        this.height = percent;
+        this.box.style.height = "calc(" + (percent * 100).toString() + "% - " + correction.toString() + "px)";
+    }
+}
+
+class ResizeContainer {
+    cur: HTMLElement;
+    prev: HTMLElement;
+    next: HTMLElement;
+    total: number;
+    part: number;
+    start: number;
+    correction: number;
+    startPercent: number;
+
+    dir: string;
+    offset: string;
+    style: string;
+    mouse: string;
+    windowPos: number;
+
+    constructor(seperator: HTMLElement, dir: string, offset: string, style: string, mouse: string, windowPos: number) {
+        this.cur = seperator;
+        this.offset = offset;
+        this.style = style;
+        this.dir = dir;
+        this.mouse = mouse;
+        this.windowPos = windowPos;
+        this.initialize();
+    }
+
+    initialize() {
+        this.prev = <HTMLElement>this.cur.previousElementSibling;
+        this.next = <HTMLElement>this.cur.nextElementSibling;
+
+        this.total = this.cur.parentElement[this.dir];
+        this.part = this.prev[this.dir] + this.next[this.dir] + 12;
+        this.start = this.cur[this.offset] + this.windowPos;
+        this.correction = this.prev[this.offset] + this.windowPos;
+        this.startPercent = (this.start - this.correction) / this.total;
+    }
+
+    adjustSize(e: MouseEvent) {
+        let curMovement = e[this.mouse] - this.start;
+
+        let curPercentMove = curMovement / this.total;
+
+        let prevWidth = this.startPercent + curPercentMove;
+        let nextWidth = (this.part / this.total) - prevWidth;
+        
+
+        this.prev.gridBox[this.style](prevWidth, 6);
+        this.next.gridBox[this.style](nextWidth, 6);
     }
 }
 
 class GridHContainer extends GridContainer {
-    constructor(appWindow: AppWindow) {
+
+    set: string = "setWidth";
+    dir: string = "clientWidth";
+
+    offset: string = "offsetLeft";
+    mouse: string = "clientX";
+    dir2: string = "width";
+    pos: string = "x";
+
+    constructor(appWindow: GridViewer) {
         super(appWindow);
     }
 
@@ -186,7 +311,15 @@ class GridHContainer extends GridContainer {
 }
 
 class GridVContainer extends GridContainer {
-    constructor(appWindow: AppWindow) {
+    set: string = "setHeight";
+    dir: string = "clientHeight";
+
+    offset: string = "offsetTop";
+    mouse: string = "clientY";
+    dir2: string = "height";
+    pos: string = "y";
+
+    constructor(appWindow: GridViewer) {
         super(appWindow);
     }
 

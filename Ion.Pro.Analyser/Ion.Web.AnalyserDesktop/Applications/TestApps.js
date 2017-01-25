@@ -9,7 +9,7 @@ var DataViewer = (function () {
     DataViewer.prototype.draw = function (data) {
         var _this = this;
         var mk = new HtmlHelper();
-        var _loop_1 = function () {
+        var _loop_1 = function() {
             var curValue = data[i];
             a = mk.tag("span", "taskbar-button-text", null, curValue.toString());
             a.onclick = function () {
@@ -19,7 +19,8 @@ var DataViewer = (function () {
             };
             this_1.window.content.appendChild(a);
         };
-        var this_1 = this, a;
+        var this_1 = this;
+        var a;
         for (var i = 0; i < data.length; i++) {
             _loop_1();
         }

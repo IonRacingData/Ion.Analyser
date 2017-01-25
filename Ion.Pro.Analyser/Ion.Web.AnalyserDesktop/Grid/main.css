@@ -41,14 +41,22 @@
 /*Containers*/
 .grid-box{
     margin: 0;
-    border: 1px solid black;
-    flex-grow: 1;
-    flex-basis: 0;
+    height: 100%;
+    width: 100%;
+    /*position: relative;*/
+    overflow: hidden;
 }
 .grid-hcon, .grid-vcon{
     display: flex;
     width: calc(100% - 0px);
     height: calc(100% - 0px);
+    /*position: relative;*/
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 .grid-hcon{
     flex-direction: row;

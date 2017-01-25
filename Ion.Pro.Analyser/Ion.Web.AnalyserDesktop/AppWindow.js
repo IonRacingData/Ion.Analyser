@@ -251,13 +251,13 @@ var AppWindow = (function () {
                 break;
         }
     };
+    AppWindow.event_move = "move";
+    AppWindow.event_resize = "resize";
+    AppWindow.event_minimize = "minimize";
+    AppWindow.event_maximize = "maximize";
+    AppWindow.event_close = "close";
     return AppWindow;
 }());
-AppWindow.event_move = "move";
-AppWindow.event_resize = "resize";
-AppWindow.event_minimize = "minimize";
-AppWindow.event_maximize = "maximize";
-AppWindow.event_close = "close";
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";
