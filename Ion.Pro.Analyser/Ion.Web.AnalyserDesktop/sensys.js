@@ -2,6 +2,7 @@ var SensorManager = (function () {
     function SensorManager() {
         this.dataCache = [];
         this.eventManager = new EventManager();
+        this.plotter = [];
     }
     SensorManager.prototype.getIds = function (callback) {
         requestAction("GetIds", callback);
@@ -37,6 +38,9 @@ var SensorManager = (function () {
             listener(this.globalPlot);
         }
         this.eventManager.addEventListener(type, listener);
+    };
+    SensorManager.prototype.register = function (plotter) {
+        this.plotter.push(plotter);
     };
     SensorManager.event_globalPlot = "globalPlot";
     return SensorManager;

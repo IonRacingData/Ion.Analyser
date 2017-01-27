@@ -46,6 +46,12 @@
         }
         this.eventManager.addEventListener(type, listener);
     }
+
+    plotter: IPlot[] = [];
+
+    register(plotter: IPlot): void {
+        this.plotter.push(plotter);
+    }
 }
 
 class SensorInformation {
@@ -55,10 +61,15 @@ class SensorInformation {
     Unit: string;
 }
 
-interface ISinglePlot {
-
+interface IPlot {
+    dataUpdate();
+    plotType: string;
 }
 
-interface IMultiPlot {
+interface ISinglePlot extends IPlot {
+    plotData: PlotData;
+}
 
+interface IMultiPlot extends IPlot {
+    plotData: PlotData[];
 }
