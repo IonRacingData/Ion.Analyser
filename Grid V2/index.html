@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Grid v2</title>
+        <style>
+            .hcon, .vcon{
+                height: 100%;
+                width: 100%;
+                position: relative;
+                display: flex;
+                margin: 0;
+                padding: 0;
+                user-select: none;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+            }
+            .hcon{
+                flex-flow: row;
+            }
+            .vcon{
+                flex-flow: column;
+            }
+            .box{
+                /*display: inline-block;*/
+                margin: 0;
+                height: 100%;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+            }
+            .window{
+                border: 1px solid red;
+                width: calc(100% - 2px);
+                height: calc(100%  - 2px);
+                /*overflow: hidden;*/
+            }
+            .hsep, .vsep{
+                border: 1px solid darkgray;
+                /*display: inline-block;*/
+                background-color: green;
+                overflow: hidden;
+            }
+            .vsep{
+                height: 4px;
+                width: 100%;
+                cursor: ns-resize;
+            }
+            .hsep{
+                width: 4px;
+                height: 100%;
+                cursor: ew-resize;
+            }
+        </style>
+        <script>
+            window.onload = function(){
+
+                let elements = document.getElementsByClassName("hsep");
+                let elements2 = document.getElementsByClassName("vsep");
+
+                for(let i = 0; i < elements.length; i++){
+                    let cur = elements[i];
+                    
+                    cur.addEventListener("mousedown", function(){
+                        
+                        console.log(cur);
+                        let prev = cur.previousElementSibling;
+                        let next = cur.nextElementSibling;
+                        let totalWidth = cur.parentElement.clientWidth
+                        let partWidth = prev.clientWidth + next.clientWidth + 12;
+                        let startX = cur.offsetLeft;
+                        let correctionValue = prev.offsetLeft;
+                        let startPercent = (startX-correctionValue) / totalWidth;
+                        
+                        console.log("TotalWidth: " + totalWidth.toString() + " partWidth: " + partWidth.toString() + " percent: " + (partWidth / totalWidth*100).toString() + "%" );
+
+                        
+                        cur.parentNode.onmousemove =  function(e){
+                            //console.log(e);
+                            let curMovement = e.clientX - startX - 13;
+                            
+                            let curPercentMove = curMovement / totalWidth;
+                            //console.log(curPercentMove * 100);
+                            let prevWidth = (startPercent) + curPercentMove;
+                            let nextWidth = (partWidth / totalWidth) - prevWidth;
+
+                            prev.style.width = "calc(" + (prevWidth * 100).toString() + "% - 6px)";
+                            next.style.width = "calc(" + (nextWidth * 100).toString() + "% - 6px)";
+                        };
+                        cur.parentNode.onmouseup = function(e){
+                            cur.parentNode.onmousemove = null;
+                        };
+                    });
+                }
+
+                for(let i = 0; i < elements2.length; i++){
+                    let cur = elements2[i];
+                    
+                    cur.addEventListener("mousedown", function(){
+                        
+                        //console.log(cur);
+                        let prev = cur.previousElementSibling;
+                        let next = cur.nextElementSibling;
+                        let totalHeight = cur.parentElement.clientHeight
+                        let partHeight = prev.clientHeight + next.clientHeight + 12;
+                        let startY = cur.offsetTop;
+                        let correctionValue = prev.offsetTop;
+                        let startPercent = (startY-correctionValue) / totalHeight;
+                        
+                        //console.log("TotalHeight: " + totalHeight.toString() + " partHeight: " + partHeight.toString() + " percent: " + (partHeight / totalHeight*100).toString() + "%" );
+
+                        
+                        cur.parentNode.onmousemove =  function(e){
+                            //console.log(e);
+                            let curMovement = e.clientY - startY - 13;
+                            
+                            let curPercentMove = curMovement / totalHeight;
+                            //console.log(curPercentMove * 100);
+                            let prevHeight = (startPercent) + curPercentMove;
+                            let nextHeight = (partHeight / totalHeight) - prevHeight;
+
+                            prev.style.height = "calc(" + (prevHeight * 100).toString() + "% - 6px)";
+                            next.style.height = "calc(" + (nextHeight * 100).toString() + "% - 6px)";
+                        };
+                        cur.parentNode.onmouseup = function(e){
+                            cur.parentNode.onmousemove = null;
+                        };
+                    });
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container" style="border: 1px solid black; width: 100%; height: 600px;">
+            <div class="hcon">
+                <div class="box" style="width: calc(25% - 6px)">
+                    <div class="vcon">
+                        <div class="box" style="height: calc(50% - 6px)">
+                            <div class="window">
+                                Hello World
+                            </div>
+                        </div><div class="vsep">&nbsp;</div><div class="box" style="height: calc(50% - 6px)">
+                            <div class="window">
+                                Hello World
+                            </div>
+                        </div>
+                    </div>
+                </div><div class="hsep">&nbsp;</div><div class="box" style="width: calc(25% - 6px)">
+                    <div class="window">
+                        Hello World
+                    </div>
+                </div><div class="hsep">&nbsp;</div><div class="box" style="width: calc(25% - 6px)">
+                    <div class="window">
+                        Hello World
+                    </div>
+                </div><div class="hsep">&nbsp;</div><div class="box" style="width: calc(25% - 6px)">
+                    <div class="window">
+                        Hello World
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

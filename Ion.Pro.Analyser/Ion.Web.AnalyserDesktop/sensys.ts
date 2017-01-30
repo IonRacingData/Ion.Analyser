@@ -8,8 +8,12 @@
 
     eventManager: EventManager = new EventManager(); 
 
-    getIds(callback: (ids: number[]) => void): void {
+    getIds(callback: (ids: SensorInformation[]) => void): void {
         requestAction("GetIds", callback);
+    }
+
+    getLoadedIds(callback: (ids: number[]) => void): void {
+        requestAction("GetLoadedIds", callback);
     }
 
     getData(id: number, callback: (data: ISensorPackage[]) => void): void{
@@ -43,4 +47,29 @@
         this.eventManager.addEventListener(type, listener);
     }
 
+    plotter: IPlot[] = [];
+
+    register(plotter: IPlot): void {
+        this.plotter.push(plotter);
+    }
+}
+
+class SensorInformation {
+    ID: number;
+    Key: string;
+    Name: string;
+    Unit: string;
+}
+
+interface IPlot {
+    dataUpdate();
+    plotType: string;
+}
+
+interface ISinglePlot extends IPlot {
+    plotData: PlotData;
+}
+
+interface IMultiPlot extends IPlot {
+    plotData: PlotData[];
 }

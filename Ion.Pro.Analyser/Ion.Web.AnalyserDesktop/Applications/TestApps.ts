@@ -2,25 +2,56 @@
     application: Application;
     window: AppWindow;
     data: ISensorPackage[];
+
+    loadedIds: number[];
+    sensorInformation: SensorInformation[];
+
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getIds((data: number[]) => this.draw(data));
+        kernel.senMan.getIds((data: SensorInformation[]) => this.loadedData(data));
+        kernel.senMan.getLoadedIds((data: number[]) => this.loadLoadedIds(data));
     }
 
-    draw(data: number[]): void {
-        var mk = new HtmlHelper();
-        for (var i = 0; i < data.length; i++) {
-            let curValue = data[i];
-            var a = <HTMLAnchorElement>mk.tag("span", "taskbar-button-text", null, curValue.toString());
-
-            a.onclick = () => {
-                kernel.senMan.setGlobal(curValue);
-                //kernel.senMan.getData(curValue, (data: ISensorPackage[]) => this.drawInner(data));
-                //requestAction("GetData?number=" + curValue.toString(), (data: ISensorPackage[]) => this.drawInner(data))
-            };
-            this.window.content.appendChild(a);
+    loadedData(data: SensorInformation[]): void {
+        this.sensorInformation = data;
+        if (this.loadedIds) {
+            this.draw(data);
         }
+    }
+
+    loadLoadedIds(data: number[]): void {
+        this.loadedIds = data;
+        if (this.sensorInformation) {
+            this.draw(this.sensorInformation);
+        }
+    }
+
+    draw(data: SensorInformation[]): void {
+        var mk = new HtmlHelper();
+
+        var table = new HtmlTableGen("table");
+        table.addHeader("ID", "Name", "Unit");
+
+        for (var i = 0; i < this.loadedIds.length; i++) {
+            let curValue = this.loadedIds[i];
+            let found: SensorInformation = null;
+            for (let j = 0; j < this.sensorInformation.length; j++) {
+                if (this.sensorInformation[j].ID == curValue) {
+                    found = this.sensorInformation[j];
+                    break;
+                }
+            }
+            if (found) {
+                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(found.ID); } }], found.ID, found.Name, found.Unit);
+            }
+            else {
+                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(curValue); } }, { field: "style", data: "background-color: #FF8888;"}], curValue, "Not found", "");
+            }
+        }
+        this.window.content.appendChild(table.generate());
+
+
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
         kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
@@ -51,7 +82,6 @@ class PlotViewer implements IApplication {
 
         google.charts.load("current", { "packages": ["corechart"] });
         google.charts.setOnLoadCallback(() => this.loadData());
-
     }
 
     loadData() {
@@ -89,14 +119,13 @@ class PlotterTester implements IApplication {
     window: AppWindow;
     plotter: Plotter;
     data: ISensorPackage[];
+    eh: EventHandler = new EventHandler();
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.plotter.setSize(this.window.width, this.window.height);
-            //this.plotter.draw();
-        });
+
+        this.createEvents(this.eh);
 
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -109,6 +138,22 @@ class PlotterTester implements IApplication {
 
         this.loadData();
         //this.drawChart(data);
+    }
+
+    createEvents(eh: EventHandler) {
+        eh.on(this.window, AppWindow.event_resize, () => {
+            this.plotter.setSize(this.window.width, this.window.height);
+            //this.plotter.canvas.width = this.window.width;
+            //this.plotter.canvas.height = this.window.height;
+            //this.plotter.draw();
+        });
+        eh.on(this.window, AppWindow.event_close, () => {
+            this.close();
+        });
+    }
+
+    close() {
+        this.eh.close();
     }
 
     loadData() {
@@ -138,16 +183,7 @@ class WebSocketTest implements IApplication {
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
 
-        let socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
 
-        socket.onmessage = (ev: MessageEvent) => {
-            console.log(ev);
-            console.log(ev.data);
-        }
-
-        socket.onopen = (ev: Event) => {
-            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
-        }
     }
 }
 

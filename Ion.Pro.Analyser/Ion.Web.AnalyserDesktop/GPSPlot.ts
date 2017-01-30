@@ -59,7 +59,7 @@
         return new Point(moved.x, this.height - moved.y);
     }
 
-    //getMousePoint(e: MouseEvent): Point {
+    getMousePoint(e: MouseEvent): Point {
         return new Point(e.layerX, e.layerY);
     }
 

@@ -1,6 +1,7 @@
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
+        this.topMost = false;
         this.eventMan = new EventManager();
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
@@ -26,6 +27,12 @@ var AppWindow = (function () {
     AppWindow.prototype.setTitle = function (title) {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
+    };
+    AppWindow.prototype.addEventListener = function (type, listener) {
+        this.eventMan.addEventListener(type, listener);
+    };
+    AppWindow.prototype.removeEventListener = function (type, listener) {
+        this.eventMan.removeEventListener(type, listener);
     };
     /* Event handlers */
     AppWindow.prototype.main_mouseDown = function (e) {
@@ -67,6 +74,10 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.close_click = function (e) {
         e.stopPropagation();
+        this.close();
+    };
+    AppWindow.prototype.close = function () {
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
     };
@@ -76,6 +87,9 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.onMove = function () {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
+    };
+    AppWindow.prototype.onClose = function () {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
     };
     AppWindow.prototype.show = function () {
         this.handle.style.display = "";
@@ -129,6 +143,10 @@ var AppWindow = (function () {
         this.setPos(newX, newY, false);
         this.setSize(newWidth, newHeight, false);
         this.changeStateTo(WindowState.TILED);
+    };
+    AppWindow.prototype.recalculateSize = function () {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
     };
     AppWindow.prototype.setPos = function (x, y, storePos) {
         if (storePos === void 0) { storePos = true; }
@@ -220,15 +238,22 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.changeWindowMode = function (mode) {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
+                break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
         }
     };
@@ -238,10 +263,12 @@ AppWindow.event_move = "move";
 AppWindow.event_resize = "resize";
 AppWindow.event_minimize = "minimize";
 AppWindow.event_maximize = "maximize";
+AppWindow.event_close = "close";
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";
-    WindowMode[WindowMode["BORDERLESS"] = 1] = "BORDERLESS";
+    WindowMode[WindowMode["BORDERLESSFULL"] = 1] = "BORDERLESSFULL";
+    WindowMode[WindowMode["BORDERLESS"] = 2] = "BORDERLESS";
 })(WindowMode || (WindowMode = {}));
 var TileState;
 (function (TileState) {

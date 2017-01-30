@@ -17,26 +17,41 @@ namespace Ion.Pro.Analyser
 
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
-        //static string ContentPath = "../../Content/";
-        static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "../../Content/";
+        public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
+        //public static string ContentPath = "html/";
 
         static void Main(string[] args)
         {
-            InsertSensorTestData();
-            InitControllers();
-            HttpServer server = new HttpServer();
-            server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            Console.WriteLine("Ion Analyser Server");
+            try
+            {
+                InsertSensorTestData();
+                InitControllers();
+                HttpServer server = new HttpServer();
+                server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ohh no, something horrible went wrong");
+                Console.WriteLine(e);
+            }
             Console.Read();
         }
 
         static void InsertSensorTestData()
         {
-            LegacySensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader gpsReader = new GPSDataReader("../../Data/GPS_DataFile.csv", 2, 2);
+            //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
 
             SensorDataStore store = SensorDataStore.GetDefault();
             if (true)
             {
+                store.LoadSensorInformation();
                 store.AddRange(reader.ReadPackages());
+                store.AddRange(gpsReader.ReadPackages());
+                
             }
             else
             {
@@ -233,54 +248,5 @@ namespace Ion.Pro.Analyser
         }
     }
 
-    public class SensorDataStore
-    {
-        //List<SensorPackage> allPackages = new List<SensorPackage>();
-        Dictionary<int, List<SensorPackage>> indexedPackages = new Dictionary<int, List<SensorPackage>>();
 
-        static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
-        public static SensorDataStore GetDefault()
-        {
-            return instance.Value;
-        }
-
-        public void Add(SensorPackage data)
-        {
-            if (!indexedPackages.ContainsKey(data.ID))
-            {
-                indexedPackages[data.ID] = new List<SensorPackage>();
-            }
-            indexedPackages[data.ID].Add(data);
-        }
-
-        public void AddRange(IEnumerable<SensorPackage> sensorPackage)
-        {
-            foreach (SensorPackage package in sensorPackage)
-            {
-                Add(package);
-            }
-        }
-
-        public SensorPackageViewModel[] GetViews(int id)
-        {
-            if (!indexedPackages.ContainsKey(id))
-                return null;
-            List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
-            foreach(SensorPackage sp in indexedPackages[id])
-            {
-                allViews.Add(sp.GetObject());
-            }
-            return allViews.ToArray();
-        }        
-
-        public SensorPackage[] GetPackages(int id)
-        {
-            return indexedPackages[id].ToArray();
-        }
-
-        public int[] GetIds()
-        {
-            return indexedPackages.Keys.ToArray();
-        }
-    }
 }

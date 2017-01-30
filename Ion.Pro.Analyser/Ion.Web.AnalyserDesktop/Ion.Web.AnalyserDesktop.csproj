@@ -41,6 +41,7 @@
     <TypeScriptCompile Include="Applications\ServerInfo.ts" />
     <TypeScriptCompile Include="Applications\TaskManager.ts" />
     <TypeScriptCompile Include="Applications\TestApps.ts" />
+    <TypeScriptCompile Include="Applications\TestDataViewer.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
     <TypeScriptCompile Include="appsys.ts" />
     <TypeScriptCompile Include="comsys.ts" />

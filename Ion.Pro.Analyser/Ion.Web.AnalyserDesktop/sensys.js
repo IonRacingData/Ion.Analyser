@@ -2,9 +2,13 @@ var SensorManager = (function () {
     function SensorManager() {
         this.dataCache = [];
         this.eventManager = new EventManager();
+        this.plotter = [];
     }
     SensorManager.prototype.getIds = function (callback) {
         requestAction("GetIds", callback);
+    };
+    SensorManager.prototype.getLoadedIds = function (callback) {
+        requestAction("GetLoadedIds", callback);
     };
     SensorManager.prototype.getData = function (id, callback) {
         if (!this.dataCache[id]) {
@@ -35,7 +39,15 @@ var SensorManager = (function () {
         }
         this.eventManager.addEventListener(type, listener);
     };
+    SensorManager.prototype.register = function (plotter) {
+        this.plotter.push(plotter);
+    };
     return SensorManager;
 }());
 SensorManager.event_globalPlot = "globalPlot";
+var SensorInformation = (function () {
+    function SensorInformation() {
+    }
+    return SensorInformation;
+}());
 //# sourceMappingURL=sensys.js.map

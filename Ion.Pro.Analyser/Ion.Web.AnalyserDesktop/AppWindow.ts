@@ -1,17 +1,20 @@
-﻿class AppWindow {
+﻿class AppWindow implements IEventManager {
     app: Application;
     title: string;
     handle: HTMLElement;
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
-    eventMan: EventManager = new EventManager();
+    topMost: boolean = false;
 
+    eventMan: EventManager = new EventManager();
 
     static event_move = "move";
     static event_resize = "resize";
     static event_minimize = "minimize";
     static event_maximize = "maximize";
+
+    static event_close = "close";
 
     x: number;
     y: number;
@@ -35,6 +38,7 @@
 
     constructor(app: Application) {
         this.app = app;
+
         var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
 
@@ -66,6 +70,14 @@
     setTitle(title: string): void {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
+    }
+
+    addEventListener(type: string, listener: any) {
+        this.eventMan.addEventListener(type, listener);
+    }
+
+    removeEventListener(type: string, listener: any) {
+        this.eventMan.removeEventListener(type, listener);
     }
 
 
@@ -116,6 +128,11 @@
 
     close_click(e: MouseEvent): void {
         e.stopPropagation();
+        this.close();
+    }
+
+    close() {
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
     }
@@ -127,6 +144,10 @@
 
     onMove(): void {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
+    }
+
+    onClose(): void {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
     }
 
     
@@ -191,7 +212,10 @@
         this.changeStateTo(WindowState.TILED);
     }
 
-    
+    recalculateSize() {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
+    }
 
     setPos(x: number, y: number, storePos: boolean = true): void {
         var outerBoxMargin: number = 8;
@@ -296,15 +320,22 @@
 
     changeWindowMode(mode: WindowMode): void {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
+                break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
         }
     }
@@ -312,7 +343,8 @@
 
 enum WindowMode {
     WINDOWED = 0,
-    BORDERLESS = 1,
+    BORDERLESSFULL = 1,
+    BORDERLESS = 2,
 }
 
 enum TileState {

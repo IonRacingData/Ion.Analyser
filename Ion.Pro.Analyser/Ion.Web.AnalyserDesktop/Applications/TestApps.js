@@ -4,25 +4,47 @@ var DataViewer = (function () {
     DataViewer.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getIds(function (data) { return _this.draw(data); });
+        kernel.senMan.getIds(function (data) { return _this.loadedData(data); });
+        kernel.senMan.getLoadedIds(function (data) { return _this.loadLoadedIds(data); });
+    };
+    DataViewer.prototype.loadedData = function (data) {
+        this.sensorInformation = data;
+        if (this.loadedIds) {
+            this.draw(data);
+        }
+    };
+    DataViewer.prototype.loadLoadedIds = function (data) {
+        this.loadedIds = data;
+        if (this.sensorInformation) {
+            this.draw(this.sensorInformation);
+        }
     };
     DataViewer.prototype.draw = function (data) {
         var _this = this;
         var mk = new HtmlHelper();
+        var table = new HtmlTableGen("table");
+        table.addHeader("ID", "Name", "Unit");
         var _loop_1 = function () {
-            var curValue = data[i];
-            a = mk.tag("span", "taskbar-button-text", null, curValue.toString());
-            a.onclick = function () {
-                kernel.senMan.setGlobal(curValue);
-                //kernel.senMan.getData(curValue, (data: ISensorPackage[]) => this.drawInner(data));
-                //requestAction("GetData?number=" + curValue.toString(), (data: ISensorPackage[]) => this.drawInner(data))
-            };
-            this_1.window.content.appendChild(a);
+            var curValue = this_1.loadedIds[i];
+            var found = null;
+            for (var j = 0; j < this_1.sensorInformation.length; j++) {
+                if (this_1.sensorInformation[j].ID == curValue) {
+                    found = this_1.sensorInformation[j];
+                    break;
+                }
+            }
+            if (found) {
+                table.addRow([{ event: "click", func: function () { kernel.senMan.setGlobal(found.ID); } }], found.ID, found.Name, found.Unit);
+            }
+            else {
+                table.addRow([{ event: "click", func: function () { kernel.senMan.setGlobal(curValue); } }, { field: "style", data: "background-color: #FF8888;" }], curValue, "Not found", "");
+            }
         };
-        var this_1 = this, a;
-        for (var i = 0; i < data.length; i++) {
+        var this_1 = this;
+        for (var i = 0; i < this.loadedIds.length; i++) {
             _loop_1();
         }
+        this.window.content.appendChild(table.generate());
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
         kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawInner(data); });
@@ -80,15 +102,12 @@ var PlotViewer = (function () {
 }());
 var PlotterTester = (function () {
     function PlotterTester() {
+        this.eh = new EventHandler();
     }
     PlotterTester.prototype.main = function () {
-        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.plotter.setSize(_this.window.width, _this.window.height);
-            //this.plotter.draw();
-        });
+        this.createEvents(this.eh);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -99,6 +118,21 @@ var PlotterTester = (function () {
         ];*/
         this.loadData();
         //this.drawChart(data);
+    };
+    PlotterTester.prototype.createEvents = function (eh) {
+        var _this = this;
+        eh.on(this.window, AppWindow.event_resize, function () {
+            _this.plotter.setSize(_this.window.width, _this.window.height);
+            //this.plotter.canvas.width = this.window.width;
+            //this.plotter.canvas.height = this.window.height;
+            //this.plotter.draw();
+        });
+        eh.on(this.window, AppWindow.event_close, function () {
+            _this.close();
+        });
+    };
+    PlotterTester.prototype.close = function () {
+        this.eh.close();
     };
     PlotterTester.prototype.loadData = function () {
         var _this = this;
@@ -125,14 +159,6 @@ var WebSocketTest = (function () {
     }
     WebSocketTest.prototype.main = function () {
         this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
-        var socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
-        socket.onmessage = function (ev) {
-            console.log(ev);
-            console.log(ev.data);
-        };
-        socket.onopen = function (ev) {
-            socket.send("Hello World from a web socket :D, and this is a realy realy long message, so we can provoke it to send it as a longer message, to check that everything works");
-        };
     };
     return WebSocketTest;
 }());
