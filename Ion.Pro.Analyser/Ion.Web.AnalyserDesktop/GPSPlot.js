@@ -4,6 +4,7 @@ var GPSPlot = (function () {
         this.scalePoint = new Point(1, 1);
         this.posData = d;
     }
+    // temp
     GPSPlot.prototype.update = function (d) {
         this.posData = d;
         this.draw();
@@ -16,7 +17,6 @@ var GPSPlot = (function () {
         this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
-        this.circle = this.makePoint();
         this.draw();
         return this.wrapper;
     };
@@ -25,8 +25,15 @@ var GPSPlot = (function () {
         for (var i = 0; i < this.posData.points.length; i++) {
             var point = this.getAbsolute(new Point(this.posData.points[i].x, this.posData.points[i].y));
             //console.log(point); 
-            this.ctxMain.ctx.putImageData(this.circle, point.x, point.y);
+            this.ctxMain.fillRect(point.x - 1, point.y - 1, 2, 2);
+            var outsideCanvasX = point.x < 0 || point.x > this.width;
+            var outsideCanvasY = point.y < 0 || point.y > this.height;
+            if (outsideCanvasX || outsideCanvasY) {
+                this.scale(point);
+            }
         }
+    };
+    GPSPlot.prototype.scale = function (p) {
     };
     GPSPlot.prototype.getRelative = function (p) {
         var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
@@ -40,14 +47,6 @@ var GPSPlot = (function () {
     };
     GPSPlot.prototype.getMousePoint = function (e) {
         return new Point(e.layerX, e.layerY);
-    };
-    GPSPlot.prototype.makePoint = function () {
-        this.ctxMain.beginPath();
-        this.ctxMain.arc(6, 6, 3, 0, 2 * Math.PI);
-        this.ctxMain.stroke();
-        var circle = this.ctxMain.ctx.getImageData(0, 0, 12, 12);
-        this.ctxMain.clear();
-        return circle;
     };
     return GPSPlot;
 }());

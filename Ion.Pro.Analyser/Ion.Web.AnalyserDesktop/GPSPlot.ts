@@ -8,12 +8,12 @@
     scalePoint: Point = new Point(1, 1);
     width: number;
     height: number;
-    circle: ImageData;
 
     constructor(d: GPSPlotData) {
         this.posData = d;
     }
 
+    // temp
     update(d: GPSPlotData): void {
         this.posData = d;
         this.draw();
@@ -24,14 +24,10 @@
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-
         this.canvas = new LayeredCanvas(this.wrapper, ["main"]);
         this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);        
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
-
-        this.circle = this.makePoint();
-
 
         this.draw();
         return this.wrapper;
@@ -42,9 +38,18 @@
         for (let i = 0; i < this.posData.points.length; i++) {
             let point: Point = this.getAbsolute(new Point(this.posData.points[i].x, this.posData.points[i].y));  
             //console.log(point); 
-            this.ctxMain.ctx.putImageData(this.circle, point.x, point.y);
-            //this.ctxMain.fillRect(point.x - 1, point.y - 1, 2, 2);     
+            this.ctxMain.fillRect(point.x - 1, point.y - 1, 2, 2); 
+
+            let outsideCanvasX = point.x < 0 || point.x > this.width;
+            let outsideCanvasY = point.y < 0 || point.y > this.height;
+            if (outsideCanvasX || outsideCanvasY) {
+                this.scale(point);
+            }
         }
+    }
+
+    scale(p: Point): void {
+        
     }
 
     getRelative(p: Point): Point {
@@ -61,17 +66,6 @@
 
     getMousePoint(e: MouseEvent): Point {
         return new Point(e.layerX, e.layerY);
-    }
-
-    makePoint(): ImageData {        
-        this.ctxMain.beginPath();
-        this.ctxMain.arc(6, 6, 3, 0, 2 * Math.PI);
-        this.ctxMain.stroke();
-        let circle = this.ctxMain.ctx.getImageData(0, 0, 12, 12);        
-        this.ctxMain.clear();
-
-
-        return circle;
     }
 
 }
