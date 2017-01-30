@@ -61,6 +61,7 @@
     <None Include="App.config" />
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\126_usart_data.iondata" />
+    <None Include="Data\GPS_DataFile.csv" />
     <None Include="Data\Sensor.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
