@@ -42,9 +42,9 @@ var SensorManager = (function () {
     SensorManager.prototype.register = function (plotter) {
         this.plotter.push(plotter);
     };
-    SensorManager.event_globalPlot = "globalPlot";
     return SensorManager;
 }());
+SensorManager.event_globalPlot = "globalPlot";
 var SensorInformation = (function () {
     function SensorInformation() {
     }

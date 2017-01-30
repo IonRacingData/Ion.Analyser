@@ -37,14 +37,14 @@ var HtmlTableGen = (function () {
     HtmlTableGen.prototype.addHeader = function () {
         var fields = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            fields[_i - 0] = arguments[_i];
+            fields[_i] = arguments[_i];
         }
         this.header = fields;
     };
     HtmlTableGen.prototype.addRow = function () {
         var columns = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            columns[_i - 0] = arguments[_i];
+            columns[_i] = arguments[_i];
         }
         this.rows.push(columns);
     };
@@ -78,7 +78,7 @@ var HtmlTableGen = (function () {
         if (this.header.length > 0) {
             var thead = document.createElement("thead");
             var headerRow = document.createElement("tr");
-            var _loop_1 = function() {
+            var _loop_1 = function () {
                 header = document.createElement("th");
                 header.innerHTML = this_1.header[i];
                 headerRow.appendChild(header);
@@ -92,8 +92,7 @@ var HtmlTableGen = (function () {
                     header.appendChild(span_1);
                 }
             };
-            var this_1 = this;
-            var header;
+            var this_1 = this, header;
             for (var i = 0; i < this.header.length; i++) {
                 _loop_1();
             }

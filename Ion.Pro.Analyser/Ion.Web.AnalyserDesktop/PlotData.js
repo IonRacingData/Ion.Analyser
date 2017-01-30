@@ -15,10 +15,12 @@ var PlotData = (function () {
             if (half === min) {
                 var diffMin = p.x - this.points[min].x;
                 var diffMax = this.points[max].x - p.x;
-                if (diffMin < diffMax)
+                if (diffMin < diffMax) {
                     return min;
-                else
+                }
+                else {
                     return max;
+                }
             }
             else if (p.x < this.points[half].x) {
                 max = half;
@@ -32,6 +34,12 @@ var PlotData = (function () {
         }
     };
     return PlotData;
+}());
+var GPSPlotData = (function () {
+    function GPSPlotData(p) {
+        this.points = p;
+    }
+    return GPSPlotData;
 }());
 var Point = (function () {
     function Point(x, y) {
@@ -54,5 +62,28 @@ var Point = (function () {
         return "x: " + this.x.toString() + "  y: " + this.y.toString();
     };
     return Point;
+}());
+var Point3D = (function () {
+    function Point3D(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    Point3D.prototype.add = function (p) {
+        return new Point3D(this.x + p.x, this.y + p.y, this.z + p.z);
+    };
+    Point3D.prototype.sub = function (p) {
+        return new Point3D(this.x - p.x, this.y - p.y, this.z - p.z);
+    };
+    Point3D.prototype.multiply = function (p) {
+        return new Point3D(this.x * p.x, this.y * p.y, this.z * p.z);
+    };
+    Point3D.prototype.divide = function (p) {
+        return new Point3D(this.x / p.x, this.y / p.y, this.z / p.z);
+    };
+    Point3D.prototype.toString = function () {
+        return "x: " + this.x.toString() + "  y: " + this.y.toString() + "  z: " + this.z.toString();
+    };
+    return Point3D;
 }());
 //# sourceMappingURL=PlotData.js.map

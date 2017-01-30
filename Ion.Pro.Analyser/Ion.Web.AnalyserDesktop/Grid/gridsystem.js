@@ -391,13 +391,14 @@ var ResizeContainer = (function () {
 var GridHContainer = (function (_super) {
     __extends(GridHContainer, _super);
     function GridHContainer(appWindow) {
-        _super.call(this, appWindow);
-        this.set = "setWidth";
-        this.dir = "clientWidth";
-        this.offset = "offsetLeft";
-        this.mouse = "clientX";
-        this.dir2 = "width";
-        this.pos = "x";
+        var _this = _super.call(this, appWindow) || this;
+        _this.set = "setWidth";
+        _this.dir = "clientWidth";
+        _this.offset = "offsetLeft";
+        _this.mouse = "clientX";
+        _this.dir2 = "width";
+        _this.pos = "x";
+        return _this;
     }
     GridHContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "hcon");
@@ -415,13 +416,14 @@ var GridHContainer = (function (_super) {
 var GridVContainer = (function (_super) {
     __extends(GridVContainer, _super);
     function GridVContainer(appWindow) {
-        _super.call(this, appWindow);
-        this.set = "setHeight";
-        this.dir = "clientHeight";
-        this.offset = "offsetTop";
-        this.mouse = "clientY";
-        this.dir2 = "height";
-        this.pos = "y";
+        var _this = _super.call(this, appWindow) || this;
+        _this.set = "setHeight";
+        _this.dir = "clientHeight";
+        _this.offset = "offsetTop";
+        _this.mouse = "clientY";
+        _this.dir2 = "height";
+        _this.pos = "y";
+        return _this;
     }
     GridVContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "vcon");

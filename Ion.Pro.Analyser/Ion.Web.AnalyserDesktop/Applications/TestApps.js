@@ -24,7 +24,7 @@ var DataViewer = (function () {
         var mk = new HtmlHelper();
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
-        var _loop_1 = function() {
+        var _loop_1 = function () {
             var curValue = this_1.loadedIds[i];
             var found = null;
             for (var j = 0; j < this_1.sensorInformation.length; j++) {
@@ -176,8 +176,82 @@ var TestViewer = (function () {
     };
     TestViewer.prototype.draw = function () {
         this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
+        this.window.content.appendChild(this.mk.tag("h1", "", null, "He llo World"));
     };
     return TestViewer;
+}());
+var MeterTester = (function () {
+    function MeterTester() {
+    }
+    MeterTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.window.content.style.overflow = "hidden";
+        this.drawMeter();
+        var slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        //slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", function () {
+            var val = slider.value;
+            _this.meterPlot.drawNeedle(parseInt(val));
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.meterPlot.setSize(_this.window.width);
+            //this.plotter.draw();
+        });
+    };
+    MeterTester.prototype.drawMeter = function () {
+        this.window.content.innerHTML = "";
+        var labels = [];
+        for (var i = 0; i <= 280; i += 20) {
+            labels.push(i.toString());
+        }
+        this.meterPlot = new MeterPlot(250, labels);
+        this.window.content.appendChild(this.meterPlot.generate());
+    };
+    return MeterTester;
+}());
+var GPSPlotTester = (function () {
+    function GPSPlotTester() {
+        this.points = [];
+    }
+    GPSPlotTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        var slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        //slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", function () {
+            var val = parseInt(slider.value) * 5;
+            _this.points.push(new Point3D(val, 5 + (val * 0.03) * (val * 0.03), 1));
+            _this.testData = new GPSPlotData(_this.points);
+            _this.update();
+        });
+        this.draw();
+    };
+    GPSPlotTester.prototype.draw = function () {
+        //this.window.content.innerHTML = "";
+        /*this.points: Point3D[] = [
+            new Point3D(10, 30, 1),
+            new Point3D(12, 30, 1),
+            new Point3D(15, 32, 1),
+            new Point3D(18, 31, 1),
+            new Point3D(30, 50, 1),
+            new Point3D(60, 47, 1),
+            new Point3D(72, 44, 1),
+            new Point3D(100, 33, 1),
+        ];*/
+        this.testData = new GPSPlotData(this.points);
+        this.plot = new GPSPlot(this.testData);
+        this.window.content.appendChild(this.plot.generate());
+    };
+    GPSPlotTester.prototype.update = function () {
+        this.plot.update(this.testData);
+    };
+    return GPSPlotTester;
 }());
 //# sourceMappingURL=TestApps.js.map
