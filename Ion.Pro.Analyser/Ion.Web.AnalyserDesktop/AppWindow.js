@@ -232,12 +232,12 @@ var AppWindow = (function () {
                 break;
         }
     };
-    AppWindow.event_move = "move";
-    AppWindow.event_resize = "resize";
-    AppWindow.event_minimize = "minimize";
-    AppWindow.event_maximize = "maximize";
     return AppWindow;
 }());
+AppWindow.event_move = "move";
+AppWindow.event_resize = "resize";
+AppWindow.event_minimize = "minimize";
+AppWindow.event_maximize = "maximize";
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";

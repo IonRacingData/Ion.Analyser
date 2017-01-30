@@ -52,6 +52,7 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Plot", new Launcher(PlotterTester, "Plot Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(MeterTester, "MeterPlot Tester"));
+    kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
 
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 }

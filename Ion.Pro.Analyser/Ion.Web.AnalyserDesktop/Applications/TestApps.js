@@ -9,7 +9,7 @@ var DataViewer = (function () {
     DataViewer.prototype.draw = function (data) {
         var _this = this;
         var mk = new HtmlHelper();
-        var _loop_1 = function() {
+        var _loop_1 = function () {
             var curValue = data[i];
             a = mk.tag("span", "taskbar-button-text", null, curValue.toString());
             a.onclick = function () {
@@ -19,8 +19,7 @@ var DataViewer = (function () {
             };
             this_1.window.content.appendChild(a);
         };
-        var this_1 = this;
-        var a;
+        var this_1 = this, a;
         for (var i = 0; i < data.length; i++) {
             _loop_1();
         }
@@ -163,25 +162,70 @@ var MeterTester = (function () {
         this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
         this.drawMeter();
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.meterPlot.setSize(_this.window.height);
-            //this.plotter.draw();
-        });
         var slider = document.createElement("input");
         slider.setAttribute("type", "range");
-        slider.style.marginTop = "200px";
+        //slider.style.marginTop = "200px";
         slider.setAttribute("value", "0");
         this.window.content.appendChild(slider);
         slider.addEventListener("input", function () {
             var val = slider.value;
             _this.meterPlot.drawNeedle(parseInt(val));
         });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.meterPlot.setSize(_this.window.width);
+            //this.plotter.draw();
+        });
     };
     MeterTester.prototype.drawMeter = function () {
         this.window.content.innerHTML = "";
-        this.meterPlot = new MeterPlot(200, ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"]);
+        var labels = [];
+        for (var i = 0; i <= 280; i += 20) {
+            labels.push(i.toString());
+        }
+        this.meterPlot = new MeterPlot(250, labels);
         this.window.content.appendChild(this.meterPlot.generate());
     };
     return MeterTester;
+}());
+var GPSPlotTester = (function () {
+    function GPSPlotTester() {
+        this.points = [];
+    }
+    GPSPlotTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        var slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        //slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", function () {
+            var val = parseInt(slider.value) * 5;
+            _this.points.push(new Point3D(val, 5 + (val * 0.03) * (val * 0.03), 1));
+            _this.testData = new GPSPlotData(_this.points);
+            _this.update();
+        });
+        this.draw();
+    };
+    GPSPlotTester.prototype.draw = function () {
+        //this.window.content.innerHTML = "";
+        /*this.points: Point3D[] = [
+            new Point3D(10, 30, 1),
+            new Point3D(12, 30, 1),
+            new Point3D(15, 32, 1),
+            new Point3D(18, 31, 1),
+            new Point3D(30, 50, 1),
+            new Point3D(60, 47, 1),
+            new Point3D(72, 44, 1),
+            new Point3D(100, 33, 1),
+        ];*/
+        this.testData = new GPSPlotData(this.points);
+        this.plot = new GPSPlot(this.testData);
+        this.window.content.appendChild(this.plot.generate());
+    };
+    GPSPlotTester.prototype.update = function () {
+        this.plot.update(this.testData);
+    };
+    return GPSPlotTester;
 }());
 //# sourceMappingURL=TestApps.js.map

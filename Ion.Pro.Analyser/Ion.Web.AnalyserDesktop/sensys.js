@@ -35,7 +35,7 @@ var SensorManager = (function () {
         }
         this.eventManager.addEventListener(type, listener);
     };
-    SensorManager.event_globalPlot = "globalPlot";
     return SensorManager;
 }());
+SensorManager.event_globalPlot = "globalPlot";
 //# sourceMappingURL=sensys.js.map

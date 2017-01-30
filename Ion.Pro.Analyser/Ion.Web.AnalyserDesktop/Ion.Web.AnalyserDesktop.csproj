@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -46,6 +46,7 @@
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="GoogleChart.ts" />
+    <TypeScriptCompile Include="GPSPlot.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />

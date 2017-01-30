@@ -54,6 +54,8 @@ var MeterPlot = (function () {
     MeterPlot.prototype.setSize = function (size) {
         this.size = size;
         this.canvas.setSize(size, size);
+        this.wrapper.style.height = size.toString() + "px";
+        this.wrapper.style.width = size.toString() + "px";
         this.draw();
     };
     return MeterPlot;

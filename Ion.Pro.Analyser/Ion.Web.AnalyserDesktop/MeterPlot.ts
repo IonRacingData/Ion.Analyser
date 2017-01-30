@@ -8,6 +8,7 @@
     labels: string[];
     totalAngle: number = (3 * Math.PI) / 2;
     startAngle: number = -(3 * Math.PI) / 4;
+    needle: ImageData;
 
     constructor(size: number, labels: string[]) {
         this.size = size;
@@ -48,11 +49,10 @@
         }
         this.drawNeedle(0);
         
-    }
+    }                  
 
     drawNeedle(percent: number): void {
-        this.ctxNeedle.clear();
-
+        this.ctxNeedle.clear();        
         let radius = this.size / 2;
         this.ctxNeedle.translate(radius, radius);
 
@@ -62,7 +62,7 @@
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
         this.ctxNeedle.moveTo(0, 0);
-        this.ctxNeedle.lineTo(0, -radius * 0.6);
+        this.ctxNeedle.lineTo(0, -radius * 0.6  );
         this.ctxNeedle.stroke();
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
@@ -73,6 +73,8 @@
     setSize(size: number): void {
         this.size = size;
         this.canvas.setSize(size, size);
+        this.wrapper.style.height = size.toString() + "px";
+        this.wrapper.style.width = size.toString() + "px";
         this.draw();
     }
 }
