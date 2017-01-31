@@ -264,7 +264,6 @@ class GPSPlotTester implements IApplication {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
             this.draw(this.points);
-
         });
         this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
             this.plot.setSize(this.window.width, this.window.height);
