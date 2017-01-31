@@ -10,7 +10,16 @@
     }
 
     draw(): void {
-        console.log("Here we should draw something, but you know, we are lazy");
+        let gen = new HtmlTableGen("table");
+        gen.addHeader("Value", "Timestamp");
+
+        for (let i = 0; i < this.plotData.points.length && i < 10; i++) {
+            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
+        }
+
+        this.window.content.appendChild(gen.generate());
+
+        //console.log("Here we should draw something, but you know, we are lazy");
     }
 
     dataUpdate(): void {
@@ -21,17 +30,110 @@
 class DataAssigner implements IApplication {
     application: Application;
     window: AppWindow;
+    mk = new HtmlHelper();
+    sensorTable: HTMLElement;
 
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
 
+        this.draw();
+    }
+
+    draw() {
+        let mk = this.mk;
+        let divLeft = mk.tag("div");
+        let divRight = this.sensorTable = mk.tag("div");
         let tableGen = new HtmlTableGen("table");
         let senMan: SensorManager = kernel.senMan;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.plotter.length; i++) {
-            tableGen.addRow(senMan.plotter[i].plotType, Array.isArray((<any>senMan.plotter[i]).plotData) ? "Multi Plot" : "Single Plot");
-        }
-        this.window.content.appendChild(tableGen.generate());
+            let curPlot = senMan.plotter[i];
+            let isMulti = Array.isArray((<any>curPlot).plotData);
 
+            if (isMulti) {
+                tableGen.addRow([{
+                    event: "click", func: () => {
+                        kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<IMultiPlot>curPlot, x));
+                    }
+                }], curPlot.plotType, "Multi Plot");
+            }
+            else {
+                tableGen.addRow([{
+                    event: "click", func: () => {
+                        kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawSingleSensors(<ISinglePlot>curPlot, x));
+                    }
+                }], curPlot.plotType, "Single Plot");
+            }
+        }
+        divLeft.appendChild(tableGen.generate());
+
+        this.window.content.appendChild(divLeft);
+        this.window.content.appendChild(divRight);
+        
+    }
+
+    convertData(si: SensorInformation, data: ISensorPackage[]): PlotData {
+        let p: Point[] = [];
+        for (let i = 0; i < data.length; i++) {
+            p[i] = new Point(data[i].TimeStamp, data[i].Value);
+        }
+        let a = new PlotData(p);
+        a.ID = si.ID;
+        return a;
+    }
+
+
+    drawSingleSensors(plot: ISinglePlot, info: SensorInformation[]) {
+        this.sensorTable.innerHTML = "";
+        for (let i = 0; i < info.length; i++) {
+            let radio = <HTMLInputElement>this.mk.tag("input");
+            let sensor = info[i];
+            radio.type = "radio";
+            radio.name = "sensor";
+            radio.addEventListener("input", (e: Event) => {
+                kernel.senMan.getData(sensor.ID, (data: ISensorPackage[]) => {
+                    plot.plotData = this.convertData(sensor, data);
+                    plot.dataUpdate();
+                });
+            });
+            let label = this.mk.tag("label");
+            label.title = sensor.ID.toString() + "(0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ")") + sensor.Name));
+            this.sensorTable.appendChild(label);
+            this.sensorTable.appendChild(this.mk.tag("br"));
+        }
+    }
+
+    drawMultiSensors(plot: IMultiPlot, info: SensorInformation[]) {
+        this.sensorTable.innerHTML = "";
+        for (let i = 0; i < info.length; i++) {
+            let checkBox = <HTMLInputElement>this.mk.tag("input");
+            let sensor = info[i];
+            checkBox.type = "checkbox";
+            checkBox.addEventListener("input", (e: Event) => {
+                if (checkBox.checked) {
+                    kernel.senMan.getData(sensor.ID, (data: ISensorPackage[]) => {
+                        plot.plotData.push(this.convertData(sensor, data));
+                        plot.dataUpdate();
+                    });
+                }
+                else {
+                    for (let i = 0; i < plot.plotData.length; i++) {
+                        if (plot.plotData[i].ID == sensor.ID) {
+                            plot.plotData.splice(i, 1);
+                            plot.dataUpdate();
+                            break;
+                        }
+                    }
+                }
+            });
+            let label = this.mk.tag("label");
+            label.title = sensor.ID.toString() + "(0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
+            label.appendChild(checkBox);
+            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ")") + sensor.Name));
+            this.sensorTable.appendChild(label);
+            this.sensorTable.appendChild(this.mk.tag("br"));
+        }
     }
 }

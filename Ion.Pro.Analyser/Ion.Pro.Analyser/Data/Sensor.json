@@ -43,20 +43,20 @@
   },
   {
     "ID": 91,
-    "Key": "ERROR_PEDDAL",
-    "Name": "Error Peddal Module",
+    "Key": "ERROR_PEDAL",
+    "Name": "Error Pedal Module",
     "Unit": ""
   },
   {
     "ID": 92,
-    "Key": "ERROR_BREAK_PRESSURE",
-    "Name": "Error break pressure",
+    "Key": "ERROR_BRAKE_PRESSURE",
+    "Name": "Error brake pressure",
     "Unit": ""
   },
   {
     "ID": 93,
-    "Key": "ERROR_BREAK_W_THROTTLE",
-    "Name": "Error Break While Throttle",
+    "Key": "ERROR_BRAKE_W_THROTTLE",
+    "Name": "Error Brake While Throttle",
     "Unit": ""
   },
 
@@ -409,20 +409,20 @@
 
   {
     "ID": 1202, // 0x4B2
-    "Key": "BREAK_LIGHT",
-    "Name": "Break light",
+    "Key": "BRAKE_LIGHT",
+    "Name": "Brake light",
     "Unit": ""
   },
   {
     "ID": 808, // 0x328
-    "Key": "BREAK_FORCE_FRONT",
-    "Name": "Break force front",
+    "Key": "BRAKE_FORCE_FRONT",
+    "Name": "Brake force front",
     "Unit": "?"
   },
   {
     "ID": 800, // 0x329
-    "Key": "BREAK_FORCE_BACK",
-    "Name": "Break force back",
+    "Key": "BRAKE_FORCE_BACK",
+    "Name": "Brake force back",
     "Unit": "?"
   },
   {
@@ -450,7 +450,7 @@
   {
     "ID": 252,
     "Key": "GPS_HIGHRES",
-    "Name": "GPS High resolution part og GPS",
+    "Name": "GPS High resolution part of GPS",
     "Unit": "*"
   }
 ]

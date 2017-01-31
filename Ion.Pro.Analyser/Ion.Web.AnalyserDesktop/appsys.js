@@ -30,8 +30,8 @@ var ApplicationManager = (function () {
         this.appList.splice(this.appList.indexOf(app), 1);
         this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     };
-    ApplicationManager.event_appLaunch = "appLaunch";
-    ApplicationManager.event_appClose = "appClose";
     return ApplicationManager;
 }());
+ApplicationManager.event_appLaunch = "appLaunch";
+ApplicationManager.event_appClose = "appClose";
 //# sourceMappingURL=appsys.js.map

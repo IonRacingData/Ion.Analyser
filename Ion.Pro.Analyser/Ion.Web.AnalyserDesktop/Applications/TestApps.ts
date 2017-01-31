@@ -9,7 +9,7 @@
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getIds((data: SensorInformation[]) => this.loadedData(data));
+        kernel.senMan.getInfos((data: SensorInformation[]) => this.loadedData(data));
         kernel.senMan.getLoadedIds((data: number[]) => this.loadLoadedIds(data));
     }
 
@@ -114,19 +114,26 @@ class PlotViewer implements IApplication {
     }
 }
 
-class PlotterTester implements IApplication {
+class PlotterTester implements IApplication, IMultiPlot {
     application: Application;
     window: AppWindow;
     plotter: Plotter;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
+    plotData: PlotData[] = [];
+    plotType: string = "Plot";
+
+    update
+
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-
+        kernel.senMan.register(this);
         this.createEvents(this.eh);
-
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -136,8 +143,16 @@ class PlotterTester implements IApplication {
             { ID: 111, TimeStamp: 2500, Value: 87 }
         ];*/
 
-        this.loadData();
+        //this.loadData();
         //this.drawChart(data);
+    }
+
+    dataUpdate() {
+        this.plotter.draw();
+        /*this.window.content.innerHTML = "";
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);*/
     }
 
     createEvents(eh: EventHandler) {
