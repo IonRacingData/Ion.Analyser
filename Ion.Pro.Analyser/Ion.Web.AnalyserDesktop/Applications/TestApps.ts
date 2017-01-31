@@ -196,6 +196,92 @@ class TestViewer implements IApplication {
 
     draw(): void {
         this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, "Hello World"));
+        this.window.content.appendChild(this.mk.tag("h1", "", null, "He llo World"));
     }
+}
+
+class MeterTester implements IApplication {
+    application: Application;
+    window: AppWindow;
+    meterPlot: MeterPlot;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.window.content.style.overflow = "hidden";
+        this.drawMeter();
+        
+        let slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        //slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", () => {
+            let val = slider.value;
+            this.meterPlot.drawNeedle(parseInt(val));
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.meterPlot.setSize(this.window.width);
+            //this.plotter.draw();
+        });
+
+    }
+
+    drawMeter() {
+        this.window.content.innerHTML = "";                
+        let labels = [];
+        for (let i = 0; i <= 280; i += 20) {
+            labels.push(i.toString());                        
+        }
+        this.meterPlot = new MeterPlot(250, labels);
+        this.window.content.appendChild(this.meterPlot.generate());
+    }
+}
+
+class GPSPlotTester implements IApplication {
+    application: Application;
+    window: AppWindow;
+    points: Point3D[] = [];
+    plot: GPSPlot;
+    testData: GPSPlotData;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+
+        let slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        //slider.style.marginTop = "200px";
+        slider.setAttribute("value", "0");
+        this.window.content.appendChild(slider);
+        slider.addEventListener("input", () => {
+            let val = parseInt(slider.value) * 5;
+            this.points.push(new Point3D(val, 5 + (val * 0.03) * (val * 0.03), 1));
+            this.testData = new GPSPlotData(this.points);
+            this.update();
+        });
+
+        this.draw();
+    }
+
+    draw(): void {
+        //this.window.content.innerHTML = "";
+        /*this.points: Point3D[] = [
+            new Point3D(10, 30, 1),
+            new Point3D(12, 30, 1),
+            new Point3D(15, 32, 1),
+            new Point3D(18, 31, 1),
+            new Point3D(30, 50, 1),
+            new Point3D(60, 47, 1),
+            new Point3D(72, 44, 1),
+            new Point3D(100, 33, 1),
+        ];*/
+        this.testData = new GPSPlotData(this.points);
+        this.plot = new GPSPlot(this.testData);
+        this.window.content.appendChild(this.plot.generate());
+    }
+
+    update(): void {
+        this.plot.update(this.testData);
+    }
+
+    
 }
