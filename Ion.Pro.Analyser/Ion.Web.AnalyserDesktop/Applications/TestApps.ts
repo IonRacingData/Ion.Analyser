@@ -18,12 +18,10 @@
         for (var i = 0; i < data.length; i++) {
             let curValue = data[i];
             table.addRow([{
-                event: "click", func: () => {
-                    kernel.senMan.setGlobal(curValue.ID);
-                }
-            }, (!curValue.Key ? {
-                field: "style", data: "background-color: #FF8888;"
-                } : {})],
+                event: "click", func: () => { kernel.senMan.setGlobal(curValue.ID); }
+            },
+            (!curValue.Key ? { field: "style", data: "background-color: #FF8888;" } : {})
+            ],
                 curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
         }
         this.window.content.appendChild(table.generate());

@@ -26,6 +26,7 @@ var DataAssigner = (function () {
     }
     DataAssigner.prototype.main = function () {
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
+        this.window.content.style.display = "flex";
         this.draw();
     };
     DataAssigner.prototype.draw = function () {
@@ -58,6 +59,10 @@ var DataAssigner = (function () {
             _loop_1(i);
         }
         divLeft.appendChild(tableGen.generate());
+        divLeft.style.width = "50%";
+        divRight.style.width = "50%";
+        divLeft.style.overflowY = "auto";
+        divRight.style.overflowY = "auto";
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);
     };
@@ -71,65 +76,61 @@ var DataAssigner = (function () {
         return a;
     };
     DataAssigner.prototype.drawSingleSensors = function (plot, info) {
-        var _this = this;
-        this.sensorTable.innerHTML = "";
-        var _loop_2 = function (i) {
-            var radio = this_1.mk.tag("input");
-            var sensor = info[i];
-            radio.type = "radio";
-            radio.name = "sensor";
-            radio.addEventListener("input", function (e) {
-                kernel.senMan.getData(sensor.ID, function (data) {
-                    plot.plotData = _this.convertData(sensor, data);
-                    plot.dataUpdate();
-                });
-            });
-            var label = this_1.mk.tag("label");
-            label.title = sensor.ID.toString() + "(0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ")") + sensor.Name));
-            this_1.sensorTable.appendChild(label);
-            this_1.sensorTable.appendChild(this_1.mk.tag("br"));
-        };
-        var this_1 = this;
-        for (var i = 0; i < info.length; i++) {
-            _loop_2(i);
-        }
+        this.drawSensors(plot, info, this.createSingleSensor);
     };
     DataAssigner.prototype.drawMultiSensors = function (plot, info) {
+        this.drawSensors(plot, info, this.createMultiSensor);
+    };
+    DataAssigner.prototype.createSingleSensor = function (plot, sensor) {
         var _this = this;
-        this.sensorTable.innerHTML = "";
-        var _loop_3 = function (i) {
-            var checkBox = this_2.mk.tag("input");
-            var sensor = info[i];
-            checkBox.type = "checkbox";
-            checkBox.addEventListener("input", function (e) {
-                if (checkBox.checked) {
-                    kernel.senMan.getData(sensor.ID, function (data) {
-                        plot.plotData.push(_this.convertData(sensor, data));
+        var radio = this.mk.tag("input");
+        radio.type = "radio";
+        radio.name = "sensor";
+        radio.addEventListener("input", function (e) {
+            kernel.senMan.getData(sensor.ID, function (data) {
+                plot.plotData = _this.convertData(sensor, data);
+                plot.dataUpdate();
+            });
+        });
+        return radio;
+    };
+    DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
+        var _this = this;
+        var checkBox = this.mk.tag("input");
+        checkBox.type = "checkbox";
+        checkBox.addEventListener("input", function (e) {
+            if (checkBox.checked) {
+                kernel.senMan.getData(sensor.ID, function (data) {
+                    plot.plotData.push(_this.convertData(sensor, data));
+                    plot.dataUpdate();
+                });
+            }
+            else {
+                for (var i = 0; i < plot.plotData.length; i++) {
+                    if (plot.plotData[i].ID == sensor.ID) {
+                        plot.plotData.splice(i, 1);
                         plot.dataUpdate();
-                    });
-                }
-                else {
-                    for (var i_1 = 0; i_1 < plot.plotData.length; i_1++) {
-                        if (plot.plotData[i_1].ID == sensor.ID) {
-                            plot.plotData.splice(i_1, 1);
-                            plot.dataUpdate();
-                            break;
-                        }
+                        break;
                     }
                 }
-            });
-            var label = this_2.mk.tag("label");
-            label.title = sensor.ID.toString() + "(0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
-            label.appendChild(checkBox);
-            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ")") + sensor.Name));
-            this_2.sensorTable.appendChild(label);
-            this_2.sensorTable.appendChild(this_2.mk.tag("br"));
-        };
-        var this_2 = this;
+            }
+        });
+        return checkBox;
+    };
+    DataAssigner.prototype.drawSensors = function (plot, info, drawMethod) {
+        this.sensorTable.innerHTML = "";
         for (var i = 0; i < info.length; i++) {
-            _loop_3(i);
+            var sensor = info[i];
+            var ctrl = drawMethod.call(this, plot, sensor);
+            var label = this.mk.tag("label");
+            label.title = sensor.ID.toString() + " (0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
+            if (!sensor.Key) {
+                label.style.color = "red";
+            }
+            label.appendChild(ctrl);
+            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
+            this.sensorTable.appendChild(label);
+            this.sensorTable.appendChild(this.mk.tag("br"));
         }
     };
     return DataAssigner;
