@@ -494,7 +494,11 @@ class ContextFixer {
     }
     fillRect(x: number, y: number, width: number, height: number): void {
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, width, height);
+        let newX: number = Math.floor(x);
+        let newY: number = Math.floor(y);
+        let newWidth: number = Math.floor(width);
+        let newHeight: number = Math.floor(height);
+        this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
     arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         this.ctx.arc(x, y, radius, startAngle, endAngle);

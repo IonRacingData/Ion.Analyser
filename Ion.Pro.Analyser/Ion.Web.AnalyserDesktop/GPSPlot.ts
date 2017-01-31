@@ -10,6 +10,8 @@
     height: number;
     relSize: IRelativeSize;
     padding: number;
+    absWidth: number;
+    absHeight: number;
 
     constructor(d: GPSPlotData) {
         this.posData = d;
@@ -30,64 +32,81 @@
         this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);        
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
-        this.padding = this.width / 100;
-        this.relSize = null;
+        this.padding = this.width * 0.05;
+        this.width -= this.padding * 2;
+        this.height -= this.padding * 2;
+        this.relSize = null;                
         
-        this.draw();
         return this.wrapper;
     }
 
-    draw(): void {
-        this.ctxMain.clear();
+    setSize(width: number, height: number): void {
+        this.canvas.setSize(width, height);
+        this.width = width;
+        this.height = height;
+        this.padding = this.width * 0.05;
+        this.width -= this.padding * 2;
+        this.height -= this.padding * 2;
+        this.draw();
+    }
 
+    draw(): void {
+        let offsetX: number;
+        let offsetY: number;
+
+        this.ctxMain.clear();
+        this.ctxMain.beginPath();
+        this.findMinMax();
+        
+        this.rescale();
+        this.rescale();
+
+        if (this.posData.points.length > 0) {
+            let firstPoint: Point = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
+            offsetX = (this.width - this.absWidth) / 2;
+            offsetY = (this.height - this.absHeight) / 2;
+            this.ctxMain.moveTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);            
+        }   
+                
+        for (let i = 0; i < this.posData.points.length; i++) {
+            
+            let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);           
+            
+            offsetX = (this.width - this.absWidth) / 2;
+            offsetY = (this.height - this.absHeight) / 2;
+            let absPoint: Point = this.getAbsolute(relPoint);
+            //this.ctxMain.fillRect(absPoint.x - 1 + this.padding + offsetX, absPoint.y - 1 + this.padding - offsetY, 2, 2);             
+            this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+
+        }
+        this.ctxMain.stroke();
+    }
+
+    findMinMax(): void {
         if (this.relSize === null && this.posData.points.length > 0) {
             this.relSize = { min: null, max: null };
             this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
-            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);
+            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);            
         }
-
-        //this.ctxMain.beginPath();
         for (let i = 0; i < this.posData.points.length; i++) {
             let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);
-            let absPoint: Point = this.getAbsolute(relPoint);            
 
             this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
             this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
             this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
             this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
-            //console.log(this.relSize.min, this.relSize.max);
-            this.rescale();
-
-            /*
-            let outsideCanvasX: boolean = absPoint.x < 0 || absPoint.x > this.width;
-            let outsideCanvasY: boolean = absPoint.y < 0 || absPoint.y > this.height;
-            if (outsideCanvasX || outsideCanvasY) {
-                this.rescale(newWidth, newHeight);
-                absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2); 
-            }
-            else {
-                this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2); 
-            }*/
-            
-            absPoint = this.getAbsolute(relPoint);
-
-            this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2); 
         }
-        console.log(this.movePoint);
     }
 
     rescale(): void {         
 
-        let newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        let newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;        
-
-        //console.log(newWidth, newHeight);
-        
+        let newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;        
+        let newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        this.absWidth = newWidth;
+        this.absHeight = newHeight;
         let xRatio: number = this.width / newWidth;
         let yRatio: number = this.height / newHeight;
-        //console.log(xRatio, yRatio);
-        let ratio: number = Math.min(xRatio, yRatio); // maybe max       
+        let ratio: number = Math.min(xRatio, yRatio);     
 
         let first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
 
@@ -97,7 +116,7 @@
         var sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
 
-        this.movePoint = this.movePoint.sub(sec);
+        this.movePoint = this.movePoint.sub(sec);        
     }
 
     getRelative(p: Point): Point {

@@ -17,52 +17,67 @@ var GPSPlot = (function () {
         this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
-        this.padding = this.width / 100;
+        this.padding = this.width * 0.05;
+        this.width -= this.padding * 2;
+        this.height -= this.padding * 2;
         this.relSize = null;
-        this.draw();
         return this.wrapper;
     };
+    GPSPlot.prototype.setSize = function (width, height) {
+        this.canvas.setSize(width, height);
+        this.width = width;
+        this.height = height;
+        this.padding = this.width * 0.05;
+        this.width -= this.padding * 2;
+        this.height -= this.padding * 2;
+        this.draw();
+    };
     GPSPlot.prototype.draw = function () {
+        var offsetX;
+        var offsetY;
         this.ctxMain.clear();
+        this.ctxMain.beginPath();
+        this.findMinMax();
+        this.rescale();
+        this.rescale();
+        if (this.posData.points.length > 0) {
+            var firstPoint = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
+            offsetX = (this.width - this.absWidth) / 2;
+            offsetY = (this.height - this.absHeight) / 2;
+            this.ctxMain.moveTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+        }
+        for (var i = 0; i < this.posData.points.length; i++) {
+            var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
+            offsetX = (this.width - this.absWidth) / 2;
+            offsetY = (this.height - this.absHeight) / 2;
+            var absPoint = this.getAbsolute(relPoint);
+            //this.ctxMain.fillRect(absPoint.x - 1 + this.padding + offsetX, absPoint.y - 1 + this.padding - offsetY, 2, 2);             
+            this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+        }
+        this.ctxMain.stroke();
+    };
+    GPSPlot.prototype.findMinMax = function () {
         if (this.relSize === null && this.posData.points.length > 0) {
             this.relSize = { min: null, max: null };
             this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
             this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);
         }
-        //this.ctxMain.beginPath();
         for (var i = 0; i < this.posData.points.length; i++) {
             var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
-            var absPoint = this.getAbsolute(relPoint);
             this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
             this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
             this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
             this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
-            //console.log(this.relSize.min, this.relSize.max);
-            this.rescale();
-            /*
-            let outsideCanvasX: boolean = absPoint.x < 0 || absPoint.x > this.width;
-            let outsideCanvasY: boolean = absPoint.y < 0 || absPoint.y > this.height;
-            if (outsideCanvasX || outsideCanvasY) {
-                this.rescale(newWidth, newHeight);
-                absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2);
-            }
-            else {
-                this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2);
-            }*/
-            absPoint = this.getAbsolute(relPoint);
-            this.ctxMain.fillRect(absPoint.x - 1, absPoint.y - 1, 2, 2);
         }
-        console.log(this.movePoint);
     };
     GPSPlot.prototype.rescale = function () {
         var newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
         var newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
-        //console.log(newWidth, newHeight);
+        this.absWidth = newWidth;
+        this.absHeight = newHeight;
         var xRatio = this.width / newWidth;
         var yRatio = this.height / newHeight;
-        //console.log(xRatio, yRatio);
-        var ratio = Math.min(xRatio, yRatio); // maybe max       
+        var ratio = Math.min(xRatio, yRatio);
         var first = new Point(this.relSize.min.x, this.relSize.min.y);
         this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
         this.scalePoint.y = Math.abs(this.scalePoint.y * ratio);

@@ -220,29 +220,38 @@ var GPSPlotTester = (function () {
     GPSPlotTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.window.content.style.overflow = "hidden";
         /*let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "50");
+        slider.setAttribute("value", "0");
         this.window.content.appendChild(slider);
         slider.addEventListener("input", () => {
-            let val = parseInt(slider.value) * 5;
-            this.points.push(new Point3D(val, 50 - val * 0.05 * val * 0.01, 1));
-            this.testData = new GPSPlotData(this.points);
-            this.update();
+            let val = parseInt(slider.value);
+            let p: Point3D[] = [];
+            p = this.points.slice(0, (this.points.length * val) / 100);
+            this.update(p);
         });*/
-        kernel.senMan.getData(252, function (d) { return _this.draw(d); });
-        //this.draw();
+        kernel.senMan.getData(252, function (d) {
+            for (var i = 0; i < d.length; i++) {
+                _this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+            }
+            _this.draw(_this.points);
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.plot.setSize(_this.window.width, _this.window.height);
+        });
     };
-    GPSPlotTester.prototype.draw = function (d) {
-        for (var i = 0; i < d.length; i++) {
-            this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
-        }
-        this.testData = new GPSPlotData(this.points);
+    GPSPlotTester.prototype.draw = function (p) {
+        this.testData = new GPSPlotData(p);
         this.plot = new GPSPlot(this.testData);
+        //console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
+        this.plot.setSize(this.window.width, this.window.height);
+        //this.plot.draw();
     };
-    GPSPlotTester.prototype.update = function () {
+    GPSPlotTester.prototype.update = function (p) {
+        this.testData = new GPSPlotData(p);
         this.plot.update(this.testData);
     };
     return GPSPlotTester;

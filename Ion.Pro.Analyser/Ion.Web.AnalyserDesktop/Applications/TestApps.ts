@@ -256,36 +256,46 @@ class GPSPlotTester implements IApplication {
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.window.content.style.overflow = "hidden";
 
         /*let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "50");
+        slider.setAttribute("value", "0");
         this.window.content.appendChild(slider);
         slider.addEventListener("input", () => {
-            let val = parseInt(slider.value) * 5;
-            this.points.push(new Point3D(val, 50 - val * 0.05 * val * 0.01, 1));
-            this.testData = new GPSPlotData(this.points);
-            this.update();
+            let val = parseInt(slider.value);
+            let p: Point3D[] = [];
+            p = this.points.slice(0, (this.points.length * val) / 100);
+            this.update(p);
         });*/
-        kernel.senMan.getData(252, (d: ISensorPackage[]) => this.draw(d));
+        kernel.senMan.getData(252, (d: ISensorPackage[]) => {
+            for (let i = 0; i < d.length; i++) {
+                this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+            }
+            this.draw(this.points);
 
-        //this.draw();
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.plot.setSize(this.window.width, this.window.height);
+        });
     }
 
-    draw(d: ISensorPackage[]): void {
-        
-        for (let i = 0; i < d.length; i++) {
-            this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
-        }
-        this.testData = new GPSPlotData(this.points);
+    draw(p: Point3D[]): void {                
+        this.testData = new GPSPlotData(p);
         this.plot = new GPSPlot(this.testData);
+        //console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
+        this.plot.setSize(this.window.width, this.window.height);
+        //this.plot.draw();
     }
 
-    update(): void {
+    update(p: Point3D[]): void {
+        this.testData = new GPSPlotData(p);
         this.plot.update(this.testData);
     }
+
+    
 
     
 }

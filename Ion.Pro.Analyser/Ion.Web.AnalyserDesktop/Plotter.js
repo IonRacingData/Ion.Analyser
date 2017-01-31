@@ -397,7 +397,11 @@ var ContextFixer = (function () {
     };
     ContextFixer.prototype.fillRect = function (x, y, width, height) {
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, width, height);
+        var newX = Math.floor(x);
+        var newY = Math.floor(y);
+        var newWidth = Math.floor(width);
+        var newHeight = Math.floor(height);
+        this.ctx.fillRect(newX, newY, newWidth, newHeight);
     };
     ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
         this.ctx.arc(x, y, radius, startAngle, endAngle);
