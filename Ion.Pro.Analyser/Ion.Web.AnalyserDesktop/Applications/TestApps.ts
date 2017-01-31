@@ -1,30 +1,12 @@
 ﻿class DataViewer implements IApplication {
     application: Application;
     window: AppWindow;
-    data: ISensorPackage[];
-
-    loadedIds: number[];
-    sensorInformation: SensorInformation[];
+    data: ISensorPackage[]; 
 
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getInfos((data: SensorInformation[]) => this.loadedData(data));
-        kernel.senMan.getLoadedIds((data: number[]) => this.loadLoadedIds(data));
-    }
-
-    loadedData(data: SensorInformation[]): void {
-        this.sensorInformation = data;
-        if (this.loadedIds) {
-            this.draw(data);
-        }
-    }
-
-    loadLoadedIds(data: number[]): void {
-        this.loadedIds = data;
-        if (this.sensorInformation) {
-            this.draw(this.sensorInformation);
-        }
+        kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     }
 
     draw(data: SensorInformation[]): void {
@@ -33,21 +15,16 @@
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
 
-        for (var i = 0; i < this.loadedIds.length; i++) {
-            let curValue = this.loadedIds[i];
-            let found: SensorInformation = null;
-            for (let j = 0; j < this.sensorInformation.length; j++) {
-                if (this.sensorInformation[j].ID == curValue) {
-                    found = this.sensorInformation[j];
-                    break;
+        for (var i = 0; i < data.length; i++) {
+            let curValue = data[i];
+            table.addRow([{
+                event: "click", func: () => {
+                    kernel.senMan.setGlobal(curValue.ID);
                 }
-            }
-            if (found) {
-                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(found.ID); } }], found.ID, found.Name, found.Unit);
-            }
-            else {
-                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(curValue); } }, { field: "style", data: "background-color: #FF8888;"}], curValue, "Not found", "");
-            }
+            }, (!curValue.Key ? {
+                field: "style", data: "background-color: #FF8888;"
+                } : {})],
+                curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
         }
         this.window.content.appendChild(table.generate());
 
