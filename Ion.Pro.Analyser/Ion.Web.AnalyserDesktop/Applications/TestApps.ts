@@ -1,30 +1,12 @@
 ﻿class DataViewer implements IApplication {
     application: Application;
     window: AppWindow;
-    data: ISensorPackage[];
-
-    loadedIds: number[];
-    sensorInformation: SensorInformation[];
+    data: ISensorPackage[]; 
 
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getIds((data: SensorInformation[]) => this.loadedData(data));
-        kernel.senMan.getLoadedIds((data: number[]) => this.loadLoadedIds(data));
-    }
-
-    loadedData(data: SensorInformation[]): void {
-        this.sensorInformation = data;
-        if (this.loadedIds) {
-            this.draw(data);
-        }
-    }
-
-    loadLoadedIds(data: number[]): void {
-        this.loadedIds = data;
-        if (this.sensorInformation) {
-            this.draw(this.sensorInformation);
-        }
+        kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     }
 
     draw(data: SensorInformation[]): void {
@@ -33,21 +15,14 @@
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
 
-        for (var i = 0; i < this.loadedIds.length; i++) {
-            let curValue = this.loadedIds[i];
-            let found: SensorInformation = null;
-            for (let j = 0; j < this.sensorInformation.length; j++) {
-                if (this.sensorInformation[j].ID == curValue) {
-                    found = this.sensorInformation[j];
-                    break;
-                }
-            }
-            if (found) {
-                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(found.ID); } }], found.ID, found.Name, found.Unit);
-            }
-            else {
-                table.addRow([{ event: "click", func: () => { kernel.senMan.setGlobal(curValue); } }, { field: "style", data: "background-color: #FF8888;"}], curValue, "Not found", "");
-            }
+        for (var i = 0; i < data.length; i++) {
+            let curValue = data[i];
+            table.addRow([{
+                event: "click", func: () => { kernel.senMan.setGlobal(curValue.ID); }
+            },
+            (!curValue.Key ? { field: "style", data: "background-color: #FF8888;" } : {})
+            ],
+                curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
         }
         this.window.content.appendChild(table.generate());
 
@@ -114,19 +89,26 @@ class PlotViewer implements IApplication {
     }
 }
 
-class PlotterTester implements IApplication {
+class PlotterTester implements IApplication, IMultiPlot {
     application: Application;
     window: AppWindow;
     plotter: Plotter;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
+    plotData: PlotData[] = [];
+    plotType: string = "Plot";
+
+    update
+
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
-
+        kernel.senMan.register(this);
         this.createEvents(this.eh);
-
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -136,8 +118,16 @@ class PlotterTester implements IApplication {
             { ID: 111, TimeStamp: 2500, Value: 87 }
         ];*/
 
-        this.loadData();
+        //this.loadData();
         //this.drawChart(data);
+    }
+
+    dataUpdate() {
+        this.plotter.draw();
+        /*this.window.content.innerHTML = "";
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);*/
     }
 
     createEvents(eh: EventHandler) {

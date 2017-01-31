@@ -4,20 +4,7 @@ var DataViewer = (function () {
     DataViewer.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getIds(function (data) { return _this.loadedData(data); });
-        kernel.senMan.getLoadedIds(function (data) { return _this.loadLoadedIds(data); });
-    };
-    DataViewer.prototype.loadedData = function (data) {
-        this.sensorInformation = data;
-        if (this.loadedIds) {
-            this.draw(data);
-        }
-    };
-    DataViewer.prototype.loadLoadedIds = function (data) {
-        this.loadedIds = data;
-        if (this.sensorInformation) {
-            this.draw(this.sensorInformation);
-        }
+        kernel.senMan.getLoadedInfos(function (ids) { return _this.draw(ids); });
     };
     DataViewer.prototype.draw = function (data) {
         var _this = this;
@@ -25,23 +12,14 @@ var DataViewer = (function () {
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
         var _loop_1 = function () {
-            var curValue = this_1.loadedIds[i];
-            var found = null;
-            for (var j = 0; j < this_1.sensorInformation.length; j++) {
-                if (this_1.sensorInformation[j].ID == curValue) {
-                    found = this_1.sensorInformation[j];
-                    break;
-                }
-            }
-            if (found) {
-                table.addRow([{ event: "click", func: function () { kernel.senMan.setGlobal(found.ID); } }], found.ID, found.Name, found.Unit);
-            }
-            else {
-                table.addRow([{ event: "click", func: function () { kernel.senMan.setGlobal(curValue); } }, { field: "style", data: "background-color: #FF8888;" }], curValue, "Not found", "");
-            }
+            var curValue = data[i];
+            table.addRow([{
+                    event: "click", func: function () { kernel.senMan.setGlobal(curValue.ID); }
+                },
+                (!curValue.Key ? { field: "style", data: "background-color: #FF8888;" } : {})
+            ], curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
         };
-        var this_1 = this;
-        for (var i = 0; i < this.loadedIds.length; i++) {
+        for (var i = 0; i < data.length; i++) {
             _loop_1();
         }
         this.window.content.appendChild(table.generate());
@@ -103,11 +81,17 @@ var PlotViewer = (function () {
 var PlotterTester = (function () {
     function PlotterTester() {
         this.eh = new EventHandler();
+        this.plotData = [];
+        this.plotType = "Plot";
     }
     PlotterTester.prototype.main = function () {
         this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
+        kernel.senMan.register(this);
         this.createEvents(this.eh);
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -116,8 +100,15 @@ var PlotterTester = (function () {
             { ID: 111, TimeStamp: 2400, Value: 15 },
             { ID: 111, TimeStamp: 2500, Value: 87 }
         ];*/
-        this.loadData();
+        //this.loadData();
         //this.drawChart(data);
+    };
+    PlotterTester.prototype.dataUpdate = function () {
+        this.plotter.draw();
+        /*this.window.content.innerHTML = "";
+        this.plotter = new Plotter(this.plotData);
+        this.window.content.appendChild(this.plotter.generatePlot());
+        this.plotter.setSize(this.window.width, this.window.height);*/
     };
     PlotterTester.prototype.createEvents = function (eh) {
         var _this = this;

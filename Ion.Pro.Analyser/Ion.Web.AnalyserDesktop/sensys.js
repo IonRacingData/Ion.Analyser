@@ -4,11 +4,36 @@ var SensorManager = (function () {
         this.eventManager = new EventManager();
         this.plotter = [];
     }
-    SensorManager.prototype.getIds = function (callback) {
+    SensorManager.prototype.getInfos = function (callback) {
         requestAction("GetIds", callback);
     };
     SensorManager.prototype.getLoadedIds = function (callback) {
         requestAction("GetLoadedIds", callback);
+    };
+    SensorManager.prototype.getLoadedInfos = function (callback) {
+        var multiBack = new Multicallback(2, function (ids, loaded) {
+            var newLoaded = [];
+            var allIds = [];
+            for (var i = 0; i < ids.length; i++) {
+                allIds[ids[i].ID] = ids[i];
+            }
+            for (var i = 0; i < loaded.length; i++) {
+                if (allIds[loaded[i]]) {
+                    newLoaded.push(allIds[loaded[i]]);
+                }
+                else {
+                    var temp = new SensorInformation();
+                    temp.ID = loaded[i];
+                    temp.Name = "Not Found";
+                    temp.Key = null;
+                    temp.Unit = null;
+                    newLoaded.push(temp);
+                }
+            }
+            callback(newLoaded);
+        });
+        this.getInfos(multiBack.createCallback());
+        this.getLoadedIds(multiBack.createCallback());
     };
     SensorManager.prototype.getData = function (id, callback) {
         if (!this.dataCache[id]) {
@@ -45,6 +70,31 @@ var SensorManager = (function () {
     return SensorManager;
 }());
 SensorManager.event_globalPlot = "globalPlot";
+var Multicallback = (function () {
+    function Multicallback(count, callback) {
+        this.responses = [];
+        this.curId = 0;
+        this.returned = 0;
+        this.callback = callback;
+        this.count = count;
+    }
+    Multicallback.prototype.createCallback = function () {
+        var _this = this;
+        var current = this.curId;
+        this.curId++;
+        return function (param) {
+            _this.responses[current] = param;
+            _this.returned++;
+            _this.checkReturn();
+        };
+    };
+    Multicallback.prototype.checkReturn = function () {
+        if (this.count == this.returned) {
+            this.callback.apply(null, this.responses);
+        }
+    };
+    return Multicallback;
+}());
 var SensorInformation = (function () {
     function SensorInformation() {
     }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Ion.Pro.Analyser.Data
 {
@@ -63,12 +64,47 @@ namespace Ion.Pro.Analyser.Data
         }
     }
 
+    public class GPSUtil
+    {
+        const double earthRadius = 6371008.8;
+        public static Tuple<long, long> ToMilli(double lat, double lon)
+        {
+            double phi = (lat * Math.PI) / 180;
+            double my = (lon * Math.PI) / 180;
+            long milliLat = (long)(phi * earthRadius * 1000);
+            long milliLong = (long)(my * Math.Cos(phi) * earthRadius * 1000);
+            return new Tuple<long, long>(milliLat, milliLong);
+        }
+
+        public static SensorPackage[] GetPackages(double lat, double lon, long time)
+        {
+            Tuple<long, long> part = ToMilli(lat, lon);
+
+            SensorPackage latPack = new SensorPackage();
+            SensorPackage longPack = new SensorPackage();
+            SensorPackage cross = new SensorPackage();
+            latPack.ID = 250;
+            latPack.Value = part.Item1;
+            latPack.TimeStamp = time;
+
+            longPack.ID = 251;
+            longPack.Value = part.Item2;
+            longPack.TimeStamp = time;
+
+            cross.ID = 252;
+            cross.Value = part.Item1;
+            cross.TimeStamp = part.Item2;
+            return new SensorPackage[] { latPack, longPack, cross };
+        }
+    }
+
+
     public class GPSDataReader : ISensorReader
     {
         string file;
         int skipStart = 0;
         int skipEnd = 0;
-        const double earthRadius = 6371008.8;
+        
         public GPSDataReader(string file, int skipStart, int skipEnd)
         {
             this.file = file;
@@ -88,37 +124,63 @@ namespace Ion.Pro.Analyser.Data
                 string[] parts = allLines[i].Split(';');
                 if (parts.Length < 3)
                     continue;
-                double latitude = double.Parse(parts[1], CultureInfo.InvariantCulture);
-                double longitude = double.Parse(parts[2], CultureInfo.InvariantCulture);
-                double phi = (latitude * Math.PI) / 180;
-                double my = (longitude * Math.PI) / 180;
-                long milliLat = (long)(phi * earthRadius * 1000);
-                long milliLong = (long)(my * Math.Cos(phi) * earthRadius * 1000);
+
                 if (first)
                 {
                     first = false;
                     startTime = DateTime.Parse(parts[0]);
                 }
                 long time = (long)((DateTime.Parse(parts[0]) - startTime).TotalMilliseconds);
-                SensorPackage latPack = new SensorPackage();
-                SensorPackage longPack = new SensorPackage();
-                SensorPackage cross = new SensorPackage();
-                latPack.ID = 250;
-                latPack.Value = milliLat;
-                latPack.TimeStamp = time;
 
-                longPack.ID = 251;
-                longPack.Value = milliLong;
-                longPack.TimeStamp = time;
-
-                cross.ID = 252;
-                cross.Value = milliLat;
-                cross.TimeStamp = milliLong;
-
-                allPackages.Add(latPack);
-                allPackages.Add(longPack);
-                allPackages.Add(cross);
+                allPackages.AddRange(GPSUtil.GetPackages(double.Parse(parts[1], CultureInfo.InvariantCulture), double.Parse(parts[2], CultureInfo.InvariantCulture), time));
             }
+            return allPackages.ToArray();
+        }
+    }
+
+    public class GPXDataReader : ISensorReader
+    {
+        string path;
+        public GPXDataReader(string path)
+        {
+            this.path = path;
+        }
+
+        public SensorPackage[] ReadPackages()
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(path);
+
+            List<SensorPackage> allPackages = new List<SensorPackage>();
+            XmlNodeList list = doc.GetElementsByTagName("trkpt");
+            bool first = true;
+            DateTime startTime = new DateTime();
+            foreach (XmlNode node in list)
+            {
+                string lat = node.Attributes["lat"].Value;
+                string lon = node.Attributes["lon"].Value;
+                string strTime = "";
+                foreach (XmlNode n in node.ChildNodes)
+                {
+                    if (n.Name == "time")
+                    {
+                        strTime = n.InnerText;
+                        break;
+                    }
+                }
+                if (strTime.Length < 5)
+                    break;
+                
+                if (first)
+                {
+                    first = false;
+                    startTime = DateTime.Parse(strTime);
+                }
+                long time = (long)((DateTime.Parse(strTime) - startTime).TotalMilliseconds);
+
+                allPackages.AddRange(GPSUtil.GetPackages(double.Parse(lat, CultureInfo.InvariantCulture), double.Parse(lon, CultureInfo.InvariantCulture), time));
+            }
+
             return allPackages.ToArray();
         }
     }
