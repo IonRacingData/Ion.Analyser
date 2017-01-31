@@ -220,31 +220,24 @@ var GPSPlotTester = (function () {
     GPSPlotTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
-        var slider = document.createElement("input");
+        /*let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
+        slider.setAttribute("value", "50");
         this.window.content.appendChild(slider);
-        slider.addEventListener("input", function () {
-            var val = parseInt(slider.value) * 5;
-            _this.points.push(new Point3D(val, 5 + (val * 0.03) * (val * 0.03), 1));
-            _this.testData = new GPSPlotData(_this.points);
-            _this.update();
-        });
-        this.draw();
+        slider.addEventListener("input", () => {
+            let val = parseInt(slider.value) * 5;
+            this.points.push(new Point3D(val, 50 - val * 0.05 * val * 0.01, 1));
+            this.testData = new GPSPlotData(this.points);
+            this.update();
+        });*/
+        kernel.senMan.getData(252, function (d) { return _this.draw(d); });
+        //this.draw();
     };
-    GPSPlotTester.prototype.draw = function () {
-        //this.window.content.innerHTML = "";
-        /*this.points: Point3D[] = [
-            new Point3D(10, 30, 1),
-            new Point3D(12, 30, 1),
-            new Point3D(15, 32, 1),
-            new Point3D(18, 31, 1),
-            new Point3D(30, 50, 1),
-            new Point3D(60, 47, 1),
-            new Point3D(72, 44, 1),
-            new Point3D(100, 33, 1),
-        ];*/
+    GPSPlotTester.prototype.draw = function (d) {
+        for (var i = 0; i < d.length; i++) {
+            this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+        }
         this.testData = new GPSPlotData(this.points);
         this.plot = new GPSPlot(this.testData);
         this.window.content.appendChild(this.plot.generate());

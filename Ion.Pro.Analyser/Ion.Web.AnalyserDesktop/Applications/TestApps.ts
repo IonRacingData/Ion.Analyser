@@ -257,33 +257,27 @@ class GPSPlotTester implements IApplication {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
 
-        let slider = document.createElement("input");
+        /*let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
+        slider.setAttribute("value", "50");
         this.window.content.appendChild(slider);
         slider.addEventListener("input", () => {
             let val = parseInt(slider.value) * 5;
-            this.points.push(new Point3D(val, 5 + (val * 0.03) * (val * 0.03), 1));
+            this.points.push(new Point3D(val, 50 - val * 0.05 * val * 0.01, 1));
             this.testData = new GPSPlotData(this.points);
             this.update();
-        });
+        });*/
+        kernel.senMan.getData(252, (d: ISensorPackage[]) => this.draw(d));
 
-        this.draw();
+        //this.draw();
     }
 
-    draw(): void {
-        //this.window.content.innerHTML = "";
-        /*this.points: Point3D[] = [
-            new Point3D(10, 30, 1),
-            new Point3D(12, 30, 1),
-            new Point3D(15, 32, 1),
-            new Point3D(18, 31, 1),
-            new Point3D(30, 50, 1),
-            new Point3D(60, 47, 1),
-            new Point3D(72, 44, 1),
-            new Point3D(100, 33, 1),
-        ];*/
+    draw(d: ISensorPackage[]): void {
+        
+        for (let i = 0; i < d.length; i++) {
+            this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+        }
         this.testData = new GPSPlotData(this.points);
         this.plot = new GPSPlot(this.testData);
         this.window.content.appendChild(this.plot.generate());
