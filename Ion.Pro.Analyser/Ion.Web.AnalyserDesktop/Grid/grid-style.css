@@ -1,0 +1,26 @@
+/* Dividers*/
+.grid-hdiv, .grid-vdiv{
+    background-color: #ff9103;
+}
+
+/*Containers*/
+.dock-selector{
+    border: 1px solid black;
+    background: lightgrey;
+}
+.dock-active{
+    border: 1px solid black;
+    background-color: cadetblue;
+}
+.dock-active:hover .dock-up, 
+.dock-active:hover .dock-down,
+.dock-active:hover .dock-left,
+.dock-active:hover .dock-right{
+    background: #333333;
+}
+.dock-up, 
+.dock-down, 
+.dock-left, 
+.dock-right{
+    background-color: #636363;
+}

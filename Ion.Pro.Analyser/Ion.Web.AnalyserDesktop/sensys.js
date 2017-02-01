@@ -64,12 +64,17 @@ var SensorManager = (function () {
         }
         this.eventManager.addEventListener(type, listener);
     };
+    SensorManager.prototype.removeEventListener = function (type, listener) {
+        this.eventManager.removeEventListener(type, listener);
+    };
     SensorManager.prototype.register = function (plotter) {
         this.plotter.push(plotter);
+        this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     };
     return SensorManager;
 }());
 SensorManager.event_globalPlot = "globalPlot";
+SensorManager.event_registerIPlot = "registerIPlot";
 var Multicallback = (function () {
     function Multicallback(count, callback) {
         this.responses = [];

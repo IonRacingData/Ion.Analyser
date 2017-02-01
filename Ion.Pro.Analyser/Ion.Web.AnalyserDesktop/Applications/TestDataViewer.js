@@ -23,33 +23,48 @@ var TestDataViewer = (function () {
 var DataAssigner = (function () {
     function DataAssigner() {
         this.mk = new HtmlHelper();
+        this.eh = new EventHandler();
     }
     DataAssigner.prototype.main = function () {
+        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
         this.draw();
+        this.eh.on(kernel.senMan, SensorManager.event_registerIPlot, function () { return _this.draw(); });
     };
     DataAssigner.prototype.draw = function () {
         var _this = this;
+        this.window.content.innerHTML = "";
         var mk = this.mk;
         var divLeft = mk.tag("div");
         var divRight = this.sensorTable = mk.tag("div");
-        var tableGen = new HtmlTableGen("table");
+        var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
+        var last = null;
         tableGen.addHeader("Plot name", "plot type");
         var _loop_1 = function (i) {
             var curPlot = senMan.plotter[i];
             var isMulti = Array.isArray(curPlot.plotData);
             if (isMulti) {
                 tableGen.addRow([{
-                        event: "click", func: function () {
+                        event: "click", func: function (e) {
+                            if (last !== null) {
+                                last.classList.remove("selectedrow");
+                            }
+                            last = _this.findTableRow(e.target);
+                            last.classList.add("selectedrow");
                             kernel.senMan.getLoadedInfos(function (x) { return _this.drawMultiSensors(curPlot, x); });
                         }
                     }], curPlot.plotType, "Multi Plot");
             }
             else {
                 tableGen.addRow([{
-                        event: "click", func: function () {
+                        event: "click", func: function (e) {
+                            if (last !== null) {
+                                last.classList.remove("selectedrow");
+                            }
+                            last = _this.findTableRow(e.target);
+                            last.classList.add("selectedrow");
                             kernel.senMan.getLoadedInfos(function (x) { return _this.drawSingleSensors(curPlot, x); });
                         }
                     }], curPlot.plotType, "Single Plot");
@@ -65,6 +80,13 @@ var DataAssigner = (function () {
         divRight.style.overflowY = "auto";
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);
+    };
+    DataAssigner.prototype.findTableRow = function (element) {
+        var curElement = element;
+        while (curElement !== null && curElement.tagName !== "TR") {
+            curElement = curElement.parentElement;
+        }
+        return curElement;
     };
     DataAssigner.prototype.convertData = function (si, data) {
         var p = [];
