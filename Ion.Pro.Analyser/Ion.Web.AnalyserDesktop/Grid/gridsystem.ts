@@ -113,6 +113,7 @@
 
         window.recalculateSize();
         window.onResize();
+        this.handleResize();
     }
 
     generateSelector() {

@@ -1,5 +1,7 @@
 ﻿class SensorManager implements IEventManager {
     dataCache: ISensorPackage[][] = [];
+    plotCache: PlotData[] = [];
+
 
     globalPlot: ISensorPackage[];
     globalId: number;
@@ -50,6 +52,37 @@
         else {
             callback(this.dataCache[id]);
         }
+    }
+
+    getPlotData(id: number, callback: (data: PlotData) => void): void {
+        if (!this.plotCache[id]) {
+            this.loadPlotData(id, callback);
+        }
+        else {
+            callback(this.plotCache[id]);
+        }
+    }
+
+    loadPlotData(id: number, callback: (data: PlotData) => void): void {
+        this.loadData(id, (data: ISensorPackage[]): void => {
+            let plot = this.convertData(data);
+            this.plotCache[id] = plot;
+            callback(plot);
+        });
+    }
+
+    convertData(data: ISensorPackage[]): PlotData {
+        if (data.length < 1)
+            return null;
+        let id = data[0].ID;
+        let p: Point[] = [];
+        for (let i = 0; i < data.length; i++) {
+            p.push(new Point(data[i].TimeStamp, data[i].Value));
+        }
+        let plot = new PlotData(p);
+        plot.ID = id;
+        return plot;
+
     }
 
     loadData(id: number, callback: (data: ISensorPackage[]) => void): void {

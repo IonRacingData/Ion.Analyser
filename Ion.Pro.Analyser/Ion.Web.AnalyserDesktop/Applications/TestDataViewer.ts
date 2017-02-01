@@ -138,16 +138,6 @@ class DataAssigner implements IApplication {
         return curElement;
     }
 
-    convertData(si: SensorInformation, data: ISensorPackage[]): PlotData {
-        let p: Point[] = [];
-        for (let i = 0; i < data.length; i++) {
-            p[i] = new Point(data[i].TimeStamp, data[i].Value);
-        }
-        let a = new PlotData(p);
-        a.ID = si.ID;
-        return a;
-    }
-
 
     drawSingleSensors(plot: ISinglePlot, info: SensorInformation[]) {
         this.drawSensors<ISinglePlot>(plot, info, this.createSingleSensor);
@@ -163,8 +153,8 @@ class DataAssigner implements IApplication {
         radio.type = "radio";
         radio.name = "sensor";
         radio.addEventListener("input", (e: Event) => {
-            kernel.senMan.getData(sensor.ID, (data: ISensorPackage[]) => {
-                plot.plotData = this.convertData(sensor, data);
+            kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
+                plot.plotData = data;
                 plot.dataUpdate();
             });
         });
@@ -176,8 +166,8 @@ class DataAssigner implements IApplication {
         checkBox.type = "checkbox";
         checkBox.addEventListener("input", (e: Event) => {
             if (checkBox.checked) {
-                kernel.senMan.getData(sensor.ID, (data: ISensorPackage[]) => {
-                    plot.plotData.push(this.convertData(sensor, data));
+                kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
+                    plot.plotData.push(data);
                     plot.dataUpdate();
                 });
             }

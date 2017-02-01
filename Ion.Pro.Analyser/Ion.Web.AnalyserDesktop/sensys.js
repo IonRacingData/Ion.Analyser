@@ -1,6 +1,7 @@
 var SensorManager = (function () {
     function SensorManager() {
         this.dataCache = [];
+        this.plotCache = [];
         this.eventManager = new EventManager();
         this.plotter = [];
     }
@@ -42,6 +43,34 @@ var SensorManager = (function () {
         else {
             callback(this.dataCache[id]);
         }
+    };
+    SensorManager.prototype.getPlotData = function (id, callback) {
+        if (!this.plotCache[id]) {
+            this.loadPlotData(id, callback);
+        }
+        else {
+            callback(this.plotCache[id]);
+        }
+    };
+    SensorManager.prototype.loadPlotData = function (id, callback) {
+        var _this = this;
+        this.loadData(id, function (data) {
+            var plot = _this.convertData(data);
+            _this.plotCache[id] = plot;
+            callback(plot);
+        });
+    };
+    SensorManager.prototype.convertData = function (data) {
+        if (data.length < 1)
+            return null;
+        var id = data[0].ID;
+        var p = [];
+        for (var i = 0; i < data.length; i++) {
+            p.push(new Point(data[i].TimeStamp, data[i].Value));
+        }
+        var plot = new PlotData(p);
+        plot.ID = id;
+        return plot;
     };
     SensorManager.prototype.loadData = function (id, callback) {
         var _this = this;
