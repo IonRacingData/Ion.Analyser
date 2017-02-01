@@ -1,10 +1,11 @@
-﻿class SensorManager {
+﻿class SensorManager implements IEventManager {
     dataCache: ISensorPackage[][] = [];
 
     globalPlot: ISensorPackage[];
     globalId: number;
 
     static event_globalPlot = "globalPlot";
+    static event_registerIPlot = "registerIPlot";
 
     eventManager: EventManager = new EventManager();
 
@@ -73,11 +74,15 @@
         this.eventManager.addEventListener(type, listener);
     }
 
+    removeEventListener(type: string, listener: any) {
+        this.eventManager.removeEventListener(type, listener);
+    }
+
     plotter: IPlot[] = [];
     
     register(plotter: IPlot): void {
-        
         this.plotter.push(plotter);
+        this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     }
 }
 

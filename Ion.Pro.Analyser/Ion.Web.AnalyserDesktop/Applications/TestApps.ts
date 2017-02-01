@@ -196,7 +196,7 @@ class TestViewer implements IApplication {
 
     draw(): void {
         this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, "He llo World"));
+        this.window.content.appendChild(this.mk.tag("h1", "", null, this.helloData.Text));
     }
 }
 

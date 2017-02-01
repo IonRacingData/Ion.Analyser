@@ -32,19 +32,23 @@ class DataAssigner implements IApplication {
     window: AppWindow;
     mk = new HtmlHelper();
     sensorTable: HTMLElement;
+    eh: EventHandler = new EventHandler();
 
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
         this.draw();
+        this.eh.on(kernel.senMan, SensorManager.event_registerIPlot, () => this.draw());
     }
 
     draw() {
+        this.window.content.innerHTML = "";
         let mk = this.mk;
         let divLeft = mk.tag("div");
         let divRight = this.sensorTable = mk.tag("div");
-        let tableGen = new HtmlTableGen("table");
+        let tableGen = new HtmlTableGen("table selectable");
         let senMan: SensorManager = kernel.senMan;
+        let last: HTMLElement = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.plotter.length; i++) {
             let curPlot = senMan.plotter[i];
@@ -52,14 +56,26 @@ class DataAssigner implements IApplication {
 
             if (isMulti) {
                 tableGen.addRow([{
-                    event: "click", func: () => {
+                    event: "click", func: (e: Event) => {
+                        if (last !== null) {
+                            last.classList.remove("selectedrow");
+                        }
+                        last = this.findTableRow(<HTMLElement>e.target);
+                        last.classList.add("selectedrow");
+                        
                         kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<IMultiPlot>curPlot, x));
                     }
                 }], curPlot.plotType, "Multi Plot");
             }
             else {
                 tableGen.addRow([{
-                    event: "click", func: () => {
+                    event: "click", func: (e: Event) => {
+                        if (last !== null) {
+                            last.classList.remove("selectedrow");
+                        }
+                        last = this.findTableRow(<HTMLElement>e.target);
+                        last.classList.add("selectedrow");
+
                         kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawSingleSensors(<ISinglePlot>curPlot, x));
                     }
                 }], curPlot.plotType, "Single Plot");
@@ -72,7 +88,15 @@ class DataAssigner implements IApplication {
         divRight.style.overflowY = "auto";
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);
-        
+    }
+
+    findTableRow(element: HTMLElement): HTMLElement {
+        let curElement: HTMLElement = element;
+
+        while (curElement !== null && curElement.tagName !== "TR") {
+            curElement = curElement.parentElement;
+        }
+        return curElement;
     }
 
     convertData(si: SensorInformation, data: ISensorPackage[]): PlotData {
