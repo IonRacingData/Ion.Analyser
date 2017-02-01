@@ -124,6 +124,7 @@ class SensorInformation {
 interface IPlot {
     dataUpdate();
     plotType: string;
+    plotWindow: AppWindow;
 }
 
 interface ISinglePlot extends IPlot {

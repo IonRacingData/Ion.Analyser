@@ -283,10 +283,12 @@
         this.setSize(this.width, this.height, false);
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
-        this.sizeHandle.parentElement.style.width = null;
-        this.sizeHandle.parentElement.style.height = null;
-        this.sizeHandle.parentElement.parentElement.style.width = null;
-        this.sizeHandle.parentElement.parentElement.style.height = null;
+        let curHandle = this.sizeHandle.parentElement
+        for (let i = 0; i < 3; i++) {
+            curHandle.style.width = null;
+            curHandle.style.height = null;
+            curHandle = curHandle.parentElement;
+        }
     }
 
     restorePos(): void {
@@ -295,14 +297,15 @@
     }
 
     removeSize(): void {
-        this.sizeHandle.style.width = "100%";
-        this.sizeHandle.style.height = "100%";
-        this.sizeHandle.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.padding = "0";
-        
+        let curHandle = this.sizeHandle;
+        for (let i = 0; i < 4; i++) {
+            curHandle.style.width = "100%";
+            curHandle.style.height = "100%";
+            if (i == 3)
+                break;
+            curHandle = curHandle.parentElement;
+        }
+        curHandle.style.padding = "0";
     }
 
     removeHeader() {
@@ -337,6 +340,15 @@
                 this.restoreHeader();
                 this.onResize();
                 break;
+        }
+    }
+
+    highlight(highlight: boolean) {
+        if (highlight) {
+            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "block";
+        }
+        else {
+            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "none";
         }
     }
 }
