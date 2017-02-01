@@ -183,7 +183,8 @@ var GridViewer = (function () {
                     && windowX < cur.offsetLeft + cur.offsetWidth
                     && windowY < cur.offsetTop + cur.offsetHeight) {
                     this.selectedBox = cur.gridBox;
-                    this.selectorWindow.setPos(this.selectedBox.box.offsetLeft + this.selectedBox.box.offsetParent.offsetLeft + this.selectedBox.box.offsetWidth / 2 - 45, this.selectedBox.box.offsetTop + this.selectedBox.box.offsetParent.offsetTop + this.selectedBox.box.offsetHeight / 2 - 45);
+                    this.selectorWindow.setPos(this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45, this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
+                    //this.selectedBox.box.offsetTop + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                     break;
                 }
             }
@@ -192,6 +193,22 @@ var GridViewer = (function () {
         else {
             this.selectorWindow.hide();
         }
+    };
+    GridViewer.prototype.getAbsoluteLeft = function (ele) {
+        var left = ele.offsetLeft;
+        while (ele.offsetParent !== null) {
+            ele = ele.offsetParent;
+            left += ele.offsetLeft;
+        }
+        return left;
+    };
+    GridViewer.prototype.getAbsoluteTop = function (ele) {
+        var top = ele.offsetTop;
+        while (ele.offsetParent !== null) {
+            ele = ele.offsetParent;
+            top += ele.offsetTop;
+        }
+        return top;
     };
     GridViewer.prototype.globalUp = function (e) {
         var windowX = e.mouse.clientX - this.window.x - 9;

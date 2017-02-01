@@ -208,23 +208,27 @@ var AppWindow = (function () {
     AppWindow.prototype.restoreSize = function () {
         this.setSize(this.width, this.height, false);
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
-        this.sizeHandle.parentElement.style.width = null;
-        this.sizeHandle.parentElement.style.height = null;
-        this.sizeHandle.parentElement.parentElement.style.width = null;
-        this.sizeHandle.parentElement.parentElement.style.height = null;
+        var curHandle = this.sizeHandle.parentElement;
+        for (var i = 0; i < 3; i++) {
+            curHandle.style.width = null;
+            curHandle.style.height = null;
+            curHandle = curHandle.parentElement;
+        }
     };
     AppWindow.prototype.restorePos = function () {
         this.handle.style.left = this.x.toString() + "px";
         this.handle.style.top = this.y.toString() + "px";
     };
     AppWindow.prototype.removeSize = function () {
-        this.sizeHandle.style.width = "100%";
-        this.sizeHandle.style.height = "100%";
-        this.sizeHandle.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.padding = "0";
+        var curHandle = this.sizeHandle;
+        for (var i = 0; i < 4; i++) {
+            curHandle.style.width = "100%";
+            curHandle.style.height = "100%";
+            if (i == 3)
+                break;
+            curHandle = curHandle.parentElement;
+        }
+        curHandle.style.padding = "0";
     };
     AppWindow.prototype.removeHeader = function () {
         this.handle.getElementsByClassName("window-header")[0].style.display = "none";
@@ -255,6 +259,14 @@ var AppWindow = (function () {
                 this.restoreHeader();
                 this.onResize();
                 break;
+        }
+    };
+    AppWindow.prototype.highlight = function (highlight) {
+        if (highlight) {
+            this.handle.getElementsByClassName("window-overlay")[0].style.display = "block";
+        }
+        else {
+            this.handle.getElementsByClassName("window-overlay")[0].style.display = "none";
         }
     };
     return AppWindow;

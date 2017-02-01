@@ -3,7 +3,7 @@ var TestDataViewer = (function () {
         this.plotType = "Test Data Viewer";
     }
     TestDataViewer.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
         kernel.senMan.register(this);
     };
     TestDataViewer.prototype.draw = function () {
@@ -29,6 +29,7 @@ var DataAssigner = (function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
+        this.window.content.style.flexWrap = "wrap";
         this.draw();
         this.eh.on(kernel.senMan, SensorManager.event_registerIPlot, function () { return _this.draw(); });
     };
@@ -41,12 +42,14 @@ var DataAssigner = (function () {
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
         var last = null;
+        var selectedPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         var _loop_1 = function (i) {
             var curPlot = senMan.plotter[i];
             var isMulti = Array.isArray(curPlot.plotData);
             if (isMulti) {
-                tableGen.addRow([{
+                tableGen.addRow([
+                    {
                         event: "click", func: function (e) {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
@@ -55,10 +58,22 @@ var DataAssigner = (function () {
                             last.classList.add("selectedrow");
                             kernel.senMan.getLoadedInfos(function (x) { return _this.drawMultiSensors(curPlot, x); });
                         }
-                    }], curPlot.plotType, "Multi Plot");
+                    },
+                    {
+                        event: "mouseenter", func: function (e) {
+                            curPlot.plotWindow.highlight(true);
+                        }
+                    },
+                    {
+                        event: "mouseleave", func: function (e) {
+                            curPlot.plotWindow.highlight(false);
+                        }
+                    },
+                ], curPlot.plotType, "Multi Plot");
             }
             else {
-                tableGen.addRow([{
+                tableGen.addRow([
+                    {
                         event: "click", func: function (e) {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
@@ -66,17 +81,30 @@ var DataAssigner = (function () {
                             last = _this.findTableRow(e.target);
                             last.classList.add("selectedrow");
                             kernel.senMan.getLoadedInfos(function (x) { return _this.drawSingleSensors(curPlot, x); });
+                        },
+                    },
+                    {
+                        event: "mouseenter", func: function (e) {
+                            selectedPlot.plotWindow.highlight(true);
                         }
-                    }], curPlot.plotType, "Single Plot");
+                    },
+                    {
+                        event: "mouseleave", func: function (e) {
+                            selectedPlot.plotWindow.highlight(false);
+                        }
+                    }
+                ], curPlot.plotType, "Single Plot");
             }
         };
         for (var i = 0; i < senMan.plotter.length; i++) {
             _loop_1(i);
         }
         divLeft.appendChild(tableGen.generate());
-        divLeft.style.width = "50%";
-        divRight.style.width = "50%";
+        divLeft.style.minWidth = "250px";
+        divLeft.style.flexGrow = "1";
         divLeft.style.overflowY = "auto";
+        divRight.style.minWidth = "250px";
+        divRight.style.flexGrow = "2";
         divRight.style.overflowY = "auto";
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);

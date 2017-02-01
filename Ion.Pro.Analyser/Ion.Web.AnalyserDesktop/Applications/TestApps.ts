@@ -97,12 +97,12 @@ class PlotterTester implements IApplication, IMultiPlot {
     eh: EventHandler = new EventHandler();
     plotData: PlotData[] = [];
     plotType: string = "Plot";
-
+    plotWindow: AppWindow;
     update
 
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
