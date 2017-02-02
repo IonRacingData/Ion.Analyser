@@ -86,10 +86,54 @@
     }
 
     loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
-        requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
+        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
+            let realData = this.convertToSensorPackage(data.Sensors);
+            console.log(realData);
+            this.dataCache[id] = realData;
+            callback(realData);
+        });
+        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
-        });
+        });*/
+    }
+
+    convertToSensorPackage(str: string): ISensorPackage[] {
+        let raw = atob(str);
+        let ret: ISensorPackage[] = [];
+        for (let i = 0; i < raw.length / 28; i++) {
+            /*console.log(raw.charCodeAt(i * 28));
+            console.log(raw.charCodeAt(i * 28 + 1));
+            console.log(raw.charCodeAt(i * 28 + 2));
+            console.log(raw.charCodeAt(i * 28 + 3));*/
+            ret[i] = {
+                ID: raw.charCodeAt(i * 28)
+                | raw.charCodeAt(i * 28 + 1) << 8
+                | raw.charCodeAt(i * 28 + 2) << 16
+                | raw.charCodeAt(i * 28 + 3) << 24,
+
+                Value: raw.charCodeAt(i * 28 + 4)
+                | raw.charCodeAt(i * 28 + 5) << 8
+                | raw.charCodeAt(i * 28 + 6) << 16
+                | raw.charCodeAt(i * 28 + 7) << 24
+                | raw.charCodeAt(i * 28 + 8) << 32
+                | raw.charCodeAt(i * 28 + 9) << 40
+                | raw.charCodeAt(i * 28 + 10) << 48
+                | raw.charCodeAt(i * 28 + 11) << 56,
+
+                TimeStamp:
+                  raw.charCodeAt(i * 28 + 12)
+                | raw.charCodeAt(i * 28 + 13) << 8
+                | raw.charCodeAt(i * 28 + 14) << 16
+                | raw.charCodeAt(i * 28 + 15) << 24
+                | raw.charCodeAt(i * 28 + 16) << 32
+                | raw.charCodeAt(i * 28 + 17) << 40
+                | raw.charCodeAt(i * 28 + 18) << 48
+                | raw.charCodeAt(i * 28 + 19) << 56,
+                
+            } 
+        }
+        return ret;
     }
 
     setGlobal(id: number) {

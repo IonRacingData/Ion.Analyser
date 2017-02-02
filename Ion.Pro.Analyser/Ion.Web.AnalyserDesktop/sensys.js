@@ -74,10 +74,49 @@ var SensorManager = (function () {
     };
     SensorManager.prototype.loadData = function (id, callback) {
         var _this = this;
-        requestAction("getdata?number=" + id.toString(), function (data) {
-            _this.dataCache[id] = data;
-            callback(data);
+        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, function (data) {
+            var realData = _this.convertToSensorPackage(data.Sensors);
+            console.log(realData);
+            _this.dataCache[id] = realData;
+            callback(realData);
         });
+        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
+            this.dataCache[id] = data;
+            callback(data);
+        });*/
+    };
+    SensorManager.prototype.convertToSensorPackage = function (str) {
+        var raw = atob(str);
+        var ret = [];
+        for (var i = 0; i < raw.length / 28; i++) {
+            /*console.log(raw.charCodeAt(i * 28));
+            console.log(raw.charCodeAt(i * 28 + 1));
+            console.log(raw.charCodeAt(i * 28 + 2));
+            console.log(raw.charCodeAt(i * 28 + 3));*/
+            ret[i] = {
+                ID: raw.charCodeAt(i * 28)
+                    | raw.charCodeAt(i * 28 + 1) << 8
+                    | raw.charCodeAt(i * 28 + 2) << 16
+                    | raw.charCodeAt(i * 28 + 3) << 24,
+                Value: raw.charCodeAt(i * 28 + 4)
+                    | raw.charCodeAt(i * 28 + 5) << 8
+                    | raw.charCodeAt(i * 28 + 6) << 16
+                    | raw.charCodeAt(i * 28 + 7) << 24
+                    | raw.charCodeAt(i * 28 + 8) << 32
+                    | raw.charCodeAt(i * 28 + 9) << 40
+                    | raw.charCodeAt(i * 28 + 10) << 48
+                    | raw.charCodeAt(i * 28 + 11) << 56,
+                TimeStamp: raw.charCodeAt(i * 28 + 12)
+                    | raw.charCodeAt(i * 28 + 13) << 8
+                    | raw.charCodeAt(i * 28 + 14) << 16
+                    | raw.charCodeAt(i * 28 + 15) << 24
+                    | raw.charCodeAt(i * 28 + 16) << 32
+                    | raw.charCodeAt(i * 28 + 17) << 40
+                    | raw.charCodeAt(i * 28 + 18) << 48
+                    | raw.charCodeAt(i * 28 + 19) << 56,
+            };
+        }
+        return ret;
     };
     SensorManager.prototype.setGlobal = function (id) {
         var _this = this;
