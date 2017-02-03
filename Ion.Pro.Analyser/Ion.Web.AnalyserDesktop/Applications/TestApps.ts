@@ -26,7 +26,7 @@
                 },
                 (!curValue.Key ? { field: "className", data: "error" } : {})
             ],
-                curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
+                curValue.ID, curValue.Name, curValue.Unit ? curValue.Unit : "");
         }
         this.window.content.appendChild(table.generate());
 

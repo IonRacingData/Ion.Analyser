@@ -21,19 +21,19 @@
     "ID": 209, // 0xD1
     "Key": "TEMP_MONO",
     "Name": "Temperature Monocoque",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 891, // 0x37B
     "Key": "TEMP_MONO_ENGINE",
     "Name": "Temperature Engine Room",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 892, //0x37C
     "Key": "TEMP_MAIN_AREA",
     "Name": "Temperature Main Monocoque",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 10,
@@ -66,19 +66,19 @@
     "ID": 200, // 0xC8
     "Key": "GYRO_X",
     "Name": "Gyroscope X Axis",
-    "Unit": "*"
+    "Unit": "&deg;"
   },
   {
     "ID": 201, // 0xC9
     "Key": "GYRO_Y",
     "Name": "Gyroscope Y Axis",
-    "Unit": "*"
+    "Unit": "&deg;"
   },
   {
     "ID": 202, // 0xCA
     "Key": "GYRO_Z",
     "Name": "Gyroscope Z Axis",
-    "Unit": "*"
+    "Unit": "&deg;"
   },
   {
     "ID": 203, // 0xCB
@@ -102,19 +102,19 @@
     "ID": 206, // 0xCE
     "Key": "MAG_X",
     "Name": "Magnetomerer X Axis",
-    "Unit": "*"
+    "Unit": "T;"
   },
   {
     "ID": 207, // 0xCF
     "Key": "MAG_Y",
     "Name": "Magnetomerer Y Axis",
-    "Unit": "*"
+    "Unit": "T"
   },
   {
     "ID": 208, // 0xD0
     "Key": "MAG_Z",
     "Name": "Magnetomerer Z Axis",
-    "Unit": "*"
+    "Unit": "T"
   },
 
   // #####--BMS_RAW values--#####
@@ -292,13 +292,13 @@
     "ID": 61456, // 0xF010
     "Key": "BMS_TEMP_BAT",
     "Name": "BMS Battery Temperature",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 61457, // 0xF011
     "Key": "BMS_TEMP_BAT_MIN",
     "Name": "BMS Battery Minimum Temperature",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 61458, // 0xF012
@@ -310,7 +310,7 @@
     "ID": 61459, // 0xF013
     "Key": "BMS_TEMP_BAT_MAX",
     "Name": "BMS Battery Maximum Temperature",
-    "Unit": "*C"
+    "Unit": "&deg;C"
   },
   {
     "ID": 61460, // 0xF014
@@ -417,13 +417,13 @@
     "ID": 808, // 0x328
     "Key": "BRAKE_FORCE_FRONT",
     "Name": "Brake force front",
-    "Unit": "?"
+    "Unit": "Bar"
   },
   {
     "ID": 800, // 0x329
     "Key": "BRAKE_FORCE_BACK",
     "Name": "Brake force back",
-    "Unit": "?"
+    "Unit": "Bar"
   },
   {
     "ID": 210, // 0xFF00 ?
@@ -439,18 +439,18 @@
     "ID": 250,
     "Key": "GPS_LAT",
     "Name": "GPS Latitude",
-    "Unit": "*"
+    "Unit": "&deg;"
   },
   {
     "ID": 251,
     "Key": "GPS_LONG",
     "Name": "GPS Longitude",
-    "Unit": "*"
+    "Unit": "&deg;"
   },
   {
     "ID": 252,
     "Key": "GPS_HIGHRES",
     "Name": "GPS High resolution part of GPS",
-    "Unit": "*"
+    "Unit": "&deg;"
   }
 ]

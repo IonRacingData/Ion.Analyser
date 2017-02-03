@@ -20,7 +20,7 @@ var DataViewer = (function () {
                     }
                 },
                 (!curValue.Key ? { field: "className", data: "error" } : {})
-            ], curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
+            ], curValue.ID, curValue.Name, curValue.Unit ? curValue.Unit : "");
         };
         for (var i = 0; i < data.length; i++) {
             _loop_1();
