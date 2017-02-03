@@ -116,15 +116,6 @@ var DataAssigner = (function () {
         }
         return curElement;
     };
-    DataAssigner.prototype.convertData = function (si, data) {
-        var p = [];
-        for (var i = 0; i < data.length; i++) {
-            p[i] = new Point(data[i].TimeStamp, data[i].Value);
-        }
-        var a = new PlotData(p);
-        a.ID = si.ID;
-        return a;
-    };
     DataAssigner.prototype.drawSingleSensors = function (plot, info) {
         this.drawSensors(plot, info, this.createSingleSensor);
     };
@@ -132,26 +123,24 @@ var DataAssigner = (function () {
         this.drawSensors(plot, info, this.createMultiSensor);
     };
     DataAssigner.prototype.createSingleSensor = function (plot, sensor) {
-        var _this = this;
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
         radio.addEventListener("input", function (e) {
-            kernel.senMan.getData(sensor.ID, function (data) {
-                plot.plotData = _this.convertData(sensor, data);
+            kernel.senMan.getPlotData(sensor.ID, function (data) {
+                plot.plotData = data;
                 plot.dataUpdate();
             });
         });
         return radio;
     };
     DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
-        var _this = this;
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
         checkBox.addEventListener("input", function (e) {
             if (checkBox.checked) {
-                kernel.senMan.getData(sensor.ID, function (data) {
-                    plot.plotData.push(_this.convertData(sensor, data));
+                kernel.senMan.getPlotData(sensor.ID, function (data) {
+                    plot.plotData.push(data);
                     plot.dataUpdate();
                 });
             }

@@ -47,6 +47,8 @@ namespace Ion.Pro.Analyser
             ISensorReader gpsReader3 = new GPXDataReader("../../Data/fredrikgps.gpx");
             //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
 
+            ComBus.GetDefault().RegisterClient(new SensorComService());
+
             SensorDataStore store = SensorDataStore.GetDefault();
             if (true)
             {
@@ -251,5 +253,24 @@ namespace Ion.Pro.Analyser
         }
     }
 
+    public class SensorNumPackage
+    {
+        public int num { get; set; }
+    }
 
+    public class SensorComService : ComBusClient
+    {
+        public override void ReceiveMessage(ComMessage message)
+        {
+            string[] parts = message.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts[0] == "sensor")
+            {
+                if (parts[1] == "getdata")
+                {
+                    SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(SensorDataStore.GetDefault().GetBinaryData(package.num)) }, message, this);
+                }
+            }
+        }
+    }
 }

@@ -64,6 +64,18 @@ namespace Ion.Pro.Analyser
             return allViews.ToArray();
         }
 
+        public byte[] GetBinaryData(int id)
+        {
+            if (!indexedPackages.ContainsKey(id))
+                return null;
+            List<byte> allViews = new List<byte>();
+            foreach (SensorPackage sp in indexedPackages[id])
+            {
+                allViews.AddRange(sp.GetBinary());
+            }
+            return allViews.ToArray();
+        }
+
         public SensorPackage[] GetPackages(int id)
         {
             return indexedPackages[id].ToArray();

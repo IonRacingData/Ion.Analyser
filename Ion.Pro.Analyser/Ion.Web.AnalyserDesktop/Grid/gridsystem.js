@@ -106,6 +106,7 @@ var GridViewer = (function () {
         box.content.appendChild(windowBody);
         window.recalculateSize();
         window.onResize();
+        this.handleResize();
     };
     GridViewer.prototype.generateSelector = function () {
         var _this = this;

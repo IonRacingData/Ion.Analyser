@@ -20,6 +20,41 @@ namespace Ion.Pro.Analyser.Data
         {
             return new SensorPackageViewModel() { ID = ID, Value = Value, TimeStamp = TimeStamp };
         }
+
+        public byte[] GetBinary()
+        {
+            return new byte[]
+            {
+                (byte)ID,
+                (byte)(ID >> 8),
+                (byte)(ID >> 16),
+                (byte)(ID >> 24),
+                (byte)Value,
+                (byte)(Value >> 8),
+                (byte)(Value >> 16),
+                (byte)(Value >> 24),
+                (byte)(Value >> 32),
+                (byte)(Value >> 40),
+                (byte)(Value >> 48),
+                (byte)(Value >> 56),
+                (byte)TimeStamp,
+                (byte)(TimeStamp >> 8),
+                (byte)(TimeStamp >> 16),
+                (byte)(TimeStamp >> 24),
+                (byte)(TimeStamp >> 32),
+                (byte)(TimeStamp >> 40),
+                (byte)(TimeStamp >> 48),
+                (byte)(TimeStamp >> 56),
+                (byte)AbsoluteTimeStamp,
+                (byte)(AbsoluteTimeStamp >> 8),
+                (byte)(AbsoluteTimeStamp >> 16),
+                (byte)(AbsoluteTimeStamp >> 24),
+                (byte)(AbsoluteTimeStamp >> 32),
+                (byte)(AbsoluteTimeStamp >> 40),
+                (byte)(AbsoluteTimeStamp >> 48),
+                (byte)(AbsoluteTimeStamp >> 56),
+            };
+        }
     }
 
     public class SensorPackageViewModel
@@ -28,6 +63,41 @@ namespace Ion.Pro.Analyser.Data
         public long Value { get; set; }
         public long TimeStamp { get; set; }
         public long AbsoluteTimeStamp { get; set; }
+
+        public byte[] GetBinary()
+        {
+            return new byte[]
+            {
+                (byte)ID,
+                (byte)(ID >> 8),
+                (byte)(ID >> 16),
+                (byte)(ID >> 24),
+                (byte)Value,
+                (byte)(Value >> 8),
+                (byte)(Value >> 16),
+                (byte)(Value >> 24),
+                (byte)(Value >> 32),
+                (byte)(Value >> 40),
+                (byte)(Value >> 48),
+                (byte)(Value >> 56),
+                (byte)TimeStamp,
+                (byte)(TimeStamp >> 8),
+                (byte)(TimeStamp >> 16),
+                (byte)(TimeStamp >> 24),
+                (byte)(TimeStamp >> 32),
+                (byte)(TimeStamp >> 40),
+                (byte)(TimeStamp >> 48),
+                (byte)(TimeStamp >> 56),
+                (byte)AbsoluteTimeStamp,
+                (byte)(AbsoluteTimeStamp >> 8),
+                (byte)(AbsoluteTimeStamp >> 16),
+                (byte)(AbsoluteTimeStamp >> 24),
+                (byte)(AbsoluteTimeStamp >> 32),
+                (byte)(AbsoluteTimeStamp >> 40),
+                (byte)(AbsoluteTimeStamp >> 48),
+                (byte)(AbsoluteTimeStamp >> 56),
+            };
+        }
     }
 
     public interface ISensorReader
