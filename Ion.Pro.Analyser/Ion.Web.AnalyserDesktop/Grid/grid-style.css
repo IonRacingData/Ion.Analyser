@@ -1,6 +1,7 @@
 /* Dividers*/
 .grid-hdiv, .grid-vdiv{
-    background-color: #ff9103;
+    /*background-color: #ff9103;*/
+    background-color: #000000;
 }
 
 /*Containers*/

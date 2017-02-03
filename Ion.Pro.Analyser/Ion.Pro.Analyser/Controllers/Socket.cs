@@ -84,7 +84,7 @@ namespace Ion.Pro.Analyser.Controllers
             }
 
             frame.ParsePayload(reader.ReadBytes(frame.PayloadLength));
-
+            Console.WriteLine($"Received frame: {frame.OpCode} {frame.PayloadLength} {frame.Masked} { frame.Fin}");
             return Encoding.Default.GetString(frame.Data);
         }
 
