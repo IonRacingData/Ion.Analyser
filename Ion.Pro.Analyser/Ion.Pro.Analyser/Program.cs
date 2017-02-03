@@ -11,10 +11,17 @@ using Ion.Pro.Analyser.Data;
 
 namespace Ion.Pro.Analyser
 {
+    enum RunMode
+    {
+        OffLine,
+        LiveTest,
+        SmallTest
+    }
+
     class Program
     {        
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-
+        static RunMode runMode = RunMode.OffLine;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
@@ -23,7 +30,7 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
-            Task.Run(() => DataInserter());
+            
             Console.WriteLine("Ion Analyser Server");
             try
             {
@@ -52,29 +59,28 @@ namespace Ion.Pro.Analyser
 
             SensorDataStore store = SensorDataStore.GetDefault();
             store.LoadSensorInformation();
-            if (false)
+            switch (runMode)
             {
-                
-                store.AddRange(reader.ReadPackages());
-                store.AddRange(gpsReader.ReadPackages());
-                store.AddRange(gpsReader2.ReadPackages());
-                store.AddRange(gpsReader3.ReadPackages());
-            }
-            else if (true)
-            {
-
-            }
-            else
-            {
-                store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
-                store.Add(new SensorPackage() { ID = 2, Value = 5, TimeStamp = 1 });
-                store.Add(new SensorPackage() { ID = 3, Value = 10, TimeStamp = 1 });
-                store.Add(new SensorPackage() { ID = 1, Value = 6, TimeStamp = 2 });
-                store.Add(new SensorPackage() { ID = 2, Value = 10, TimeStamp = 2 });
-                store.Add(new SensorPackage() { ID = 3, Value = 100, TimeStamp = 2 });
-                store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
-                store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
-                store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+                case RunMode.OffLine:
+                    store.AddRange(reader.ReadPackages());
+                    store.AddRange(gpsReader.ReadPackages());
+                    store.AddRange(gpsReader2.ReadPackages());
+                    store.AddRange(gpsReader3.ReadPackages());
+                    break;
+                case RunMode.LiveTest:
+                    Task.Run(() => DataInserter());
+                    break;
+                case RunMode.SmallTest:
+                    store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
+                    store.Add(new SensorPackage() { ID = 2, Value = 5, TimeStamp = 1 });
+                    store.Add(new SensorPackage() { ID = 3, Value = 10, TimeStamp = 1 });
+                    store.Add(new SensorPackage() { ID = 1, Value = 6, TimeStamp = 2 });
+                    store.Add(new SensorPackage() { ID = 2, Value = 10, TimeStamp = 2 });
+                    store.Add(new SensorPackage() { ID = 3, Value = 100, TimeStamp = 2 });
+                    store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
+                    store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
+                    store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+                    break;
             }
         }
 
