@@ -159,6 +159,8 @@ var Plotter = (function () {
     };
     Plotter.prototype.draw = function () {
         this.ctxMain.clear();
+        this.drawXAxis();
+        this.drawYAxis();
         for (var d = 0; d < this.data.length; d++) {
             var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
@@ -188,8 +190,6 @@ var Plotter = (function () {
             this.ctxMain.stroke();
             this.ctxMain.fillStyle = this.mainColor;
         }
-        this.drawXAxis();
-        this.drawYAxis();
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
             var pointString = this.selectedPoint.toString();

@@ -185,6 +185,9 @@
     draw(): void {
         this.ctxMain.clear();        
 
+        this.drawXAxis();
+        this.drawYAxis();
+
         for (var d: number = 0; d < this.data.length; d++) {
             var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
@@ -220,8 +223,7 @@
             this.ctxMain.fillStyle = this.mainColor;
         }
 
-        this.drawXAxis();
-        this.drawYAxis();
+       
 
         if (this.selectedPoint !== null) {
             var abs: Point = this.getAbsolute(this.selectedPoint);
