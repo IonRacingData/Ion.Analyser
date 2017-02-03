@@ -23,6 +23,7 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
+            Task.Run(() => DataInserter());
             Console.WriteLine("Ion Analyser Server");
             try
             {
@@ -50,13 +51,18 @@ namespace Ion.Pro.Analyser
             ComBus.GetDefault().RegisterClient(new SensorComService());
 
             SensorDataStore store = SensorDataStore.GetDefault();
-            if (true)
+            store.LoadSensorInformation();
+            if (false)
             {
-                store.LoadSensorInformation();
+                
                 store.AddRange(reader.ReadPackages());
                 store.AddRange(gpsReader.ReadPackages());
-                //store.AddRange(gpsReader2.ReadPackages());
+                store.AddRange(gpsReader2.ReadPackages());
                 store.AddRange(gpsReader3.ReadPackages());
+            }
+            else if (true)
+            {
+
             }
             else
             {
@@ -69,6 +75,23 @@ namespace Ion.Pro.Analyser
                 store.Add(new SensorPackage() { ID = 1, Value = 100, TimeStamp = 3 });
                 store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
                 store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
+            }
+        }
+
+        static void DataInserter()
+        {
+            DateTime begin = DateTime.Now;
+            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            SensorPackage[] all = reader.ReadPackages();
+            int i = 0;
+            while (i < all.Length - 1)
+            {
+                //Console.WriteLine("Tick");
+                SensorPackage pack = all[i];
+                SensorDataStore.GetDefault().AddLive(pack);
+                //Console.WriteLine("At: " + pack.TimeStamp.ToString());
+                System.Threading.Thread.Sleep((int)(all[i+1].TimeStamp - all[i].TimeStamp));
+                i++;
             }
         }
 
@@ -260,6 +283,41 @@ namespace Ion.Pro.Analyser
 
     public class SensorComService : ComBusClient
     {
+        public SensorComService()
+        {
+            SensorDataStore.GetDefault().DataReceived += SensorComService_DataReceived;
+        }
+
+        List<SensorPackage> SendCache = new List<SensorPackage>();
+
+        DateTime lastSend = new DateTime();
+
+        private void SensorComService_DataReceived(object sender, SensorEventArgs e)
+        {
+            DateTime current = DateTime.Now;
+            SendCache.Add(e.Package);
+            if ((current - lastSend).TotalMilliseconds > 30)
+            {
+                List<byte> allBytes = new List<byte>();
+                foreach (SensorPackage sp in SendCache)
+                {
+                    allBytes.AddRange(sp.GetBinary());
+                }
+                SendCache.Clear();
+                ComBus.SendMessage(new ComMessage()
+                {
+                    MessageId = 10,
+                    Status = (int)ComMessageStatus.Request110,
+                    Path = "/sensor/update",
+                    NodeId = this.Id,
+                    Data = JSONObject.Create(new { Sensors = Convert.ToBase64String(allBytes.ToArray()) }).ToJsonString()
+                });
+                
+                lastSend = current;
+            }
+            
+        }
+
         public override void ReceiveMessage(ComMessage message)
         {
             string[] parts = message.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);

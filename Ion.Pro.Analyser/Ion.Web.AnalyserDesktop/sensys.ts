@@ -9,6 +9,28 @@
     static event_globalPlot = "globalPlot";
     static event_registerIPlot = "registerIPlot";
 
+    constructor() {
+        kernel.netMan.registerService(10, (data: any) => {
+            let dataArray = <ISensorPackage[]>this.convertToSensorPackage(data.Sensors);
+            for (let j = 0; j < dataArray.length; j++){
+                let realData = dataArray[j];
+                if (!this.dataCache[realData.ID]) {
+                    this.dataCache[realData.ID] = [];
+                }
+                this.dataCache[realData.ID].push(realData);
+                if (!this.plotCache[realData.ID]) {
+                    this.plotCache[realData.ID] = new PlotData([]);
+                }
+                this.plotCache[realData.ID].points.push(new Point(realData.TimeStamp, realData.Value));   
+            }
+            for (let i = 0; i < this.plotter.length; i++) {
+                this.plotter[i].dataUpdate();
+            }
+            
+            //if ()
+        });
+    }
+
     eventManager: EventManager = new EventManager();
 
     getInfos(callback: (ids: SensorInformation[]) => void): void {

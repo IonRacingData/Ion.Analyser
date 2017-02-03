@@ -9,10 +9,16 @@ using System.Threading.Tasks;
 
 namespace Ion.Pro.Analyser
 {
+    public class SensorEventArgs : EventArgs
+    {
+        public SensorPackage Package { get; set; }
+    }
+
     public class SensorDataStore
     {
         //List<SensorPackage> allPackages = new List<SensorPackage>();
         Dictionary<int, List<SensorPackage>> indexedPackages = new Dictionary<int, List<SensorPackage>>();
+        public event EventHandler<SensorEventArgs> DataReceived;
 
         static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
         public static SensorDataStore GetDefault()
@@ -89,6 +95,17 @@ namespace Ion.Pro.Analyser
         public int[] GetLoadedIds()
         {
             return indexedPackages.Keys.ToArray();
+        }
+
+        public void AddLive(SensorPackage pack)
+        {
+            this.Add(pack);
+            OnDataReceived(pack);
+        }
+
+        public void OnDataReceived(SensorPackage package)
+        {
+            DataReceived?.Invoke(this, new SensorEventArgs() { Package = package });
         }
     }
 

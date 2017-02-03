@@ -4,8 +4,9 @@ function startUp() {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: new SensorManager()
+        senMan: null
     };
+    kernel.senMan = new SensorManager();
     kernel.senMan.setGlobal(841);
     registerLaunchers();
     var mk = new HtmlHelper();

@@ -34,6 +34,10 @@ class NetworkManager {
         }
     }
 
+    registerService(callbackId: number, callback: (data: any) => void) {
+        this.serviceCallback[callbackId] = callback;
+    }
+
     sendMessage(path: string, message: any, callback: (data: any) => void) {
         let pack: IComMessage = {
             Status: ComMessageStatus.Request110,

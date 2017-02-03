@@ -26,6 +26,9 @@ var NetworkManager = (function () {
             _this.isReady = true;
         };
     }
+    NetworkManager.prototype.registerService = function (callbackId, callback) {
+        this.serviceCallback[callbackId] = callback;
+    };
     NetworkManager.prototype.sendMessage = function (path, message, callback) {
         var pack = {
             Status: ComMessageStatus.Request110,

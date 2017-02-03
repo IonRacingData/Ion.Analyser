@@ -1,9 +1,28 @@
 var SensorManager = (function () {
     function SensorManager() {
+        var _this = this;
         this.dataCache = [];
         this.plotCache = [];
         this.eventManager = new EventManager();
         this.plotter = [];
+        kernel.netMan.registerService(10, function (data) {
+            var dataArray = _this.convertToSensorPackage(data.Sensors);
+            for (var j = 0; j < dataArray.length; j++) {
+                var realData = dataArray[j];
+                if (!_this.dataCache[realData.ID]) {
+                    _this.dataCache[realData.ID] = [];
+                }
+                _this.dataCache[realData.ID].push(realData);
+                if (!_this.plotCache[realData.ID]) {
+                    _this.plotCache[realData.ID] = new PlotData([]);
+                }
+                _this.plotCache[realData.ID].points.push(new Point(realData.TimeStamp, realData.Value));
+            }
+            for (var i = 0; i < _this.plotter.length; i++) {
+                _this.plotter[i].dataUpdate();
+            }
+            //if ()
+        });
     }
     SensorManager.prototype.getInfos = function (callback) {
         requestAction("GetIds", callback);
