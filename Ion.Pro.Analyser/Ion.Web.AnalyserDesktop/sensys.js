@@ -74,16 +74,16 @@ var SensorManager = (function () {
     };
     SensorManager.prototype.loadData = function (id, callback) {
         var _this = this;
-        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, function (data) {
-            var realData = _this.convertToSensorPackage(data.Sensors);
+        /*kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
+            let realData = this.convertToSensorPackage(data.Sensors);
             console.log(realData);
-            _this.dataCache[id] = realData;
+            this.dataCache[id] = realData;
             callback(realData);
-        });
-        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
-            this.dataCache[id] = data;
-            callback(data);
         });*/
+        requestAction("getdata?number=" + id.toString(), function (data) {
+            _this.dataCache[id] = data;
+            callback(data);
+        });
     };
     SensorManager.prototype.convertToSensorPackage = function (str) {
         var raw = atob(str);
