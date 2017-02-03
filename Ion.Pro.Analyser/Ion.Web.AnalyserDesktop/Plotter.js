@@ -8,10 +8,10 @@ var Plotter = (function () {
         this.isMarking = false;
         this.displayGrid = true;
         this.stickyAxes = true;
-        this.backgroundColor = "white";
+        this.backgroundColor = "rgb(45, 45, 45)";
         this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "black"; // "black";
-        this.mainColor = "black";
+        this.axisColor = "white"; //"black"; // "black";
+        this.mainColor = "white";
         this.data = data;
     }
     Plotter.prototype.generatePlot = function () {
@@ -170,6 +170,7 @@ var Plotter = (function () {
             var points = this.data[d].points;
             var drawPoint = 0;
             var checkPoint = lastPoint;
+            this.ctxMain.strokeStyle = this.data[d].color;
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
@@ -184,6 +185,7 @@ var Plotter = (function () {
                 lastPoint = point;
             }
             this.ctxMain.stroke();
+            this.ctxMain.fillStyle = this.mainColor;
         }
         this.drawXAxis();
         this.drawYAxis();

@@ -18,11 +18,10 @@
     marking: IMarking;
     displayGrid = true;
     stickyAxes = true;
-    backgroundColor = "white";
+    backgroundColor = "rgb(45, 45, 45)";
     gridColor = "rgba(100,100,100,0.3)";
-    axisColor = "black"; // "black";
-    mainColor = "black";
-
+    axisColor = "white";//"black"; // "black";
+    mainColor = "white";
 
     constructor(data: PlotData[]) {
         this.data = data;
@@ -199,6 +198,8 @@
             var drawPoint: number = 0;
             var checkPoint: Point = lastPoint;
 
+            this.ctxMain.strokeStyle = this.data[d].color;
+
             for (var i: number = firstVisibleIdx; i < totalLength; i++) {
                 var point: Point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
@@ -215,6 +216,7 @@
             }
 
             this.ctxMain.stroke();
+            this.ctxMain.fillStyle = this.mainColor;
         }
 
         this.drawXAxis();
