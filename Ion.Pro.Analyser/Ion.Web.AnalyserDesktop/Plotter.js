@@ -411,6 +411,7 @@ var ContextFixer = (function () {
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     };
     ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
+        radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     };
     ContextFixer.prototype.measureText = function (text) {

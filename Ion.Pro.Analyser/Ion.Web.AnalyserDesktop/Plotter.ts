@@ -509,7 +509,8 @@ class ContextFixer {
         let newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {        
+        radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     }
     measureText(text: string): number {
