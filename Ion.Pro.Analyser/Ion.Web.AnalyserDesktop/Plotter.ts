@@ -183,8 +183,7 @@
     }
 
     draw(): void {
-        this.ctxMain.clear();
-        this.ctxMain.beginPath();
+        this.ctxMain.clear();        
 
         for (var d: number = 0; d < this.data.length; d++) {
             var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
@@ -198,6 +197,7 @@
             var drawPoint: number = 0;
             var checkPoint: Point = lastPoint;
 
+            this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.data[d].color;
 
             for (var i: number = firstVisibleIdx; i < totalLength; i++) {
@@ -215,6 +215,7 @@
                 lastPoint = point;
             }
 
+            this.ctxMain.ctx.closePath();
             this.ctxMain.stroke();
             this.ctxMain.fillStyle = this.mainColor;
         }

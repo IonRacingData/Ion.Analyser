@@ -159,7 +159,6 @@ var Plotter = (function () {
     };
     Plotter.prototype.draw = function () {
         this.ctxMain.clear();
-        this.ctxMain.beginPath();
         for (var d = 0; d < this.data.length; d++) {
             var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
@@ -170,6 +169,7 @@ var Plotter = (function () {
             var points = this.data[d].points;
             var drawPoint = 0;
             var checkPoint = lastPoint;
+            this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.data[d].color;
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
@@ -184,6 +184,7 @@ var Plotter = (function () {
                 }
                 lastPoint = point;
             }
+            this.ctxMain.ctx.closePath();
             this.ctxMain.stroke();
             this.ctxMain.fillStyle = this.mainColor;
         }
