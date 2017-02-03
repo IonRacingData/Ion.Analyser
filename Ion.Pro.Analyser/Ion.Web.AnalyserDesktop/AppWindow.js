@@ -179,10 +179,10 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.setSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
-        if (width < 230)
+        /*if (width < 230)
             width = 230;
         if (height < 150)
-            height = 150;
+            height = 150;*/
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
