@@ -174,11 +174,11 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
-var MeterTester = (function () {
-    function MeterTester() {
+var GaugeTester = (function () {
+    function GaugeTester() {
         this.val = 0;
     }
-    MeterTester.prototype.main = function () {
+    GaugeTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
@@ -205,12 +205,12 @@ var MeterTester = (function () {
             //this.plotter.draw();
         });
     };
-    MeterTester.prototype.drawMeter = function () {
+    GaugeTester.prototype.drawMeter = function () {
         //this.window.content.innerHTML = "";                        
         this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
         this.window.content.appendChild(this.gauge.generate());
     };
-    return MeterTester;
+    return GaugeTester;
 }());
 var GPSPlotTester = (function () {
     function GPSPlotTester() {

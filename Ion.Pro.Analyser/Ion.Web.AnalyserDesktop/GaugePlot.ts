@@ -1,20 +1,20 @@
 ﻿class GaugePlot {
-    wrapper: HTMLDivElement;
-    canvas: LayeredCanvas;
-    ctxMain: ContextFixer;
-    ctxNeedle: ContextFixer;
-    ctxCenter: ContextFixer;
-    size: number;
-    padding: number = 5;
-    labels: string[];
-    totalAngle: number = (3 * Math.PI) / 2;
-    startAngle: number = -(3 * Math.PI) / 4;
-    needle: ImageData;
-    offsetX: number;
-    offsetY: number;   
-    color: string = "black";
-    needleColor: string = "black";   
-    percent: number = 0; 
+    public wrapper: HTMLDivElement;
+    private canvas: LayeredCanvas;
+    private ctxMain: ContextFixer;
+    private ctxNeedle: ContextFixer;
+    private ctxCenter: ContextFixer;
+    private size: number;
+    private padding: number = 5;
+    private labels: string[];
+    private totalAngle: number = (3 * Math.PI) / 2;
+    private startAngle: number = -(3 * Math.PI) / 4;
+    private needle: ImageData;
+    private offsetX: number;
+    private offsetY: number;   
+    private color: string = "black";
+    private needleColor: string = "black";   
+    private percent: number = 0; 
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         this.size = Math.min(width, height);
@@ -102,7 +102,7 @@
         
     }                  
 
-    drawNeedle(): void {        
+    private drawNeedle(): void {        
 
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();

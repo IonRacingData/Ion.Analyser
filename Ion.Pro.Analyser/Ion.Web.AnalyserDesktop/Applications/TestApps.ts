@@ -204,7 +204,7 @@ class TestViewer implements IApplication {
     }
 }
 
-class MeterTester implements IApplication {
+class GaugeTester implements IApplication {
     application: Application;
     window: AppWindow;
     gauge: GaugePlot;
@@ -227,7 +227,7 @@ class MeterTester implements IApplication {
 
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-
+                
         this.gauge.wrapper.addEventListener("wheel", (e: WheelEvent) => {
             this.val -= e.deltaY / 3;
             this.val = this.val > 100 ? 100 : this.val;
