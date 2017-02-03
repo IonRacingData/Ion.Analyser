@@ -179,6 +179,10 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.setSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
+        if (width < 230)
+            width = 230;
+        if (height < 150)
+            height = 150;
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
@@ -191,13 +195,19 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.setRelativeSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
-        this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
-        this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
-        this.width = width + this.deltaX;
-        this.height = height + this.deltaY;
+        var newWidth = width + this.deltaX;
+        var newHeight = height + this.deltaY;
+        if (newWidth < 230)
+            newWidth = 230;
+        if (newHeight < 150)
+            newHeight = 150;
+        this.sizeHandle.style.width = (newWidth).toString() + "px";
+        this.sizeHandle.style.height = (newHeight).toString() + "px";
+        this.width = newWidth;
+        this.height = newHeight;
         if (storeSize) {
-            this.storeWidth = width + this.deltaX;
-            this.storeHeight = height + this.deltaY;
+            this.storeWidth = newWidth;
+            this.storeHeight = newHeight;
         }
         this.onResize();
     };

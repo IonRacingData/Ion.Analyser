@@ -13,10 +13,13 @@ var DataViewer = (function () {
         table.addHeader("ID", "Name", "Unit");
         var _loop_1 = function () {
             var curValue = data[i];
-            table.addRow([{
-                    event: "click", func: function () { kernel.senMan.setGlobal(curValue.ID); }
+            table.addRow([
+                {
+                    event: "click", func: function () {
+                        kernel.senMan.setGlobal(curValue.ID);
+                    }
                 },
-                (!curValue.Key ? { field: "style", data: "background-color: #FF8888;" } : {})
+                (!curValue.Key ? { field: "className", data: "error" } : {})
             ], curValue.ID, curValue.Name, curValue.Unit ? "" : curValue.Unit);
         };
         for (var i = 0; i < data.length; i++) {

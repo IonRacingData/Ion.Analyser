@@ -81,12 +81,16 @@ table.table {
 }
 
 .table tr:nth-child(2n) {
-    background-color: #babfd1;
+    background-color: #3c3c3c;
 }
 
 .table thead {
-    background-color: #383e47;
+    background-color: #111215;
     color: white;
+}
+
+.table tr.error {
+    background-color: rgb(104, 34, 34);
 }
 
 table.table.selectable tr.selectedrow {
