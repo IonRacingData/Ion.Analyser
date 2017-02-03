@@ -13,7 +13,8 @@
     offsetX: number;
     offsetY: number;   
     color: string = "black";
-    needleColor: string = "black";    
+    needleColor: string = "black";   
+    percent: number = 0; 
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         this.size = Math.min(width, height);
@@ -59,8 +60,6 @@
 
     draw(): void {
 
-
-
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         let radius = this.size / 2;
@@ -99,35 +98,34 @@
 
         
 
-        this.drawNeedle(0);     
+        this.drawNeedle();     
         
     }                  
 
-    drawNeedle(percent: number): void {
-
-        percent = percent > 100 ? 100 : percent;
-        percent = percent < 0 ? 0 : percent;
+    drawNeedle(): void {        
 
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         let radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
     
-        let ang = (percent / 100) * this.totalAngle;
+        let ang = (this.percent / 100) * this.totalAngle;
 
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
-        //this.ctxNeedle.moveTo(0, 0);
-        /*this.ctxNeedle.lineTo(0, -radius * 0.8);
-        this.ctxNeedle.moveTo(1, -radius * 0.8);
-        this.ctxNeedle.lineTo(1, 0);
-        this.ctxNeedle.stroke();*/
         this.ctxNeedle.fillRect(-1, 0, 2, -radius * 0.85);
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
 
+    }
+
+    setValue(percent: number): void {
+        percent = percent > 100 ? 100 : percent;
+        percent = percent < 0 ? 0 : percent;
+        this.percent = percent;
+        this.drawNeedle();
     }
 
     setSize(width: number, height: number): void {

@@ -198,7 +198,7 @@ var MeterTester = (function () {
             _this.val -= e.deltaY / 3;
             _this.val = _this.val > 100 ? 100 : _this.val;
             _this.val = _this.val < 0 ? 0 : _this.val;
-            _this.gauge.drawNeedle(_this.val);
+            _this.gauge.setValue(_this.val);
         });
         this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
             _this.gauge.setSize(_this.window.width, _this.window.height);

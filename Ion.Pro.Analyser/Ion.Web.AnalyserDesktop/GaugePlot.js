@@ -5,6 +5,7 @@ var GaugePlot = (function () {
         this.startAngle = -(3 * Math.PI) / 4;
         this.color = "black";
         this.needleColor = "black";
+        this.percent = 0;
         this.size = Math.min(width, height);
         var labels = [];
         for (var i = min; i <= max; i += step) {
@@ -70,28 +71,27 @@ var GaugePlot = (function () {
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
         }
-        this.drawNeedle(0);
+        this.drawNeedle();
     };
-    GaugePlot.prototype.drawNeedle = function (percent) {
-        percent = percent > 100 ? 100 : percent;
-        percent = percent < 0 ? 0 : percent;
+    GaugePlot.prototype.drawNeedle = function () {
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         var radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-        var ang = (percent / 100) * this.totalAngle;
+        var ang = (this.percent / 100) * this.totalAngle;
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
-        //this.ctxNeedle.moveTo(0, 0);
-        /*this.ctxNeedle.lineTo(0, -radius * 0.8);
-        this.ctxNeedle.moveTo(1, -radius * 0.8);
-        this.ctxNeedle.lineTo(1, 0);
-        this.ctxNeedle.stroke();*/
         this.ctxNeedle.fillRect(-1, 0, 2, -radius * 0.85);
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
+    };
+    GaugePlot.prototype.setValue = function (percent) {
+        percent = percent > 100 ? 100 : percent;
+        percent = percent < 0 ? 0 : percent;
+        this.percent = percent;
+        this.drawNeedle();
     };
     GaugePlot.prototype.setSize = function (width, height) {
         this.size = Math.min(width, height);
