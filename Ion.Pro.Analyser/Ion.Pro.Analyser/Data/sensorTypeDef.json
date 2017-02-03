@@ -1,0 +1,16 @@
+﻿{
+	"$schema": "http://json-schema.org/draft-04/schema",
+  "title": "JSON Schema for Sensor ID packages",
+
+	"type": "array",
+
+  "items": {
+    "type": "object",
+    "properties": {
+      "ID": { "type": "number" },
+      "Key": { "type": "string" },
+      "Name": { "type": "string" },
+      "Unit": { "type": "string" }
+    }
+  }
+}

@@ -41,13 +41,22 @@ namespace Ion.Pro.Analyser
 
         static void InsertSensorTestData()
         {
-            LegacySensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader gpsReader = new GPSDataReader("../../Data/GPS_DataFile.csv", 2, 2);
+            ISensorReader gpsReader2 = new GPXDataReader("../../Data/stiangps.gpx");
+            ISensorReader gpsReader3 = new GPXDataReader("../../Data/fredrikgps.gpx");
             //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
+
+            ComBus.GetDefault().RegisterClient(new SensorComService());
 
             SensorDataStore store = SensorDataStore.GetDefault();
             if (true)
             {
+                store.LoadSensorInformation();
                 store.AddRange(reader.ReadPackages());
+                store.AddRange(gpsReader.ReadPackages());
+                //store.AddRange(gpsReader2.ReadPackages());
+                store.AddRange(gpsReader3.ReadPackages());
             }
             else
             {
@@ -128,7 +137,7 @@ namespace Ion.Pro.Analyser
 
                 Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
 
-                bool printTimes = true;
+                bool printTimes = false;
                 if (printTimes)
                 {
                     PrintTimes(Watch);
@@ -244,54 +253,24 @@ namespace Ion.Pro.Analyser
         }
     }
 
-    public class SensorDataStore
+    public class SensorNumPackage
     {
-        //List<SensorPackage> allPackages = new List<SensorPackage>();
-        Dictionary<int, List<SensorPackage>> indexedPackages = new Dictionary<int, List<SensorPackage>>();
+        public int num { get; set; }
+    }
 
-        static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
-        public static SensorDataStore GetDefault()
+    public class SensorComService : ComBusClient
+    {
+        public override void ReceiveMessage(ComMessage message)
         {
-            return instance.Value;
-        }
-
-        public void Add(SensorPackage data)
-        {
-            if (!indexedPackages.ContainsKey(data.ID))
+            string[] parts = message.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts[0] == "sensor")
             {
-                indexedPackages[data.ID] = new List<SensorPackage>();
+                if (parts[1] == "getdata")
+                {
+                    SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(SensorDataStore.GetDefault().GetBinaryData(package.num)) }, message, this);
+                }
             }
-            indexedPackages[data.ID].Add(data);
-        }
-
-        public void AddRange(IEnumerable<SensorPackage> sensorPackage)
-        {
-            foreach (SensorPackage package in sensorPackage)
-            {
-                Add(package);
-            }
-        }
-
-        public SensorPackageViewModel[] GetViews(int id)
-        {
-            if (!indexedPackages.ContainsKey(id))
-                return null;
-            List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
-            foreach(SensorPackage sp in indexedPackages[id])
-            {
-                allViews.Add(sp.GetObject());
-            }
-            return allViews.ToArray();
-        }        
-
-        public SensorPackage[] GetPackages(int id)
-        {
-            return indexedPackages[id].ToArray();
-        }
-
-        public int[] GetIds()
-        {
-            return indexedPackages.Keys.ToArray();
         }
     }
 }

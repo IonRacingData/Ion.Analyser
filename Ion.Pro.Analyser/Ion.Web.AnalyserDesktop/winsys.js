@@ -48,7 +48,7 @@ var WindowManager = (function () {
         }
     };
     WindowManager.prototype.mouseUp = function (e) {
-        console.log(e);
+        //console.log(e);
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
@@ -118,11 +118,11 @@ var WindowManager = (function () {
     WindowManager.prototype.raiseEvent = function (type, data) {
         this.eventManager.raiseEvent(type, data);
     };
-    WindowManager.event_globalDrag = "globalDrag";
-    WindowManager.event_globalUp = "globalUp;";
-    WindowManager.event_windowOpen = "windowOpen";
-    WindowManager.event_windowSelect = "windowSelect";
-    WindowManager.event_windowClose = "windowClose";
     return WindowManager;
 }());
+WindowManager.event_globalDrag = "globalDrag";
+WindowManager.event_globalUp = "globalUp;";
+WindowManager.event_windowOpen = "windowOpen";
+WindowManager.event_windowSelect = "windowSelect";
+WindowManager.event_windowClose = "windowClose";
 //# sourceMappingURL=winsys.js.map

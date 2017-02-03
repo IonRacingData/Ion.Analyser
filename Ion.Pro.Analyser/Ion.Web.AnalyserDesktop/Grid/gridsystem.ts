@@ -113,6 +113,7 @@
 
         window.recalculateSize();
         window.onResize();
+        this.handleResize();
     }
 
     generateSelector() {
@@ -201,8 +202,9 @@
                     && windowY < cur.offsetTop + cur.offsetHeight) {
                     this.selectedBox = cur.gridBox;
                     this.selectorWindow.setPos(
-                        this.selectedBox.box.offsetLeft + (<HTMLElement>this.selectedBox.box.offsetParent).offsetLeft + this.selectedBox.box.offsetWidth / 2 - 45
-                        , this.selectedBox.box.offsetTop + (<HTMLElement>this.selectedBox.box.offsetParent).offsetTop + this.selectedBox.box.offsetHeight / 2 - 45);
+                        this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45
+                        , this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
+                    //this.selectedBox.box.offsetTop + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                     break;
                 }
             }
@@ -213,6 +215,23 @@
         else {
             this.selectorWindow.hide();
         }
+    }
+
+    getAbsoluteLeft(ele: HTMLElement): number {
+        let left = ele.offsetLeft;
+        while (ele.offsetParent !== null) {
+            ele = <HTMLElement>ele.offsetParent;
+            left += ele.offsetLeft;
+        }
+        return left;
+    }
+    getAbsoluteTop(ele: HTMLElement): number {
+        let top = ele.offsetTop;
+        while (ele.offsetParent !== null) {
+            ele = <HTMLElement>ele.offsetParent;
+            top += ele.offsetTop;
+        }
+        return top;
     }
 
     selectedContainer: GridContainer;

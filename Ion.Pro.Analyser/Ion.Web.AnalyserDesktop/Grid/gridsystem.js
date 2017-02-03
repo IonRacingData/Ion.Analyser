@@ -106,6 +106,7 @@ var GridViewer = (function () {
         box.content.appendChild(windowBody);
         window.recalculateSize();
         window.onResize();
+        this.handleResize();
     };
     GridViewer.prototype.generateSelector = function () {
         var _this = this;
@@ -183,7 +184,8 @@ var GridViewer = (function () {
                     && windowX < cur.offsetLeft + cur.offsetWidth
                     && windowY < cur.offsetTop + cur.offsetHeight) {
                     this.selectedBox = cur.gridBox;
-                    this.selectorWindow.setPos(this.selectedBox.box.offsetLeft + this.selectedBox.box.offsetParent.offsetLeft + this.selectedBox.box.offsetWidth / 2 - 45, this.selectedBox.box.offsetTop + this.selectedBox.box.offsetParent.offsetTop + this.selectedBox.box.offsetHeight / 2 - 45);
+                    this.selectorWindow.setPos(this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45, this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
+                    //this.selectedBox.box.offsetTop + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                     break;
                 }
             }
@@ -192,6 +194,22 @@ var GridViewer = (function () {
         else {
             this.selectorWindow.hide();
         }
+    };
+    GridViewer.prototype.getAbsoluteLeft = function (ele) {
+        var left = ele.offsetLeft;
+        while (ele.offsetParent !== null) {
+            ele = ele.offsetParent;
+            left += ele.offsetLeft;
+        }
+        return left;
+    };
+    GridViewer.prototype.getAbsoluteTop = function (ele) {
+        var top = ele.offsetTop;
+        while (ele.offsetParent !== null) {
+            ele = ele.offsetParent;
+            top += ele.offsetTop;
+        }
+        return top;
     };
     GridViewer.prototype.globalUp = function (e) {
         var windowX = e.mouse.clientX - this.window.x - 9;
@@ -391,13 +409,14 @@ var ResizeContainer = (function () {
 var GridHContainer = (function (_super) {
     __extends(GridHContainer, _super);
     function GridHContainer(appWindow) {
-        _super.call(this, appWindow);
-        this.set = "setWidth";
-        this.dir = "clientWidth";
-        this.offset = "offsetLeft";
-        this.mouse = "clientX";
-        this.dir2 = "width";
-        this.pos = "x";
+        var _this = _super.call(this, appWindow) || this;
+        _this.set = "setWidth";
+        _this.dir = "clientWidth";
+        _this.offset = "offsetLeft";
+        _this.mouse = "clientX";
+        _this.dir2 = "width";
+        _this.pos = "x";
+        return _this;
     }
     GridHContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "hcon");
@@ -415,13 +434,14 @@ var GridHContainer = (function (_super) {
 var GridVContainer = (function (_super) {
     __extends(GridVContainer, _super);
     function GridVContainer(appWindow) {
-        _super.call(this, appWindow);
-        this.set = "setHeight";
-        this.dir = "clientHeight";
-        this.offset = "offsetTop";
-        this.mouse = "clientY";
-        this.dir2 = "height";
-        this.pos = "y";
+        var _this = _super.call(this, appWindow) || this;
+        _this.set = "setHeight";
+        _this.dir = "clientHeight";
+        _this.offset = "offsetTop";
+        _this.mouse = "clientY";
+        _this.dir2 = "height";
+        _this.pos = "y";
+        return _this;
     }
     GridVContainer.prototype.create = function () {
         return _super.prototype.create.call(this, "vcon");

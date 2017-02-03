@@ -22,10 +22,13 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app-style-dark.css" />
+    <Content Include="app-style.css" />
     <Content Include="app.css" />
     <Content Include="Grid\grid.js" />
     <Content Include="Grid\index.html" />
-    <Content Include="Grid\main.css" />
+    <Content Include="Grid\grid-style.css" />
+    <Content Include="Grid\grid.css" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
     <Content Include="web.config" />
@@ -41,15 +44,18 @@
     <TypeScriptCompile Include="Applications\ServerInfo.ts" />
     <TypeScriptCompile Include="Applications\TaskManager.ts" />
     <TypeScriptCompile Include="Applications\TestApps.ts" />
+    <TypeScriptCompile Include="Applications\TestDataViewer.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
     <TypeScriptCompile Include="appsys.ts" />
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="GoogleChart.ts" />
+    <TypeScriptCompile Include="GPSPlot.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
+    <TypeScriptCompile Include="GaugePlot.ts" />
     <TypeScriptCompile Include="models.ts" />
     <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Plotter.ts" />
