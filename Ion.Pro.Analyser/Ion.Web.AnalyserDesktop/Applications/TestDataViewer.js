@@ -42,7 +42,7 @@ var DataAssigner = (function () {
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
         var last = null;
-        var selectedPlot = null;
+        //let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         var _loop_1 = function (i) {
             var curPlot = senMan.plotter[i];
@@ -85,12 +85,12 @@ var DataAssigner = (function () {
                     },
                     {
                         event: "mouseenter", func: function (e) {
-                            selectedPlot.plotWindow.highlight(true);
+                            curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
                         event: "mouseleave", func: function (e) {
-                            selectedPlot.plotWindow.highlight(false);
+                            curPlot.plotWindow.highlight(false);
                         }
                     }
                 ], curPlot.plotType, "Single Plot");
@@ -126,7 +126,8 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        radio.addEventListener("input", function (e) {
+        radio.addEventListener("change", function (e) {
+            console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
                 plot.plotData = data;
                 plot.dataUpdate();
@@ -137,7 +138,8 @@ var DataAssigner = (function () {
     DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
-        checkBox.addEventListener("input", function (e) {
+        checkBox.addEventListener("change", function (e) {
+            console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, function (data) {
                     plot.plotData.push(data);
