@@ -49,6 +49,7 @@ namespace Ion.Pro.Analyser.Controllers
         public Stream BaseStream { get; private set; }
         BinaryReader reader;
         BinaryWriter writer;
+        public bool Closed { get; private set; } = false;
 
         public WebSocketClient(Stream s)
         {
@@ -59,14 +60,19 @@ namespace Ion.Pro.Analyser.Controllers
 
         public string ReadString()
         {
+            if (Closed)
+                return null;
+
+            Console.WriteLine("Read string!");
             WebSocketFrame frame = new WebSocketFrame();
             byte[] bytes = reader.ReadBytes(2);
+            Console.WriteLine("Read something!");
             if (bytes.Length == 0)
                 return null;
 
             frame.ParseFirstPart(bytes);
 
-            
+
             if (frame.PayloadLength == 126)
             {
                 byte[] data = reader.ReadBytes(2);
@@ -85,7 +91,21 @@ namespace Ion.Pro.Analyser.Controllers
 
             frame.ParsePayload(reader.ReadBytes(frame.PayloadLength));
             Console.WriteLine($"Received frame: {frame.OpCode} {frame.PayloadLength} {frame.Masked} { frame.Fin}");
+
+            if (frame.OpCode == 0x08)
+            {
+                this.Close();
+            }
+
             return Encoding.Default.GetString(frame.Data);
+        }
+
+        public void Close()
+        {
+            WebSocketFrame frame = WebSocketFrame.CreateCloseFrame();
+            writer.Write(frame.GetBytes(false));
+            this.Closed = true;
+            this.BaseStream.Close();
         }
 
         public void WriteString(string v)
@@ -117,6 +137,18 @@ namespace Ion.Pro.Analyser.Controllers
             return frame;
         }
 
+        public static WebSocketFrame CreateCloseFrame()
+        {
+            WebSocketFrame frame = new WebSocketFrame()
+            {
+                Fin = true,
+                OpCode = 0x08,
+                Masked = false,
+                Data = new byte[0],
+                PayloadLength = 0,
+            };
+            return frame;
+        }
        
         /// <summary>
         /// Parses the two first bytes of the header, to be able to know if it should read in more length or not

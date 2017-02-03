@@ -35,11 +35,18 @@ namespace Ion.Pro.Analyser
             ConnectedClients.Add(client);
             client.Id = NodeId++;
             client.ComBus = this;
+            Console.WriteLine($"Registerd client: {client.Id} {client.Name} type: {client.GetType().Name}");
         }
 
         public void SendMessage(ComMessage message)
         {
             Console.WriteLine("Sending Message over Combus: " + message.MessageId + " from: " + message.NodeId + " to: " + message.DestinationId);
+            if (message.Data == null && message.Path == null && message.Status == 0)
+            {
+                Console.WriteLine("Detecting empty message, not sending it");
+                return;
+            }
+                
             foreach (ComBusClient client in ConnectedClients)
             {
                 if (message.NodeId != client.Id)
@@ -48,11 +55,18 @@ namespace Ion.Pro.Analyser
                 }
             }
         }
+
+        public void DeregisterClient(ComBusClient client)
+        {
+            ConnectedClients.Remove(client);
+            Console.WriteLine($"Deregisterd client: {client.Id} {client.Name} type: {client.GetType().Name}");
+        }
     }
 
     public interface IComBus
     {
         void SendMessage(ComMessage message);
+        void DeregisterClient(ComBusClient webSocketComBusClient);
     }
 
     public class ComMessage
@@ -90,17 +104,27 @@ namespace Ion.Pro.Analyser
     {
         public abstract string ReadString();
         public abstract void WriteString(string s);
+        public bool Closed { get; protected set; } = false;
 
         protected async Task StartReceiving()
         {
-            while (true)
+            while (!this.Closed)
             {
                 string request = await Task.Run(() => this.ReadString());
-                JSONObject jso = JSONObject.Parse(request);
-                ComMessage message = jso.ToObject<ComMessage>();
-                message.NodeId = this.Id;
-                this.ComBus.SendMessage(message);
-                Console.WriteLine($"This is a test message: {message.MessageId}: {message.Path} {message.Status} {message.Data}");
+                if (request == null)
+                    continue;
+                try
+                {
+                    JSONObject jso = JSONObject.Parse(request);
+                    ComMessage message = jso.ToObject<ComMessage>();
+                    message.NodeId = this.Id;
+                    this.ComBus.SendMessage(message);
+                    Console.WriteLine($"This is a test message: {message.MessageId}: {message.Path} {message.Status} {message.Data}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
 
@@ -128,18 +152,35 @@ namespace Ion.Pro.Analyser
 
         public override string ReadString()
         {
+            if (client.Closed)
+            {
+                ComBus.DeregisterClient(this);
+                this.Closed = true;
+                return null;
+            }
             return client.ReadString();
         }
 
         public override void WriteString(string s)
         {
+            if (client.Closed)
+            {
+                ComBus.DeregisterClient(this);
+                this.Closed = true;
+                return;
+            }
             this.client.WriteString(s);
         }
 
         public override void Close()
         {
+            this.client.Close();
             this.client.BaseStream.Close();
             this.rawClient.Close();
+            if (client.Closed)
+            {
+                ComBus.DeregisterClient(this);
+            }
         }
     }
 

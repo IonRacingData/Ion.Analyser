@@ -137,7 +137,7 @@ namespace Ion.Pro.Analyser
 
                 Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
 
-                bool printTimes = true;
+                bool printTimes = false;
                 if (printTimes)
                 {
                     PrintTimes(Watch);

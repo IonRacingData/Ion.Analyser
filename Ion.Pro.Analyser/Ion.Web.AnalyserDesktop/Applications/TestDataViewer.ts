@@ -51,7 +51,7 @@ class DataAssigner implements IApplication {
         let tableGen = new HtmlTableGen("table selectable");
         let senMan: SensorManager = kernel.senMan;
         let last: HTMLElement = null;
-        let selectedPlot: IPlot = null;
+        //let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.plotter.length; i++) {
             let curPlot = senMan.plotter[i];
@@ -102,13 +102,13 @@ class DataAssigner implements IApplication {
                     {
                         event: "mouseenter", func: (e: Event) =>
                         {
-                            selectedPlot.plotWindow.highlight(true);
+                            curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
                         event: "mouseleave", func: (e: Event) =>
                         {
-                            selectedPlot.plotWindow.highlight(false);
+                            curPlot.plotWindow.highlight(false);
                         }
                     }
                 ], curPlot.plotType, "Single Plot");
@@ -152,7 +152,8 @@ class DataAssigner implements IApplication {
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        radio.addEventListener("input", (e: Event) => {
+        radio.addEventListener("change", (e: Event) => {
+            console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
                 plot.plotData = data;
                 plot.dataUpdate();
@@ -164,7 +165,8 @@ class DataAssigner implements IApplication {
     createMultiSensor(plot: IMultiPlot, sensor: SensorInformation): HTMLElement {
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
-        checkBox.addEventListener("input", (e: Event) => {
+        checkBox.addEventListener("change", (e: Event) => {
+            console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
                     plot.plotData.push(data);
