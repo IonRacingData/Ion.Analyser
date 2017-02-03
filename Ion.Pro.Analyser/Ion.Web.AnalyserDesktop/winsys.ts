@@ -76,7 +76,7 @@
     }
 
     mouseUp(e: MouseEvent): void {
-        console.log(e);
+        //console.log(e);
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });

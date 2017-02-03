@@ -86,16 +86,16 @@
     }
 
     loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
-        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
+        /*kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
             let realData = this.convertToSensorPackage(data.Sensors);
             console.log(realData);
             this.dataCache[id] = realData;
             callback(realData);
-        });
-        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
+        });*/
+        requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
-        });*/
+        });
     }
 
     convertToSensorPackage(str: string): ISensorPackage[] {
