@@ -1,10 +1,23 @@
 ﻿class PlotData {
     ID: number;
-
+    color: string;
     points: Point[];
 
     constructor(p: Point[]) {
         this.points = p;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        
+        do {
+            r = Math.floor(Math.random() * 256);
+            g = Math.floor(Math.random() * 256);
+            b = Math.floor(Math.random() * 256);
+        }
+        while (r + g + b < 255 + 128);
+
+        this.color = "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";        
+
     }
 
     getClosest(p: Point): Point {

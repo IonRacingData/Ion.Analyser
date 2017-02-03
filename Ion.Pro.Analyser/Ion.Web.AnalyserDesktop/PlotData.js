@@ -1,6 +1,15 @@
 var PlotData = (function () {
     function PlotData(p) {
         this.points = p;
+        var r = 0;
+        var g = 0;
+        var b = 0;
+        do {
+            r = Math.floor(Math.random() * 256);
+            g = Math.floor(Math.random() * 256);
+            b = Math.floor(Math.random() * 256);
+        } while (r + g + b < 255 + 128);
+        this.color = "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";
     }
     PlotData.prototype.getClosest = function (p) {
         return this.points[this.getIndexOf(p)];

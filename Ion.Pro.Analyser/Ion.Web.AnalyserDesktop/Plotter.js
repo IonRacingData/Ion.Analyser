@@ -8,10 +8,10 @@ var Plotter = (function () {
         this.isMarking = false;
         this.displayGrid = true;
         this.stickyAxes = true;
-        this.backgroundColor = "white";
+        this.backgroundColor = "rgb(45, 45, 45)";
         this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "black"; // "black";
-        this.mainColor = "black";
+        this.axisColor = "white"; //"black"; // "black";
+        this.mainColor = "white";
         this.data = data;
     }
     Plotter.prototype.generatePlot = function () {
@@ -159,7 +159,8 @@ var Plotter = (function () {
     };
     Plotter.prototype.draw = function () {
         this.ctxMain.clear();
-        this.ctxMain.beginPath();
+        this.drawXAxis();
+        this.drawYAxis();
         for (var d = 0; d < this.data.length; d++) {
             var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
@@ -170,6 +171,8 @@ var Plotter = (function () {
             var points = this.data[d].points;
             var drawPoint = 0;
             var checkPoint = lastPoint;
+            this.ctxMain.beginPath();
+            this.ctxMain.strokeStyle = this.data[d].color;
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
@@ -183,10 +186,10 @@ var Plotter = (function () {
                 }
                 lastPoint = point;
             }
+            this.ctxMain.ctx.closePath();
             this.ctxMain.stroke();
+            this.ctxMain.fillStyle = this.mainColor;
         }
-        this.drawXAxis();
-        this.drawYAxis();
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
             var pointString = this.selectedPoint.toString();

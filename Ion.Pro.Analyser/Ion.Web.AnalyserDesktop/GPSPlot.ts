@@ -12,6 +12,7 @@
     padding: number;
     absWidth: number;
     absHeight: number;
+    color: string = "white";
 
     constructor(d: GPSPlotData) {
         this.posData = d;
@@ -56,6 +57,7 @@
 
         this.ctxMain.clear();
         this.ctxMain.beginPath();
+        this.ctxMain.strokeStyle = this.color;
         this.findMinMax();
         
         this.rescale();

@@ -2,6 +2,7 @@ var GPSPlot = (function () {
     function GPSPlot(d) {
         this.movePoint = new Point(0, 0);
         this.scalePoint = new Point(1, 1);
+        this.color = "white";
         this.posData = d;
     }
     // temp
@@ -37,6 +38,7 @@ var GPSPlot = (function () {
         var offsetY;
         this.ctxMain.clear();
         this.ctxMain.beginPath();
+        this.ctxMain.strokeStyle = this.color;
         this.findMinMax();
         this.rescale();
         this.rescale();

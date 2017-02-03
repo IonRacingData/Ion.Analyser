@@ -55,7 +55,7 @@ namespace Ion.Pro.Analyser
                 store.LoadSensorInformation();
                 store.AddRange(reader.ReadPackages());
                 store.AddRange(gpsReader.ReadPackages());
-                store.AddRange(gpsReader2.ReadPackages());
+                //store.AddRange(gpsReader2.ReadPackages());
                 store.AddRange(gpsReader3.ReadPackages());
             }
             else
