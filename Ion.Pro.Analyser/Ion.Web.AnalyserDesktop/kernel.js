@@ -32,6 +32,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Plot", new Launcher(PlotterTester, "Plot Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
+    kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
 }
 var Launcher = (function () {

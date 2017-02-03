@@ -295,9 +295,31 @@ class GPSPlotTester implements IApplication {
     update(p: Point3D[]): void {
         this.testData = new GPSPlotData(p);
         this.plot.update(this.testData);
+    }   
+    
+}
+
+class LabelTester {
+    application: Application;
+    window: AppWindow;
+    label: LabelController;
+    val: number = 0;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.window.content.style.overflow = "hidden";
+        this.label = new LabelController(this.window.width, this.window.height);
+        let div = this.label.generate();
+        this.window.content.appendChild(div);
+        this.label.setValue(this.val);
+
+        div.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY;
+            this.label.setValue(this.val);
+        });
+
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.label.setSize(this.window.width, this.window.height);
+        });
     }
-
-    
-
-    
 }

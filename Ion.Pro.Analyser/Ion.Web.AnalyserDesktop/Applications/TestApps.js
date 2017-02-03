@@ -255,4 +255,26 @@ var GPSPlotTester = (function () {
     };
     return GPSPlotTester;
 }());
+var LabelTester = (function () {
+    function LabelTester() {
+        this.val = 0;
+    }
+    LabelTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.window.content.style.overflow = "hidden";
+        this.label = new LabelController(this.window.width, this.window.height);
+        var div = this.label.generate();
+        this.window.content.appendChild(div);
+        this.label.setValue(this.val);
+        div.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY;
+            _this.label.setValue(_this.val);
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.label.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    return LabelTester;
+}());
 //# sourceMappingURL=TestApps.js.map
