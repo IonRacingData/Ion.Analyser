@@ -173,34 +173,39 @@ var TestViewer = (function () {
 }());
 var MeterTester = (function () {
     function MeterTester() {
+        this.val = 0;
     }
     MeterTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
-        this.drawMeter();
-        var slider = document.createElement("input");
+        /*
+        let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
         slider.setAttribute("value", "0");
         this.window.content.appendChild(slider);
-        slider.addEventListener("input", function () {
-            var val = slider.value;
-            _this.meterPlot.drawNeedle(parseInt(val));
+        slider.addEventListener("input", () => {
+            let val = slider.value;
+            this.gauge.drawNeedle(parseInt(val));
+        });*/
+        this.drawMeter();
+        this.gauge.setSize(this.window.width, this.window.height);
+        this.gauge.wrapper.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY / 3;
+            _this.val = _this.val > 100 ? 100 : _this.val;
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.gauge.drawNeedle(_this.val);
         });
         this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.meterPlot.setSize(_this.window.width);
+            _this.gauge.setSize(_this.window.width, _this.window.height);
             //this.plotter.draw();
         });
     };
     MeterTester.prototype.drawMeter = function () {
-        this.window.content.innerHTML = "";
-        var labels = [];
-        for (var i = 0; i <= 280; i += 20) {
-            labels.push(i.toString());
-        }
-        this.meterPlot = new MeterPlot(250, labels);
-        this.window.content.appendChild(this.meterPlot.generate());
+        //this.window.content.innerHTML = "";                        
+        this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
+        this.window.content.appendChild(this.gauge.generate());
     };
     return MeterTester;
 }());

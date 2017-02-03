@@ -203,13 +203,14 @@ class TestViewer implements IApplication {
 class MeterTester implements IApplication {
     application: Application;
     window: AppWindow;
-    meterPlot: MeterPlot;
+    gauge: GaugePlot;
+    val: number = 0;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
-        this.drawMeter();
-        
+
+        /*
         let slider = document.createElement("input");
         slider.setAttribute("type", "range");
         //slider.style.marginTop = "200px";
@@ -217,23 +218,31 @@ class MeterTester implements IApplication {
         this.window.content.appendChild(slider);
         slider.addEventListener("input", () => {
             let val = slider.value;
-            this.meterPlot.drawNeedle(parseInt(val));
+            this.gauge.drawNeedle(parseInt(val));
+        });*/                
+
+        this.drawMeter();
+        this.gauge.setSize(this.window.width, this.window.height);
+
+        this.gauge.wrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 3;
+            this.val = this.val > 100 ? 100 : this.val;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.gauge.drawNeedle(this.val);            
         });
+
+        
         this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
-            this.meterPlot.setSize(this.window.width);
+            this.gauge.setSize(this.window.width, this.window.height);
             //this.plotter.draw();
         });
 
     }
 
     drawMeter() {
-        this.window.content.innerHTML = "";                
-        let labels = [];
-        for (let i = 0; i <= 280; i += 20) {
-            labels.push(i.toString());                        
-        }
-        this.meterPlot = new MeterPlot(250, labels);
-        this.window.content.appendChild(this.meterPlot.generate());
+        //this.window.content.innerHTML = "";                        
+        this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
+        this.window.content.appendChild(this.gauge.generate());
     }
 }
 

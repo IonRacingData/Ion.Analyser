@@ -22,6 +22,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app-style-dark.css" />
     <Content Include="app-style.css" />
     <Content Include="app.css" />
     <Content Include="Grid\grid.js" />
@@ -54,7 +55,7 @@
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
-    <TypeScriptCompile Include="MeterPlot.ts" />
+    <TypeScriptCompile Include="GaugePlot.ts" />
     <TypeScriptCompile Include="models.ts" />
     <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Plotter.ts" />

@@ -369,6 +369,10 @@ var ContextFixer = (function () {
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }
+    ContextFixer.prototype.fill = function () {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fill();
+    };
     ContextFixer.prototype.moveTo = function (x, y) {
         var newX = Math.floor(x) + 0.5;
         var newY = Math.floor(y) + 0.5;

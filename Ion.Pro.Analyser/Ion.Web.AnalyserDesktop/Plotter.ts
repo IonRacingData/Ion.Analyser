@@ -466,6 +466,10 @@ class ContextFixer {
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }
+    fill() {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fill();
+    }
     moveTo(x: number, y: number): void {
         var newX: number = Math.floor(x) + 0.5;
         var newY: number = Math.floor(y) + 0.5;

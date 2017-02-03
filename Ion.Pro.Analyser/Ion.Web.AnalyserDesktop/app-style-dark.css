@@ -23,6 +23,11 @@
     position: relative;
 }
 
+.window-body {
+    background-color: #2d2d2d;
+    color: white;
+}
+
 .window-overlay {
     position: absolute;
     left: 0px;
@@ -115,7 +120,7 @@ span.table-resize{
 }
 
 .gauge-plot {
-    color: darkgray;
+    color: lightgray;
     /* needle color */    
-    border-color: yellow;
+    border-color: red;
 }
