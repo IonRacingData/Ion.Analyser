@@ -1,7 +1,7 @@
 var Plotter = (function () {
     function Plotter(data) {
         this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(1, 1);
+        this.scalePoint = new Point(0.01, 1);
         this.isDragging = false;
         this.zoomSpeed = 1.1;
         this.selectedPoint = null;
@@ -26,46 +26,12 @@ var Plotter = (function () {
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
-        this.wrapper.addEventListener("mousedown", function (e) {
-            e.preventDefault();
-            _this.mouseMod = new Point(_this.movePoint.x - e.layerX, _this.movePoint.y - (_this.height - e.layerY));
-            _this.mouseDown = true;
-            if (e.altKey) {
-                _this.isMarking = true;
-                var mousePoint = _this.getMousePoint(e);
-                _this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-                console.log(_this.marking.firstPoint);
-            }
-        });
-        this.wrapper.addEventListener("mousemove", function (e) {
-            if (_this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
-                if (_this.isMarking) {
-                    _this.marking.secondPoint = _this.getMousePoint(e);
-                    _this.drawMarking();
-                }
-                else {
-                    _this.isDragging = true;
-                    _this.movePoint = new Point(e.layerX + _this.mouseMod.x, (_this.height - e.layerY) + _this.mouseMod.y);
-                    _this.draw();
-                }
-            }
-        });
-        this.wrapper.addEventListener("mouseup", function (e) {
-            _this.wrapper.focus();
-            _this.mouseDown = false;
-            if (_this.isDragging) {
-                _this.isDragging = false;
-            }
-            else if (_this.isMarking) {
-                _this.isMarking = false;
-                if (_this.marking.width !== 0 && _this.marking.height !== 0) {
-                    _this.zoomByMarking();
-                }
-            }
-            else {
-                _this.selectPoint(e);
-            }
-        });
+        this.wrapper.addEventListener("mousedown", function (e) { return _this.wrapper_mouseDown(e); });
+        this.wrapper.addEventListener("mousemove", function (e) { return _this.wrapper_mouseMove(e); });
+        this.wrapper.addEventListener("mouseup", function (e) { return _this.wrapper_mouseUp(e); });
+        this.wrapper.addEventListener("touchstart", function (e) { return _this.wrapper_touchStart(e); });
+        this.wrapper.addEventListener("touchmove", function (e) { return _this.wrapper_touchMove(e); });
+        this.wrapper.addEventListener("touchend", function (e) { return _this.wrapper_touchEnd(e); });
         this.wrapper.addEventListener("mouseleave", function () {
             _this.mouseDown = false;
             _this.isMarking = false;
@@ -91,6 +57,88 @@ var Plotter = (function () {
         this.draw();
         return this.wrapper;
     };
+    Plotter.prototype.wrapper_mouseDown = function (e) {
+        e.preventDefault();
+        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint = this.getMousePoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    };
+    Plotter.prototype.wrapper_mouseMove = function (e) {
+        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getMousePoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
+                this.draw();
+            }
+        }
+    };
+    Plotter.prototype.wrapper_mouseUp = function (e) {
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getMousePoint(e));
+        }
+    };
+    Plotter.prototype.wrapper_touchStart = function (e) {
+        e.preventDefault();
+        console.log(e);
+        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint = this.getTouchPoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    };
+    Plotter.prototype.wrapper_touchMove = function (e) {
+        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getTouchPoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
+                this.draw();
+            }
+        }
+    };
+    Plotter.prototype.wrapper_touchEnd = function (e) {
+        console.log(e);
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getTouchPoint(e));
+        }
+    };
     Plotter.prototype.drawMarking = function () {
         this.ctxMarking.clear();
         this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
@@ -105,7 +153,8 @@ var Plotter = (function () {
         this.draw();
     };
     Plotter.prototype.selectPoint = function (e) {
-        var mp = this.getMousePoint(e);
+        //var mp: Point = this.getMousePoint(e);
+        var mp = e;
         var p = null;
         for (var i = 0; i < this.data.length; i++) {
             var closest = this.data[i].getClosest(this.getRelative(mp));
@@ -156,6 +205,12 @@ var Plotter = (function () {
     };
     Plotter.prototype.getMousePoint = function (e) {
         return new Point(e.layerX, e.layerY);
+    };
+    Plotter.prototype.getTouchPoint = function (e) {
+        if (e.touches.length > 0)
+            return new Point(e.touches[0].clientX, e.touches[0].clientY);
+        else
+            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     };
     Plotter.prototype.draw = function () {
         this.ctxMain.clear();

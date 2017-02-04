@@ -204,16 +204,19 @@ class TestViewer implements IApplication {
     }
 }
 
-class GaugeTester implements IApplication {
+class GaugeTester implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
     gauge: GaugePlot;
     val: number = 0;
+    plotType: string = "GaugePlot";
+    plotWindow: AppWindow;
+    plotData: PlotData;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
-
+        kernel.senMan.register(this);
         /*
         let slider = document.createElement("input");
         slider.setAttribute("type", "range");
@@ -247,6 +250,10 @@ class GaugeTester implements IApplication {
         //this.window.content.innerHTML = "";                        
         this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
         this.window.content.appendChild(this.gauge.generate());
+    }
+
+    dataUpdate() {
+        this.gauge.setValue((this.plotData.points[this.plotData.points.length - 1].y / 200) * 100);
     }
 }
 

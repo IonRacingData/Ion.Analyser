@@ -8,7 +8,7 @@
     height: number;
     data: PlotData[];
     movePoint = new Point(50, 50);
-    scalePoint = new Point(1, 1);
+    scalePoint = new Point(0.01, 1);
     mouseMod: Point;
     mouseDown: boolean;
     isDragging = false;
@@ -40,48 +40,14 @@
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
 
-        this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
-            e.preventDefault();
-            this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
-            this.mouseDown = true;
-            if (e.altKey) {
-                this.isMarking = true;
-                var mousePoint: Point = this.getMousePoint(e);
-                this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-                console.log(this.marking.firstPoint);
-            }
-        });
-        this.wrapper.addEventListener("mousemove", (e: MouseEvent) => {
-            if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
-                if (this.isMarking) {
-                    this.marking.secondPoint = this.getMousePoint(e);
-                    this.drawMarking();
-                }
-                else {
-                    this.isDragging = true;
-                    this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
-                    this.draw();
-                }
+        this.wrapper.addEventListener("mousedown", (e: MouseEvent) => this.wrapper_mouseDown(e));
+        this.wrapper.addEventListener("mousemove", (e: MouseEvent) => this.wrapper_mouseMove(e));
+        this.wrapper.addEventListener("mouseup", (e: MouseEvent) => this.wrapper_mouseUp(e));
 
-            }
+        this.wrapper.addEventListener("touchstart", (e: TouchEvent) => this.wrapper_touchStart(e));
+        this.wrapper.addEventListener("touchmove", (e: TouchEvent) => this.wrapper_touchMove(e));
+        this.wrapper.addEventListener("touchend", (e: TouchEvent) => this.wrapper_touchEnd(e));
 
-        });
-        this.wrapper.addEventListener("mouseup", (e: MouseEvent) => {
-            this.wrapper.focus();
-            this.mouseDown = false;
-            if (this.isDragging) {
-                this.isDragging = false;
-            }
-            else if (this.isMarking) {
-                this.isMarking = false;
-                if (this.marking.width !== 0 && this.marking.height !== 0) {
-                    this.zoomByMarking();
-                }
-            }
-            else {
-                this.selectPoint(e);
-            }
-        });
         this.wrapper.addEventListener("mouseleave", () => {
             this.mouseDown = false;
             this.isMarking = false;
@@ -107,6 +73,96 @@
         return this.wrapper;
     }
 
+    private wrapper_mouseDown(e: MouseEvent): void {
+        e.preventDefault();
+        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint: Point = this.getMousePoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    }
+
+    private wrapper_mouseMove(e: MouseEvent): void {
+        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getMousePoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
+                this.draw();
+            }
+
+        }
+    }
+
+    private wrapper_mouseUp(e: MouseEvent): void {
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getMousePoint(e));
+        }
+    }
+
+    private wrapper_touchStart(e: TouchEvent): void {
+        e.preventDefault();
+        console.log(e);
+        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint: Point = this.getTouchPoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    }
+
+    private wrapper_touchMove(e: TouchEvent): void {
+        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getTouchPoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
+                this.draw();
+            }
+
+        }
+    }
+
+    private wrapper_touchEnd(e: TouchEvent): void {
+        console.log(e);
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getTouchPoint(e));
+        }
+    }
+
     drawMarking(): void {
         this.ctxMarking.clear();
         this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
@@ -122,8 +178,9 @@
         this.draw();
     }
 
-    selectPoint(e: MouseEvent): void {
-        var mp: Point = this.getMousePoint(e);
+    selectPoint(e: Point): void {
+        //var mp: Point = this.getMousePoint(e);
+        var mp = e;
         var p: Point = null;
         for (let i: number = 0; i < this.data.length; i++) {
             var closest: Point = this.data[i].getClosest(this.getRelative(mp));
@@ -180,6 +237,13 @@
 
     getMousePoint(e: MouseEvent): Point {
         return new Point(e.layerX, e.layerY);
+    }
+
+    getTouchPoint(e: TouchEvent): Point {
+        if (e.touches.length > 0)
+            return new Point(e.touches[0].clientX, e.touches[0].clientY);
+        else
+            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }
 
     draw(): void {

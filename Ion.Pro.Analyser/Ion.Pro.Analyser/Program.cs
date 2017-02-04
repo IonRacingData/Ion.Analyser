@@ -21,7 +21,7 @@ namespace Ion.Pro.Analyser
     class Program
     {        
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.OffLine;
+        static RunMode runMode = RunMode.LiveTest;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
@@ -90,14 +90,21 @@ namespace Ion.Pro.Analyser
             ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
             SensorPackage[] all = reader.ReadPackages();
             int i = 0;
-            while (i < all.Length - 1)
+            try
             {
-                //Console.WriteLine("Tick");
-                SensorPackage pack = all[i];
-                SensorDataStore.GetDefault().AddLive(pack);
-                //Console.WriteLine("At: " + pack.TimeStamp.ToString());
-                System.Threading.Thread.Sleep((int)(all[i+1].TimeStamp - all[i].TimeStamp));
-                i++;
+                while (i < all.Length - 1)
+                {
+                    //Console.WriteLine("Tick");
+                    SensorPackage pack = all[i];
+                    SensorDataStore.GetDefault().AddLive(pack);
+                    //Console.WriteLine("At: " + pack.TimeStamp.ToString());
+                    System.Threading.Thread.Sleep((int)(all[i + 1].TimeStamp - all[i].TimeStamp));
+                    i++;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
@@ -302,7 +309,7 @@ namespace Ion.Pro.Analyser
         {
             DateTime current = DateTime.Now;
             SendCache.Add(e.Package);
-            if ((current - lastSend).TotalMilliseconds > 30)
+            if ((current - lastSend).TotalMilliseconds > 100)
             {
                 List<byte> allBytes = new List<byte>();
                 foreach (SensorPackage sp in SendCache)

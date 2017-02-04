@@ -177,11 +177,13 @@ var TestViewer = (function () {
 var GaugeTester = (function () {
     function GaugeTester() {
         this.val = 0;
+        this.plotType = "GaugePlot";
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
         this.window.content.style.overflow = "hidden";
+        kernel.senMan.register(this);
         /*
         let slider = document.createElement("input");
         slider.setAttribute("type", "range");
@@ -209,6 +211,9 @@ var GaugeTester = (function () {
         //this.window.content.innerHTML = "";                        
         this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
         this.window.content.appendChild(this.gauge.generate());
+    };
+    GaugeTester.prototype.dataUpdate = function () {
+        this.gauge.setValue((this.plotData.points[this.plotData.points.length - 1].y / 200) * 100);
     };
     return GaugeTester;
 }());
