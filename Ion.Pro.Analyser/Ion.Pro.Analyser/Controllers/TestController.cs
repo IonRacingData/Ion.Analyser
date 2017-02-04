@@ -21,7 +21,12 @@ namespace Ion.Pro.Analyser.Controllers
 
         public IActionResult GetIds()
         {
-            return Json(SensorDataStore.GetDefault().GetIds().OrderBy(x => x));
+            return Json(SensorDataStore.GetDefault().GetIds().OrderBy(x => x.ID));
+        }
+
+        public IActionResult GetLoadedIds()
+        {
+            return Json(SensorDataStore.GetDefault().GetLoadedIds().OrderBy(x => x));
         }
 
         public IActionResult GetData(string number)

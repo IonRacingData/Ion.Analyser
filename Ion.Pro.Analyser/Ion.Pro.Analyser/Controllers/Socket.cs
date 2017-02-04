@@ -30,14 +30,15 @@ namespace Ion.Pro.Analyser.Controllers
 
         public void HandleSocket(HttpContext context)
         {
-            WebSocketClient client = new WebSocketClient(context.Wrapper.Client.GetStream());
+            ComBus.GetDefault().RegisterClient(new WebSocketComBusClient(context.Wrapper.Client));
+            //WebSocketClient client = new WebSocketClient(context.Wrapper.Client.GetStream());
 
-            while (true)
+            /*while (true)
             {
                 Console.WriteLine(client.ReadString());
 
                 client.WriteString("Cool :D");
-            }
+            }*/
         }
 
         
@@ -48,6 +49,7 @@ namespace Ion.Pro.Analyser.Controllers
         public Stream BaseStream { get; private set; }
         BinaryReader reader;
         BinaryWriter writer;
+        public bool Closed { get; private set; } = false;
 
         public WebSocketClient(Stream s)
         {
@@ -58,14 +60,19 @@ namespace Ion.Pro.Analyser.Controllers
 
         public string ReadString()
         {
+            if (Closed)
+                return null;
+
+            Console.WriteLine("Read string!");
             WebSocketFrame frame = new WebSocketFrame();
             byte[] bytes = reader.ReadBytes(2);
+            Console.WriteLine("Read something!");
             if (bytes.Length == 0)
                 return null;
 
             frame.ParseFirstPart(bytes);
 
-            
+
             if (frame.PayloadLength == 126)
             {
                 byte[] data = reader.ReadBytes(2);
@@ -83,13 +90,27 @@ namespace Ion.Pro.Analyser.Controllers
             }
 
             frame.ParsePayload(reader.ReadBytes(frame.PayloadLength));
+            Console.WriteLine($"Received frame: {frame.OpCode} {frame.PayloadLength} {frame.Masked} { frame.Fin}");
+
+            if (frame.OpCode == 0x08)
+            {
+                this.Close();
+            }
 
             return Encoding.Default.GetString(frame.Data);
         }
 
+        public void Close()
+        {
+            WebSocketFrame frame = WebSocketFrame.CreateCloseFrame();
+            writer.Write(frame.GetBytes(false));
+            this.Closed = true;
+            this.BaseStream.Close();
+        }
+
         public void WriteString(string v)
         {
-            WebSocketFrame frame = WebSocketFrame.CreateFrame("Cool :D");
+            WebSocketFrame frame = WebSocketFrame.CreateFrame(v);
             writer.Write(frame.GetBytes(false));
         }
     }
@@ -116,6 +137,18 @@ namespace Ion.Pro.Analyser.Controllers
             return frame;
         }
 
+        public static WebSocketFrame CreateCloseFrame()
+        {
+            WebSocketFrame frame = new WebSocketFrame()
+            {
+                Fin = true,
+                OpCode = 0x08,
+                Masked = false,
+                Data = new byte[0],
+                PayloadLength = 0,
+            };
+            return frame;
+        }
        
         /// <summary>
         /// Parses the two first bytes of the header, to be able to know if it should read in more length or not
@@ -150,7 +183,28 @@ namespace Ion.Pro.Analyser.Controllers
         {
             List<byte> returnData = new List<byte>();
             returnData.Add((byte)((Fin ? 1 : 0) << 0x7 | OpCode));
-            returnData.Add((byte)((Masked ? 1 : 0) << 0x7 | PayloadLength));
+            if (PayloadLength > ushort.MaxValue)
+            {
+                returnData.Add((byte)((Masked ? 1 : 0) << 0x7 | 127));
+                returnData.Add(0);
+                returnData.Add(0);
+                returnData.Add(0);
+                returnData.Add(0);
+                returnData.Add((byte)(PayloadLength >> 24));
+                returnData.Add((byte)(PayloadLength >> 16));
+                returnData.Add((byte)(PayloadLength >> 8));
+                returnData.Add((byte)(PayloadLength));
+            }
+            else if (PayloadLength > sbyte.MaxValue)
+            {
+                returnData.Add((byte)((Masked ? 1 : 0) << 0x7 | 126));
+                returnData.Add((byte)(PayloadLength >> 8));
+                returnData.Add((byte)(PayloadLength));
+            }
+            else
+            {
+                returnData.Add((byte)((Masked ? 1 : 0) << 0x7 | PayloadLength));
+            }
 
             if (Masked)
             {

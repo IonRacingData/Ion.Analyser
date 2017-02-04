@@ -48,7 +48,7 @@ var WindowManager = (function () {
         }
     };
     WindowManager.prototype.mouseUp = function (e) {
-        console.log(e);
+        //console.log(e);
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
@@ -93,7 +93,7 @@ var WindowManager = (function () {
         this.reorderWindows();
     };
     WindowManager.prototype.closeWindow = function (appWindow) {
-        this.body.removeChild(appWindow.handle);
+        appWindow.handle.parentElement.removeChild(appWindow.handle);
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
@@ -101,20 +101,28 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.reorderWindows = function () {
         for (var i = 0; i < this.order.length; i++) {
-            this.order[i].handle.style.zIndex = ((i + 1) * 100).toString();
+            if (this.order[i].topMost) {
+                this.order[i].handle.style.zIndex = ((i + 1) * 100000).toString();
+            }
+            else {
+                this.order[i].handle.style.zIndex = ((i + 1) * 100).toString();
+            }
         }
     };
     WindowManager.prototype.addEventListener = function (type, listner) {
         this.eventManager.addEventListener(type, listner);
     };
+    WindowManager.prototype.removeEventListener = function (type, listener) {
+        this.eventManager.removeEventListener(type, listener);
+    };
     WindowManager.prototype.raiseEvent = function (type, data) {
         this.eventManager.raiseEvent(type, data);
     };
-    WindowManager.event_globalDrag = "globalDrag";
-    WindowManager.event_globalUp = "globalUp;";
-    WindowManager.event_windowOpen = "windowOpen";
-    WindowManager.event_windowSelect = "windowSelect";
-    WindowManager.event_windowClose = "windowClose";
     return WindowManager;
 }());
+WindowManager.event_globalDrag = "globalDrag";
+WindowManager.event_globalUp = "globalUp;";
+WindowManager.event_windowOpen = "windowOpen";
+WindowManager.event_windowSelect = "windowSelect";
+WindowManager.event_windowClose = "windowClose";
 //# sourceMappingURL=winsys.js.map

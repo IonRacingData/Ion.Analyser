@@ -8,10 +8,10 @@ var Plotter = (function () {
         this.isMarking = false;
         this.displayGrid = true;
         this.stickyAxes = true;
-        this.backgroundColor = "white";
+        this.backgroundColor = "rgb(45, 45, 45)";
         this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "black"; //"black";
-        this.mainColor = "black";
+        this.axisColor = "white"; //"black"; // "black";
+        this.mainColor = "white";
         this.data = data;
     }
     Plotter.prototype.generatePlot = function () {
@@ -38,7 +38,7 @@ var Plotter = (function () {
             }
         });
         this.wrapper.addEventListener("mousemove", function (e) {
-            if (_this.mouseDown && (e.movementX != 0 || e.movementY != 0)) {
+            if (_this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
                 if (_this.isMarking) {
                     _this.marking.secondPoint = _this.getMousePoint(e);
                     _this.drawMarking();
@@ -53,15 +53,18 @@ var Plotter = (function () {
         this.wrapper.addEventListener("mouseup", function (e) {
             _this.wrapper.focus();
             _this.mouseDown = false;
-            if (_this.isDragging)
+            if (_this.isDragging) {
                 _this.isDragging = false;
+            }
             else if (_this.isMarking) {
                 _this.isMarking = false;
-                if (_this.marking.width !== 0 && _this.marking.height !== 0)
+                if (_this.marking.width !== 0 && _this.marking.height !== 0) {
                     _this.zoomByMarking();
+                }
             }
-            else
+            else {
                 _this.selectPoint(e);
+            }
         });
         this.wrapper.addEventListener("mouseleave", function () {
             _this.mouseDown = false;
@@ -106,13 +109,16 @@ var Plotter = (function () {
         var p = null;
         for (var i = 0; i < this.data.length; i++) {
             var closest = this.data[i].getClosest(this.getRelative(mp));
-            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10)
+            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                 p = closest;
+            }
         }
-        if (p !== null)
+        if (p !== null) {
             this.selectedPoint = p;
-        else
+        }
+        else {
             this.selectedPoint = null;
+        }
         this.draw();
     };
     Plotter.prototype.zoom = function (e) {
@@ -120,20 +126,24 @@ var Plotter = (function () {
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
         if (e.deltaY < 0) {
-            if (e.ctrlKey == true)
+            if (e.ctrlKey === true) {
                 this.scalePoint.x *= this.zoomSpeed;
-            else if (e.shiftKey == true)
+            }
+            else if (e.shiftKey === true) {
                 this.scalePoint.y *= this.zoomSpeed;
+            }
             else {
                 this.scalePoint.x *= this.zoomSpeed;
                 this.scalePoint.y *= this.zoomSpeed;
             }
         }
         else {
-            if (e.ctrlKey == true)
+            if (e.ctrlKey === true) {
                 this.scalePoint.x /= this.zoomSpeed;
-            else if (e.shiftKey == true)
+            }
+            else if (e.shiftKey === true) {
                 this.scalePoint.y /= this.zoomSpeed;
+            }
             else {
                 this.scalePoint.x /= this.zoomSpeed;
                 this.scalePoint.y /= this.zoomSpeed;
@@ -149,16 +159,20 @@ var Plotter = (function () {
     };
     Plotter.prototype.draw = function () {
         this.ctxMain.clear();
-        this.ctxMain.beginPath();
+        this.drawXAxis();
+        this.drawYAxis();
         for (var d = 0; d < this.data.length; d++) {
             var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
-            if (firstVisibleIdx > 0)
+            if (firstVisibleIdx > 0) {
                 firstVisibleIdx--;
+            }
             var lastPoint = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
             var totalLength = this.data[d].points.length;
             var points = this.data[d].points;
             var drawPoint = 0;
             var checkPoint = lastPoint;
+            this.ctxMain.beginPath();
+            this.ctxMain.strokeStyle = this.data[d].color;
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
@@ -172,10 +186,10 @@ var Plotter = (function () {
                 }
                 lastPoint = point;
             }
+            this.ctxMain.ctx.closePath();
             this.ctxMain.stroke();
+            this.ctxMain.fillStyle = this.mainColor;
         }
-        this.drawXAxis();
-        this.drawYAxis();
         if (this.selectedPoint !== null) {
             var abs = this.getAbsolute(this.selectedPoint);
             var pointString = this.selectedPoint.toString();
@@ -194,10 +208,12 @@ var Plotter = (function () {
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
         var y = origo.y;
         if (!visible && this.stickyAxes) {
-            if (origo.y < 0)
+            if (origo.y < 0) {
                 y = 0;
-            else
+            }
+            else {
                 y = this.height;
+            }
         }
         this.ctxMain.beginPath();
         this.ctxMain.moveTo(0, y);
@@ -214,7 +230,7 @@ var Plotter = (function () {
             var number;
             var numWidth;
             var numOffset;
-            if (Math.abs(transformer.x).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
+            if (Math.abs(transformer.x).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "     0";
             }
             else if (Math.abs(scale) > 5) {
@@ -250,10 +266,12 @@ var Plotter = (function () {
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
         var x = origo.x;
         if (!visible && this.stickyAxes) {
-            if (origo.x < 0)
+            if (origo.x < 0) {
                 x = 0;
-            else
+            }
+            else {
                 x = this.width;
+            }
         }
         this.ctxMain.beginPath();
         this.ctxMain.moveTo(x, 0);
@@ -270,7 +288,7 @@ var Plotter = (function () {
             var number;
             var numWidth;
             var numOffset;
-            if (Math.abs(transformer.y).toFixed(decimalPlaces) == (0).toFixed(decimalPlaces)) {
+            if (Math.abs(transformer.y).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "";
             }
             else if (Math.abs(scale) > 5) {
@@ -300,9 +318,7 @@ var Plotter = (function () {
         this.ctxMain.fillStyle = this.mainColor;
     };
     Plotter.prototype.calculateSteps = function (scaling) {
-        var log10 = function log10(val) {
-            return Math.log(val) / Math.LN10;
-        };
+        var log10 = function (val) { return Math.log(val) / Math.LN10; };
         var maxR = 100 / scaling;
         var scale = Math.floor(log10(maxR));
         var step = Math.floor(maxR / Math.pow(10, scale));
@@ -317,8 +333,9 @@ var Plotter = (function () {
         }
         var newstep = step * Math.pow(10, scale) * scaling;
         var decimalPlaces = 0;
-        if (scale < 0)
+        if (scale < 0) {
             decimalPlaces = scale * -1;
+        }
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
     };
     Plotter.prototype.getRelative = function (p) {
@@ -355,6 +372,10 @@ var ContextFixer = (function () {
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }
+    ContextFixer.prototype.fill = function () {
+        this.ctx.fillStyle = this.fillStyle;
+        this.ctx.fill();
+    };
     ContextFixer.prototype.moveTo = function (x, y) {
         var newX = Math.floor(x) + 0.5;
         var newY = Math.floor(y) + 0.5;
@@ -383,9 +404,14 @@ var ContextFixer = (function () {
     };
     ContextFixer.prototype.fillRect = function (x, y, width, height) {
         this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fillRect(x, y, width, height);
+        var newX = Math.floor(x);
+        var newY = Math.floor(y);
+        var newWidth = Math.floor(width);
+        var newHeight = Math.floor(height);
+        this.ctx.fillRect(newX, newY, newWidth, newHeight);
     };
     ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
+        radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     };
     ContextFixer.prototype.measureText = function (text) {

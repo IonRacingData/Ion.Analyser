@@ -23,12 +23,15 @@ var ApplicationManager = (function () {
     ApplicationManager.prototype.addEventListener = function (type, listener) {
         this.eventManager.addEventListener(type, listener);
     };
+    ApplicationManager.prototype.removeEventListener = function (type, listener) {
+        this.eventManager.removeEventListener(type, listener);
+    };
     ApplicationManager.prototype.closeApplication = function (app) {
         this.appList.splice(this.appList.indexOf(app), 1);
         this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     };
-    ApplicationManager.event_appLaunch = "appLaunch";
-    ApplicationManager.event_appClose = "appClose";
     return ApplicationManager;
 }());
+ApplicationManager.event_appLaunch = "appLaunch";
+ApplicationManager.event_appClose = "appClose";
 //# sourceMappingURL=appsys.js.map

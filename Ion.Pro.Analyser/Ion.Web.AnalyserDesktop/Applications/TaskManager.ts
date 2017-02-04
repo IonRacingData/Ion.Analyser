@@ -3,16 +3,28 @@
     mainWindow: AppWindow;
     infoWindows: AppWindow[] = [];
     mk: HtmlHelper;
+    eh: EventHandler = new EventHandler();
 
     main() {
         this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        kernel.winMan.addEventListener(WindowManager.event_windowOpen, () => this.draw());
-        kernel.winMan.addEventListener(WindowManager.event_windowClose, () => this.draw());
-        kernel.appMan.addEventListener(ApplicationManager.event_appLaunch, () => this.draw());
-        kernel.appMan.addEventListener(ApplicationManager.event_appClose, () => this.draw());
+        this.addEvents(this.eh);
         this.draw();
     }
 
+    addEvents(eh: EventHandler) {
+
+        eh.on(kernel.winMan, WindowManager.event_windowOpen, () => this.draw());
+        eh.on(kernel.winMan, WindowManager.event_windowClose, () => this.draw());
+
+        eh.on(kernel.appMan, ApplicationManager.event_appLaunch, () => this.draw());
+        eh.on(kernel.appMan, ApplicationManager.event_appClose, () => this.draw());
+
+        eh.on(this.mainWindow, AppWindow.event_close, () => this.close());
+    }
+
+    close() {
+        this.eh.close();
+    }
 
     draw() {
         this.mainWindow.content.innerHTML = "";

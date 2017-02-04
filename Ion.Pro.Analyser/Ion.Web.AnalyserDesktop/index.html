@@ -5,8 +5,12 @@
     <meta charset="utf-8" />
     <title>Ion Analyser</title>
     <link rel="stylesheet" href="/app.css" type="text/css" />
+    <!--<link rel="stylesheet" href="/app-style.css" title="app-style" type="text/css" />-->
+    <link rel="stylesheet" href="/app-style-dark.css" title="app-style" type="text/css" />
+    
     <link rel="stylesheet" href="/window.css" type="text/css" />
-    <link rel="stylesheet" href="/Grid/main.css" type="text/css" />
+    <link rel="stylesheet" href="/Grid/grid.css" type="text/css" />
+    <link rel="stylesheet" href="/Grid/grid-style.css" type="text/css" />
 
 
     <script src="/app.js"></script>
@@ -23,13 +27,16 @@
     <script src="/models.js"></script>
     <script src="/Plotter.js"></script>
     <script src="/PlotData.js"></script>
-    <script src="/MeterPlot.js"></script>
+    <script src="/GaugePlot.js"></script>
+    <script src="/GPSPlot.js"></script>
     <script src="/sensys.js"></script>
     <script src="/TaskBar.js"></script>
     <script src="/winsys.js"></script>
+    
 
     <script src="/Applications/TaskManager.js"></script>
     <script src="/Applications/TestApps.js"></script>
+    <script src="/Applications/TestDataViewer.js"></script>
 
     <script src="/Grid/gridsystem.js"></script>
         
@@ -58,7 +65,10 @@
                     <span class="window-control-exit">&#x2715;</span>
                 </div>
             </div>
-            <div class="window-body"></div>
+            <div class="window-body-wrapper">
+                <div class="window-body"></div>
+                <div class="window-overlay"></div>
+            </div>
         </div>
         <!--<div class="window-right"></div>
         <div class="window-bottom-left"></div>

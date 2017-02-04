@@ -76,7 +76,11 @@ namespace NicroWare.Pro.DmxControl.JSON
             {
                 char currentChar = Get();
                 if (currentChar == '\\')
+                {
+                    currentChar = Get();
+                    builder.Append(currentChar);
                     continue;
+                }
                 else if (currentChar == '"')
                 {
                     break;
@@ -329,8 +333,21 @@ namespace NicroWare.Pro.DmxControl.JSON
 
         private static object GetObjectValue(double num, Type t)
         {
+
             if (doubleFixer.ContainsKey(t))
                 return doubleFixer[t](num);
+            else if (t.IsEnum)
+            {
+                Type subt = Enum.GetUnderlyingType(t);
+                if (doubleFixer.ContainsKey(subt))
+                {
+                    return Enum.ToObject(t, doubleFixer[subt](num));
+                }
+                else
+                {
+                    throw new NotFiniteNumberException("num is not a number");
+                }
+            }
             else
                 throw new NotFiniteNumberException("num is not a number");
         }
@@ -398,7 +415,7 @@ namespace NicroWare.Pro.DmxControl.JSON
 
         public override void ToJsonString(StringBuilder builder)
         {
-            builder.Append("\"" + StringValue.Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\"", "'") + "\"");
+            builder.Append("\"" + StringValue.Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\"", "\\\"") + "\"");
         }
 
         public static JSONString ToEnumString(Enum e)
@@ -553,6 +570,14 @@ namespace NicroWare.Pro.DmxControl.JSON
             char curChar = doc.Peek();
             while (true)
             {
+                if (curChar == '/' && doc.Peek() == '/')
+                {
+                    while (curChar != '\n')
+                    {
+                        curChar = doc.Get();
+                    }
+                    curChar = doc.NextNonWhiteSpace();
+                }
                 if (curChar == '"')
                 {
                     JSONField jsonField = (JSONField)new JSONField().Parse(doc);
@@ -609,6 +634,14 @@ namespace NicroWare.Pro.DmxControl.JSON
             char c = doc.Peek();
             while (true)
             {
+                if (c == '/' && doc.Peek() == '/')
+                {
+                    while (c != '\n')
+                    {
+                        c = doc.Get();
+                    }
+                    c = doc.NextNonWhiteSpace();
+                }
                 if (c == ']')
                     break;
                 Nodes.Add(JSONObject.ParseNodeStart(c, doc));

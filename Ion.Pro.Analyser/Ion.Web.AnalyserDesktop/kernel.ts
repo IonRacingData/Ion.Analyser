@@ -14,8 +14,10 @@ function startUp() {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: new SensorManager()
+        senMan: null
     };
+
+    kernel.senMan = new SensorManager();
 
     kernel.senMan.setGlobal(841);
 
@@ -50,12 +52,21 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Car", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Car", new Launcher(PlotViewer, "Plot Viewer"));
 
+    kernel.appMan.registerApplication("Data", new Launcher(TestDataViewer, "Test Viewer"));
+    kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
+
     kernel.appMan.registerApplication("Plot", new Launcher(PlotterTester, "Plot Tester"));
-    kernel.appMan.registerApplication("Plot", new Launcher(MeterTester, "MeterPlot Tester"));
+    kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
+    kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
 
     kernel.appMan.registerApplication("Dash", new Launcher(DashboardTester, "Dashboard Tester"));
 
     kernel.appMan.registerApplication("Administration", new Launcher(TaskManager, "Task Manager"));
+}
+
+interface EventTarget extends IEventManager
+{
+
 }
 
 interface HTMLElement {

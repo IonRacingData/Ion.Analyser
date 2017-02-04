@@ -1,17 +1,20 @@
-﻿class AppWindow {
+﻿class AppWindow implements IEventManager {
     app: Application;
     title: string;
     handle: HTMLElement;
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
-    eventMan: EventManager = new EventManager();
+    topMost: boolean = false;
 
+    eventMan: EventManager = new EventManager();
 
     static event_move = "move";
     static event_resize = "resize";
     static event_minimize = "minimize";
     static event_maximize = "maximize";
+
+    static event_close = "close";
 
     x: number;
     y: number;
@@ -35,6 +38,7 @@
 
     constructor(app: Application) {
         this.app = app;
+
         var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
 
@@ -66,6 +70,14 @@
     setTitle(title: string): void {
         this.title = title;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
+    }
+
+    addEventListener(type: string, listener: any) {
+        this.eventMan.addEventListener(type, listener);
+    }
+
+    removeEventListener(type: string, listener: any) {
+        this.eventMan.removeEventListener(type, listener);
     }
 
 
@@ -116,6 +128,11 @@
 
     close_click(e: MouseEvent): void {
         e.stopPropagation();
+        this.close();
+    }
+
+    close() {
+        this.onClose();
         this.app.onClose();
         this.winMan.closeWindow(this);
     }
@@ -127,6 +144,10 @@
 
     onMove(): void {
         this.eventMan.raiseEvent(AppWindow.event_move, null);
+    }
+
+    onClose(): void {
+        this.eventMan.raiseEvent(AppWindow.event_close, null);
     }
 
     
@@ -191,7 +212,10 @@
         this.changeStateTo(WindowState.TILED);
     }
 
-    
+    recalculateSize() {
+        this.width = this.content.clientWidth;
+        this.height = this.content.clientHeight;
+    }
 
     setPos(x: number, y: number, storePos: boolean = true): void {
         var outerBoxMargin: number = 8;
@@ -224,6 +248,10 @@
 
 
     setSize(width: number, height: number, storeSize: boolean = true): void {
+        /*if (width < 230)
+            width = 230;
+        if (height < 150)
+            height = 150;*/
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
@@ -236,13 +264,20 @@
     }    
 
     setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
-        this.sizeHandle.style.width = (width + this.deltaX).toString() + "px";
-        this.sizeHandle.style.height = (height + this.deltaY).toString() + "px";
-        this.width = width + this.deltaX;
-        this.height = height + this.deltaY;
+        let newWidth = width + this.deltaX;
+        let newHeight = height + this.deltaY;
+
+        if (newWidth < 230)
+            newWidth = 230;
+        if (newHeight < 150)
+            newHeight = 150;
+        this.sizeHandle.style.width = (newWidth).toString() + "px";
+        this.sizeHandle.style.height = (newHeight).toString() + "px";
+        this.width = newWidth;
+        this.height = newHeight;
         if (storeSize) {
-            this.storeWidth = width + this.deltaX;
-            this.storeHeight = height + this.deltaY;
+            this.storeWidth = newWidth;
+            this.storeHeight = newHeight;
         }
         this.onResize();
     }
@@ -259,10 +294,12 @@
         this.setSize(this.width, this.height, false);
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
-        this.sizeHandle.parentElement.style.width = null;
-        this.sizeHandle.parentElement.style.height = null;
-        this.sizeHandle.parentElement.parentElement.style.width = null;
-        this.sizeHandle.parentElement.parentElement.style.height = null;
+        let curHandle = this.sizeHandle.parentElement
+        for (let i = 0; i < 3; i++) {
+            curHandle.style.width = null;
+            curHandle.style.height = null;
+            curHandle = curHandle.parentElement;
+        }
     }
 
     restorePos(): void {
@@ -271,14 +308,15 @@
     }
 
     removeSize(): void {
-        this.sizeHandle.style.width = "100%";
-        this.sizeHandle.style.height = "100%";
-        this.sizeHandle.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.width = "100%";
-        this.sizeHandle.parentElement.parentElement.style.height = "100%";
-        this.sizeHandle.parentElement.parentElement.style.padding = "0";
-        
+        let curHandle = this.sizeHandle;
+        for (let i = 0; i < 4; i++) {
+            curHandle.style.width = "100%";
+            curHandle.style.height = "100%";
+            if (i == 3)
+                break;
+            curHandle = curHandle.parentElement;
+        }
+        curHandle.style.padding = "0";
     }
 
     removeHeader() {
@@ -296,23 +334,40 @@
 
     changeWindowMode(mode: WindowMode): void {
         switch (mode) {
-            case WindowMode.BORDERLESS:
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
+                this.recalculateSize();
+                this.onResize();
+                break;
+            case WindowMode.BORDERLESS:
+                this.removeHeader();
+                this.onResize();
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
+                this.onResize();
                 break;
+        }
+    }
+
+    highlight(highlight: boolean) {
+        if (highlight) {
+            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "block";
+        }
+        else {
+            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "none";
         }
     }
 }
 
 enum WindowMode {
     WINDOWED = 0,
-    BORDERLESS = 1,
+    BORDERLESSFULL = 1,
+    BORDERLESS = 2,
 }
 
 enum TileState {
