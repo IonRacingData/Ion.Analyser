@@ -296,27 +296,4 @@ class GPSPlotTester implements IApplication {
         this.testData = new GPSPlotData(p);
         this.plot.update(this.testData);
     }
-<<<<<<< HEAD
-}
-
-class DashboardTester implements IApplication {
-    application: Application;
-    window: AppWindow;
-    meterPlot: MeterPlot;
-
-    main() {
-        this.window = kernel.winMan.createWindow(this.application, "Dashboard Tester");
-        this.window.content.style.overflow = "hidden";
-        this.drawBarGraph();
-    }
-
-    drawBarGraph() {
-        //Fredrik was here.
-    }
-=======
-
-    
-
-    
->>>>>>> master
 }

@@ -11,7 +11,7 @@ var DataViewer = (function () {
         var mk = new HtmlHelper();
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
-        var _loop_1 = function () {
+        var _loop_1 = function() {
             var curValue = data[i];
             table.addRow([
                 {
@@ -254,18 +254,5 @@ var GPSPlotTester = (function () {
         this.plot.update(this.testData);
     };
     return GPSPlotTester;
-}());
-var DashboardTester = (function () {
-    function DashboardTester() {
-    }
-    DashboardTester.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Dashboard Tester");
-        this.window.content.style.overflow = "hidden";
-        this.drawBarGraph();
-    };
-    DashboardTester.prototype.drawBarGraph = function () {
-        //Fredrik was here.
-    };
-    return DashboardTester;
 }());
 //# sourceMappingURL=TestApps.js.map
