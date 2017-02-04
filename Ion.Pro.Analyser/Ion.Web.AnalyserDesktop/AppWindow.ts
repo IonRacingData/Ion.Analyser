@@ -55,6 +55,9 @@
         headerBar.addEventListener("mousedown", (e: MouseEvent) => this.header_mouseDown(e));
         resize.addEventListener("mousedown", (e: MouseEvent) => this.resize_mouseDown(e));
 
+        (<HTMLDivElement>headerBar).addEventListener("touchstart", (e: TouchEvent) => this.header_touchStart(e));
+        (<HTMLDivElement>resize).addEventListener("touchstart", (e: TouchEvent) => this.resize_touchStart(e));
+
         min.addEventListener("mousedown", (e: MouseEvent) => this.minimize_click(e));
         max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
         exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
@@ -96,11 +99,34 @@
         this.winMan.selectWindow(this);
     }
 
+    header_touchStart(e: TouchEvent): void {
+        e.stopPropagation();
+        //e.preventDefault();
+        console.log(e);
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+
+        this.winMan.dragging = true;
+        this.winMan.selectWindow(this);
+    }
+
     resize_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
         this.deltaY = this.height - e.pageY;
+        // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
+
+        this.winMan.resizing = true;
+        this.winMan.selectWindow(this);
+    }
+
+    resize_touchStart(e: TouchEvent): void {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("resizeDown");
+        this.deltaX = this.width - e.targetTouches[0].pageX;
+        this.deltaY = this.height - e.targetTouches[0].pageY;
         // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
 
         this.winMan.resizing = true;

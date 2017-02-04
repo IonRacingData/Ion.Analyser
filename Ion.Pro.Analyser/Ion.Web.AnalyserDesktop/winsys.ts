@@ -33,6 +33,8 @@
 
         window.addEventListener("mousemove", (e: MouseEvent) => this.mouseMove(e));
         window.addEventListener("mouseup", (e: MouseEvent) => this.mouseUp(e));
+        window.addEventListener("touchmove", (e: TouchEvent) => this.touchMove(e));
+        window.addEventListener("touchend", (e: TouchEvent) => this.touchEnd(e));
         this.eventManager = new EventManager();
         //this.addEventListener = this.eventManager.addEventListener;
         //this.addEventListener2 = this.eventManager.addEventListener;
@@ -40,43 +42,57 @@
     }
 
     mouseMove(e: MouseEvent): void {
-        if (this.dragging) {
+        this.handleMouseMoveing(e.pageX, e.pageY, e);
+    }
 
-            this.activeWindow.setRelativePos(e.pageX, e.pageY);
+    touchMove(e: TouchEvent): void {
+        e.preventDefault();
+        this.handleMouseMoveing(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
+    }
+
+    handleMouseMoveing(x: number, y: number, e: Event): void {
+        if (this.dragging) {
+            this.activeWindow.setRelativePos(x, y);
             var tileZone: number = this.tileZone;
             var topBar: number = this.topBar;
 
-            if (e.pageX < tileZone && e.pageY < topBar + tileZone) {
+            if (x < tileZone && y < topBar + tileZone) {
                 this.activeWindow.tile(TileState.TOPLEFT);
             }
-            else if (e.pageX < tileZone && e.pageY > window.innerHeight - tileZone) {
+            else if (x < tileZone && y > window.innerHeight - tileZone) {
                 this.activeWindow.tile(TileState.BOTTOMLEFT);
             }
-            else if (e.pageX > window.innerWidth - tileZone && e.pageY < topBar + tileZone) {
+            else if (x > window.innerWidth - tileZone && y < topBar + tileZone) {
                 this.activeWindow.tile(TileState.TOPRIGHT);
             }
-            else if (e.pageX > window.innerWidth - tileZone && e.pageY > window.innerHeight - tileZone) {
+            else if (x > window.innerWidth - tileZone && y > window.innerHeight - tileZone) {
                 this.activeWindow.tile(TileState.BOTTOMRIGHT);
             }
-            else if (e.pageY < topBar + tileZone) {
+            else if (y < topBar + tileZone) {
                 this.activeWindow.maximize();
             }
-            else if (e.pageX < tileZone) {
+            else if (x < tileZone) {
                 this.activeWindow.tile(TileState.LEFT);
             }
-            else if (e.pageX > window.innerWidth - tileZone) {
+            else if (x > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
 
             this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
         }
         else if (this.resizing) {
-            this.activeWindow.setRelativeSize(e.pageX, e.pageY);
+            this.activeWindow.setRelativeSize(x, y);
         }
     }
 
     mouseUp(e: MouseEvent): void {
         //console.log(e);
+        this.dragging = false;
+        this.resizing = false;
+        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
+    }
+
+    touchEnd(e: TouchEvent): void {
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });

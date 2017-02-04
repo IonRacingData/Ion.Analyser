@@ -16,6 +16,8 @@ var AppWindow = (function () {
         var resize = handle.getElementsByClassName("window-bottom-right")[0];
         headerBar.addEventListener("mousedown", function (e) { return _this.header_mouseDown(e); });
         resize.addEventListener("mousedown", function (e) { return _this.resize_mouseDown(e); });
+        headerBar.addEventListener("touchstart", function (e) { return _this.header_touchStart(e); });
+        resize.addEventListener("touchstart", function (e) { return _this.resize_touchStart(e); });
         min.addEventListener("mousedown", function (e) { return _this.minimize_click(e); });
         max.addEventListener("mousedown", function (e) { return _this.maximize_click(e); });
         exit.addEventListener("mousedown", function (e) { return _this.close_click(e); });
@@ -46,11 +48,30 @@ var AppWindow = (function () {
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
     };
+    AppWindow.prototype.header_touchStart = function (e) {
+        e.stopPropagation();
+        //e.preventDefault();
+        console.log(e);
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+        this.winMan.dragging = true;
+        this.winMan.selectWindow(this);
+    };
     AppWindow.prototype.resize_mouseDown = function (e) {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
         this.deltaY = this.height - e.pageY;
+        // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
+        this.winMan.resizing = true;
+        this.winMan.selectWindow(this);
+    };
+    AppWindow.prototype.resize_touchStart = function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("resizeDown");
+        this.deltaX = this.width - e.targetTouches[0].pageX;
+        this.deltaY = this.height - e.targetTouches[0].pageY;
         // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
         this.winMan.resizing = true;
         this.winMan.selectWindow(this);

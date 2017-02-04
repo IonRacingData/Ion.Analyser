@@ -68,7 +68,10 @@ namespace Ion.Pro.Analyser.Controllers
             byte[] bytes = reader.ReadBytes(2);
             Console.WriteLine("Read something!");
             if (bytes.Length == 0)
+            {
+                this.Close();
                 return null;
+            }
 
             frame.ParseFirstPart(bytes);
 
