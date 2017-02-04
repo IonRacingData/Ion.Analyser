@@ -44,7 +44,7 @@ var DataAssigner = (function () {
         var last = null;
         //let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
-        var _loop_1 = function (i) {
+        var _loop_1 = function(i) {
             var curPlot = senMan.plotter[i];
             var isMulti = Array.isArray(curPlot.plotData);
             if (isMulti) {

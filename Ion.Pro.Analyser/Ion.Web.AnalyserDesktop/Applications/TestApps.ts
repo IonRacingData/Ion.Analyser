@@ -297,3 +297,22 @@ class GPSPlotTester implements IApplication {
         this.plot.update(this.testData);
     }
 }
+
+class SegmentsTester implements IApplication {
+    application: Application;
+    window: AppWindow;
+    segment: Segment;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "Segment Tester");
+        this.window.content.style.overflow = "hidden";
+    }
+
+    draw(p: Point3D[]): void {
+        
+    }
+
+    update(p: Point3D[]): void {
+        
+    }
+}

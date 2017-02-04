@@ -158,10 +158,10 @@ var SensorManager = (function () {
         this.plotter.push(plotter);
         this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     };
+    SensorManager.event_globalPlot = "globalPlot";
+    SensorManager.event_registerIPlot = "registerIPlot";
     return SensorManager;
 }());
-SensorManager.event_globalPlot = "globalPlot";
-SensorManager.event_registerIPlot = "registerIPlot";
 var Multicallback = (function () {
     function Multicallback(count, callback) {
         this.responses = [];

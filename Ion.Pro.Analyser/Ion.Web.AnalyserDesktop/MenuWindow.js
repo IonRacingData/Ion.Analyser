@@ -1,8 +1,8 @@
 var MenuWindow = (function () {
     function MenuWindow(container, x, y) {
+        var _this = this;
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
-        var _this = this;
         this.items = [];
         this.categories = [];
         this.container = container;
@@ -57,7 +57,7 @@ var MenuWindow = (function () {
     MenuWindow.prototype.makeList = function (list, mk) {
         var _this = this;
         var ul = mk.tag("ul");
-        var _loop_1 = function (i) {
+        var _loop_1 = function(i) {
             var curItem = list[i];
             var li = mk.tag("li");
             var a = mk.tag("a", "", [{

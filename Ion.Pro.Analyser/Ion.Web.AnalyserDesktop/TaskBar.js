@@ -16,19 +16,19 @@ var Applet = (function () {
 var WindowList = (function (_super) {
     __extends(WindowList, _super);
     function WindowList(content) {
-        var _this = _super.call(this) || this;
-        _this.content = content;
-        var winMan = _this.winMan = kernel.winMan;
+        var _this = this;
+        _super.call(this);
+        this.content = content;
+        var winMan = this.winMan = kernel.winMan;
         winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programOpen(); });
         winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.programClose(); });
         winMan.addEventListener(WindowManager.event_windowSelect, function () { return _this.programSelect(); });
-        _this.addWindows();
-        return _this;
+        this.addWindows();
     }
     WindowList.prototype.addWindows = function () {
         var _this = this;
         this.content.innerHTML = "";
-        var _loop_1 = function (i) {
+        var _loop_1 = function(i) {
             var cur = this_1.winMan.windows[i];
             var ctrl = document.createElement("div");
             ctrl.innerHTML = cur.title;
@@ -61,12 +61,12 @@ var WindowList = (function (_super) {
 var MainMenu = (function (_super) {
     __extends(MainMenu, _super);
     function MainMenu(content) {
-        var _this = _super.call(this) || this;
-        _this.content = content;
+        var _this = this;
+        _super.call(this);
+        this.content = content;
         var mk = new HtmlHelper();
-        _this.content.appendChild(mk.tag("div", "taskbar-button-text", [{ event: "click", func: function (e) { return _this.click_menu(e); } }], "Menu"));
-        _this.menuHandle = new MenuWindow(document.body);
-        return _this;
+        this.content.appendChild(mk.tag("div", "taskbar-button-text", [{ event: "click", func: function (e) { return _this.click_menu(e); } }], "Menu"));
+        this.menuHandle = new MenuWindow(document.body);
     }
     MainMenu.prototype.fillMenu = function () {
         this.menuHandle.clear();

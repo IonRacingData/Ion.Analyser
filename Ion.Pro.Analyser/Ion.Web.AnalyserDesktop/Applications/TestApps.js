@@ -255,4 +255,17 @@ var GPSPlotTester = (function () {
     };
     return GPSPlotTester;
 }());
+var SegmentsTester = (function () {
+    function SegmentsTester() {
+    }
+    SegmentsTester.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Segment Tester");
+        this.window.content.style.overflow = "hidden";
+    };
+    SegmentsTester.prototype.draw = function (p) {
+    };
+    SegmentsTester.prototype.update = function (p) {
+    };
+    return SegmentsTester;
+}());
 //# sourceMappingURL=TestApps.js.map

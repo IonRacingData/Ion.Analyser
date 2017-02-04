@@ -59,6 +59,7 @@
     <TypeScriptCompile Include="models.ts" />
     <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Plotter.ts" />
+    <TypeScriptCompile Include="Segment.ts" />
     <TypeScriptCompile Include="sensys.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />
     <TypeScriptCompile Include="AppWindow.ts" />
