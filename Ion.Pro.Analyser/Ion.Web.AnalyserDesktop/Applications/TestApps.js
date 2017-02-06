@@ -282,4 +282,28 @@ var LabelTester = (function () {
     };
     return LabelTester;
 }());
+var BarTester = (function () {
+    function BarTester() {
+        this.val = 0;
+    }
+    BarTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.bar = new BarController(this.window.width, this.window.height);
+        var barWrapper = this.bar.generate();
+        this.window.content.appendChild(barWrapper);
+        this.bar.setValue(this.val);
+        barWrapper.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY / 10;
+            _this.val = _this.val > 100 ? 100 : _this.val;
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.bar.setValue(_this.val);
+        });
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.bar.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    return BarTester;
+}());
 //# sourceMappingURL=TestApps.js.map

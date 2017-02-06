@@ -128,3 +128,7 @@ span.table-resize{
     /* needle color */    
     border-color: red;
 }
+
+.bar-controller {
+    background-color: green;
+}

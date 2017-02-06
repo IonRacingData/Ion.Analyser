@@ -33,7 +33,7 @@
         this.wrapper.className = "plot-wrapper";
 
         this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
+        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);        
         this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
         this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
         this.width = this.canvas.getWidth();

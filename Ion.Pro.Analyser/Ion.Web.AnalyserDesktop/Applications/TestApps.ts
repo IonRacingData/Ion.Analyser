@@ -330,3 +330,32 @@ class LabelTester {
         });
     }
 }
+
+class BarTester {
+    application: Application;
+    window: AppWindow;
+    bar: BarController;
+    val: number = 0;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.bar = new BarController(this.window.width, this.window.height);
+        let barWrapper = this.bar.generate();
+        this.window.content.appendChild(barWrapper);
+        this.bar.setValue(this.val);
+
+        barWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 10;
+            this.val = this.val > 100 ? 100 : this.val;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.bar.setValue(this.val);
+        });
+
+        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+            this.bar.setSize(this.window.width, this.window.height);
+        });
+    }
+
+
+}

@@ -48,6 +48,7 @@
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
     <TypeScriptCompile Include="appsys.ts" />
     <TypeScriptCompile Include="comsys.ts" />
+    <TypeScriptCompile Include="Controllers\BarController.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="GoogleChart.ts" />
     <TypeScriptCompile Include="Controllers\GPSPlot.ts" />

@@ -18,8 +18,8 @@
         });
     }
 
-    generate() {
-        return this.wrapper;
+    generate(): HTMLDivElement {
+        return <HTMLDivElement>this.wrapper;
     }
 
     setValue(value: number) {
