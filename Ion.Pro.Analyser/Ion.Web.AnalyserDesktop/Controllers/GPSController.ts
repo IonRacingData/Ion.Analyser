@@ -1,4 +1,4 @@
-﻿class GPSPlot extends CanvasController {
+﻿class GPSController extends CanvasController {
     posData: GPSPlotData;    
     ctxMain: ContextFixer;        
     relSize: IRelativeSize;
@@ -116,23 +116,6 @@
 
         this.movePoint = this.movePoint.sub(sec);        
     }
-
-    getRelative(p: Point): Point {
-        var moved: Point = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        var scaled: Point = moved.divide(this.scalePoint);
-        return scaled;
-    }
-
-    getAbsolute(p: Point): Point {
-        var scaled: Point = p.multiply(this.scalePoint);
-        var moved: Point = scaled.add(this.movePoint);        
-        return new Point(moved.x, this.height - moved.y);
-    }
-
-    getMousePoint(e: MouseEvent): Point {
-        return new Point(e.layerX, e.layerY);
-    }
-
 }
 
 interface IRelativeSize {   

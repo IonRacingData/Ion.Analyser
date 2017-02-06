@@ -1,82 +1,89 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var LineChartController = (function (_super) {
-    __extends(LineChartController, _super);
-    function LineChartController(data) {
-        var _this = _super.call(this) || this;
-        _this.isDragging = false;
-        _this.zoomSpeed = 1.1;
-        _this.selectedPoint = null;
-        _this.isMarking = false;
-        _this.displayGrid = true;
-        _this.stickyAxes = true;
-        _this.backgroundColor = "rgb(45, 45, 45)";
-        _this.gridColor = "rgba(100,100,100,0.3)";
-        _this.axisColor = "white"; //"black"; // "black";
-        _this.mainColor = "white";
-        _this.data = data;
-        _this.movePoint = new Point(50, 50);
-        _this.scalePoint = new Point(0.01, 1);
-        return _this;
+﻿class LineChartController extends CanvasController{        
+    private data: PlotData[];
+    private ctxMain: ContextFixer;
+    private ctxMarking: ContextFixer;
+    private ctxBackground: ContextFixer;        
+    private mouseMod: Point;
+    private mouseDown: boolean;
+    private isDragging = false;
+    private zoomSpeed: number = 1.1;
+    private selectedPoint: Point = null;
+    private isMarking = false;
+    private marking: IMarking;
+    private displayGrid = true;
+    private stickyAxes = true;
+    private backgroundColor = "rgb(45, 45, 45)";
+    private gridColor = "rgba(100,100,100,0.3)";
+    private axisColor = "white";//"black"; // "black";
+    private mainColor = "white";
+
+    constructor(data: PlotData[]) {
+        super();
+        this.data = data;
+        this.movePoint = new Point(50, 50);
+        this.scalePoint = new Point(0.01, 1);
     }
-    LineChartController.prototype.generate = function () {
-        var _this = this;
+
+    generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
+
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
-        this.wrapper.addEventListener("mousedown", function (e) { return _this.wrapper_mouseDown(e); });
-        this.wrapper.addEventListener("mousemove", function (e) { return _this.wrapper_mouseMove(e); });
-        this.wrapper.addEventListener("mouseup", function (e) { return _this.wrapper_mouseUp(e); });
-        this.wrapper.addEventListener("touchstart", function (e) { return _this.wrapper_touchStart(e); });
-        this.wrapper.addEventListener("touchmove", function (e) { return _this.wrapper_touchMove(e); });
-        this.wrapper.addEventListener("touchend", function (e) { return _this.wrapper_touchEnd(e); });
-        this.wrapper.addEventListener("mouseleave", function () {
-            _this.mouseDown = false;
-            _this.isMarking = false;
-            _this.ctxMarking.clear();
+
+        this.wrapper.addEventListener("mousedown", (e: MouseEvent) => this.wrapper_mouseDown(e));
+        this.wrapper.addEventListener("mousemove", (e: MouseEvent) => this.wrapper_mouseMove(e));
+        this.wrapper.addEventListener("mouseup", (e: MouseEvent) => this.wrapper_mouseUp(e));
+
+        this.wrapper.addEventListener("touchstart", (e: TouchEvent) => this.wrapper_touchStart(e));
+        this.wrapper.addEventListener("touchmove", (e: TouchEvent) => this.wrapper_touchMove(e));
+        this.wrapper.addEventListener("touchend", (e: TouchEvent) => this.wrapper_touchEnd(e));
+
+        this.wrapper.addEventListener("mouseleave", () => {
+            this.mouseDown = false;
+            this.isMarking = false;
+            this.ctxMarking.clear();
         });
-        this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
-        this.wrapper.addEventListener("keydown", function (e) {
+        this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
+        this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             console.log("key pressed");
             if (e.key === "g") {
-                _this.displayGrid = _this.displayGrid === true ? false : true;
-                _this.draw();
-            }
-            else if (e.key === "r") {
-                _this.scalePoint = new Point(1, 1);
-                _this.movePoint = new Point(50, 50);
-                _this.draw();
-            }
-            else if (e.key === "a") {
-                _this.stickyAxes = _this.stickyAxes === true ? false : true;
-                _this.draw();
+                this.displayGrid = this.displayGrid === true ? false : true;
+                this.draw();
+            } else if (e.key === "r") {
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                this.draw();
+            } else if (e.key === "a") {
+                this.stickyAxes = this.stickyAxes === true ? false : true;
+                this.draw();
             }
         });
+
         this.draw();
         return this.wrapper;
-    };
-    LineChartController.prototype.wrapper_mouseDown = function (e) {
+    }
+
+    private wrapper_mouseDown(e: MouseEvent): void {
         e.preventDefault();
         this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
         this.mouseDown = true;
         if (e.altKey) {
             this.isMarking = true;
-            var mousePoint = this.getMousePoint(e);
+            var mousePoint: Point = this.getMousePoint(e);
             this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
             console.log(this.marking.firstPoint);
         }
-    };
-    LineChartController.prototype.wrapper_mouseMove = function (e) {
+    }
+
+    private wrapper_mouseMove(e: MouseEvent): void {
         if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
             if (this.isMarking) {
                 this.marking.secondPoint = this.getMousePoint(e);
@@ -87,9 +94,11 @@ var LineChartController = (function (_super) {
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();
             }
+
         }
-    };
-    LineChartController.prototype.wrapper_mouseUp = function (e) {
+    }
+
+    private wrapper_mouseUp(e: MouseEvent): void {
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
@@ -104,20 +113,22 @@ var LineChartController = (function (_super) {
         else {
             this.selectPoint(this.getMousePoint(e));
         }
-    };
-    LineChartController.prototype.wrapper_touchStart = function (e) {
+    }
+
+    private wrapper_touchStart(e: TouchEvent): void {
         e.preventDefault();
         console.log(e);
         this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
         this.mouseDown = true;
         if (e.altKey) {
             this.isMarking = true;
-            var mousePoint = this.getTouchPoint(e);
+            var mousePoint: Point = this.getTouchPoint(e);
             this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
             console.log(this.marking.firstPoint);
         }
-    };
-    LineChartController.prototype.wrapper_touchMove = function (e) {
+    }
+
+    private wrapper_touchMove(e: TouchEvent): void {
         if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
             if (this.isMarking) {
                 this.marking.secondPoint = this.getTouchPoint(e);
@@ -128,9 +139,11 @@ var LineChartController = (function (_super) {
                 this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
                 this.draw();
             }
+
         }
-    };
-    LineChartController.prototype.wrapper_touchEnd = function (e) {
+    }
+
+    private wrapper_touchEnd(e: TouchEvent): void {
         console.log(e);
         this.wrapper.focus();
         this.mouseDown = false;
@@ -146,42 +159,49 @@ var LineChartController = (function (_super) {
         else {
             this.selectPoint(this.getTouchPoint(e));
         }
-    };
-    LineChartController.prototype.drawMarking = function () {
+    }
+
+    private drawMarking(): void {
         this.ctxMarking.clear();
         this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
-    };
-    LineChartController.prototype.setSize = function (width, height) {
+    }
+
+    setSize(width: number, height: number): void {
         this.width = width;
         this.height = height;
         this.canvas.setSize(width, height);
         this.draw();
-    };
-    LineChartController.prototype.selectPoint = function (e) {
+    }
+
+    private selectPoint(e: Point): void {
         //var mp: Point = this.getMousePoint(e);
         var mp = e;
-        var p = null;
-        for (var i = 0; i < this.data.length; i++) {
-            var closest = this.data[i].getClosest(this.getRelative(mp));
+        var p: Point = null;
+        for (let i: number = 0; i < this.data.length; i++) {
+            var closest: Point = this.data[i].getClosest(this.getRelative(mp));
             if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                 p = closest;
             }
         }
+
         if (p !== null) {
             this.selectedPoint = p;
         }
         else {
             this.selectedPoint = null;
         }
+
         this.draw();
-    };
-    LineChartController.prototype.zoom = function (e) {
+    }
+
+    private zoom(e: WheelEvent): void {
         e.preventDefault();
-        var mousePoint = this.getMousePoint(e);
-        var curRel = this.getRelative(mousePoint);
+        var mousePoint: Point = this.getMousePoint(e);
+        var curRel: Point = this.getRelative(mousePoint);
+
         if (e.deltaY < 0) {
             if (e.ctrlKey === true) {
                 this.scalePoint.x *= this.zoomSpeed;
@@ -206,67 +226,85 @@ var LineChartController = (function (_super) {
                 this.scalePoint.y /= this.zoomSpeed;
             }
         }
-        var newRel = this.getRelative(mousePoint);
-        var move = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
+        var newRel: Point = this.getRelative(mousePoint);
+
+        var move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
         this.movePoint = this.movePoint.add(move);
         this.draw();
-    };
-    LineChartController.prototype.getTouchPoint = function (e) {
+    }    
+
+    getTouchPoint(e: TouchEvent): Point {
         if (e.touches.length > 0)
             return new Point(e.touches[0].clientX, e.touches[0].clientY);
         else
             return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    };
-    LineChartController.prototype.draw = function () {
-        this.ctxMain.clear();
+    }
+
+    draw(): void {
+        this.ctxMain.clear();        
+
         this.drawXAxis();
         this.drawYAxis();
-        for (var d = 0; d < this.data.length; d++) {
-            var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+
+        for (var d: number = 0; d < this.data.length; d++) {
+            var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
                 firstVisibleIdx--;
             }
-            var lastPoint = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
-            var totalLength = this.data[d].points.length;
-            var points = this.data[d].points;
-            var drawPoint = 0;
-            var checkPoint = lastPoint;
+
+            var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
+            var totalLength: number = this.data[d].points.length;
+            var points: Point[] = this.data[d].points;
+            var drawPoint: number = 0;
+            var checkPoint: Point = lastPoint;
+
             this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.data[d].color;
-            for (var i = firstVisibleIdx; i < totalLength; i++) {
-                var point = this.getAbsolute(points[i]);
+
+            for (var i: number = firstVisibleIdx; i < totalLength; i++) {
+                var point: Point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
                     this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
                     this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
                     drawPoint++;
                     checkPoint = point;
                 }
+
                 if (point.x > this.width) {
                     break;
                 }
                 lastPoint = point;
             }
+
             this.ctxMain.ctx.closePath();
             this.ctxMain.stroke();
             this.ctxMain.fillStyle = this.mainColor;
         }
+
+       
+
         if (this.selectedPoint !== null) {
-            var abs = this.getAbsolute(this.selectedPoint);
-            var pointString = this.selectedPoint.toString();
+            var abs: Point = this.getAbsolute(this.selectedPoint);
+            var pointString: string = this.selectedPoint.toString();
             this.ctxMain.beginPath();
             this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
             this.ctxMain.stroke();
             this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
         }
+
         this.ctxBackground.fillStyle = this.backgroundColor;
         this.ctxBackground.fillRect(0, 0, this.width, this.height);
-    };
-    LineChartController.prototype.drawXAxis = function () {
+
+    }
+
+    private drawXAxis(): void {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
-        var origo = this.getAbsolute(new Point(0, 0));
-        var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
-        var y = origo.y;
+
+        var origo: Point = this.getAbsolute(new Point(0, 0));
+        var visible: boolean = origo.y >= 0 && origo.y <= this.height ? true : false;
+
+        var y: number = origo.y;
         if (!visible && this.stickyAxes) {
             if (origo.y < 0) {
                 y = 0;
@@ -275,21 +313,25 @@ var LineChartController = (function (_super) {
                 y = this.height;
             }
         }
+
         this.ctxMain.beginPath();
         this.ctxMain.moveTo(0, y);
         this.ctxMain.lineTo(this.width, y);
         this.ctxMain.stroke();
-        var stepping = this.calculateSteps(this.scalePoint.x);
-        var steps = stepping.steps;
-        var decimalPlaces = stepping.decimalPlaces;
-        var scale = stepping.scale;
-        for (var i = -steps; i < this.width + steps; i += steps) {
+
+        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.x);
+        var steps: number = stepping.steps;
+        var decimalPlaces: number = stepping.decimalPlaces;
+        var scale: number = stepping.scale;
+
+        for (var i: number = -steps; i < this.width + steps; i += steps) {
             this.ctxMain.beginPath();
-            var absX = i + this.movePoint.x % steps;
-            var transformer = this.getRelative(new Point(absX, y));
-            var number;
-            var numWidth;
-            var numOffset;
+            var absX: number = i + this.movePoint.x % steps;
+            var transformer: Point = this.getRelative(new Point(absX, y));
+            var number: string;
+            var numWidth: number;
+            var numOffset: number;
+
             if (Math.abs(transformer.x).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "     0";
             }
@@ -299,32 +341,39 @@ var LineChartController = (function (_super) {
             else {
                 number = transformer.x.toFixed(decimalPlaces);
             }
+
             numWidth = this.ctxMain.measureText(number);
             numOffset = y === this.height ? y - 15 : y + 15;
             this.ctxMain.fillText(number, absX - (numWidth / 2), numOffset);
+
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
+
             if (this.displayGrid) {
                 this.ctxMain.moveTo(absX, 0);
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            } /*
+            }/*
             else {
                 this.ctxMain.moveTo(absX, y);
                 this.ctxMain.lineTo(absX, y + 4);
                 this.ctxMain.stroke();
             }*/
         }
+
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
-    };
-    LineChartController.prototype.drawYAxis = function () {
+    }
+
+    private drawYAxis(): void {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
-        var origo = this.getAbsolute(new Point(0, 0));
-        var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
-        var x = origo.x;
+
+        var origo: Point = this.getAbsolute(new Point(0, 0));
+        var visible: boolean = origo.x >= 0 && origo.x <= this.width ? true : false;
+
+        var x: number = origo.x;
         if (!visible && this.stickyAxes) {
             if (origo.x < 0) {
                 x = 0;
@@ -333,21 +382,25 @@ var LineChartController = (function (_super) {
                 x = this.width;
             }
         }
+
         this.ctxMain.beginPath();
         this.ctxMain.moveTo(x, 0);
         this.ctxMain.lineTo(x, this.height);
         this.ctxMain.stroke();
-        var stepping = this.calculateSteps(this.scalePoint.y);
-        var steps = stepping.steps;
-        var decimalPlaces = stepping.decimalPlaces;
-        var scale = stepping.scale;
-        for (var i = -steps; i < this.height + steps; i += steps) {
+
+        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.y);
+        var steps: number = stepping.steps;
+        var decimalPlaces: number = stepping.decimalPlaces;
+        var scale: number = stepping.scale;
+
+        for (var i: number = -steps; i < this.height + steps; i += steps) {
             this.ctxMain.beginPath();
-            var absY = this.height - (i + this.movePoint.y % steps);
-            var transformer = this.getRelative(new Point(x, absY));
-            var number;
-            var numWidth;
-            var numOffset;
+            var absY: number = this.height - (i + this.movePoint.y % steps);
+            var transformer: Point = this.getRelative(new Point(x, absY));
+            var number: string;
+            var numWidth: number;
+            var numOffset: number;
+
             if (Math.abs(transformer.y).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "";
             }
@@ -357,31 +410,37 @@ var LineChartController = (function (_super) {
             else {
                 number = transformer.y.toFixed(decimalPlaces);
             }
+
             numWidth = this.ctxMain.measureText(number);
             numOffset = x === 0 ? x + 8 : x - (numWidth + 7);
             this.ctxMain.fillText(number, numOffset, absY + 3);
+
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
+
             if (this.displayGrid) {
                 this.ctxMain.moveTo(0, absY);
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            } /*
+            }/*
             else {
                 this.ctxMain.moveTo(origo.x, absY);
                 this.ctxMain.lineTo(origo.x - 4, absY);
                 this.ctxMain.stroke();
             }*/
         }
+
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
-    };
-    LineChartController.prototype.calculateSteps = function (scaling) {
-        var log10 = function (val) { return Math.log(val) / Math.LN10; };
-        var maxR = 100 / scaling;
-        var scale = Math.floor(log10(maxR));
-        var step = Math.floor(maxR / Math.pow(10, scale));
+    }
+
+    private calculateSteps(scaling: number): IStepInfo {
+        var log10: (val: number) => number = (val: number): number => Math.log(val) / Math.LN10;
+
+        var maxR: number = 100 / scaling;
+        var scale: number = Math.floor(log10(maxR));
+        var step: number = Math.floor(maxR / Math.pow(10, scale));
         if (step < 2) {
             step = 1;
         }
@@ -391,121 +450,158 @@ var LineChartController = (function (_super) {
         else {
             step = 5;
         }
-        var newstep = step * Math.pow(10, scale) * scaling;
-        var decimalPlaces = 0;
+        var newstep: number = step * Math.pow(10, scale) * scaling;
+        var decimalPlaces: number = 0;
         if (scale < 0) {
             decimalPlaces = scale * -1;
         }
+
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
-    };
-    LineChartController.prototype.zoomByMarking = function () {
+    }    
+
+    private zoomByMarking(): void {
         this.ctxMarking.clear();
-        var width = this.marking.width;
-        var height = this.marking.height;
-        var xRatio = this.width / width;
-        var yRatio = this.height / height;
-        var downLeft = new Point(Math.min(this.marking.firstPoint.x, this.marking.secondPoint.x), Math.max(this.marking.firstPoint.y, this.marking.secondPoint.y));
-        var first = this.getRelative(downLeft);
+
+        var width: number = this.marking.width;
+        var height: number = this.marking.height;
+        var xRatio: number = this.width / width;
+        var yRatio: number = this.height / height;
+
+        var downLeft: Point = new Point(
+            Math.min(
+                this.marking.firstPoint.x,
+                this.marking.secondPoint.x),
+            Math.max(
+                this.marking.firstPoint.y,
+                this.marking.secondPoint.y)
+        );
+
+        var first: Point = this.getRelative(downLeft);
+
         this.scalePoint.x = Math.abs(this.scalePoint.x * xRatio);
         this.scalePoint.y = Math.abs(this.scalePoint.y * yRatio);
-        var sec = this.getAbsolute(first);
+
+        var sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
+
         this.movePoint = this.movePoint.sub(sec);
+
         this.draw();
-    };
-    return LineChartController;
-}(CanvasController));
-var ContextFixer = (function () {
-    function ContextFixer(canvas) {
+    }
+}
+
+interface IStepInfo {
+    steps: number;
+    decimalPlaces: number;
+    scale: number;
+}
+
+interface IMarking {
+    firstPoint: Point;
+    secondPoint: Point;
+    width: number;
+    height: number;
+}
+
+class ContextFixer {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    fillStyle: string;
+    strokeStyle: string;
+    textAlign: string;
+    textBaseline: string;
+
+    constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }
-    ContextFixer.prototype.fill = function () {
+    fill() {
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.fill();
-    };
-    ContextFixer.prototype.moveTo = function (x, y) {
-        var newX = Math.floor(x) + 0.5;
-        var newY = Math.floor(y) + 0.5;
+    }
+    moveTo(x: number, y: number): void {
+        var newX: number = Math.floor(x) + 0.5;
+        var newY: number = Math.floor(y) + 0.5;
         this.ctx.moveTo(newX, newY);
-    };
-    ContextFixer.prototype.lineTo = function (x, y) {
-        var newX = Math.floor(x) + 0.5;
-        var newY = Math.floor(y) + 0.5;
+    }
+    lineTo(x: number, y: number): void {
+        var newX: number = Math.floor(x) + 0.5;
+        var newY: number = Math.floor(y) + 0.5;
         this.ctx.lineTo(newX, newY);
-    };
-    ContextFixer.prototype.clear = function () {
+    }
+    clear(): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    };
-    ContextFixer.prototype.beginPath = function () {
+    }
+    beginPath(): void {
         this.ctx.beginPath();
-    };
-    ContextFixer.prototype.stroke = function () {
+    }
+    stroke(): void {
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();
-    };
-    ContextFixer.prototype.fillText = function (text, x, y) {
+    }
+    fillText(text: string, x: number, y: number): void {
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.textAlign = this.textAlign;
         this.ctx.textBaseline = this.textBaseline;
         this.ctx.fillText(text, x, y);
-    };
-    ContextFixer.prototype.fillRect = function (x, y, width, height) {
+    }
+    fillRect(x: number, y: number, width: number, height: number): void {
         this.ctx.fillStyle = this.fillStyle;
-        var newX = Math.floor(x);
-        var newY = Math.floor(y);
-        var newWidth = Math.floor(width);
-        var newHeight = Math.floor(height);
+        let newX: number = Math.floor(x);
+        let newY: number = Math.floor(y);
+        let newWidth: number = Math.floor(width);
+        let newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
-    };
-    ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
+    }
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {        
         radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
-    };
-    ContextFixer.prototype.measureText = function (text) {
+    }
+    measureText(text: string): number {
         return this.ctx.measureText(text).width;
-    };
-    ContextFixer.prototype.translate = function (x, y) {
+    }
+    translate(x: number, y: number): void {
         this.ctx.translate(x, y);
-    };
-    ContextFixer.prototype.rotate = function (angle) {
+    }
+    rotate(angle: number): void {
         this.ctx.rotate(angle);
-    };
-    return ContextFixer;
-}());
-var LayeredCanvas = (function () {
-    function LayeredCanvas(wrapper) {
-        this.canvases = [];
-        this.mk = new HtmlHelper;
+    }
+}
+
+class LayeredCanvas {
+    private wrapper: HTMLElement;
+    private canvases: HTMLCanvasElement[] = [];
+    private mk: HtmlHelper = new HtmlHelper;
+
+    constructor(wrapper: HTMLElement) {
         this.wrapper = wrapper;
     }
-    LayeredCanvas.prototype.addCanvas = function () {
-        var canvas = this.mk.tag("canvas", "plot-canvas");
+
+    addCanvas(): HTMLCanvasElement {
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
         this.wrapper.appendChild(canvas);
         this.canvases.push(canvas);
         return canvas;
-    };
-    LayeredCanvas.prototype.getWidth = function () {
+    }
+
+    getWidth(): number {
         if (this.canvases.length > 0) {
             return this.canvases[0].width;
         }
         return -1;
-    };
-    LayeredCanvas.prototype.getHeight = function () {
+    }
+    getHeight(): number {
         if (this.canvases.length > 0) {
             return this.canvases[0].height;
         }
         return -1;
-    };
-    LayeredCanvas.prototype.setSize = function (width, height) {
-        for (var _i = 0, _a = this.canvases; _i < _a.length; _i++) {
-            var c = _a[_i];
+    }
+    setSize(width: number, height: number): void {
+        for (let c of this.canvases) {
             c.width = width;
             c.height = height;
         }
-    };
-    return LayeredCanvas;
-}());
-//# sourceMappingURL=Plotter.js.map
+    }
+}

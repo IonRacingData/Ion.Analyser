@@ -1,76 +1,92 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var GaugeController = (function (_super) {
-    __extends(GaugeController, _super);
-    function GaugeController(width, height, min, max, step) {
-        var _this = _super.call(this) || this;
-        _this.padding = 5;
-        _this.totalAngle = (3 * Math.PI) / 2;
-        _this.startAngle = -(3 * Math.PI) / 4;
-        _this.color = "black";
-        _this.needleColor = "black";
-        _this.percent = 0;
-        _this.size = Math.min(width, height);
-        var labels = [];
-        for (var i = min; i <= max; i += step) {
+﻿class GaugeController extends CanvasController {
+    private ctxMain: ContextFixer;
+    private ctxNeedle: ContextFixer;
+    private ctxCenter: ContextFixer;
+    private size: number;
+    private padding: number = 5;
+    private labels: string[];
+    private totalAngle: number = (3 * Math.PI) / 2;
+    private startAngle: number = -(3 * Math.PI) / 4;
+    private needle: ImageData;
+    private offsetX: number;
+    private offsetY: number;   
+    private color: string = "black";
+    private needleColor: string = "black";   
+    private percent: number = 0; 
+
+    constructor(width: number, height: number, min: number, max: number, step: number) {
+        super();
+        this.size = Math.min(width, height);
+        let labels: string[] = [];
+        for (let i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
-        _this.labels = labels;
+        this.labels = labels;
+
         // temp stylesheet thingy
-        var ss;
-        var all = document.styleSheets;
-        for (var i = 0; i < all.length; i++) {
+
+        let ss: CSSStyleSheet;
+        let all: StyleSheetList = document.styleSheets;
+        for (let i = 0; i < all.length; i++) {
             if (all[i].title === "app-style") {
-                ss = all[i];
-                var rules = ss.cssRules;
-                for (var j = 0; j < rules.length; j++) {
-                    var rule = rules[j];
+                ss = <CSSStyleSheet>all[i];
+                let rules = ss.cssRules;
+
+                for (let j = 0; j < rules.length; j++) {
+                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];                    
                     if (rule.selectorText === ".gauge-plot") {
-                        _this.color = rule.style.color;
-                        _this.needleColor = rule.style.borderColor;
+                        this.color = rule.style.color;
+                        this.needleColor = rule.style.borderColor;
                         break;
                     }
                 }
                 break;
             }
-        }
-        return _this;
+        }            
+
+        
     }
-    GaugeController.prototype.generate = function () {
+
+    generate(): HTMLElement {        
         this.wrapper = this.mk.tag("div", "plot-wrapper");
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
         this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
+
         this.setSize(this.size, this.size);
         return this.wrapper;
-    };
-    GaugeController.prototype.draw = function () {
+    }
+        
+    draw(): void {
+
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
-        var radius = this.size / 2;
+        let radius = this.size / 2;
+
         // center dot
-        this.ctxCenter.fillStyle = this.color;
+        this.ctxCenter.fillStyle = this.color;        
         this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
         //this.ctxCenter.beginPath();
         this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
-        this.ctxCenter.fill();
+        this.ctxCenter.fill();        
+
         // ring
         this.ctxMain.beginPath();
         this.ctxMain.translate(radius + this.offsetX, radius + this.offsetY);
         this.ctxMain.arc(0, 0, radius - this.padding, 3 * Math.PI / 4, Math.PI / 4);
         this.ctxMain.stroke();
         this.ctxMain.ctx.closePath();
+
         // labels
         this.ctxMain.textBaseline = "middle";
         this.ctxMain.textAlign = "center";
-        this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";
-        for (var i = 0; i < this.labels.length; i++) {
-            var increment = this.totalAngle / (this.labels.length - 1);
-            var ang = (i * increment) + this.startAngle;
+        this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";        
+
+        for (let i = 0; i < this.labels.length; i++) {
+            let increment = this.totalAngle / (this.labels.length - 1);
+            let ang = (i * increment) + this.startAngle;
+
             this.ctxMain.rotate(ang);
             this.ctxMain.translate(0, -radius * 0.8);
             this.ctxMain.rotate(-ang);
@@ -78,15 +94,21 @@ var GaugeController = (function (_super) {
             this.ctxMain.rotate(ang);
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
-        }
-        this.drawNeedle();
-    };
-    GaugeController.prototype.drawNeedle = function () {
+        }        
+
+        this.drawNeedle();     
+        
+    }                  
+
+    private drawNeedle(): void {        
+
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
-        var radius = this.size / 2;
+        let radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-        var ang = (this.percent / 100) * this.totalAngle;
+    
+        let ang = (this.percent / 100) * this.totalAngle;
+
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
@@ -94,20 +116,20 @@ var GaugeController = (function (_super) {
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
-    };
-    GaugeController.prototype.setValue = function (percent) {
+    }
+
+    setValue(percent: number): void {
         percent = percent > 100 ? 100 : percent;
         percent = percent < 0 ? 0 : percent;
         this.percent = percent;
         this.drawNeedle();
-    };
-    GaugeController.prototype.setSize = function (width, height) {
+    }
+
+    setSize(width: number, height: number): void {
         this.size = Math.min(width, height);
         this.offsetX = (width - this.size) / 2;
         this.offsetY = (height - this.size) / 2 + (height * 0.05);
-        this.canvas.setSize(width, height);
+        this.canvas.setSize(width, height);        
         this.draw();
-    };
-    return GaugeController;
-}(CanvasController));
-//# sourceMappingURL=GaugePlot.js.map
+    }
+}

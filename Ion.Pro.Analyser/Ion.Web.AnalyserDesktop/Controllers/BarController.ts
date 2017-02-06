@@ -1,27 +1,23 @@
-﻿class BarController {
-    wrapper: HTMLDivElement;
-    private bar: HTMLDivElement;
-    private width: number;
-    private height: number;
-    private percent: number;
-    private mk: HtmlHelper = new HtmlHelper;
+﻿class BarController extends SingleValueController {    
+    private bar: HTMLElement;    
 
     constructor(width: number, height: number) {
-        this.wrapper = <HTMLDivElement>this.mk.tag("div", "bar-controller-wrapper");
-        this.bar = <HTMLDivElement>this.mk.tag("div", "bar-controller");
+        super();
+        this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
+        this.bar = this.mk.tag("div", "bar-controller");
         this.wrapper.appendChild(this.bar);
         this.setSize(width, height);
     }
 
-    generate(): HTMLDivElement {        
+    generate(): HTMLElement {        
         return this.wrapper;
     }
 
     setValue(percent: number): void {
         percent = percent < 0 ? 0 : percent;
         percent = percent > 100 ? 100 : percent;
-        this.percent = percent;
-        this.bar.style.height = this.percent + "%";
+        this.value = percent;
+        this.bar.style.height = this.value + "%";
     }
 
     setSize(width: number, height: number): void {

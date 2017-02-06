@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Controller = (function () {
     function Controller() {
+        this.mk = new HtmlHelper;
     }
     Controller.prototype.setSize = function (width, height) { };
     return Controller;
@@ -28,5 +29,12 @@ var CanvasController = (function (_super) {
         return new Point(e.layerX, e.layerY);
     };
     return CanvasController;
+}(Controller));
+var SingleValueController = (function (_super) {
+    __extends(SingleValueController, _super);
+    function SingleValueController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SingleValueController;
 }(Controller));
 //# sourceMappingURL=Controller.js.map

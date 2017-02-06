@@ -95,19 +95,6 @@ var GPSController = (function (_super) {
         sec.y = this.height - sec.y;
         this.movePoint = this.movePoint.sub(sec);
     };
-    GPSController.prototype.getRelative = function (p) {
-        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        var scaled = moved.divide(this.scalePoint);
-        return scaled;
-    };
-    GPSController.prototype.getAbsolute = function (p) {
-        var scaled = p.multiply(this.scalePoint);
-        var moved = scaled.add(this.movePoint);
-        return new Point(moved.x, this.height - moved.y);
-    };
-    GPSController.prototype.getMousePoint = function (e) {
-        return new Point(e.layerX, e.layerY);
-    };
     return GPSController;
 }(CanvasController));
-//# sourceMappingURL=GPSPlot.js.map
+//# sourceMappingURL=GPSController.js.map

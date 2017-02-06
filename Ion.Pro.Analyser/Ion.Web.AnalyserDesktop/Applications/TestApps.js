@@ -81,20 +81,20 @@ var PlotViewer = (function () {
     };
     return PlotViewer;
 }());
-var PlotterTester = (function () {
-    function PlotterTester() {
+var LineChartTester = (function () {
+    function LineChartTester() {
         this.eh = new EventHandler();
         this.plotData = [];
         this.plotType = "Plot";
     }
-    PlotterTester.prototype.main = function () {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+    LineChartTester.prototype.main = function () {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
-        this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generate());
-        this.plotter.setSize(this.window.width, this.window.height);
+        this.lineChart = new LineChartController(this.plotData);
+        this.window.content.appendChild(this.lineChart.generate());
+        this.lineChart.setSize(this.window.width, this.window.height);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
             { ID: 111, TimeStamp: 2100, Value: 67 },
@@ -106,17 +106,17 @@ var PlotterTester = (function () {
         //this.loadData();
         //this.drawChart(data);
     };
-    PlotterTester.prototype.dataUpdate = function () {
-        this.plotter.draw();
+    LineChartTester.prototype.dataUpdate = function () {
+        this.lineChart.draw();
         /*this.window.content.innerHTML = "";
         this.plotter = new Plotter(this.plotData);
         this.window.content.appendChild(this.plotter.generatePlot());
         this.plotter.setSize(this.window.width, this.window.height);*/
     };
-    PlotterTester.prototype.createEvents = function (eh) {
+    LineChartTester.prototype.createEvents = function (eh) {
         var _this = this;
         eh.on(this.window, AppWindow.event_resize, function () {
-            _this.plotter.setSize(_this.window.width, _this.window.height);
+            _this.lineChart.setSize(_this.window.width, _this.window.height);
             //this.plotter.canvas.width = this.window.width;
             //this.plotter.canvas.height = this.window.height;
             //this.plotter.draw();
@@ -125,28 +125,28 @@ var PlotterTester = (function () {
             _this.close();
         });
     };
-    PlotterTester.prototype.close = function () {
+    LineChartTester.prototype.close = function () {
         this.eh.close();
     };
-    PlotterTester.prototype.loadData = function () {
+    LineChartTester.prototype.loadData = function () {
         var _this = this;
         kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawChart(data); });
         //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
         //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
     };
-    PlotterTester.prototype.drawChart = function (data) {
+    LineChartTester.prototype.drawChart = function (data) {
         this.data = data;
         this.window.content.innerHTML = "";
         var plotData = new PlotData([]);
         for (var i = 0; i < data.length; i++) {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
-        this.plotter = new Plotter([plotData]);
-        this.window.content.appendChild(this.plotter.generate());
-        this.plotter.setSize(this.window.width, this.window.height);
+        this.lineChart = new LineChartController([plotData]);
+        this.window.content.appendChild(this.lineChart.generate());
+        this.lineChart.setSize(this.window.width, this.window.height);
         //this.plotter.draw();
     };
-    return PlotterTester;
+    return LineChartTester;
 }());
 var WebSocketTest = (function () {
     function WebSocketTest() {
@@ -181,36 +181,27 @@ var GaugeTester = (function () {
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
-        /*
-        let slider = document.createElement("input");
-        slider.setAttribute("type", "range");
-        //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
-        this.window.content.appendChild(slider);
-        slider.addEventListener("input", () => {
-            let val = slider.value;
-            this.gauge.drawNeedle(parseInt(val));
-        });*/
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-        this.gauge.wrapper.addEventListener("wheel", function (e) {
+        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+            _this.gauge.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    GaugeTester.prototype.drawMeter = function () {
+        var _this = this;
+        //this.window.content.innerHTML = "";                        
+        this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
+        var gaugeWrapper = this.gauge.generate();
+        this.window.content.appendChild(gaugeWrapper);
+        gaugeWrapper.addEventListener("wheel", function (e) {
             _this.val -= e.deltaY / 3;
             _this.val = _this.val > 100 ? 100 : _this.val;
             _this.val = _this.val < 0 ? 0 : _this.val;
             _this.gauge.setValue(_this.val);
         });
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
-            _this.gauge.setSize(_this.window.width, _this.window.height);
-            //this.plotter.draw();
-        });
-    };
-    GaugeTester.prototype.drawMeter = function () {
-        //this.window.content.innerHTML = "";                        
-        this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
-        this.window.content.appendChild(this.gauge.generate());
     };
     GaugeTester.prototype.dataUpdate = function () {
         this.gauge.setValue((this.plotData.points[this.plotData.points.length - 1].y / 200) * 100);
@@ -248,7 +239,7 @@ var GPSPlotTester = (function () {
     };
     GPSPlotTester.prototype.draw = function (p) {
         this.testData = new GPSPlotData(p);
-        this.plot = new GPSPlot(this.testData);
+        this.plot = new GPSController(this.testData);
         //console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
         this.plot.setSize(this.window.width, this.window.height);
