@@ -49,10 +49,10 @@
     generate(): HTMLDivElement {
         this.wrapper = document.createElement("div");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["main", "needle", "center"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxNeedle = new ContextFixer(this.canvas.canvases["needle"]);
-        this.ctxCenter = new ContextFixer(this.canvas.canvases["center"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
+        this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
 
         this.setSize(this.size, this.size);
         return this.wrapper;

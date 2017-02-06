@@ -1,13 +1,6 @@
-﻿class GPSPlot {
-    posData: GPSPlotData;
-    otherData: PlotData;
-    wrapper: HTMLDivElement;
-    canvas: LayeredCanvas;
-    ctxMain: ContextFixer;
-    movePoint: Point = new Point(0, 0);
-    scalePoint: Point = new Point(1, 1);
-    width: number;
-    height: number;
+﻿class GPSPlot extends CanvasController {
+    posData: GPSPlotData;    
+    ctxMain: ContextFixer;        
     relSize: IRelativeSize;
     padding: number;
     absWidth: number;
@@ -15,6 +8,9 @@
     color: string = "white";
 
     constructor(d: GPSPlotData) {
+        super();
+        this.movePoint = new Point(0, 0);
+        this.scalePoint = new Point(1, 1);
         this.posData = d;
     }
 
@@ -24,13 +20,13 @@
         this.draw();
     }
 
-    generate(): HTMLDivElement {
+    generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-        this.canvas = new LayeredCanvas(this.wrapper, ["main"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);        
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());        
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.padding = this.width * 0.05;

@@ -1,28 +1,36 @@
-var Plotter = (function () {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Plotter = (function (_super) {
+    __extends(Plotter, _super);
     function Plotter(data) {
-        this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(0.01, 1);
-        this.isDragging = false;
-        this.zoomSpeed = 1.1;
-        this.selectedPoint = null;
-        this.isMarking = false;
-        this.displayGrid = true;
-        this.stickyAxes = true;
-        this.backgroundColor = "rgb(45, 45, 45)";
-        this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "white"; //"black"; // "black";
-        this.mainColor = "white";
-        this.data = data;
+        var _this = _super.call(this) || this;
+        _this.isDragging = false;
+        _this.zoomSpeed = 1.1;
+        _this.selectedPoint = null;
+        _this.isMarking = false;
+        _this.displayGrid = true;
+        _this.stickyAxes = true;
+        _this.backgroundColor = "rgb(45, 45, 45)";
+        _this.gridColor = "rgba(100,100,100,0.3)";
+        _this.axisColor = "white"; //"black"; // "black";
+        _this.mainColor = "white";
+        _this.data = data;
+        _this.movePoint = new Point(50, 50);
+        _this.scalePoint = new Point(0.01, 1);
+        return _this;
     }
-    Plotter.prototype.generatePlot = function () {
+    Plotter.prototype.generate = function () {
         var _this = this;
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
-        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
@@ -419,7 +427,7 @@ var Plotter = (function () {
         this.draw();
     };
     return Plotter;
-}());
+}(CanvasController));
 var ContextFixer = (function () {
     function ContextFixer(canvas) {
         this.canvas = canvas;
@@ -481,30 +489,34 @@ var ContextFixer = (function () {
     return ContextFixer;
 }());
 var LayeredCanvas = (function () {
-    function LayeredCanvas(wrapper, names) {
-        this.canvases = {};
-        var canvas = document.createElement("canvas");
-        canvas.className = "plot-canvas";
-        for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {
-            var name_1 = names_1[_i];
-            this.canvases[name_1] = canvas.cloneNode();
-            wrapper.appendChild(this.canvases[name_1]);
-        }
+    function LayeredCanvas(wrapper) {
+        this.canvases = [];
+        this.mk = new HtmlHelper;
+        this.wrapper = wrapper;
     }
-    LayeredCanvas.prototype.getContext = function (name) {
-        var ctx = this.canvases[name].getContext("2d");
-        return ctx;
+    LayeredCanvas.prototype.addCanvas = function () {
+        var canvas = this.mk.tag("canvas", "plot-canvas");
+        this.wrapper.appendChild(canvas);
+        this.canvases.push(canvas);
+        return canvas;
     };
     LayeredCanvas.prototype.getWidth = function () {
-        return this.canvases["main"].width;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].width;
+        }
+        return -1;
     };
     LayeredCanvas.prototype.getHeight = function () {
-        return this.canvases["main"].height;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].height;
+        }
+        return -1;
     };
     LayeredCanvas.prototype.setSize = function (width, height) {
-        for (var name_2 in this.canvases) {
-            this.canvases[name_2].width = width;
-            this.canvases[name_2].height = height;
+        for (var _i = 0, _a = this.canvases; _i < _a.length; _i++) {
+            var c = _a[_i];
+            c.width = width;
+            c.height = height;
         }
     };
     return LayeredCanvas;

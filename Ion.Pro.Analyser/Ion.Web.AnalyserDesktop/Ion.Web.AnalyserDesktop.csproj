@@ -49,6 +49,7 @@
     <TypeScriptCompile Include="appsys.ts" />
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="Controllers\BarController.ts" />
+    <TypeScriptCompile Include="Controllers\Controller.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="GoogleChart.ts" />
     <TypeScriptCompile Include="Controllers\GPSPlot.ts" />

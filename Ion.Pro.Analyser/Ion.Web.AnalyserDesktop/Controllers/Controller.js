@@ -14,6 +14,19 @@ var CanvasController = (function (_super) {
     function CanvasController() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    CanvasController.prototype.getRelative = function (p) {
+        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
+        var scaled = moved.divide(this.scalePoint);
+        return scaled;
+    };
+    CanvasController.prototype.getAbsolute = function (p) {
+        var scaled = p.multiply(this.scalePoint);
+        var moved = scaled.add(this.movePoint);
+        return new Point(moved.x, this.height - moved.y);
+    };
+    CanvasController.prototype.getMousePoint = function (e) {
+        return new Point(e.layerX, e.layerY);
+    };
     return CanvasController;
 }(Controller));
 //# sourceMappingURL=Controller.js.map

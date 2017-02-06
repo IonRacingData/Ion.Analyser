@@ -1,9 +1,17 @@
-var GPSPlot = (function () {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GPSPlot = (function (_super) {
+    __extends(GPSPlot, _super);
     function GPSPlot(d) {
-        this.movePoint = new Point(0, 0);
-        this.scalePoint = new Point(1, 1);
-        this.color = "white";
-        this.posData = d;
+        var _this = _super.call(this) || this;
+        _this.color = "white";
+        _this.movePoint = new Point(0, 0);
+        _this.scalePoint = new Point(1, 1);
+        _this.posData = d;
+        return _this;
     }
     // temp
     GPSPlot.prototype.update = function (d) {
@@ -14,8 +22,8 @@ var GPSPlot = (function () {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["main"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.padding = this.width * 0.05;
@@ -101,5 +109,5 @@ var GPSPlot = (function () {
         return new Point(e.layerX, e.layerY);
     };
     return GPSPlot;
-}());
+}(CanvasController));
 //# sourceMappingURL=GPSPlot.js.map

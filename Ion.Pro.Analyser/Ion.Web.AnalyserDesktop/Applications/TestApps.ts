@@ -111,7 +111,7 @@ class PlotterTester implements IApplication, IMultiPlot {
         kernel.senMan.register(this);
         this.createEvents(this.eh);
         this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generatePlot());
+        this.window.content.appendChild(this.plotter.generate());
         this.plotter.setSize(this.window.width, this.window.height);
         /*var data: ISensorPackage[] = [
             { ID: 111, TimeStamp: 2000, Value: 54 },
@@ -164,7 +164,7 @@ class PlotterTester implements IApplication, IMultiPlot {
             plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
         }
         this.plotter = new Plotter([plotData]);
-        this.window.content.appendChild(this.plotter.generatePlot());
+        this.window.content.appendChild(this.plotter.generate());
         this.plotter.setSize(this.window.width, this.window.height);        
         //this.plotter.draw();
     }

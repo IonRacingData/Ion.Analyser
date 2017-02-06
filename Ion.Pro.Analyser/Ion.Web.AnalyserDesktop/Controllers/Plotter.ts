@@ -1,14 +1,8 @@
-﻿class Plotter {
-    wrapper: HTMLDivElement;
-    canvas: LayeredCanvas;
+﻿class Plotter extends CanvasController{        
+    data: PlotData[];
     ctxMain: ContextFixer;
     ctxMarking: ContextFixer;
-    ctxBackground: ContextFixer;
-    width: number;
-    height: number;
-    data: PlotData[];
-    movePoint = new Point(50, 50);
-    scalePoint = new Point(0.01, 1);
+    ctxBackground: ContextFixer;        
     mouseMod: Point;
     mouseDown: boolean;
     isDragging = false;
@@ -24,18 +18,22 @@
     mainColor = "white";
 
     constructor(data: PlotData[]) {
+        super();
         this.data = data;
+        this.movePoint = new Point(50, 50);
+        this.scalePoint = new Point(0.01, 1);
     }
 
-    generatePlot(): HTMLDivElement {
+    generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);        
-        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
-        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
@@ -589,32 +587,37 @@ class ContextFixer {
 }
 
 class LayeredCanvas {
-    canvases: { [name: string]: HTMLCanvasElement } = {};
+    private wrapper: HTMLElement;
+    private canvases: HTMLCanvasElement[] = [];
+    private mk: HtmlHelper = new HtmlHelper;
 
-    constructor(wrapper: HTMLDivElement, names: string[]) {
-        var canvas: HTMLCanvasElement = document.createElement("canvas");
-        canvas.className = "plot-canvas";
-        for (let name of names) {
-            this.canvases[name] = <HTMLCanvasElement>canvas.cloneNode();
-            wrapper.appendChild(this.canvases[name]);
-        }
+    constructor(wrapper: HTMLElement) {
+        this.wrapper = wrapper;
     }
 
-    getContext(name: string): CanvasRenderingContext2D {
-        var ctx: CanvasRenderingContext2D = this.canvases[name].getContext("2d");
-        return ctx;
+    addCanvas(): HTMLCanvasElement {
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
+        this.wrapper.appendChild(canvas);
+        this.canvases.push(canvas);
+        return canvas;
     }
 
     getWidth(): number {
-        return this.canvases["main"].width;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].width;
+        }
+        return -1;
     }
     getHeight(): number {
-        return this.canvases["main"].height;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].height;
+        }
+        return -1;
     }
     setSize(width: number, height: number): void {
-        for (let name in this.canvases) {
-            this.canvases[name].width = width;
-            this.canvases[name].height = height;
+        for (let c of this.canvases) {
+            c.width = width;
+            c.height = height;
         }
     }
 }
