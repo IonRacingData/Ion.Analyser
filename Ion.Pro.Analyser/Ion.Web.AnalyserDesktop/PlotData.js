@@ -1,6 +1,22 @@
-var PlotData = (function () {
-    function PlotData(p) {
-        this.points = p;
+var Color = (function () {
+    function Color(r, g, b, a) {
+        this.a = null;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        if (a) {
+            this.a = a;
+        }
+    }
+    Color.prototype.toString = function () {
+        if (this.a) {
+            return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
+        }
+        else {
+            return "rgb(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ")";
+        }
+    };
+    Color.randomColor = function (lowLimit, highLimit) {
         var r = 0;
         var g = 0;
         var b = 0;
@@ -8,8 +24,15 @@ var PlotData = (function () {
             r = Math.floor(Math.random() * 256);
             g = Math.floor(Math.random() * 256);
             b = Math.floor(Math.random() * 256);
-        } while (r + g + b < 255 + 128);
-        this.color = "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";
+        } while (r + g + b > lowLimit && r + g + b < highLimit);
+        return new Color(r, g, b);
+    };
+    return Color;
+}());
+var PlotData = (function () {
+    function PlotData(p) {
+        this.points = p;
+        this.color = Color.randomColor(0, 255 + 128);
     }
     PlotData.prototype.getClosest = function (p) {
         return this.points[this.getIndexOf(p)];

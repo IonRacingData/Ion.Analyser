@@ -265,7 +265,7 @@
             var checkPoint: Point = lastPoint;
 
             this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.data[d].color;
+            this.ctxMain.strokeStyle = this.data[d].color.toString();
 
             for (var i: number = firstVisibleIdx; i < totalLength; i++) {
                 var point: Point = this.getAbsolute(points[i]);

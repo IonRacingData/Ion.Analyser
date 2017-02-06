@@ -1,25 +1,3 @@
-var TestDataViewer = (function () {
-    function TestDataViewer() {
-        this.plotType = "Test Data Viewer";
-    }
-    TestDataViewer.prototype.main = function () {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
-    };
-    TestDataViewer.prototype.draw = function () {
-        var gen = new HtmlTableGen("table");
-        gen.addHeader("Value", "Timestamp");
-        for (var i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
-        }
-        this.window.content.appendChild(gen.generate());
-        //console.log("Here we should draw something, but you know, we are lazy");
-    };
-    TestDataViewer.prototype.dataUpdate = function () {
-        this.draw();
-    };
-    return TestDataViewer;
-}());
 var DataAssigner = (function () {
     function DataAssigner() {
         this.mk = new HtmlHelper();
@@ -175,5 +153,27 @@ var DataAssigner = (function () {
         }
     };
     return DataAssigner;
+}());
+var TestDataViewer = (function () {
+    function TestDataViewer() {
+        this.plotType = "Test Data Viewer";
+    }
+    TestDataViewer.prototype.main = function () {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
+        kernel.senMan.register(this);
+    };
+    TestDataViewer.prototype.draw = function () {
+        var gen = new HtmlTableGen("table");
+        gen.addHeader("Value", "Timestamp");
+        for (var i = 0; i < this.plotData.points.length && i < 10; i++) {
+            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
+        }
+        this.window.content.appendChild(gen.generate());
+        //console.log("Here we should draw something, but you know, we are lazy");
+    };
+    TestDataViewer.prototype.dataUpdate = function () {
+        this.draw();
+    };
+    return TestDataViewer;
 }());
 //# sourceMappingURL=TestDataViewer.js.map

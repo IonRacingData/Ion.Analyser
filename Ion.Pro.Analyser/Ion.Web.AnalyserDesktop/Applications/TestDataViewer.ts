@@ -1,34 +1,4 @@
-﻿class TestDataViewer implements IApplication, ISinglePlot {
-    application: Application;
-    window: AppWindow;
-    plotData: PlotData;
-    plotType: string = "Test Data Viewer";
-    plotWindow: AppWindow;
-
-    main(): void {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
-    }
-
-    draw(): void {
-        let gen = new HtmlTableGen("table");
-        gen.addHeader("Value", "Timestamp");
-
-        for (let i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
-        }
-
-        this.window.content.appendChild(gen.generate());
-
-        //console.log("Here we should draw something, but you know, we are lazy");
-    }
-
-    dataUpdate(): void {
-        this.draw();
-    }
-}
-
-class DataAssigner implements IApplication {
+﻿class DataAssigner implements IApplication {
     application: Application;
     window: AppWindow;
     mk = new HtmlHelper();
@@ -60,36 +30,32 @@ class DataAssigner implements IApplication {
             if (isMulti) {
                 tableGen.addRow([
                     {
-                        event: "click", func: (e: Event) =>
-                        {
+                        event: "click", func: (e: Event) => {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
                             }
                             last = this.findTableRow(<HTMLElement>e.target);
                             last.classList.add("selectedrow");
-                        
+
                             kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<IMultiPlot>curPlot, x));
                         }
                     },
                     {
-                        event: "mouseenter", func: (e: Event) =>
-                        {
+                        event: "mouseenter", func: (e: Event) => {
                             curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
-                        event: "mouseleave", func: (e: Event) =>
-                        {
+                        event: "mouseleave", func: (e: Event) => {
                             curPlot.plotWindow.highlight(false);
                         }
                     },
-                    ], curPlot.plotType, "Multi Plot");
+                ], curPlot.plotType, "Multi Plot");
             }
             else {
                 tableGen.addRow([
                     {
-                        event: "click", func: (e: Event) =>
-                        {
+                        event: "click", func: (e: Event) => {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
                             }
@@ -100,14 +66,12 @@ class DataAssigner implements IApplication {
                         },
                     },
                     {
-                        event: "mouseenter", func: (e: Event) =>
-                        {
+                        event: "mouseenter", func: (e: Event) => {
                             curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
-                        event: "mouseleave", func: (e: Event) =>
-                        {
+                        event: "mouseleave", func: (e: Event) => {
                             curPlot.plotWindow.highlight(false);
                         }
                     }
@@ -201,5 +165,35 @@ class DataAssigner implements IApplication {
             this.sensorTable.appendChild(label);
             this.sensorTable.appendChild(this.mk.tag("br"));
         }
+    }
+}
+
+class TestDataViewer implements IApplication, ISinglePlot {
+    application: Application;
+    window: AppWindow;
+    plotData: PlotData;
+    plotType: string = "Test Data Viewer";
+    plotWindow: AppWindow;
+
+    main(): void {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
+        kernel.senMan.register(this);
+    }
+
+    draw(): void {
+        let gen = new HtmlTableGen("table");
+        gen.addHeader("Value", "Timestamp");
+
+        for (let i = 0; i < this.plotData.points.length && i < 10; i++) {
+            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
+        }
+
+        this.window.content.appendChild(gen.generate());
+
+        //console.log("Here we should draw something, but you know, we are lazy");
+    }
+
+    dataUpdate(): void {
+        this.draw();
     }
 }

@@ -52,7 +52,7 @@
 
     handleMouseMoveing(x: number, y: number, e: Event): void {
         if (this.dragging) {
-            this.activeWindow.setRelativePos(x, y);
+            this.activeWindow.__setRelativePos(x, y);
             var tileZone: number = this.tileZone;
             var topBar: number = this.topBar;
 
@@ -81,7 +81,7 @@
             this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
         }
         else if (this.resizing) {
-            this.activeWindow.setRelativeSize(x, y);
+            this.activeWindow.__setRelativeSize(x, y);
         }
     }
 
@@ -100,7 +100,8 @@
 
     createWindow(app: Application, title: string): AppWindow {
         var window: AppWindow = this.makeWindow(app);
-        window.setTitle(title);
+        //window.setTitle(title);
+        window.title = title;
         app.windows.push(window);
         this.registerWindow(window);
 

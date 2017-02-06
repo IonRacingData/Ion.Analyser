@@ -80,8 +80,10 @@ class MainMenu extends Applet {
     click_menu(e: MouseEvent): void {
         this.menuHandle.hide();
         this.fillMenu();
-        this.menuHandle.x = e.pageX;
-        this.menuHandle.y = e.pageY;
+        //this.menuHandle.x = e.pageX;
+        //this.menuHandle.y = e.pageY;
+        this.menuHandle.x = 0;
+        this.menuHandle.y = 40;
         this.menuHandle.show();
     }
 }

@@ -227,7 +227,7 @@ var Plotter = (function () {
             var drawPoint = 0;
             var checkPoint = lastPoint;
             this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.data[d].color;
+            this.ctxMain.strokeStyle = this.data[d].color.toString();
             for (var i = firstVisibleIdx; i < totalLength; i++) {
                 var point = this.getAbsolute(points[i]);
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {

@@ -50,49 +50,6 @@
     }
 }
 
-class PlotViewer implements IApplication {
-    application: Application;
-    window: AppWindow;
-    innerChart: HTMLElement;
-    main(): void {
-        this.window = kernel.winMan.createWindow(this.application, "Plot window");
-        this.innerChart = document.createElement("div");
-        this.window.content.appendChild(this.innerChart);
-
-        google.charts.load("current", { "packages": ["corechart"] });
-        google.charts.setOnLoadCallback(() => this.loadData());
-    }
-
-    loadData() {
-        requestAction("getdata?number=61445", (data: ISensorPackage[]) => this.drawChart(data));
-    }
-
-    drawChart(sensorData: ISensorPackage[]): void {
-
-        var preData: any[][] = [["Time stamp", "Value"]];
-        for (var i = 1; i < 30; i++) {
-            preData[i] = [(sensorData[i].TimeStamp / 1000).toString() + "s", sensorData[i].Value];
-        }
-        var data = google.visualization.arrayToDataTable(preData);
-        /*var data = google.visualization.arrayToDataTable([
-            ["Year", "Sales", "Expenses"],
-            ["2004", 1000, 400],
-            ['2005', 1170, 460],
-            ['2006', 660, 1120],
-            ['2007', 1030, 540]
-        ]);*/
-
-        var options = {
-            title: "Sensor package 61457",
-            curveType: "function",
-            legende: { position: "bottom" }
-        };
-
-        var chart = new google.visualization.LineChart(this.innerChart);
-        chart.draw(data, options);
-    }
-}
-
 class PlotterTester implements IApplication, IMultiPlot {
     application: Application;
     window: AppWindow;
@@ -170,17 +127,6 @@ class PlotterTester implements IApplication, IMultiPlot {
     }
 }
 
-class WebSocketTest implements IApplication {
-    application: Application;
-    window: AppWindow;
-
-    main(): void {
-        this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
-
-
-    }
-}
-
 class TestViewer implements IApplication {
     application: Application;
     window: AppWindow;
@@ -239,7 +185,7 @@ class GaugeTester implements IApplication, ISinglePlot {
         });
 
         
-        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+        this.window.addEventListener(AppWindow.event_resize, () => {
             this.gauge.setSize(this.window.width, this.window.height);
             //this.plotter.draw();
         });
@@ -285,7 +231,7 @@ class GPSPlotTester implements IApplication {
             }
             this.draw(this.points);
         });
-        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+        this.window.addEventListener(AppWindow.event_resize, () => {
             this.plot.setSize(this.window.width, this.window.height);
         });
     }
@@ -325,7 +271,7 @@ class LabelTester {
             this.label.setValue(this.val);
         });
 
-        this.window.eventMan.addEventListener(AppWindow.event_resize, () => {
+        this.window.addEventListener(AppWindow.event_resize, () => {
             this.label.setSize(this.window.width, this.window.height);
         });
     }

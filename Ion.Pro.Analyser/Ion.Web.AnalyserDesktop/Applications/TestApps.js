@@ -43,44 +43,6 @@ var DataViewer = (function () {
     };
     return DataViewer;
 }());
-var PlotViewer = (function () {
-    function PlotViewer() {
-    }
-    PlotViewer.prototype.main = function () {
-        var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "Plot window");
-        this.innerChart = document.createElement("div");
-        this.window.content.appendChild(this.innerChart);
-        google.charts.load("current", { "packages": ["corechart"] });
-        google.charts.setOnLoadCallback(function () { return _this.loadData(); });
-    };
-    PlotViewer.prototype.loadData = function () {
-        var _this = this;
-        requestAction("getdata?number=61445", function (data) { return _this.drawChart(data); });
-    };
-    PlotViewer.prototype.drawChart = function (sensorData) {
-        var preData = [["Time stamp", "Value"]];
-        for (var i = 1; i < 30; i++) {
-            preData[i] = [(sensorData[i].TimeStamp / 1000).toString() + "s", sensorData[i].Value];
-        }
-        var data = google.visualization.arrayToDataTable(preData);
-        /*var data = google.visualization.arrayToDataTable([
-            ["Year", "Sales", "Expenses"],
-            ["2004", 1000, 400],
-            ['2005', 1170, 460],
-            ['2006', 660, 1120],
-            ['2007', 1030, 540]
-        ]);*/
-        var options = {
-            title: "Sensor package 61457",
-            curveType: "function",
-            legende: { position: "bottom" }
-        };
-        var chart = new google.visualization.LineChart(this.innerChart);
-        chart.draw(data, options);
-    };
-    return PlotViewer;
-}());
 var PlotterTester = (function () {
     function PlotterTester() {
         this.eh = new EventHandler();
@@ -148,14 +110,6 @@ var PlotterTester = (function () {
     };
     return PlotterTester;
 }());
-var WebSocketTest = (function () {
-    function WebSocketTest() {
-    }
-    WebSocketTest.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Web Socket test");
-    };
-    return WebSocketTest;
-}());
 var TestViewer = (function () {
     function TestViewer() {
     }
@@ -202,7 +156,7 @@ var GaugeTester = (function () {
             _this.val = _this.val < 0 ? 0 : _this.val;
             _this.gauge.setValue(_this.val);
         });
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+        this.window.addEventListener(AppWindow.event_resize, function () {
             _this.gauge.setSize(_this.window.width, _this.window.height);
             //this.plotter.draw();
         });
@@ -242,7 +196,7 @@ var GPSPlotTester = (function () {
             }
             _this.draw(_this.points);
         });
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+        this.window.addEventListener(AppWindow.event_resize, function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
     };
@@ -276,7 +230,7 @@ var LabelTester = (function () {
             _this.val -= e.deltaY;
             _this.label.setValue(_this.val);
         });
-        this.window.eventMan.addEventListener(AppWindow.event_resize, function () {
+        this.window.addEventListener(AppWindow.event_resize, function () {
             _this.label.setSize(_this.window.width, _this.window.height);
         });
     };

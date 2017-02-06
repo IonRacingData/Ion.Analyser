@@ -1,23 +1,53 @@
-﻿class PlotData {
-    ID: number;
-    color: string;
-    points: Point[];
+﻿class Color {
+    public r: number;
+    public g: number;
+    public b: number;
+    public a?: number = null;
 
-    constructor(p: Point[]) {
-        this.points = p;
+    constructor(r: number, g: number, b: number)
+    constructor(r: number, g: number, b: number, a?: number) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        if (a) {
+            this.a = a;
+        }
+    }
+
+    public toString() {
+        if (this.a) {
+            return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
+        }
+        else {
+            return "rgb(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ")";
+        }
+    }
+
+    public static randomColor(lowLimit: number, highLimit: number): Color {
+        
         let r = 0;
         let g = 0;
         let b = 0;
-        
+
         do {
             r = Math.floor(Math.random() * 256);
             g = Math.floor(Math.random() * 256);
             b = Math.floor(Math.random() * 256);
         }
-        while (r + g + b < 255 + 128);
+        while (r + g + b > lowLimit && r + g + b < highLimit);
 
-        this.color = "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";        
+        return new Color(r, g, b);
+    }
+}
 
+class PlotData {
+    ID: number;
+    color: Color;
+    points: Point[];
+
+    constructor(p: Point[]) {
+        this.points = p;
+        this.color = Color.randomColor(0, 255 + 128);
     }
 
     getClosest(p: Point): Point {

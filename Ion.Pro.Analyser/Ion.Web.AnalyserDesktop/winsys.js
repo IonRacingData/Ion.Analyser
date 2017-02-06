@@ -26,7 +26,7 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.handleMouseMoveing = function (x, y, e) {
         if (this.dragging) {
-            this.activeWindow.setRelativePos(x, y);
+            this.activeWindow.__setRelativePos(x, y);
             var tileZone = this.tileZone;
             var topBar = this.topBar;
             if (x < tileZone && y < topBar + tileZone) {
@@ -53,7 +53,7 @@ var WindowManager = (function () {
             this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
         }
         else if (this.resizing) {
-            this.activeWindow.setRelativeSize(x, y);
+            this.activeWindow.__setRelativeSize(x, y);
         }
     };
     WindowManager.prototype.mouseUp = function (e) {
@@ -69,7 +69,8 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
-        window.setTitle(title);
+        //window.setTitle(title);
+        window.title = title;
         app.windows.push(window);
         this.registerWindow(window);
         return window;

@@ -82,8 +82,10 @@ var MainMenu = (function (_super) {
     MainMenu.prototype.click_menu = function (e) {
         this.menuHandle.hide();
         this.fillMenu();
-        this.menuHandle.x = e.pageX;
-        this.menuHandle.y = e.pageY;
+        //this.menuHandle.x = e.pageX;
+        //this.menuHandle.y = e.pageY;
+        this.menuHandle.x = 0;
+        this.menuHandle.y = 40;
         this.menuHandle.show();
     };
     return MainMenu;
