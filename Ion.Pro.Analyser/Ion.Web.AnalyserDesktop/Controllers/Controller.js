@@ -10,6 +10,13 @@ var Controller = (function () {
     Controller.prototype.setSize = function (width, height) { };
     return Controller;
 }());
+var SingleValueController = (function (_super) {
+    __extends(SingleValueController, _super);
+    function SingleValueController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SingleValueController;
+}(Controller));
 var CanvasController = (function (_super) {
     __extends(CanvasController, _super);
     function CanvasController() {
@@ -30,11 +37,11 @@ var CanvasController = (function (_super) {
     };
     return CanvasController;
 }(Controller));
-var SingleValueController = (function (_super) {
-    __extends(SingleValueController, _super);
-    function SingleValueController() {
+var SingleValueCanvasController = (function (_super) {
+    __extends(SingleValueCanvasController, _super);
+    function SingleValueCanvasController() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    return SingleValueController;
-}(Controller));
+    return SingleValueCanvasController;
+}(CanvasController));
 //# sourceMappingURL=Controller.js.map

@@ -8,6 +8,11 @@
     public abstract generate(): HTMLElement;
 }
 
+abstract class SingleValueController extends Controller {
+    protected value: number;
+    public abstract setValue(value: number): void;
+}
+
 abstract class CanvasController extends Controller {
     protected canvas: LayeredCanvas;    
     protected movePoint: Point;
@@ -32,7 +37,7 @@ abstract class CanvasController extends Controller {
     protected abstract draw(): void;
 }
 
-abstract class SingleValueController extends Controller {
+abstract class SingleValueCanvasController extends CanvasController {
     protected value: number;
     public abstract setValue(value: number): void;
 }

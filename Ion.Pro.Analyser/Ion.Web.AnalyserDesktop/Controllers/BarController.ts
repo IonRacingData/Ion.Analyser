@@ -9,7 +9,7 @@
         this.setSize(width, height);
     }
 
-    generate(): HTMLElement {        
+    generate(): HTMLElement {
         return this.wrapper;
     }
 

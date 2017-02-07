@@ -1,4 +1,4 @@
-﻿class GaugeController extends CanvasController {
+﻿class GaugeController extends SingleValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxNeedle: ContextFixer;
     private ctxCenter: ContextFixer;
@@ -11,8 +11,7 @@
     private offsetX: number;
     private offsetY: number;   
     private color: string = "black";
-    private needleColor: string = "black";   
-    private percent: number = 0; 
+    private needleColor: string = "black";    
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         super();
@@ -107,7 +106,7 @@
         let radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
     
-        let ang = (this.percent / 100) * this.totalAngle;
+        let ang = (this.value / 100) * this.totalAngle;
 
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
@@ -121,7 +120,7 @@
     setValue(percent: number): void {
         percent = percent > 100 ? 100 : percent;
         percent = percent < 0 ? 0 : percent;
-        this.percent = percent;
+        this.value = percent;
         this.drawNeedle();
     }
 
