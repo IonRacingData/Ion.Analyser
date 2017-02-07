@@ -1,0 +1,57 @@
+﻿body {
+
+}
+
+.flex-container {
+    display: -webkit-flex;
+    display: flex;
+    width: 400px;
+    height: 250px;
+    background-color: lightgrey;
+}
+
+.segmentDiv_a {
+    width: 25px;
+    margin: 10px;
+}
+
+.segmentDiv_b {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.segmentDiv_c {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.segmentDiv_d {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.segmentDiv_e {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.segmentDiv_f {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.segmentDiv_g {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}
+
+.svg {
+    width: 200px;
+    height:300px;
+}

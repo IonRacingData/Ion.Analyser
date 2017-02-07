@@ -31,6 +31,7 @@
     <Content Include="Grid\grid.css" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
+    <Content Include="Segments.css" />
     <Content Include="web.config" />
     <Content Include="window.css" />
   </ItemGroup>

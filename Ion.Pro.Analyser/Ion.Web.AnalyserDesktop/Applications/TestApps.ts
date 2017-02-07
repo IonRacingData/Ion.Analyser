@@ -268,7 +268,7 @@ class GPSPlotTester implements IApplication {
         this.window.content.appendChild(slider);
         slider.addEventListener("input", () => {
             let val = parseInt(slider.value);
-            let p: Point3D[] = [];
+            let p: Point3D[] = [];8
             p = this.points.slice(0, (this.points.length * val) / 100);
             this.update(p);
         });*/
@@ -305,7 +305,46 @@ class SegmentsTester implements IApplication {
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "Segment Tester");
-        this.window.content.style.overflow = "hidden";
+        let divv;
+        let canvas;
+
+        let height = 10;
+        let width = 50;
+
+        let container = document.createElement("div");
+        container.className = "flex-container";
+
+        for (let i = 0; i < 7; i++) {
+            divv = document.createElement("div");
+            divv.className = "segmentDiv_" + String.fromCharCode("a".charCodeAt(0) + i);
+            canvas = document.createElement("canvas");
+            canvas.className = "segment_" + String.fromCharCode("a".charCodeAt(0) + i);
+            let ctx = canvas.getContext("2d");
+            if (i != 0 && i != 3 && i != 6) {
+                canvas.width = height;
+                canvas.height = width;
+                ctx.translate(height, 0);
+                ctx.rotate(90 * Math.PI / 180);
+            } else {
+                canvas.width = width;
+                canvas.height = height;
+            }
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(Math.tan(0.25 * Math.PI) * (height / 2), 0);
+            ctx.lineTo(width - (Math.tan(0.25 * Math.PI) * (height / 2)), 0);
+            ctx.lineTo(width, height / 2);
+            ctx.lineTo(width - (Math.tan(0.25 * Math.PI) * (height / 2)), height);
+            ctx.lineTo(Math.tan(0.25 * Math.PI) * (height / 2), height);
+            ctx.lineTo(0, height / 2);
+
+            ctx.stroke();
+            ctx.fillStyle = "red";
+            ctx.fill();
+
+            divv.appendChild(canvas)
+            container.appendChild(divv);
+        }
+        this.window.content.appendChild(container);
     }
 
     draw(p: Point3D[]): void {
