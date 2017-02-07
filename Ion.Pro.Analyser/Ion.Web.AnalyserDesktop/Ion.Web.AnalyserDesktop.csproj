@@ -54,6 +54,7 @@
     <TypeScriptCompile Include="HtmlHelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="Controllers\LabelController.ts" />
+    <TypeScriptCompile Include="Matrix.ts" />
     <TypeScriptCompile Include="MenuWindow.ts" />
     <TypeScriptCompile Include="Controllers\GaugePlot.ts" />
     <TypeScriptCompile Include="models.ts" />
