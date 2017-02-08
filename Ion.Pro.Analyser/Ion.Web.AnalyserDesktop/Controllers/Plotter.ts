@@ -6,7 +6,7 @@
     ctxBackground: ContextFixer;
     width: number;
     height: number;
-    data: PlotData[];
+    data: IPlotData[];
     movePoint = new Point(50, 50);
     scalePoint = new Point(0.01, 1);
     mouseMod: Point;
@@ -23,7 +23,7 @@
     axisColor = "white";//"black"; // "black";
     mainColor = "white";
 
-    constructor(data: PlotData[]) {
+    constructor(data: IPlotData[]) {
         this.data = data;
     }
 
@@ -183,7 +183,8 @@
         var mp = e;
         var p: Point = null;
         for (let i: number = 0; i < this.data.length; i++) {
-            var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+            //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+            var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
             if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                 p = closest;
             }
@@ -253,14 +254,14 @@
         this.drawYAxis();
 
         for (var d: number = 0; d < this.data.length; d++) {
-            var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
                 firstVisibleIdx--;
             }
 
-            var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
-            var totalLength: number = this.data[d].points.length;
-            var points: Point[] = this.data[d].points;
+            var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
+            var totalLength: number = this.data[d].getLength();
             var drawPoint: number = 0;
             var checkPoint: Point = lastPoint;
 
@@ -268,7 +269,7 @@
             this.ctxMain.strokeStyle = this.data[d].color.toString();
 
             for (var i: number = firstVisibleIdx; i < totalLength; i++) {
-                var point: Point = this.getAbsolute(points[i]);
+                var point: Point = this.getAbsolute(this.data[d].getValue(i));
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
                     this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
                     this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));

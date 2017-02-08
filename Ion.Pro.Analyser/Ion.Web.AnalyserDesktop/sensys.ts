@@ -227,9 +227,9 @@ interface IPlot {
 }
 
 interface ISinglePlot extends IPlot {
-    plotData: PlotData;
+    plotData: IPlotData;
 }
 
 interface IMultiPlot extends IPlot {
-    plotData: PlotData[];
+    plotData: IPlotData[];
 }

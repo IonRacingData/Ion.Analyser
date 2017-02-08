@@ -67,6 +67,41 @@ var PlotData = (function () {
     };
     return PlotData;
 }());
+var PlotDataHelper = (function () {
+    function PlotDataHelper() {
+    }
+    PlotDataHelper.getClosest = function (plotData, p) {
+        return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
+    };
+    PlotDataHelper.getIndexOf = function (plotData, p) {
+        var min = 0;
+        var max = plotData.getLength() - 1;
+        var half;
+        while (true) {
+            half = Math.floor((min + max) / 2);
+            if (half === min) {
+                var diffMin = p.x - plotData.getValue(min).x;
+                var diffMax = plotData.getValue(max).x - p.x;
+                if (diffMin < diffMax) {
+                    return min;
+                }
+                else {
+                    return max;
+                }
+            }
+            else if (p.x < plotData.getValue(half).x) {
+                max = half;
+            }
+            else if (p.x > plotData.getValue(half).x) {
+                min = half;
+            }
+            else {
+                return half;
+            }
+        }
+    };
+    return PlotDataHelper;
+}());
 var GPSPlotData = (function () {
     function GPSPlotData(p) {
         this.points = p;
@@ -117,5 +152,19 @@ var Point3D = (function () {
         return "x: " + this.x.toString() + "  y: " + this.y.toString() + "  z: " + this.z.toString();
     };
     return Point3D;
+}());
+var PlotDataViewer = (function () {
+    function PlotDataViewer(realData) {
+        this.realData = realData;
+        this.ID = realData.ID;
+        this.color = realData.color;
+    }
+    PlotDataViewer.prototype.getLength = function () {
+        return this.realData.points.length;
+    };
+    PlotDataViewer.prototype.getValue = function (index) {
+        return this.realData.points[index];
+    };
+    return PlotDataViewer;
 }());
 //# sourceMappingURL=PlotData.js.map

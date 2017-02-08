@@ -119,7 +119,7 @@
         radio.addEventListener("change", (e: Event) => {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                plot.plotData = data;
+                plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
             });
         });
@@ -133,7 +133,7 @@
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                    plot.plotData.push(data);
+                    plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
                 });
             }
@@ -171,7 +171,7 @@
 class TestDataViewer implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
-    plotData: PlotData;
+    plotData: IPlotData;
     plotType: string = "Test Data Viewer";
     plotWindow: AppWindow;
 
@@ -184,8 +184,8 @@ class TestDataViewer implements IApplication, ISinglePlot {
         let gen = new HtmlTableGen("table");
         gen.addHeader("Value", "Timestamp");
 
-        for (let i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
+        for (let i = 0; i < this.plotData.getLength() && i < 10; i++) {
+            gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
         }
 
         this.window.content.appendChild(gen.generate());

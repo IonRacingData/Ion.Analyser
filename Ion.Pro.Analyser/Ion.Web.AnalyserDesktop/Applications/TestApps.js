@@ -38,7 +38,6 @@ var DataViewer = (function () {
         for (var i = 0; i < 10; i++) {
             gen.addRow(data[i].ID, data[i].Value, data[i].TimeStamp);
         }
-        //gen.addArray(data, ["ID", "Value", "TimeStamp"]);
         this.innerTable.appendChild(gen.generate());
     };
     return DataViewer;
@@ -57,31 +56,14 @@ var PlotterTester = (function () {
         this.plotter = new Plotter(this.plotData);
         this.window.content.appendChild(this.plotter.generatePlot());
         this.plotter.setSize(this.window.width, this.window.height);
-        /*var data: ISensorPackage[] = [
-            { ID: 111, TimeStamp: 2000, Value: 54 },
-            { ID: 111, TimeStamp: 2100, Value: 67 },
-            { ID: 111, TimeStamp: 2200, Value: 21 },
-            { ID: 111, TimeStamp: 2300, Value: 12 },
-            { ID: 111, TimeStamp: 2400, Value: 15 },
-            { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];*/
-        //this.loadData();
-        //this.drawChart(data);
     };
     PlotterTester.prototype.dataUpdate = function () {
         this.plotter.draw();
-        /*this.window.content.innerHTML = "";
-        this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);*/
     };
     PlotterTester.prototype.createEvents = function (eh) {
         var _this = this;
         eh.on(this.window, AppWindow.event_resize, function () {
             _this.plotter.setSize(_this.window.width, _this.window.height);
-            //this.plotter.canvas.width = this.window.width;
-            //this.plotter.canvas.height = this.window.height;
-            //this.plotter.draw();
         });
         eh.on(this.window, AppWindow.event_close, function () {
             _this.close();
@@ -89,24 +71,6 @@ var PlotterTester = (function () {
     };
     PlotterTester.prototype.close = function () {
         this.eh.close();
-    };
-    PlotterTester.prototype.loadData = function () {
-        var _this = this;
-        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawChart(data); });
-        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
-        //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
-    };
-    PlotterTester.prototype.drawChart = function (data) {
-        this.data = data;
-        this.window.content.innerHTML = "";
-        var plotData = new PlotData([]);
-        for (var i = 0; i < data.length; i++) {
-            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
-        }
-        this.plotter = new Plotter([plotData]);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);
-        //this.plotter.draw();
     };
     return PlotterTester;
 }());
@@ -167,7 +131,7 @@ var GaugeTester = (function () {
         this.window.content.appendChild(this.gauge.generate());
     };
     GaugeTester.prototype.dataUpdate = function () {
-        this.gauge.setValue((this.plotData.points[this.plotData.points.length - 1].y / 200) * 100);
+        this.gauge.setValue((this.plotData.getValue[this.plotData.getLength() - 1].y / 200) * 100);
     };
     return GaugeTester;
 }());

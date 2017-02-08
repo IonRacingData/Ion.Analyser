@@ -44,7 +44,6 @@
         for (var i = 0; i < 10; i++) {
             gen.addRow(data[i].ID, data[i].Value, data[i].TimeStamp);
         }
-        //gen.addArray(data, ["ID", "Value", "TimeStamp"]);
 
         this.innerTable.appendChild(gen.generate());
     }
@@ -56,7 +55,7 @@ class PlotterTester implements IApplication, IMultiPlot {
     plotter: Plotter;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
-    plotData: PlotData[] = [];
+    plotData: IPlotData[] = [];
     plotType: string = "Plot";
     plotWindow: AppWindow;
     update
@@ -70,33 +69,15 @@ class PlotterTester implements IApplication, IMultiPlot {
         this.plotter = new Plotter(this.plotData);
         this.window.content.appendChild(this.plotter.generatePlot());
         this.plotter.setSize(this.window.width, this.window.height);
-        /*var data: ISensorPackage[] = [
-            { ID: 111, TimeStamp: 2000, Value: 54 },
-            { ID: 111, TimeStamp: 2100, Value: 67 },
-            { ID: 111, TimeStamp: 2200, Value: 21 },
-            { ID: 111, TimeStamp: 2300, Value: 12 },
-            { ID: 111, TimeStamp: 2400, Value: 15 },
-            { ID: 111, TimeStamp: 2500, Value: 87 }
-        ];*/
-
-        //this.loadData();
-        //this.drawChart(data);
     }
 
     dataUpdate() {
         this.plotter.draw();
-        /*this.window.content.innerHTML = "";
-        this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);*/
     }
 
     createEvents(eh: EventHandler) {
         eh.on(this.window, AppWindow.event_resize, () => {
             this.plotter.setSize(this.window.width, this.window.height);
-            //this.plotter.canvas.width = this.window.width;
-            //this.plotter.canvas.height = this.window.height;
-            //this.plotter.draw();
         });
         eh.on(this.window, AppWindow.event_close, () => {
             this.close();
@@ -105,25 +86,6 @@ class PlotterTester implements IApplication, IMultiPlot {
 
     close() {
         this.eh.close();
-    }
-
-    loadData() {
-        kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawChart(data));
-        //kernel.senMan.getData(841, (data: ISensorPackage[]) => this.drawChart(data));
-        //requestAction("getdata?number=841", (data: ISensorPackage[]) => this.drawChart(data));
-    }
-
-    drawChart(data: ISensorPackage[]) {
-        this.data = data;        
-        this.window.content.innerHTML = "";
-        var plotData = new PlotData([]);
-        for (var i = 0; i < data.length; i++) {
-            plotData.points[i] = new Point(data[i].TimeStamp, data[i].Value);
-        }
-        this.plotter = new Plotter([plotData]);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);        
-        //this.plotter.draw();
     }
 }
 
@@ -157,7 +119,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     val: number = 0;
     plotType: string = "GaugePlot";
     plotWindow: AppWindow;
-    plotData: PlotData;
+    plotData: IPlotData;
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
@@ -199,7 +161,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     }
 
     dataUpdate() {
-        this.gauge.setValue((this.plotData.points[this.plotData.points.length - 1].y / 200) * 100);
+        this.gauge.setValue((this.plotData.getValue[this.plotData.getLength() - 1].y / 200) * 100);
     }
 }
 

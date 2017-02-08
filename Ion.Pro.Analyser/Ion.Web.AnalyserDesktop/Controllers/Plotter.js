@@ -157,7 +157,8 @@ var Plotter = (function () {
         var mp = e;
         var p = null;
         for (var i = 0; i < this.data.length; i++) {
-            var closest = this.data[i].getClosest(this.getRelative(mp));
+            //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+            var closest = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
             if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                 p = closest;
             }
@@ -217,19 +218,19 @@ var Plotter = (function () {
         this.drawXAxis();
         this.drawYAxis();
         for (var d = 0; d < this.data.length; d++) {
-            var firstVisibleIdx = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+            var firstVisibleIdx = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
             if (firstVisibleIdx > 0) {
                 firstVisibleIdx--;
             }
-            var lastPoint = lastPoint = this.getAbsolute(this.data[d].points[firstVisibleIdx]);
-            var totalLength = this.data[d].points.length;
-            var points = this.data[d].points;
+            var lastPoint = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
+            var totalLength = this.data[d].getLength();
             var drawPoint = 0;
             var checkPoint = lastPoint;
             this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.data[d].color.toString();
             for (var i = firstVisibleIdx; i < totalLength; i++) {
-                var point = this.getAbsolute(points[i]);
+                var point = this.getAbsolute(this.data[d].getValue(i));
                 if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
                     this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
                     this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));

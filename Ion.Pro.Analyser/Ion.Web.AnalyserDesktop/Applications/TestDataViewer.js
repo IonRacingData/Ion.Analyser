@@ -107,7 +107,7 @@ var DataAssigner = (function () {
         radio.addEventListener("change", function (e) {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
-                plot.plotData = data;
+                plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
             });
         });
@@ -120,7 +120,7 @@ var DataAssigner = (function () {
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, function (data) {
-                    plot.plotData.push(data);
+                    plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
                 });
             }
@@ -165,8 +165,8 @@ var TestDataViewer = (function () {
     TestDataViewer.prototype.draw = function () {
         var gen = new HtmlTableGen("table");
         gen.addHeader("Value", "Timestamp");
-        for (var i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
+        for (var i = 0; i < this.plotData.getLength() && i < 10; i++) {
+            gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
         }
         this.window.content.appendChild(gen.generate());
         //console.log("Here we should draw something, but you know, we are lazy");
