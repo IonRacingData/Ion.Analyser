@@ -49,8 +49,8 @@ namespace Ion.Pro.Analyser
 
         static void InsertSensorTestData()
         {
-            //ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
-            ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
+            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader reader2 = new LegacySensorReader("../../Data/freq.iondata");
             ISensorReader gpsReader = new GPSDataReader("../../Data/GPS_DataFile.csv", 2, 2);
             ISensorReader gpsReader2 = new GPXDataReader("../../Data/stiangps.gpx");
             ISensorReader gpsReader3 = new GPXDataReader("../../Data/fredrikgps.gpx");
@@ -64,6 +64,7 @@ namespace Ion.Pro.Analyser
             {
                 case RunMode.OffLine:
                     store.AddRange(reader.ReadPackages());
+                    store.AddRange(reader2.ReadPackages());
                     store.AddRange(gpsReader.ReadPackages());
                     store.AddRange(gpsReader2.ReadPackages());
                     store.AddRange(gpsReader3.ReadPackages());
