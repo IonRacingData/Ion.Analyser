@@ -21,7 +21,7 @@ namespace Ion.Pro.Analyser
     class Program
     {        
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.LiveTest;
+        static RunMode runMode = RunMode.OffLine;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
@@ -49,7 +49,8 @@ namespace Ion.Pro.Analyser
 
         static void InsertSensorTestData()
         {
-            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            //ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
             ISensorReader gpsReader = new GPSDataReader("../../Data/GPS_DataFile.csv", 2, 2);
             ISensorReader gpsReader2 = new GPXDataReader("../../Data/stiangps.gpx");
             ISensorReader gpsReader3 = new GPXDataReader("../../Data/fredrikgps.gpx");
@@ -88,6 +89,7 @@ namespace Ion.Pro.Analyser
         {
             DateTime begin = DateTime.Now;
             ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            //ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
             SensorPackage[] all = reader.ReadPackages();
             int i = 0;
             try
@@ -96,6 +98,7 @@ namespace Ion.Pro.Analyser
                 {
                     //Console.WriteLine("Tick");
                     SensorPackage pack = all[i];
+                    //pack.TimeStamp *= 1000;
                     SensorDataStore.GetDefault().AddLive(pack);
                     //Console.WriteLine("At: " + pack.TimeStamp.ToString());
                     System.Threading.Thread.Sleep((int)(all[i + 1].TimeStamp - all[i].TimeStamp));
