@@ -17,8 +17,11 @@ namespace Ion.Pro.Analyser
     public class SensorDataStore
     {
         //List<SensorPackage> allPackages = new List<SensorPackage>();
-        Dictionary<int, List<SensorPackage>> indexedPackages = new Dictionary<int, List<SensorPackage>>();
+        Dictionary<int, List<RealSensorPackage>> indexedPackages = new Dictionary<int, List<RealSensorPackage>>();
         public event EventHandler<SensorEventArgs> DataReceived;
+
+        public const string SensorFile = "Sensors/Sensor.json";
+        public const string SensorInfoFile = "Sensors/SensorInfo.json";
 
         static Singelton<SensorDataStore> instance = new Singelton<SensorDataStore>();
         public static SensorDataStore GetDefault()
@@ -28,16 +31,47 @@ namespace Ion.Pro.Analyser
 
         List<SensorInformation> sensorInformations = new List<SensorInformation>();
 
+        Dictionary<string, SensorInformation> sensorKeyMapping = new Dictionary<string, SensorInformation>();
+
         public void LoadSensorInformation()
         {
-            FileInfo fi = new FileInfo("Data/sensor.json");
-            if (fi.Exists)
+            FileInfo sensorFile = new FileInfo(SensorFile);
+            FileInfo sensorInfoFile = new FileInfo(SensorInfoFile);
+            if (sensorFile.Exists)
             {
-                sensorInformations.AddRange(JSONObject.Parse(File.ReadAllText(fi.FullName)).ToArray<SensorInformation[]>());
+                this.SensorInfoAddRange(JSONObject.Parse(File.ReadAllText(sensorFile.FullName)).ToArray<SensorInformation[]>());
             }
             else
             {
-                throw new FileNotFoundException("sensor.json was not found");
+                throw new FileNotFoundException("Sensor.json was not found");
+            }
+            if (sensorInfoFile.Exists)
+            {
+                SensorValueInformation[] senVal = JSONObject.Parse(File.ReadAllText(sensorInfoFile.FullName)).ToArray<SensorValueInformation[]>();
+                foreach (SensorValueInformation sv in senVal)
+                {
+                    if (sensorKeyMapping.ContainsKey(sv.Key))
+                    {
+                        sensorKeyMapping[sv.Key].ValueInfo = sv;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Could not find sensor with key: " + sv.Key);
+                    }
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("SensorInfo.json was not found");
+            }
+        }
+
+        private void SensorInfoAddRange(IEnumerable<SensorInformation> infos)
+        {
+            foreach(SensorInformation si in infos)
+            {
+                sensorInformations.Add(si);
+                sensorKeyMapping[si.Key] = si;
             }
         }
 
@@ -45,9 +79,9 @@ namespace Ion.Pro.Analyser
         {
             if (!indexedPackages.ContainsKey(data.ID))
             {
-                indexedPackages[data.ID] = new List<SensorPackage>();
+                indexedPackages[data.ID] = new List<RealSensorPackage>();
             }
-            indexedPackages[data.ID].Add(data);
+            indexedPackages[data.ID].Add(RealSensorPackage.Convert(data));
         }
 
         public void AddRange(IEnumerable<SensorPackage> sensorPackage)
@@ -63,10 +97,10 @@ namespace Ion.Pro.Analyser
             if (!indexedPackages.ContainsKey(id))
                 return null;
             List<SensorPackageViewModel> allViews = new List<SensorPackageViewModel>();
-            foreach (SensorPackage sp in indexedPackages[id])
+            /*foreach (SensorPackage sp in indexedPackages[id])
             {
                 allViews.Add(sp.GetObject());
-            }
+            }*/
             return allViews.ToArray();
         }
 
@@ -75,14 +109,14 @@ namespace Ion.Pro.Analyser
             if (!indexedPackages.ContainsKey(id))
                 return null;
             List<byte> allViews = new List<byte>();
-            foreach (SensorPackage sp in indexedPackages[id])
+            foreach (RealSensorPackage sp in indexedPackages[id])
             {
                 allViews.AddRange(sp.GetBinary());
             }
             return allViews.ToArray();
         }
 
-        public SensorPackage[] GetPackages(int id)
+        public RealSensorPackage[] GetPackages(int id)
         {
             return indexedPackages[id].ToArray();
         }
@@ -115,5 +149,21 @@ namespace Ion.Pro.Analyser
         public string Key { get; set; }
         public string Name { get; set; }
         public string Unit { get; set; }
+        public SensorValueInformation ValueInfo { get; set; }
+    }
+
+    public class SensorValueInformation
+    {
+        public string Key { get; set; }
+        public string Unit { get; set; }
+        public int Resolution { get; set; }
+
+
+        public bool? Signed { get; set; }
+
+        public long? MinValue { get; set; }
+        public long? MaxValue { get; set; }
+        public long? MinDisplay { get; set; }
+        public long? MaxDisplay { get; set; }
     }
 }

@@ -61,14 +61,20 @@
     <None Include="App.config" />
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\freq.iondata" />
+    <None Include="Sensors\SensorInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Data\stiangps.gpx" />
     <None Include="Data\126_usart_data.iondata" />
     <None Include="Data\fredrikgps.gpx" />
     <None Include="Data\GPS_DataFile.csv" />
-    <None Include="Data\Sensor.json">
+    <None Include="Sensors\Sensor.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\sensorTypeDef.json">
+    <None Include="Sensors\sensorInfoTypeDef.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sensors\sensorTypeDef.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -81,7 +87,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Data_4Sensor_1json__JSONSchema="sensorTypeDef.json" />
+      <UserProperties Sensors_4SensorInfo_1json__JSONSchema="sensorInfoTypeDef.json" Sensors_4Sensor_1json__JSONSchema="sensorTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

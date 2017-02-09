@@ -3,8 +3,8 @@ var SensorManager = (function () {
         var _this = this;
         this.dataCache = [];
         this.plotCache = [];
-        this.eventManager = new EventManager();
         this.plotter = [];
+        this.eventManager = new EventManager();
         kernel.netMan.registerService(10, function (data) {
             var dataArray = _this.convertToSensorPackage(data.Sensors);
             for (var j = 0; j < dataArray.length; j++) {
@@ -112,19 +112,31 @@ var SensorManager = (function () {
             console.log(raw.charCodeAt(i * 28 + 1));
             console.log(raw.charCodeAt(i * 28 + 2));
             console.log(raw.charCodeAt(i * 28 + 3));*/
+            var buf = new ArrayBuffer(8);
+            var insert = new Uint8Array(buf);
+            insert[0] = raw.charCodeAt(i * 28 + 4);
+            insert[1] = raw.charCodeAt(i * 28 + 5);
+            insert[2] = raw.charCodeAt(i * 28 + 6);
+            insert[3] = raw.charCodeAt(i * 28 + 7);
+            insert[4] = raw.charCodeAt(i * 28 + 8);
+            insert[5] = raw.charCodeAt(i * 28 + 9);
+            insert[6] = raw.charCodeAt(i * 28 + 10);
+            insert[7] = raw.charCodeAt(i * 28 + 11);
+            var output = new Float64Array(buf);
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                     | raw.charCodeAt(i * 28 + 1) << 8
                     | raw.charCodeAt(i * 28 + 2) << 16
                     | raw.charCodeAt(i * 28 + 3) << 24,
-                Value: raw.charCodeAt(i * 28 + 4)
-                    | raw.charCodeAt(i * 28 + 5) << 8
-                    | raw.charCodeAt(i * 28 + 6) << 16
-                    | raw.charCodeAt(i * 28 + 7) << 24
-                    | raw.charCodeAt(i * 28 + 8) << 32
-                    | raw.charCodeAt(i * 28 + 9) << 40
-                    | raw.charCodeAt(i * 28 + 10) << 48
-                    | raw.charCodeAt(i * 28 + 11) << 56,
+                Value: output[0],
+                /*Value: raw.charCodeAt(i * 28 + 4)
+                | raw.charCodeAt(i * 28 + 5) << 8
+                | raw.charCodeAt(i * 28 + 6) << 16
+                | raw.charCodeAt(i * 28 + 7) << 24
+                | raw.charCodeAt(i * 28 + 8) << 32
+                | raw.charCodeAt(i * 28 + 9) << 40
+                | raw.charCodeAt(i * 28 + 10) << 48
+                | raw.charCodeAt(i * 28 + 11) << 56,*/
                 TimeStamp: raw.charCodeAt(i * 28 + 12)
                     | raw.charCodeAt(i * 28 + 13) << 8
                     | raw.charCodeAt(i * 28 + 14) << 16

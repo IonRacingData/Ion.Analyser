@@ -57,6 +57,62 @@ namespace Ion.Pro.Analyser.Data
         }
     }
 
+    public struct RealSensorPackage
+    {
+        public int ID { get; set; }
+        public double Value { get; set; }
+        public long TimeStamp { get; set; }
+        public long AbsoluteTimeStamp { get; set; }
+
+        public static RealSensorPackage Convert(SensorPackage package)
+        {
+            return new RealSensorPackage() {
+                ID = package.ID,
+                Value = package.Value,
+                TimeStamp = package.TimeStamp,
+                AbsoluteTimeStamp = package.AbsoluteTimeStamp,
+            };
+
+        }
+
+        public byte[] GetBinary()
+        {
+            byte[] valByes = BitConverter.GetBytes(Value);
+            return new byte[]
+            {
+                
+                (byte)ID,
+                (byte)(ID >> 8),
+                (byte)(ID >> 16),
+                (byte)(ID >> 24),
+                valByes[0],
+                valByes[1],
+                valByes[2],
+                valByes[3],
+                valByes[4],
+                valByes[5],
+                valByes[6],
+                valByes[7],
+                (byte)TimeStamp,
+                (byte)(TimeStamp >> 8),
+                (byte)(TimeStamp >> 16),
+                (byte)(TimeStamp >> 24),
+                (byte)(TimeStamp >> 32),
+                (byte)(TimeStamp >> 40),
+                (byte)(TimeStamp >> 48),
+                (byte)(TimeStamp >> 56),
+                (byte)AbsoluteTimeStamp,
+                (byte)(AbsoluteTimeStamp >> 8),
+                (byte)(AbsoluteTimeStamp >> 16),
+                (byte)(AbsoluteTimeStamp >> 24),
+                (byte)(AbsoluteTimeStamp >> 32),
+                (byte)(AbsoluteTimeStamp >> 40),
+                (byte)(AbsoluteTimeStamp >> 48),
+                (byte)(AbsoluteTimeStamp >> 56),
+            };
+        }
+    }
+
     public class SensorPackageViewModel
     {
         public int ID { get; set; }
