@@ -49,10 +49,10 @@
     }
 }
 
-class PlotterTester implements IApplication, IMultiPlot {
+class LineChartTester implements IApplication, IMultiPlot {
     application: Application;
     window: AppWindow;
-    plotter: Plotter;
+    lineChart: LineChartController;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
     plotData: IPlotData[] = [];
@@ -62,22 +62,22 @@ class PlotterTester implements IApplication, IMultiPlot {
 
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
-        this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);
+        this.lineChart = new LineChartController(this.plotData);
+        this.window.content.appendChild(this.lineChart.generate());
+        this.lineChart.setSize(this.window.width, this.window.height);
     }
 
     dataUpdate() {
-        this.plotter.draw();
+        this.lineChart.draw();
     }
 
     createEvents(eh: EventHandler) {
         eh.on(this.window, AppWindow.event_resize, () => {
-            this.plotter.setSize(this.window.width, this.window.height);
+            this.lineChart.setSize(this.window.width, this.window.height);
         });
         eh.on(this.window, AppWindow.event_close, () => {
             this.close();
@@ -115,49 +115,38 @@ class TestViewer implements IApplication {
 class GaugeTester implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
-    gauge: GaugePlot;
+    gauge: GaugeController;
     val: number = 0;
     plotType: string = "GaugePlot";
     plotWindow: AppWindow;
     plotData: IPlotData;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
         this.window.content.style.overflow = "hidden";
-        kernel.senMan.register(this);
-        /*
-        let slider = document.createElement("input");
-        slider.setAttribute("type", "range");
-        //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
-        this.window.content.appendChild(slider);
-        slider.addEventListener("input", () => {
-            let val = slider.value;
-            this.gauge.drawNeedle(parseInt(val));
-        });*/                
+        kernel.senMan.register(this);                
 
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-                
-        this.gauge.wrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 3;
-            this.val = this.val > 100 ? 100 : this.val;
-            this.val = this.val < 0 ? 0 : this.val;
-            this.gauge.setValue(this.val);
-        });
-
         
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.gauge.setSize(this.window.width, this.window.height);
-            //this.plotter.draw();
         });
 
     }
 
     drawMeter() {
         //this.window.content.innerHTML = "";                        
-        this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
-        this.window.content.appendChild(this.gauge.generate());
+        this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
+        let gaugeWrapper = this.gauge.generate();
+        this.window.content.appendChild(gaugeWrapper);
+
+        gaugeWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 3;
+            this.val = this.val > 100 ? 100 : this.val;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.gauge.setValue(this.val);
+        });
     }
 
     dataUpdate() {
@@ -169,7 +158,7 @@ class GPSPlotTester implements IApplication {
     application: Application;
     window: AppWindow;
     points: Point3D[] = [];
-    plot: GPSPlot;
+    plot: GPSController;
     testData: GPSPlotData;
 
     main() {
@@ -200,7 +189,7 @@ class GPSPlotTester implements IApplication {
 
     draw(p: Point3D[]): void {                
         this.testData = new GPSPlotData(p);
-        this.plot = new GPSPlot(this.testData);
+        this.plot = new GPSController(this.testData);
         //console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
         this.plot.setSize(this.window.width, this.window.height);
@@ -237,4 +226,33 @@ class LabelTester {
             this.label.setSize(this.window.width, this.window.height);
         });
     }
+}
+
+class BarTester {
+    application: Application;
+    window: AppWindow;
+    bar: BarController;
+    val: number = 0;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.bar = new BarController(this.window.width, this.window.height);
+        let barWrapper = this.bar.generate();
+        this.window.content.appendChild(barWrapper);
+        this.bar.setValue(this.val);        
+
+        barWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 10;
+            this.val = this.val > 100 ? 100 : this.val;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.bar.setValue(this.val);
+        });
+
+        this.window.addEventListener(AppWindow.event_resize, () => {
+            this.bar.setSize(this.window.width, this.window.height);
+        });
+    }
+
+
 }

@@ -1,28 +1,36 @@
-var Plotter = (function () {
-    function Plotter(data) {
-        this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(0.01, 1);
-        this.isDragging = false;
-        this.zoomSpeed = 1.1;
-        this.selectedPoint = null;
-        this.isMarking = false;
-        this.displayGrid = true;
-        this.stickyAxes = true;
-        this.backgroundColor = "rgb(45, 45, 45)";
-        this.gridColor = "rgba(100,100,100,0.3)";
-        this.axisColor = "white"; //"black"; // "black";
-        this.mainColor = "white";
-        this.data = data;
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var LineChartController = (function (_super) {
+    __extends(LineChartController, _super);
+    function LineChartController(data) {
+        var _this = _super.call(this) || this;
+        _this.isDragging = false;
+        _this.zoomSpeed = 1.1;
+        _this.selectedPoint = null;
+        _this.isMarking = false;
+        _this.displayGrid = true;
+        _this.stickyAxes = true;
+        _this.backgroundColor = "rgb(45, 45, 45)";
+        _this.gridColor = "rgba(100,100,100,0.3)";
+        _this.axisColor = "white"; //"black"; // "black";
+        _this.mainColor = "white";
+        _this.data = data;
+        _this.movePoint = new Point(50, 50);
+        _this.scalePoint = new Point(0.01, 1);
+        return _this;
     }
-    Plotter.prototype.generatePlot = function () {
+    LineChartController.prototype.generate = function () {
         var _this = this;
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
-        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
@@ -57,7 +65,7 @@ var Plotter = (function () {
         this.draw();
         return this.wrapper;
     };
-    Plotter.prototype.wrapper_mouseDown = function (e) {
+    LineChartController.prototype.wrapper_mouseDown = function (e) {
         e.preventDefault();
         this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
         this.mouseDown = true;
@@ -68,7 +76,7 @@ var Plotter = (function () {
             console.log(this.marking.firstPoint);
         }
     };
-    Plotter.prototype.wrapper_mouseMove = function (e) {
+    LineChartController.prototype.wrapper_mouseMove = function (e) {
         if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
             if (this.isMarking) {
                 this.marking.secondPoint = this.getMousePoint(e);
@@ -81,7 +89,7 @@ var Plotter = (function () {
             }
         }
     };
-    Plotter.prototype.wrapper_mouseUp = function (e) {
+    LineChartController.prototype.wrapper_mouseUp = function (e) {
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
@@ -97,7 +105,7 @@ var Plotter = (function () {
             this.selectPoint(this.getMousePoint(e));
         }
     };
-    Plotter.prototype.wrapper_touchStart = function (e) {
+    LineChartController.prototype.wrapper_touchStart = function (e) {
         e.preventDefault();
         console.log(e);
         this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
@@ -109,7 +117,7 @@ var Plotter = (function () {
             console.log(this.marking.firstPoint);
         }
     };
-    Plotter.prototype.wrapper_touchMove = function (e) {
+    LineChartController.prototype.wrapper_touchMove = function (e) {
         if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
             if (this.isMarking) {
                 this.marking.secondPoint = this.getTouchPoint(e);
@@ -122,7 +130,7 @@ var Plotter = (function () {
             }
         }
     };
-    Plotter.prototype.wrapper_touchEnd = function (e) {
+    LineChartController.prototype.wrapper_touchEnd = function (e) {
         console.log(e);
         this.wrapper.focus();
         this.mouseDown = false;
@@ -139,20 +147,20 @@ var Plotter = (function () {
             this.selectPoint(this.getTouchPoint(e));
         }
     };
-    Plotter.prototype.drawMarking = function () {
+    LineChartController.prototype.drawMarking = function () {
         this.ctxMarking.clear();
         this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
     };
-    Plotter.prototype.setSize = function (width, height) {
+    LineChartController.prototype.setSize = function (width, height) {
         this.width = width;
         this.height = height;
         this.canvas.setSize(width, height);
         this.draw();
     };
-    Plotter.prototype.selectPoint = function (e) {
+    LineChartController.prototype.selectPoint = function (e) {
         //var mp: Point = this.getMousePoint(e);
         var mp = e;
         var p = null;
@@ -171,7 +179,7 @@ var Plotter = (function () {
         }
         this.draw();
     };
-    Plotter.prototype.zoom = function (e) {
+    LineChartController.prototype.zoom = function (e) {
         e.preventDefault();
         var mousePoint = this.getMousePoint(e);
         var curRel = this.getRelative(mousePoint);
@@ -204,16 +212,13 @@ var Plotter = (function () {
         this.movePoint = this.movePoint.add(move);
         this.draw();
     };
-    Plotter.prototype.getMousePoint = function (e) {
-        return new Point(e.layerX, e.layerY);
-    };
-    Plotter.prototype.getTouchPoint = function (e) {
+    LineChartController.prototype.getTouchPoint = function (e) {
         if (e.touches.length > 0)
             return new Point(e.touches[0].clientX, e.touches[0].clientY);
         else
             return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     };
-    Plotter.prototype.draw = function () {
+    LineChartController.prototype.draw = function () {
         this.ctxMain.clear();
         this.drawXAxis();
         this.drawYAxis();
@@ -257,7 +262,7 @@ var Plotter = (function () {
         this.ctxBackground.fillStyle = this.backgroundColor;
         this.ctxBackground.fillRect(0, 0, this.width, this.height);
     };
-    Plotter.prototype.drawXAxis = function () {
+    LineChartController.prototype.drawXAxis = function () {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
@@ -265,7 +270,7 @@ var Plotter = (function () {
         var y = origo.y;
         if (!visible && this.stickyAxes) {
             if (origo.y < 0) {
-                y = 0;
+                y = -1;
             }
             else {
                 y = this.height;
@@ -305,17 +310,12 @@ var Plotter = (function () {
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            } /*
-            else {
-                this.ctxMain.moveTo(absX, y);
-                this.ctxMain.lineTo(absX, y + 4);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
     };
-    Plotter.prototype.drawYAxis = function () {
+    LineChartController.prototype.drawYAxis = function () {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
@@ -323,7 +323,7 @@ var Plotter = (function () {
         var x = origo.x;
         if (!visible && this.stickyAxes) {
             if (origo.x < 0) {
-                x = 0;
+                x = -1;
             }
             else {
                 x = this.width;
@@ -354,7 +354,7 @@ var Plotter = (function () {
                 number = transformer.y.toFixed(decimalPlaces);
             }
             numWidth = this.ctxMain.measureText(number);
-            numOffset = x === 0 ? x + 8 : x - (numWidth + 7);
+            numOffset = x === -1 ? x + 8 : x - (numWidth + 7);
             this.ctxMain.fillText(number, numOffset, absY + 3);
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
@@ -363,17 +363,12 @@ var Plotter = (function () {
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            } /*
-            else {
-                this.ctxMain.moveTo(origo.x, absY);
-                this.ctxMain.lineTo(origo.x - 4, absY);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
     };
-    Plotter.prototype.calculateSteps = function (scaling) {
+    LineChartController.prototype.calculateSteps = function (scaling) {
         var log10 = function (val) { return Math.log(val) / Math.LN10; };
         var maxR = 100 / scaling;
         var scale = Math.floor(log10(maxR));
@@ -394,17 +389,7 @@ var Plotter = (function () {
         }
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
     };
-    Plotter.prototype.getRelative = function (p) {
-        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        var scaled = moved.divide(this.scalePoint);
-        return scaled;
-    };
-    Plotter.prototype.getAbsolute = function (p) {
-        var scaled = p.multiply(this.scalePoint);
-        var moved = scaled.add(this.movePoint);
-        return new Point(moved.x, this.height - moved.y);
-    };
-    Plotter.prototype.zoomByMarking = function () {
+    LineChartController.prototype.zoomByMarking = function () {
         this.ctxMarking.clear();
         var width = this.marking.width;
         var height = this.marking.height;
@@ -419,8 +404,8 @@ var Plotter = (function () {
         this.movePoint = this.movePoint.sub(sec);
         this.draw();
     };
-    return Plotter;
-}());
+    return LineChartController;
+}(CanvasController));
 var ContextFixer = (function () {
     function ContextFixer(canvas) {
         this.canvas = canvas;
@@ -482,32 +467,36 @@ var ContextFixer = (function () {
     return ContextFixer;
 }());
 var LayeredCanvas = (function () {
-    function LayeredCanvas(wrapper, names) {
-        this.canvases = {};
-        var canvas = document.createElement("canvas");
-        canvas.className = "plot-canvas";
-        for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {
-            var name_1 = names_1[_i];
-            this.canvases[name_1] = canvas.cloneNode();
-            wrapper.appendChild(this.canvases[name_1]);
-        }
+    function LayeredCanvas(wrapper) {
+        this.canvases = [];
+        this.mk = new HtmlHelper;
+        this.wrapper = wrapper;
     }
-    LayeredCanvas.prototype.getContext = function (name) {
-        var ctx = this.canvases[name].getContext("2d");
-        return ctx;
+    LayeredCanvas.prototype.addCanvas = function () {
+        var canvas = this.mk.tag("canvas", "plot-canvas");
+        this.wrapper.appendChild(canvas);
+        this.canvases.push(canvas);
+        return canvas;
     };
     LayeredCanvas.prototype.getWidth = function () {
-        return this.canvases["main"].width;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].width;
+        }
+        return -1;
     };
     LayeredCanvas.prototype.getHeight = function () {
-        return this.canvases["main"].height;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].height;
+        }
+        return -1;
     };
     LayeredCanvas.prototype.setSize = function (width, height) {
-        for (var name_2 in this.canvases) {
-            this.canvases[name_2].width = width;
-            this.canvases[name_2].height = height;
+        for (var _i = 0, _a = this.canvases; _i < _a.length; _i++) {
+            var c = _a[_i];
+            c.width = width;
+            c.height = height;
         }
     };
     return LayeredCanvas;
 }());
-//# sourceMappingURL=Plotter.js.map
+//# sourceMappingURL=LineChartController.js.map

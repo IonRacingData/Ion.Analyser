@@ -1,24 +1,17 @@
-﻿class LabelController {
-    wrapper: HTMLElement;
-    private textWrapper: HTMLElement;
-    private mk: HtmlHelper = new HtmlHelper();
-    private width: number;
-    private height: number;
+﻿class LabelController extends SingleValueController{
+    private textWrapper: HTMLElement;    
     private fontSize: number = 10;
 
     constructor(width: number, height: number) {
+        super();
         this.wrapper = this.mk.tag("div", "label-controller");
         this.textWrapper = this.mk.tag("span");
         this.wrapper.appendChild(this.textWrapper);
         this.textWrapper.style.fontSize = this.fontSize + "px";
         this.setSize(width, height);
-
-        this.textWrapper.addEventListener("mouseover", (e: MouseEvent) => {
-            e.preventDefault();
-        });
     }
 
-    generate() {
+    generate(): HTMLElement {
         return this.wrapper;
     }
 

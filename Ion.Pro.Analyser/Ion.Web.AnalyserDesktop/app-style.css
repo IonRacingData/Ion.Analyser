@@ -117,5 +117,9 @@ span.table-resize{
 .gauge-plot {
     color: darkgray;
     /* needle color */    
-    border-color: yellow;
+    border-color: red;
+}
+
+.bar-controller {
+    background-color: green;
 }

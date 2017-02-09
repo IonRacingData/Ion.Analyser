@@ -42,37 +42,37 @@ var DataViewer = (function () {
     };
     return DataViewer;
 }());
-var PlotterTester = (function () {
-    function PlotterTester() {
+var LineChartTester = (function () {
+    function LineChartTester() {
         this.eh = new EventHandler();
         this.plotData = [];
         this.plotType = "Plot";
     }
-    PlotterTester.prototype.main = function () {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Plotter Tester");
+    LineChartTester.prototype.main = function () {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
-        this.plotter = new Plotter(this.plotData);
-        this.window.content.appendChild(this.plotter.generatePlot());
-        this.plotter.setSize(this.window.width, this.window.height);
+        this.lineChart = new LineChartController(this.plotData);
+        this.window.content.appendChild(this.lineChart.generate());
+        this.lineChart.setSize(this.window.width, this.window.height);
     };
-    PlotterTester.prototype.dataUpdate = function () {
-        this.plotter.draw();
+    LineChartTester.prototype.dataUpdate = function () {
+        this.lineChart.draw();
     };
-    PlotterTester.prototype.createEvents = function (eh) {
+    LineChartTester.prototype.createEvents = function (eh) {
         var _this = this;
         eh.on(this.window, AppWindow.event_resize, function () {
-            _this.plotter.setSize(_this.window.width, _this.window.height);
+            _this.lineChart.setSize(_this.window.width, _this.window.height);
         });
         eh.on(this.window, AppWindow.event_close, function () {
             _this.close();
         });
     };
-    PlotterTester.prototype.close = function () {
+    LineChartTester.prototype.close = function () {
         this.eh.close();
     };
-    return PlotterTester;
+    return LineChartTester;
 }());
 var TestViewer = (function () {
     function TestViewer() {
@@ -99,36 +99,27 @@ var GaugeTester = (function () {
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Meter Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
-        /*
-        let slider = document.createElement("input");
-        slider.setAttribute("type", "range");
-        //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
-        this.window.content.appendChild(slider);
-        slider.addEventListener("input", () => {
-            let val = slider.value;
-            this.gauge.drawNeedle(parseInt(val));
-        });*/
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-        this.gauge.wrapper.addEventListener("wheel", function (e) {
+        this.window.addEventListener(AppWindow.event_resize, function () {
+            _this.gauge.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    GaugeTester.prototype.drawMeter = function () {
+        var _this = this;
+        //this.window.content.innerHTML = "";                        
+        this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
+        var gaugeWrapper = this.gauge.generate();
+        this.window.content.appendChild(gaugeWrapper);
+        gaugeWrapper.addEventListener("wheel", function (e) {
             _this.val -= e.deltaY / 3;
             _this.val = _this.val > 100 ? 100 : _this.val;
             _this.val = _this.val < 0 ? 0 : _this.val;
             _this.gauge.setValue(_this.val);
         });
-        this.window.addEventListener(AppWindow.event_resize, function () {
-            _this.gauge.setSize(_this.window.width, _this.window.height);
-            //this.plotter.draw();
-        });
-    };
-    GaugeTester.prototype.drawMeter = function () {
-        //this.window.content.innerHTML = "";                        
-        this.gauge = new GaugePlot(this.window.width, this.window.height, 0, 200, 20);
-        this.window.content.appendChild(this.gauge.generate());
     };
     GaugeTester.prototype.dataUpdate = function () {
         this.gauge.setValue((this.plotData.getValue[this.plotData.getLength() - 1].y / 200) * 100);
@@ -166,7 +157,7 @@ var GPSPlotTester = (function () {
     };
     GPSPlotTester.prototype.draw = function (p) {
         this.testData = new GPSPlotData(p);
-        this.plot = new GPSPlot(this.testData);
+        this.plot = new GPSController(this.testData);
         //console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
         this.plot.setSize(this.window.width, this.window.height);
@@ -199,5 +190,29 @@ var LabelTester = (function () {
         });
     };
     return LabelTester;
+}());
+var BarTester = (function () {
+    function BarTester() {
+        this.val = 0;
+    }
+    BarTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.bar = new BarController(this.window.width, this.window.height);
+        var barWrapper = this.bar.generate();
+        this.window.content.appendChild(barWrapper);
+        this.bar.setValue(this.val);
+        barWrapper.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY / 10;
+            _this.val = _this.val > 100 ? 100 : _this.val;
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.bar.setValue(_this.val);
+        });
+        this.window.addEventListener(AppWindow.event_resize, function () {
+            _this.bar.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    return BarTester;
 }());
 //# sourceMappingURL=TestApps.js.map

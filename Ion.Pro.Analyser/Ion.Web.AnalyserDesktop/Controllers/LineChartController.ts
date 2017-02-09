@@ -1,41 +1,39 @@
-﻿class Plotter {
-    wrapper: HTMLDivElement;
-    canvas: LayeredCanvas;
-    ctxMain: ContextFixer;
-    ctxMarking: ContextFixer;
-    ctxBackground: ContextFixer;
-    width: number;
-    height: number;
-    data: IPlotData[];
-    movePoint = new Point(50, 50);
-    scalePoint = new Point(0.01, 1);
-    mouseMod: Point;
-    mouseDown: boolean;
-    isDragging = false;
-    zoomSpeed: number = 1.1;
-    selectedPoint: Point = null;
-    isMarking = false;
-    marking: IMarking;
-    displayGrid = true;
-    stickyAxes = true;
-    backgroundColor = "rgb(45, 45, 45)";
-    gridColor = "rgba(100,100,100,0.3)";
-    axisColor = "white";//"black"; // "black";
-    mainColor = "white";
+﻿class LineChartController extends CanvasController{        
+    private data: IPlotData[];
+    private ctxMain: ContextFixer;
+    private ctxMarking: ContextFixer;
+    private ctxBackground: ContextFixer;        
+    private mouseMod: Point;
+    private mouseDown: boolean;
+    private isDragging = false;
+    private zoomSpeed: number = 1.1;
+    private selectedPoint: Point = null;
+    private isMarking = false;
+    private marking: IMarking;
+    private displayGrid = true;
+    private stickyAxes = true;
+    private backgroundColor = "rgb(45, 45, 45)";
+    private gridColor = "rgba(100,100,100,0.3)";
+    private axisColor = "white";//"black"; // "black";
+    private mainColor = "white";
 
     constructor(data: IPlotData[]) {
+        super();
         this.data = data;
+        this.movePoint = new Point(50, 50);
+        this.scalePoint = new Point(0.01, 1);
     }
 
-    generatePlot(): HTMLDivElement {
+    generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-        this.canvas = new LayeredCanvas(this.wrapper, ["background", "main", "marking"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxMarking = new ContextFixer(this.canvas.canvases["marking"]);
-        this.ctxBackground = new ContextFixer(this.canvas.canvases["background"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
@@ -163,7 +161,7 @@
         }
     }
 
-    drawMarking(): void {
+    private drawMarking(): void {
         this.ctxMarking.clear();
         this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
@@ -178,7 +176,7 @@
         this.draw();
     }
 
-    selectPoint(e: Point): void {
+    private selectPoint(e: Point): void {
         //var mp: Point = this.getMousePoint(e);
         var mp = e;
         var p: Point = null;
@@ -200,7 +198,7 @@
         this.draw();
     }
 
-    zoom(e: WheelEvent): void {
+    private zoom(e: WheelEvent): void {
         e.preventDefault();
         var mousePoint: Point = this.getMousePoint(e);
         var curRel: Point = this.getRelative(mousePoint);
@@ -234,11 +232,7 @@
         var move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
         this.movePoint = this.movePoint.add(move);
         this.draw();
-    }
-
-    getMousePoint(e: MouseEvent): Point {
-        return new Point(e.layerX, e.layerY);
-    }
+    }    
 
     getTouchPoint(e: TouchEvent): Point {
         if (e.touches.length > 0)
@@ -304,7 +298,7 @@
 
     }
 
-    drawXAxis(): void {
+    private drawXAxis(): void {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
 
@@ -314,7 +308,7 @@
         var y: number = origo.y;
         if (!visible && this.stickyAxes) {
             if (origo.y < 0) {
-                y = 0;
+                y = -1;
             }
             else {
                 y = this.height;
@@ -361,19 +355,14 @@
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            }/*
-            else {
-                this.ctxMain.moveTo(absX, y);
-                this.ctxMain.lineTo(absX, y + 4);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
 
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
     }
 
-    drawYAxis(): void {
+    private drawYAxis(): void {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
 
@@ -383,7 +372,7 @@
         var x: number = origo.x;
         if (!visible && this.stickyAxes) {
             if (origo.x < 0) {
-                x = 0;
+                x = -1;
             }
             else {
                 x = this.width;
@@ -419,7 +408,7 @@
             }
 
             numWidth = this.ctxMain.measureText(number);
-            numOffset = x === 0 ? x + 8 : x - (numWidth + 7);
+            numOffset = x === -1 ? x + 8 : x - (numWidth + 7);
             this.ctxMain.fillText(number, numOffset, absY + 3);
 
             this.ctxMain.stroke();
@@ -430,19 +419,14 @@
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            }/*
-            else {
-                this.ctxMain.moveTo(origo.x, absY);
-                this.ctxMain.lineTo(origo.x - 4, absY);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
 
         this.ctxMain.strokeStyle = this.mainColor;
         this.ctxMain.fillStyle = this.mainColor;
     }
 
-    calculateSteps(scaling: number): IStepInfo {
+    private calculateSteps(scaling: number): IStepInfo {
         var log10: (val: number) => number = (val: number): number => Math.log(val) / Math.LN10;
 
         var maxR: number = 100 / scaling;
@@ -464,21 +448,9 @@
         }
 
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
-    }
+    }    
 
-    getRelative(p: Point): Point {
-        var moved: Point = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        var scaled: Point = moved.divide(this.scalePoint);
-        return scaled;
-    }
-
-    getAbsolute(p: Point): Point {
-        var scaled: Point = p.multiply(this.scalePoint);
-        var moved: Point = scaled.add(this.movePoint);
-        return new Point(moved.x, this.height - moved.y);
-    }
-
-    zoomByMarking(): void {
+    private zoomByMarking(): void {
         this.ctxMarking.clear();
 
         var width: number = this.marking.width;
@@ -590,32 +562,37 @@ class ContextFixer {
 }
 
 class LayeredCanvas {
-    canvases: { [name: string]: HTMLCanvasElement } = {};
+    private wrapper: HTMLElement;
+    private canvases: HTMLCanvasElement[] = [];
+    private mk: HtmlHelper = new HtmlHelper;
 
-    constructor(wrapper: HTMLDivElement, names: string[]) {
-        var canvas: HTMLCanvasElement = document.createElement("canvas");
-        canvas.className = "plot-canvas";
-        for (let name of names) {
-            this.canvases[name] = <HTMLCanvasElement>canvas.cloneNode();
-            wrapper.appendChild(this.canvases[name]);
-        }
+    constructor(wrapper: HTMLElement) {
+        this.wrapper = wrapper;
     }
 
-    getContext(name: string): CanvasRenderingContext2D {
-        var ctx: CanvasRenderingContext2D = this.canvases[name].getContext("2d");
-        return ctx;
+    addCanvas(): HTMLCanvasElement {
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
+        this.wrapper.appendChild(canvas);
+        this.canvases.push(canvas);
+        return canvas;
     }
 
     getWidth(): number {
-        return this.canvases["main"].width;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].width;
+        }
+        return -1;
     }
     getHeight(): number {
-        return this.canvases["main"].height;
+        if (this.canvases.length > 0) {
+            return this.canvases[0].height;
+        }
+        return -1;
     }
     setSize(width: number, height: number): void {
-        for (let name in this.canvases) {
-            this.canvases[name].width = width;
-            this.canvases[name].height = height;
+        for (let c of this.canvases) {
+            c.width = width;
+            c.height = height;
         }
     }
 }

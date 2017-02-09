@@ -225,8 +225,6 @@ span.table-resize{
 
 .plot-canvas {    
     position: absolute;
-
-
     /*border: 1px solid black;*/
 }
 .plot-wrapper {
@@ -238,4 +236,14 @@ span.table-resize{
     justify-content: center;
     align-items: center;
     user-select: none;
+}
+
+.bar-controller {
+    background-color: blue;
+    width: 100%;
+}
+
+.bar-controller-wrapper {
+    display: flex;
+    align-items: flex-end;
 }
