@@ -4,7 +4,12 @@
     protected width: number;
     protected mk: HtmlHelper = new HtmlHelper;
 
-    public setSize(width: number, height: number) { }
+    public setSize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        this.onSizeChange();
+    }
+    protected abstract onSizeChange(): void;
     public abstract generate(): HTMLElement;
 }
 

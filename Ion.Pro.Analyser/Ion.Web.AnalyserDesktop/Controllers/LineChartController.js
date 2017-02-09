@@ -154,10 +154,8 @@ var LineChartController = (function (_super) {
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
     };
-    LineChartController.prototype.setSize = function (width, height) {
-        this.width = width;
-        this.height = height;
-        this.canvas.setSize(width, height);
+    LineChartController.prototype.onSizeChange = function () {
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     };
     LineChartController.prototype.selectPoint = function (e) {

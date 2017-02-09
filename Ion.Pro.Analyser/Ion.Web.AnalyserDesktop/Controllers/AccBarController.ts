@@ -4,7 +4,6 @@
     leftBar: HTMLElement;
     rightBar: HTMLElement;
 
-
     constructor(width: number, height: number) {
         super();
         this.wrapper = this.mk.tag("div", "accBar-controller-wrapper");
@@ -33,10 +32,10 @@
             this.leftBar.style.width = 0 + "%";
             this.rightBar.style.width = value + "%";
         }
-    }
+    }    
 
-    setSize(widht: number, height: number) {
-        this.wrapper.style.width = widht + "px";
-        this.wrapper.style.height = height + "px";
+    protected onSizeChange(): void {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.width + "px";
     }
 }

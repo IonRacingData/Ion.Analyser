@@ -169,10 +169,8 @@
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
     }
 
-    setSize(width: number, height: number): void {
-        this.width = width;
-        this.height = height;
-        this.canvas.setSize(width, height);
+    protected onSizeChange(): void {
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     }
 

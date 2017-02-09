@@ -33,9 +33,9 @@ var AccBarController = (function (_super) {
             this.rightBar.style.width = value + "%";
         }
     };
-    AccBarController.prototype.setSize = function (widht, height) {
-        this.wrapper.style.width = widht + "px";
-        this.wrapper.style.height = height + "px";
+    AccBarController.prototype.onSizeChange = function () {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.width + "px";
     };
     return AccBarController;
 }(SingleValueController));
