@@ -244,6 +244,7 @@ var SensorInfoHelper = (function () {
         var min = SensorInfoHelper.minValue(info);
         var max = SensorInfoHelper.maxValue(info);
         var newVal = (p.y - min) / (max - min);
+        return new Point(p.x, newVal);
     };
     return SensorInfoHelper;
 }());

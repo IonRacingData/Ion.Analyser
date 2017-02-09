@@ -248,7 +248,7 @@ class SensorValueInformation {
 }
 
 class SensorInfoHelper {
-    public static maxValue(info: SensorInformation) {
+    public static maxValue(info: SensorInformation): number {
         let val = 0;
         let temp = info.ValueInfo;
         if (temp.MaxDisplay) {
@@ -263,7 +263,7 @@ class SensorInfoHelper {
         return val;
     }
 
-    public static minValue(info: SensorInformation) {
+    public static minValue(info: SensorInformation): number {
         let val = 0;
         let temp = info.ValueInfo;
         if (temp.MinDisplay) {
@@ -278,11 +278,12 @@ class SensorInfoHelper {
         return val;
     }
 
-    public static getPercent(info: SensorInformation, p: Point) {
+    public static getPercent(info: SensorInformation, p: Point): Point {
         let min = SensorInfoHelper.minValue(info);
         let max = SensorInfoHelper.maxValue(info);
 
         let newVal = (p.y - min) / (max - min);
+        return new Point(p.x, newVal);
     }
 }
 
