@@ -31,6 +31,7 @@ namespace Ion.Pro.Analyser
 
         List<SensorInformation> sensorInformations = new List<SensorInformation>();
 
+        Dictionary<int, SensorInformation> sensorIdMapping = new Dictionary<int, SensorInformation>();
         Dictionary<string, SensorInformation> sensorKeyMapping = new Dictionary<string, SensorInformation>();
 
         public void LoadSensorInformation()
@@ -72,6 +73,7 @@ namespace Ion.Pro.Analyser
             {
                 sensorInformations.Add(si);
                 sensorKeyMapping[si.Key] = si;
+                sensorIdMapping[si.ID] = si;
             }
         }
 
@@ -81,7 +83,15 @@ namespace Ion.Pro.Analyser
             {
                 indexedPackages[data.ID] = new List<RealSensorPackage>();
             }
-            indexedPackages[data.ID].Add(RealSensorPackage.Convert(data));
+            RealSensorPackage temp = RealSensorPackage.Convert(data);
+            if (sensorIdMapping.ContainsKey(data.ID))
+            {
+                SensorInformation info = sensorIdMapping[data.ID];
+                if (info.ValueInfo == null)
+                    throw new Exception("Missing ValueInfo for package: " + info.ID.ToString() + ", " + info.Key + ", " + info.Name);
+                temp.Value = info.ValueInfo.ConvertValue((int)temp.Value);
+            }
+            indexedPackages[data.ID].Add(temp);
         }
 
         public void AddRange(IEnumerable<SensorPackage> sensorPackage)
@@ -165,5 +175,48 @@ namespace Ion.Pro.Analyser
         public long? MaxValue { get; set; }
         public long? MinDisplay { get; set; }
         public long? MaxDisplay { get; set; }
+
+        public double ConvertToPercent(int rawValue)
+        {
+            if (Signed != null && Signed.Value)
+            {
+                int shift = 0;
+                if (rawValue >> Resolution > 0)
+                    shift = (-1 << Resolution);
+                return ((double)(shift | rawValue)) / (double)(((long)1 << Resolution) - 1);
+            }
+            else
+            {
+                return ((double)rawValue) / (((long)1 << Resolution) - 1);
+            }
+        }
+
+        public double ConvertValue(int rawValue)
+        {
+            if (Signed != null && MaxValue != null)
+            {
+                if (!Signed.Value)
+                    MinValue = -MaxValue.Value - 1;
+            }
+            if (MaxValue == null && MinValue == null)
+            {
+                return rawValue;
+            }
+            else if (Signed != null && Signed.Value)
+            {
+                if (MaxValue == null)
+                    throw new Exception("Missing max value for calculation for key: " + this.Key);
+                return ConvertToPercent(rawValue) * MaxValue.Value;
+            }
+            else if (MinValue != null && MaxValue != null)
+            {
+                return ConvertToPercent(rawValue) * (MaxValue.Value - MinValue.Value) + MinValue.Value;
+            }
+            else
+            {
+
+                throw new Exception("Missing MaxValue and MinValue for calculation for key: " + this.Key);
+            }
+        }
     }
 }
