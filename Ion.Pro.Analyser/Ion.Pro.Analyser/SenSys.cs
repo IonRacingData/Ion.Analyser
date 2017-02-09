@@ -196,6 +196,8 @@ namespace Ion.Pro.Analyser
             if (Signed != null && MaxValue != null)
             {
                 if (!Signed.Value)
+                    MinValue = 0;
+                else
                     MinValue = -MaxValue.Value - 1;
             }
             if (MaxValue == null && MinValue == null)
@@ -214,8 +216,7 @@ namespace Ion.Pro.Analyser
             }
             else
             {
-
-                throw new Exception("Missing MaxValue and MinValue for calculation for key: " + this.Key);
+                throw new Exception("Missing MaxValue and/or MinValue for calculation for key: " + this.Key);
             }
         }
     }

@@ -228,10 +228,62 @@ class Multicallback {
 }
 
 class SensorInformation {
-    ID: number;
-    Key: string;
-    Name: string;
-    Unit: string;
+    public ID: number;
+    public Key: string;
+    public Name: string;
+    public Unit: string;
+    public ValueInfo: SensorValueInformation;
+}
+
+class SensorValueInformation {
+    public Key: string;
+    public Unit: string;
+    public Resolution: number;
+
+    public Signed?: boolean;
+    public MinValue?: number;
+    public MaxValue?: number;
+    public MinDisplay?: number;
+    public MaxDisplay?: number;
+}
+
+class SensorInfoHelper {
+    public static maxValue(info: SensorInformation) {
+        let val = 0;
+        let temp = info.ValueInfo;
+        if (temp.MaxDisplay) {
+            val = temp.MaxDisplay;
+        }
+        else if (temp.MaxValue) {
+            val = temp.MaxValue;
+        }
+        else {
+            val = (1 << temp.Resolution) - 1;
+        }
+        return val;
+    }
+
+    public static minValue(info: SensorInformation) {
+        let val = 0;
+        let temp = info.ValueInfo;
+        if (temp.MinDisplay) {
+            val = temp.MinDisplay;
+        }
+        else if (temp.MinValue) {
+            val = temp.MinValue;
+        }
+        else if (temp.Signed) {
+            val = -SensorInfoHelper.maxValue(info) - 1;
+        }
+        return val;
+    }
+
+    public static getPercent(info: SensorInformation, p: Point) {
+        let min = SensorInfoHelper.minValue(info);
+        let max = SensorInfoHelper.maxValue(info);
+
+        let newVal = (p.y - min) / (max - min);
+    }
 }
 
 interface IPlot {

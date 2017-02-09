@@ -204,4 +204,47 @@ var SensorInformation = (function () {
     }
     return SensorInformation;
 }());
+var SensorValueInformation = (function () {
+    function SensorValueInformation() {
+    }
+    return SensorValueInformation;
+}());
+var SensorInfoHelper = (function () {
+    function SensorInfoHelper() {
+    }
+    SensorInfoHelper.maxValue = function (info) {
+        var val = 0;
+        var temp = info.ValueInfo;
+        if (temp.MaxDisplay) {
+            val = temp.MaxDisplay;
+        }
+        else if (temp.MaxValue) {
+            val = temp.MaxValue;
+        }
+        else {
+            val = (1 << temp.Resolution) - 1;
+        }
+        return val;
+    };
+    SensorInfoHelper.minValue = function (info) {
+        var val = 0;
+        var temp = info.ValueInfo;
+        if (temp.MinDisplay) {
+            val = temp.MinDisplay;
+        }
+        else if (temp.MinValue) {
+            val = temp.MinValue;
+        }
+        else if (temp.Signed) {
+            val = -SensorInfoHelper.maxValue(info) - 1;
+        }
+        return val;
+    };
+    SensorInfoHelper.getPercent = function (info, p) {
+        var min = SensorInfoHelper.minValue(info);
+        var max = SensorInfoHelper.maxValue(info);
+        var newVal = (p.y - min) / (max - min);
+    };
+    return SensorInfoHelper;
+}());
 //# sourceMappingURL=sensys.js.map
