@@ -104,6 +104,9 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
+        if (plot.plotData.ID == sensor.ID) {
+            radio.checked = true;
+        }
         radio.addEventListener("change", function (e) {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
@@ -116,6 +119,12 @@ var DataAssigner = (function () {
     DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
+        for (var i = 0; i < plot.plotData.length; i++) {
+            if (plot.plotData[i].ID == sensor.ID) {
+                checkBox.checked = true;
+                break;
+            }
+        }
         checkBox.addEventListener("change", function (e) {
             console.log("Multi checkbox click");
             if (checkBox.checked) {

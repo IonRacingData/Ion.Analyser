@@ -116,6 +116,9 @@
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
+        if (plot.plotData.ID == sensor.ID) {
+            radio.checked = true;
+        }
         radio.addEventListener("change", (e: Event) => {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
@@ -129,6 +132,13 @@
     createMultiSensor(plot: IMultiPlot, sensor: SensorInformation): HTMLElement {
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
+        for (let i = 0; i < plot.plotData.length; i++) {
+            if (plot.plotData[i].ID == sensor.ID) {
+                checkBox.checked = true;
+                break;
+            }
+        }
+
         checkBox.addEventListener("change", (e: Event) => {
             console.log("Multi checkbox click");
             if (checkBox.checked) {
