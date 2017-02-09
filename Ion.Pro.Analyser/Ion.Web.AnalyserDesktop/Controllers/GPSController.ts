@@ -35,12 +35,10 @@
         this.relSize = null;                
         
         return this.wrapper;
-    }
+    }    
 
-    setSize(width: number, height: number): void {
-        this.canvas.setSize(width, height);
-        this.width = width;
-        this.height = height;
+    protected onSizeChange(): void {
+        this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
         this.width -= this.padding * 2;
         this.height -= this.padding * 2;

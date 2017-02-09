@@ -22,11 +22,9 @@ var BarController = (function (_super) {
         this.value = percent;
         this.bar.style.height = this.value + "%";
     };
-    BarController.prototype.setSize = function (width, height) {
-        this.width = width;
-        this.height = height;
-        this.wrapper.style.width = width + "px";
-        this.wrapper.style.height = height + "px";
+    BarController.prototype.onSizeChange = function () {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.height + "px";
     };
     return BarController;
 }(SingleValueController));

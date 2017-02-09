@@ -22,11 +22,9 @@ var LabelController = (function (_super) {
         this.textWrapper.innerHTML = value.toString();
         this.adjustFontSize();
     };
-    LabelController.prototype.setSize = function (width, height) {
-        this.width = width;
-        this.height = height;
-        this.wrapper.style.width = width + "px";
-        this.wrapper.style.height = height * 0.87 + "px";
+    LabelController.prototype.onSizeChange = function () {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.height * 0.87 + "px";
         this.adjustFontSize();
     };
     LabelController.prototype.adjustFontSize = function () {

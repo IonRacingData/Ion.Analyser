@@ -32,10 +32,8 @@ var GPSController = (function (_super) {
         this.relSize = null;
         return this.wrapper;
     };
-    GPSController.prototype.setSize = function (width, height) {
-        this.canvas.setSize(width, height);
-        this.width = width;
-        this.height = height;
+    GPSController.prototype.onSizeChange = function () {
+        this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
         this.width -= this.padding * 2;
         this.height -= this.padding * 2;

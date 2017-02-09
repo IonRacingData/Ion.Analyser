@@ -100,11 +100,11 @@ var GaugeController = (function (_super) {
         this.value = percent;
         this.drawNeedle();
     };
-    GaugeController.prototype.setSize = function (width, height) {
-        this.size = Math.min(width, height);
-        this.offsetX = (width - this.size) / 2;
-        this.offsetY = (height - this.size) / 2 + (height * 0.05);
-        this.canvas.setSize(width, height);
+    GaugeController.prototype.onSizeChange = function () {
+        this.size = Math.min(this.width, this.height);
+        this.offsetX = (this.width - this.size) / 2;
+        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     };
     return GaugeController;

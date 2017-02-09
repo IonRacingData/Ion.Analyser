@@ -256,3 +256,32 @@ class BarTester {
 
 
 }
+
+class AccBarTester {
+    application: Application;
+    window: AppWindow;
+    accBar: AccBarController;
+    val: number = 0;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.accBar = new AccBarController(this.window.width, this.window.height);
+        let accBarWrapper = this.accBar.generate();
+        this.window.content.appendChild(accBarWrapper);
+        this.accBar.setValue(this.val);
+
+        accBarWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 10;
+            this.val = this.val > 100 ? 100 : this.val;
+            this.val = this.val < -100 ? -100 : this.val;
+            this.accBar.setValue(this.val);
+        });
+
+        this.window.addEventListener(AppWindow.event_resize, () => {
+            this.accBar.setSize(this.window.width, this.window.height);
+        });
+    }
+
+
+}

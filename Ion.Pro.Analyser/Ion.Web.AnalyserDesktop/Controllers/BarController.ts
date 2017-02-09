@@ -20,10 +20,8 @@
         this.bar.style.height = this.value + "%";
     }
 
-    setSize(width: number, height: number): void {
-        this.width = width;
-        this.height = height;
-        this.wrapper.style.width = width + "px";
-        this.wrapper.style.height = height + "px";
+    protected onSizeChange(): void {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.height + "px";
     }
 }

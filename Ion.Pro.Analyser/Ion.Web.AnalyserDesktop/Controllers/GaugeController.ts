@@ -122,13 +122,13 @@
         percent = percent < 0 ? 0 : percent;
         this.value = percent;
         this.drawNeedle();
-    }
+    }    
 
-    setSize(width: number, height: number): void {
-        this.size = Math.min(width, height);
-        this.offsetX = (width - this.size) / 2;
-        this.offsetY = (height - this.size) / 2 + (height * 0.05);
-        this.canvas.setSize(width, height);        
+    protected onSizeChange(): void {
+        this.size = Math.min(this.width, this.height);
+        this.offsetX = (this.width - this.size) / 2;
+        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     }
 }

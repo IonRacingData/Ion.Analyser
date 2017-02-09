@@ -7,7 +7,11 @@ var Controller = (function () {
     function Controller() {
         this.mk = new HtmlHelper;
     }
-    Controller.prototype.setSize = function (width, height) { };
+    Controller.prototype.setSize = function (width, height) {
+        this.width = width;
+        this.height = height;
+        this.onSizeChange();
+    };
     return Controller;
 }());
 var SingleValueController = (function (_super) {

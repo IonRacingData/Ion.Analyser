@@ -20,11 +20,9 @@
         this.adjustFontSize();
     }
 
-    setSize(width: number, height: number) {
-        this.width = width;
-        this.height = height;
-        this.wrapper.style.width = width + "px";
-        this.wrapper.style.height = height * 0.87 + "px";
+    protected onSizeChange(): void {
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.height * 0.87 + "px";
 
         this.adjustFontSize();
     }
