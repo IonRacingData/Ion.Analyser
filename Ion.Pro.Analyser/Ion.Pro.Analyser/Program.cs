@@ -88,6 +88,8 @@ namespace Ion.Pro.Analyser
                 case RunMode.OffLine:
                     foreach (ISensorReader reader in readers)
                     {
+                        if (reader == null)
+                            continue;
                         store.AddRange(reader.ReadPackages());
                     }
                     break;

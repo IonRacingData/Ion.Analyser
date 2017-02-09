@@ -68,6 +68,8 @@ namespace Ion.Pro.Analyser.SenSys
         public ISensorReader GetSensorReader(string file, params object[] extraParam)
         {
             FileInfo fi = new FileInfo(file);
+            if (!fi.Exists)
+                return null;
             string ext = fi.Extension.Remove(0, 1);
             if (ReaderLinker.ContainsKey(ext))
             {
