@@ -48,6 +48,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
+    kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
 
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));

@@ -18,13 +18,13 @@ var WindowManager = (function () {
         //addEventListener
     }
     WindowManager.prototype.mouseMove = function (e) {
-        this.handleMouseMoveing(e.pageX, e.pageY, e);
+        this.handleMouseMoving(e.pageX, e.pageY, e);
     };
     WindowManager.prototype.touchMove = function (e) {
         e.preventDefault();
-        this.handleMouseMoveing(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
+        this.handleMouseMoving(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
     };
-    WindowManager.prototype.handleMouseMoveing = function (x, y, e) {
+    WindowManager.prototype.handleMouseMoving = function (x, y, e) {
         if (this.dragging) {
             this.activeWindow.__setRelativePos(x, y);
             var tileZone = this.tileZone;

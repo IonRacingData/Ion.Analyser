@@ -207,3 +207,51 @@ class TestDataViewer implements IApplication, ISinglePlot {
         this.draw();
     }
 }
+
+class SensorSetSelector implements IApplication {
+    public application: Application;
+    private window: AppWindow;
+    private mk = new HtmlHelper();
+    private wrapper: HTMLElement;
+
+    public main(): void {
+        this.wrapper = this.mk.tag("div");
+        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        requestAction("GetAvaiableSets", (data: SensorSetInformation[]) => this.drawData(data));
+        this.window.content.appendChild(this.wrapper);
+    }
+
+    private drawData(data: SensorSetInformation[]): void {
+        this.wrapper.innerHTML = "";
+        var table = new HtmlTableGen("table selectable");
+        
+        table.addHeader("File name", "File size", "Sensor reader");
+        for (let a of data) {
+            table.addRow(
+                [
+                    {
+                        "event": "click",
+                        "func": (event: Event) =>
+                        {
+                            //console.log("you clicked on: " + a.FileName);
+                            requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
+                            kernel.senMan.clearCache();
+                        }
+                    }
+                ],
+                a.FileName,
+                a.Size,
+                a.FileReader
+            );
+        }
+
+        this.wrapper.appendChild(table.generate());
+    }
+}
+
+interface SensorSetInformation {
+    FileName: string;
+    FullFileName: string;
+    Size: number;
+    FileReader: string;
+}
