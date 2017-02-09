@@ -247,3 +247,32 @@ span.table-resize{
     display: flex;
     align-items: flex-end;
 }
+
+.accBar-controller-wrapper {
+    height: 100%;
+}
+
+.accBar-controller-left-wrapper {
+    height: 100%;
+    width: 50%;
+    float: left;
+}
+
+.accBar-controller-right-wrapper {
+    height: 100%;
+    width: 50%;
+    float: right;
+}
+
+.accBar-controller-left {
+    height: 100%;
+    background-color: blue;
+    float: right;
+}
+
+.accBar-controller-right {
+    height: 100%;
+    background-color: red;
+    float: left;
+}
+
