@@ -307,7 +307,7 @@
         var y: number = origo.y;
         if (!visible && this.stickyAxes) {
             if (origo.y < 0) {
-                y = 0;
+                y = -1;
             }
             else {
                 y = this.height;
@@ -354,12 +354,7 @@
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            }/*
-            else {
-                this.ctxMain.moveTo(absX, y);
-                this.ctxMain.lineTo(absX, y + 4);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
 
         this.ctxMain.strokeStyle = this.mainColor;
@@ -376,7 +371,7 @@
         var x: number = origo.x;
         if (!visible && this.stickyAxes) {
             if (origo.x < 0) {
-                x = 0;
+                x = -1;
             }
             else {
                 x = this.width;
@@ -412,7 +407,7 @@
             }
 
             numWidth = this.ctxMain.measureText(number);
-            numOffset = x === 0 ? x + 8 : x - (numWidth + 7);
+            numOffset = x === -1 ? x + 8 : x - (numWidth + 7);
             this.ctxMain.fillText(number, numOffset, absY + 3);
 
             this.ctxMain.stroke();
@@ -423,12 +418,7 @@
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
                 this.ctxMain.stroke();
-            }/*
-            else {
-                this.ctxMain.moveTo(origo.x, absY);
-                this.ctxMain.lineTo(origo.x - 4, absY);
-                this.ctxMain.stroke();
-            }*/
+            }
         }
 
         this.ctxMain.strokeStyle = this.mainColor;
