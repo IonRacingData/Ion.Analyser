@@ -9,8 +9,8 @@
     private isMarking = false;
     private marking: IMarking;
     private displayGrid = true;
-    private stickyAxes = true; 
-    private autoScroll = true;   
+    private stickyAxes = true;
+    private autoScroll = false;
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";//"black"; // "black";
     private mainColor = "white";
@@ -48,27 +48,29 @@
             this.ctxMarking.clear();
         });
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
-        this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
-            console.log("key pressed");
-            if (e.key === "g") {
-                this.displayGrid = this.displayGrid === true ? false : true;
-                this.draw();
-            } else if (e.key === "r") {
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
-                this.draw();
-            } else if (e.key === "a") {
-                this.stickyAxes = this.stickyAxes === true ? false : true;
-                this.draw();
-            }
-            else if (e.key === "k") {
-                this.autoScroll = this.autoScroll === true ? false : true;
-                this.draw();
-            }
-        });
+        this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
 
         this.draw();
         return this.wrapper;
+    }
+
+    private wrapper_keyDown(e: KeyboardEvent) {
+        switch (e.key) {
+            case "g":
+                this.displayGrid = this.displayGrid === true ? false : true;
+                break;               
+            case "r":
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);                
+                break;
+            case "a":
+                this.stickyAxes = this.stickyAxes === true ? false : true;                
+                break;
+            case "k":
+                this.autoScroll = this.autoScroll === true ? false : true;                
+                break;
+        }
+        this.draw();
     }
 
     private wrapper_mouseDown(e: MouseEvent): void {

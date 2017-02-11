@@ -13,7 +13,7 @@ var LineChartController = (function (_super) {
         _this.isMarking = false;
         _this.displayGrid = true;
         _this.stickyAxes = true;
-        _this.autoScroll = true;
+        _this.autoScroll = false;
         _this.gridColor = "rgba(100,100,100,0.3)";
         _this.axisColor = "white"; //"black"; // "black";
         _this.mainColor = "white";
@@ -44,28 +44,27 @@ var LineChartController = (function (_super) {
             _this.ctxMarking.clear();
         });
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
-        this.wrapper.addEventListener("keydown", function (e) {
-            console.log("key pressed");
-            if (e.key === "g") {
-                _this.displayGrid = _this.displayGrid === true ? false : true;
-                _this.draw();
-            }
-            else if (e.key === "r") {
-                _this.scalePoint = new Point(1, 1);
-                _this.movePoint = new Point(50, 50);
-                _this.draw();
-            }
-            else if (e.key === "a") {
-                _this.stickyAxes = _this.stickyAxes === true ? false : true;
-                _this.draw();
-            }
-            else if (e.key === "k") {
-                _this.autoScroll = _this.autoScroll === true ? false : true;
-                _this.draw();
-            }
-        });
+        this.wrapper.addEventListener("keydown", function (e) { return _this.wrapper_keyDown(e); });
         this.draw();
         return this.wrapper;
+    };
+    LineChartController.prototype.wrapper_keyDown = function (e) {
+        switch (e.key) {
+            case "g":
+                this.displayGrid = this.displayGrid === true ? false : true;
+                break;
+            case "r":
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                break;
+            case "a":
+                this.stickyAxes = this.stickyAxes === true ? false : true;
+                break;
+            case "k":
+                this.autoScroll = this.autoScroll === true ? false : true;
+                break;
+        }
+        this.draw();
     };
     LineChartController.prototype.wrapper_mouseDown = function (e) {
         e.preventDefault();
