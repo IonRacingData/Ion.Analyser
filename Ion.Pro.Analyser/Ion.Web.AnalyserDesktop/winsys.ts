@@ -42,15 +42,15 @@
     }
 
     mouseMove(e: MouseEvent): void {
-        this.handleMouseMoveing(e.pageX, e.pageY, e);
+        this.handleMouseMoving(e.pageX, e.pageY, e);
     }
 
     touchMove(e: TouchEvent): void {
         e.preventDefault();
-        this.handleMouseMoveing(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
+        this.handleMouseMoving(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
     }
 
-    handleMouseMoveing(x: number, y: number, e: Event): void {
+    handleMouseMoving(x: number, y: number, e: Event): void {
         if (this.dragging) {
             this.activeWindow.__setRelativePos(x, y);
             var tileZone: number = this.tileZone;
@@ -85,14 +85,14 @@
         }
     }
 
-    mouseUp(e: MouseEvent): void {
+    private mouseUp(e: MouseEvent): void {
         //console.log(e);
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
-    touchEnd(e: TouchEvent): void {
+    private touchEnd(e: TouchEvent): void {
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
@@ -108,12 +108,12 @@
         return window;
     }
 
-    makeWindow(app: Application): AppWindow {
+    private makeWindow(app: Application): AppWindow {
         var tempWindow: AppWindow = new AppWindow(app);
         return tempWindow;
     }
 
-    registerWindow(app: AppWindow): void {
+    private registerWindow(app: AppWindow): void {
         app.winMan = this;
         this.body.appendChild(app.handle);
         this.windows.push(app);
@@ -172,7 +172,7 @@
         this.eventManager.removeEventListener(type, listener);
     }
 
-    raiseEvent(type: string, data: any): void {
+    private raiseEvent(type: string, data: any): void {
         this.eventManager.raiseEvent(type, data);
     }
 }

@@ -149,6 +149,21 @@ var SensorManager = (function () {
         }
         return ret;
     };
+    SensorManager.prototype.clearCache = function () {
+        this.dataCache = [];
+        this.plotCache = [];
+        for (var _i = 0, _a = this.plotter; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (Array.isArray(a.plotData)) {
+                a.plotData.splice(0);
+                a.dataUpdate();
+            }
+            else {
+                a.plotData = null;
+                a.dataUpdate();
+            }
+        }
+    };
     SensorManager.prototype.setGlobal = function (id) {
         var _this = this;
         this.globalId = id;

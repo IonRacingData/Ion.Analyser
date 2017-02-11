@@ -172,6 +172,21 @@
         return ret;
     }
 
+    public clearCache(): void {
+        this.dataCache = [];
+        this.plotCache = [];
+        for (let a of this.plotter) {
+            if (Array.isArray((<any>a).plotData)) {
+                (<IMultiPlot>a).plotData.splice(0);
+                (<IMultiPlot>a).dataUpdate();
+            }
+            else {
+                (<ISinglePlot>a).plotData = null;
+                (<ISinglePlot>a).dataUpdate();
+            }
+        }
+    }
+
     setGlobal(id: number) {
         this.globalId = id;
         this.getData(id, (data: ISensorPackage[]) => {
