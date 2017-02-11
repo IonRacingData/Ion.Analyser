@@ -1,8 +1,6 @@
-﻿class LineChartController extends CanvasController{        
-    private data: IPlotData[];
+﻿class LineChartController extends MultiValueCanvasController{
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
-    private ctxBackground: ContextFixer;        
     private mouseMod: Point;
     private mouseDown: boolean;
     private isDragging = false;
@@ -11,15 +9,14 @@
     private isMarking = false;
     private marking: IMarking;
     private displayGrid = true;
-    private stickyAxes = true;
-    private backgroundColor = "rgb(45, 45, 45)";
+    private stickyAxes = true; 
+    private autoScroll = true;   
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";//"black"; // "black";
     private mainColor = "white";
 
-    constructor(data: IPlotData[]) {
+    constructor() {
         super();
-        this.data = data;
         this.movePoint = new Point(50, 50);
         this.scalePoint = new Point(0.01, 1);
     }
@@ -30,7 +27,6 @@
         this.wrapper.className = "plot-wrapper";
 
         this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxBackground = new ContextFixer(this.canvas.addCanvas());
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
 
@@ -63,6 +59,10 @@
                 this.draw();
             } else if (e.key === "a") {
                 this.stickyAxes = this.stickyAxes === true ? false : true;
+                this.draw();
+            }
+            else if (e.key === "k") {
+                this.autoScroll = this.autoScroll === true ? false : true;
                 this.draw();
             }
         });
@@ -171,7 +171,25 @@
 
     protected onSizeChange(): void {
         this.canvas.setSize(this.width, this.height);
+        this.wrapper.style.width = this.width + "px";
+        this.wrapper.style.height = this.height + "px";
         this.draw();
+    }
+
+    protected onDataChange(): void {        
+        if (this.autoScroll) {
+            this.moveToLastPoint();
+        }
+        this.draw();
+    }
+
+    private moveToLastPoint(): void {
+        if (this.data[0]) {
+            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
+            if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
+                this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
+            }
+        }
     }
 
     private selectPoint(e: Point): void {
@@ -239,61 +257,60 @@
             return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     }
 
-    draw(): void {
+    protected draw(): void {
         this.ctxMain.clear();        
 
         this.drawXAxis();
         this.drawYAxis();
 
-        for (var d: number = 0; d < this.data.length; d++) {
-            //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
-            var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
-            if (firstVisibleIdx > 0) {
-                firstVisibleIdx--;
-            }
+        if (this.data) {
 
-            var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-            var totalLength: number = this.data[d].getLength();
-            var drawPoint: number = 0;
-            var checkPoint: Point = lastPoint;
-
-            this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.data[d].color.toString();
-
-            for (var i: number = firstVisibleIdx; i < totalLength; i++) {
-                var point: Point = this.getAbsolute(this.data[d].getValue(i));
-                if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                    this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
-                    this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                    drawPoint++;
-                    checkPoint = point;
+            for (var d: number = 0; d < this.data.length; d++) {
+                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+                var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
+                if (firstVisibleIdx > 0) {
+                    firstVisibleIdx--;
                 }
 
-                if (point.x > this.width) {
-                    break;
+                var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
+                var totalLength: number = this.data[d].getLength();
+                var drawPoint: number = 0;
+                var checkPoint: Point = lastPoint;
+
+                this.ctxMain.beginPath();
+                this.ctxMain.strokeStyle = this.data[d].color.toString();
+
+                for (var i: number = firstVisibleIdx; i < totalLength; i++) {
+                    var point: Point = this.getAbsolute(this.data[d].getValue(i));
+                    if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
+                        this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
+                        this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
+                        drawPoint++;
+                        checkPoint = point;
+                    }
+
+                    if (point.x > this.width) {
+                        break;
+                    }
+                    lastPoint = point;
                 }
-                lastPoint = point;
+
+                this.ctxMain.ctx.closePath();
+                this.ctxMain.stroke();
+                this.ctxMain.fillStyle = this.mainColor;
             }
 
-            this.ctxMain.ctx.closePath();
-            this.ctxMain.stroke();
-            this.ctxMain.fillStyle = this.mainColor;
-        }
 
-       
 
-        if (this.selectedPoint !== null) {
-            var abs: Point = this.getAbsolute(this.selectedPoint);
-            var pointString: string = this.selectedPoint.toString();
-            this.ctxMain.beginPath();
-            this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-            this.ctxMain.stroke();
-            this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
-        }
-
-        this.ctxBackground.fillStyle = this.backgroundColor;
-        this.ctxBackground.fillRect(0, 0, this.width, this.height);
-
+            if (this.selectedPoint !== null) {
+                var abs: Point = this.getAbsolute(this.selectedPoint);
+                var pointString: string = this.selectedPoint.toString();
+                this.ctxMain.beginPath();
+                this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+                this.ctxMain.stroke();
+                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
+            }
+        }        
     }
 
     private drawXAxis(): void {

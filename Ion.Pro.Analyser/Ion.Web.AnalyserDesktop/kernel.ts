@@ -55,7 +55,6 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(BarTester, "Bar Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
-    kernel.appMan.registerApplication("Plot", new Launcher(AccBarTester, "Accelerator Bar Test"));
 
 
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));

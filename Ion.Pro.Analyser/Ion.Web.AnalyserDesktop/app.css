@@ -238,41 +238,28 @@ span.table-resize{
     user-select: none;
 }
 
-.bar-controller {
+.bar-controller-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.bar-controller-barWrapper1 {
+    flex-grow: 1;        
+}
+
+.bar-controller-barWrapper2 {
+    flex-grow: 1;       
+}
+
+.bar-controller-bar1 {
     background-color: blue;
     width: 100%;
 }
 
-.bar-controller-wrapper {
-    display: flex;
-    align-items: flex-end;
-}
-
-.accBar-controller-wrapper {
-    height: 100%;
-}
-
-.accBar-controller-left-wrapper {
-    height: 100%;
-    width: 50%;
-    float: left;
-}
-
-.accBar-controller-right-wrapper {
-    height: 100%;
-    width: 50%;
-    float: right;
-}
-
-.accBar-controller-left {
-    height: 100%;
-    background-color: blue;
-    float: right;
-}
-
-.accBar-controller-right {
-    height: 100%;
+.bar-controller-bar2 {
     background-color: red;
-    float: left;
+    width: 100%;
 }
+
+
 
