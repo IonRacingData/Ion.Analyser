@@ -199,14 +199,15 @@ var BarTester = (function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height);
+        this.bar = new BarController(this.window.width, this.window.height, false, true);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         this.bar.setValue(this.val);
+        // for testing    
         barWrapper.addEventListener("wheel", function (e) {
-            _this.val -= e.deltaY / 10;
-            _this.val = _this.val > 100 ? 100 : _this.val;
-            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.val -= e.deltaY / 100;
+            _this.val = _this.val > 1 ? 1 : _this.val;
+            _this.val = _this.val < -1 ? -1 : _this.val;
             _this.bar.setValue(_this.val);
         });
         this.window.addEventListener(AppWindow.event_resize, function () {

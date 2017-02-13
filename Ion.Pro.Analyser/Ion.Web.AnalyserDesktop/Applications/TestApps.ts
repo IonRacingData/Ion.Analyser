@@ -235,15 +235,16 @@ class BarTester {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height);
+        this.bar = new BarController(this.window.width, this.window.height, false, true);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         this.bar.setValue(this.val);        
 
+        // for testing    
         barWrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 10;
-            this.val = this.val > 100 ? 100 : this.val;
-            this.val = this.val < 0 ? 0 : this.val;
+            this.val -= e.deltaY / 100;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.val = this.val < -1 ? -1 : this.val;
             this.bar.setValue(this.val);
         });
 

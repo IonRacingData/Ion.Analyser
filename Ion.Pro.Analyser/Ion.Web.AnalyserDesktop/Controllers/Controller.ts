@@ -24,7 +24,7 @@ abstract class SingleValueController extends Controller {
 }
 
 abstract class CanvasController extends Controller {
-    protected canvas: LayeredCanvas;    
+    protected canvas: LayeredCanvas;
     protected movePoint: Point;
     protected scalePoint: Point;
 

@@ -240,26 +240,24 @@ span.table-resize{
 
 .bar-controller-wrapper {
     display: flex;
-    flex-direction: column;
 }
 
 .bar-controller-barWrapper1 {
-    flex-grow: 1;        
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-end;
 }
 
 .bar-controller-barWrapper2 {
-    flex-grow: 1;       
+    flex-grow: 1;
 }
 
 .bar-controller-bar1 {
     background-color: blue;
-    width: 100%;
 }
 
 .bar-controller-bar2 {
-    background-color: red;
-    width: 100%;
+    background-color: red;    
 }
-
 
 
