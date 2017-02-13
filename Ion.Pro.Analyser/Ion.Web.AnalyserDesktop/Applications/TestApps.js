@@ -122,7 +122,7 @@ var GaugeTester = (function () {
         });
     };
     GaugeTester.prototype.dataUpdate = function () {
-        this.gauge.setValue((this.plotData.getValue[this.plotData.getLength() - 1].y / 200) * 100);
+        this.gauge.setValue((this.plotData.getValue(this.plotData.getLength() - 1).y / 200) * 100);
     };
     return GaugeTester;
 }());

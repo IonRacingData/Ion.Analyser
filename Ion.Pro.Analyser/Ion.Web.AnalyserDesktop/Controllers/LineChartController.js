@@ -13,12 +13,12 @@ var LineChartController = (function (_super) {
         _this.isMarking = false;
         _this.displayGrid = true;
         _this.stickyAxes = true;
-        _this.autoScroll = false;
+        _this.autoScroll = true;
         _this.gridColor = "rgba(100,100,100,0.3)";
         _this.axisColor = "white"; //"black"; // "black";
         _this.mainColor = "white";
         _this.movePoint = new Point(50, 50);
-        _this.scalePoint = new Point(0.01, 1);
+        _this.scalePoint = new Point(0.05, 6);
         return _this;
     }
     LineChartController.prototype.generate = function () {

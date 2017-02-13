@@ -10,7 +10,7 @@
     private marking: IMarking;
     private displayGrid = true;
     private stickyAxes = true;
-    private autoScroll = false;
+    private autoScroll = true;
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";//"black"; // "black";
     private mainColor = "white";
@@ -18,7 +18,7 @@
     constructor() {
         super();
         this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(0.01, 1);
+        this.scalePoint = new Point(0.05, 6);
     }
 
     generate(): HTMLElement {

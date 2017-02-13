@@ -116,7 +116,7 @@
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData.ID == sensor.ID) {
+        if (plot.plotData && plot.plotData.ID == sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", (e: Event) => {
