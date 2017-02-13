@@ -61,6 +61,9 @@
     protected onDataChange(): void {
         
         let val = this.value * 100;
+        if (this.double) {
+            val = (val - 50) * 2;
+        }
 
         if (this.horizontal) {
             if (this.double) {

@@ -53,6 +53,9 @@ var BarController = (function (_super) {
     };
     BarController.prototype.onDataChange = function () {
         var val = this.value * 100;
+        if (this.double) {
+            val = (val - 50) * 2;
+        }
         if (this.horizontal) {
             if (this.double) {
                 this.bar2.style.width = val < 0 ? 0 + "%" : val + "%";

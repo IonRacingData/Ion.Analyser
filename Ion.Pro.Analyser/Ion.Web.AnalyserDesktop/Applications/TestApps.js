@@ -208,7 +208,7 @@ var BarTester = (function () {
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, false, false);
+        this.bar = new BarController(this.window.width, this.window.height, true, true);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         //this.bar.setValue(this.val);
