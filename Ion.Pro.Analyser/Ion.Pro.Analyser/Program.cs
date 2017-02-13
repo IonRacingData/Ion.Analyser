@@ -22,7 +22,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.OffLine;
+        static RunMode runMode = RunMode.LiveTest;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
@@ -331,7 +331,7 @@ namespace Ion.Pro.Analyser
             SensorDataStore.GetDefault().DataReceived += SensorComService_DataReceived;
         }
 
-        List<SensorPackage> SendCache = new List<SensorPackage>();
+        List<RealSensorPackage> SendCache = new List<RealSensorPackage>();
 
         DateTime lastSend = new DateTime();
 
@@ -342,7 +342,7 @@ namespace Ion.Pro.Analyser
             if ((current - lastSend).TotalMilliseconds > 100)
             {
                 List<byte> allBytes = new List<byte>();
-                foreach (SensorPackage sp in SendCache)
+                foreach (RealSensorPackage sp in SendCache)
                 {
                     allBytes.AddRange(sp.GetBinary());
                 }

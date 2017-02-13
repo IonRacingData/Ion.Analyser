@@ -10,7 +10,7 @@ namespace Ion.Pro.Analyser.SenSys
 {
     public class SensorEventArgs : EventArgs
     {
-        public SensorPackage Package { get; set; }
+        public RealSensorPackage Package { get; set; }
     }
 
     public interface ISensorReader
@@ -172,7 +172,7 @@ namespace Ion.Pro.Analyser.SenSys
             }
         }
 
-        public void Add(SensorPackage data)
+        public RealSensorPackage Add(SensorPackage data)
         {
             if (!indexedPackages.ContainsKey(data.ID))
             {
@@ -187,6 +187,7 @@ namespace Ion.Pro.Analyser.SenSys
                 temp.Value = info.ValueInfo.ConvertValue((int)temp.Value);
             }
             indexedPackages[data.ID].Add(temp);
+            return temp;
         }
 
         public void AddRange(IEnumerable<SensorPackage> sensorPackage)
@@ -238,11 +239,11 @@ namespace Ion.Pro.Analyser.SenSys
 
         public void AddLive(SensorPackage pack)
         {
-            this.Add(pack);
-            OnDataReceived(pack);
+            RealSensorPackage rsp = this.Add(pack);
+            OnDataReceived(rsp);
         }
 
-        public void OnDataReceived(SensorPackage package)
+        public void OnDataReceived(RealSensorPackage package)
         {
             DataReceived?.Invoke(this, new SensorEventArgs() { Package = package });
         }
