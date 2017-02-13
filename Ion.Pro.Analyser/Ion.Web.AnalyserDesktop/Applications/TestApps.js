@@ -172,47 +172,61 @@ var GPSPlotTester = (function () {
 var LabelTester = (function () {
     function LabelTester() {
         this.val = 0;
+        this.plotType = "Label";
     }
     LabelTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "LabelTester");
         this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
         this.label = new LabelController(this.window.width, this.window.height);
         var div = this.label.generate();
         this.window.content.appendChild(div);
-        this.label.setValue(this.val);
-        div.addEventListener("wheel", function (e) {
-            _this.val -= e.deltaY;
-            _this.label.setValue(_this.val);
-        });
+        /*
+        div.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY;
+            this.label.setValue(this.val);
+        });*/
         this.window.addEventListener(AppWindow.event_resize, function () {
             _this.label.setSize(_this.window.width, _this.window.height);
         });
+    };
+    LabelTester.prototype.dataUpdate = function () {
+        this.label.setData(this.plotData);
     };
     return LabelTester;
 }());
 var BarTester = (function () {
     function BarTester() {
         this.val = 0;
+        this.plotType = "Bar";
     }
     BarTester.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height, true, true);
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.bar = new BarController(this.window.width, this.window.height, false, false);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
-        this.bar.setValue(this.val);
+        //this.bar.setValue(this.val);
         // for testing    
-        barWrapper.addEventListener("wheel", function (e) {
-            _this.val -= e.deltaY / 100;
-            _this.val = _this.val > 1 ? 1 : _this.val;
-            _this.val = _this.val < -1 ? -1 : _this.val;
-            _this.bar.setValue(_this.val);
+        /*
+        barWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 100;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.val = this.val < -1 ? -1 : this.val;
+            this.bar.setValue(this.val);
         });
+        */
         this.window.addEventListener(AppWindow.event_resize, function () {
             _this.bar.setSize(_this.window.width, _this.window.height);
         });
+    };
+    BarTester.prototype.dataUpdate = function () {
+        this.bar.setData(this.plotData);
     };
     return BarTester;
 }());

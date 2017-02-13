@@ -19,11 +19,32 @@ var Controller = (function () {
 var SingleValueController = (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.value = 0;
+        _this.lastID = -1;
+        return _this;
     }
     SingleValueController.prototype.setData = function (d) {
+        var _this = this;
         this.data = d;
+        if (this.data) {
+            var curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, function (i) {
+                    _this.lastSensorInfo = i;
+                    _this.lastID = _this.data.ID;
+                    _this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.value = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                }
+                this.onDataChange();
+            }
+        }
     };
+    SingleValueController.prototype.setValue = function (value) { };
     return SingleValueController;
 }(Controller));
 var CanvasController = (function (_super) {

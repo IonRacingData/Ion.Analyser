@@ -201,57 +201,77 @@ class GPSPlotTester implements IApplication {
     
 }
 
-class LabelTester {
+class LabelTester implements ISinglePlot {
     application: Application;
     window: AppWindow;
     label: LabelController;
     val: number = 0;
+    plotData: IPlotData;
+    plotType: string = "Label";
+    plotWindow: AppWindow;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "LabelTester");
         this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+
         this.label = new LabelController(this.window.width, this.window.height);
         let div = this.label.generate();
-        this.window.content.appendChild(div);
-        this.label.setValue(this.val);
+        this.window.content.appendChild(div);        
 
+        /*
         div.addEventListener("wheel", (e: WheelEvent) => {
             this.val -= e.deltaY;
             this.label.setValue(this.val);
-        });
+        });*/
 
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.label.setSize(this.window.width, this.window.height);
         });
     }
+
+    dataUpdate() {
+        this.label.setData(this.plotData);
+    }
 }
 
-class BarTester {
+class BarTester implements ISinglePlot {
     application: Application;
     window: AppWindow;
     bar: BarController;
     val: number = 0;
+    plotData: IPlotData;
+    plotType: string = "Bar";
+    plotWindow: AppWindow;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height, true, true);
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.bar = new BarController(this.window.width, this.window.height, false, false);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
-        this.bar.setValue(this.val);        
+        //this.bar.setValue(this.val);
 
         // for testing    
+        /*
         barWrapper.addEventListener("wheel", (e: WheelEvent) => {
             this.val -= e.deltaY / 100;
             this.val = this.val > 1 ? 1 : this.val;
             this.val = this.val < -1 ? -1 : this.val;
             this.bar.setValue(this.val);
         });
+        */
 
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.bar.setSize(this.window.width, this.window.height);
         });
     }
 
+    dataUpdate(): void {
+        this.bar.setData(this.plotData);
+    }
 
 }

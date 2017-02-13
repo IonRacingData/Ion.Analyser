@@ -28,7 +28,7 @@
 
             if (!this.plotCache[sensId]) {
                 this.plotCache[sensId] = new PlotData([]);
-                //this.plotCache[sensId].ID = sensId;
+                this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
         }

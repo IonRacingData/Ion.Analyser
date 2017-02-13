@@ -22,7 +22,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.OffLine;
+        static RunMode runMode = RunMode.LiveTest;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";

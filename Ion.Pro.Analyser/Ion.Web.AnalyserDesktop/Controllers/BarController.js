@@ -32,9 +32,9 @@ var BarController = (function (_super) {
         }
         if (this.horizontal) {
             this.wrapper.style.flexDirection = "row";
-            this.bar1.style.height = 100 + "%";
+            this.bar1.style.height = "100%";
             if (this.double) {
-                this.bar2.style.height = 100 + "%";
+                this.bar2.style.height = "100%";
                 this.barWrapper1.style.justifyContent = "flex-end";
             }
         }
@@ -46,13 +46,6 @@ var BarController = (function (_super) {
             }
         }
         return this.wrapper;
-    };
-    // temp
-    BarController.prototype.setValue = function (percent) {
-        percent = percent < -1 ? -1 : percent;
-        percent = percent > 1 ? 1 : percent;
-        this.value = percent;
-        this.onDataChange();
     };
     BarController.prototype.onSizeChange = function () {
         this.wrapper.style.width = this.width + "px";
@@ -75,7 +68,7 @@ var BarController = (function (_super) {
                 this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : 0 + "%";
             }
             else {
-                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
+                this.bar1.style.height = val < 0 ? "0%" : val + "%";
             }
         }
     };
