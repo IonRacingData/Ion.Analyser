@@ -436,7 +436,7 @@
   {
     "Key": "SIN2",
     "Unit": "%",
-    "Signed": false,
+    "Signed": true,
     "MaxValue": 100,
     "Resolution": 8
   },
