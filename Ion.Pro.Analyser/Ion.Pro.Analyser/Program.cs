@@ -65,21 +65,21 @@ namespace Ion.Pro.Analyser
             BinaryWriter bw = new BinaryWriter(new FileStream("../../Data/sinus.log16", FileMode.Create));
             for (int i = 0; i < 100000; i++)
             {
-                /*pack = new SensorPackage() { ID = 42, TimeStamp = i * 10, Value = (byte)((Math.Sin(i / 20.0) + 1) * 127) };
+                pack = new SensorPackage() { ID = 42, TimeStamp = i * 10, Value = (byte)((Math.Sin(i / 20.0) + 1) * 127) };
                 bw.Write(GetLegacyFormat(pack));
                 pack = new SensorPackage() { ID = 43, TimeStamp = i * 10, Value = (sbyte)(Math.Sin(i / 20.0) * 127) };
                 bw.Write(GetLegacyFormat(pack));
                 pack = new SensorPackage() { ID = 44, TimeStamp = i * 10, Value = (byte)((Math.Cos(i / 20.0) + 1) * 127) };
-                bw.Write(GetLegacyFormat(pack));*/
+                bw.Write(GetLegacyFormat(pack));
 
 
-
+                /*
                 pack = new SensorPackage() { ID = 42, TimeStamp = i * 10, Value = (byte)((Math.Sin(i / 20.0) + 1) * 127) };
                 bw.Write(GetLegacyFormat(pack));
                 pack = new SensorPackage() { ID = 43, TimeStamp = i * 10, Value = (byte)((Math.Sin((i / 20.0) + (Math.PI * 2 / 3)) + 1) * 127) };
                 bw.Write(GetLegacyFormat(pack));
                 pack = new SensorPackage() { ID = 44, TimeStamp = i * 10, Value = (byte)((Math.Sin((i / 20.0) + (Math.PI * 4 / 3)) + 1) * 127) };
-                bw.Write(GetLegacyFormat(pack));
+                bw.Write(GetLegacyFormat(pack));*/
 
             }
             bw.Close();
