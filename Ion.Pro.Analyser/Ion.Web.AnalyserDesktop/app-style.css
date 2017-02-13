@@ -110,12 +110,12 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.plot-canvas {    
-    
-}
-
 .gauge-plot {
     color: darkgray;
     /* needle color */    
-    border-color: yellow;
+    border-color: red;
+}
+
+.plot-wrapper {
+    background-color: rgb(45, 45, 45);
 }

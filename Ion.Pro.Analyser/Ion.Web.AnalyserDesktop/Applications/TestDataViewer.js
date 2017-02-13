@@ -1,25 +1,3 @@
-var TestDataViewer = (function () {
-    function TestDataViewer() {
-        this.plotType = "Test Data Viewer";
-    }
-    TestDataViewer.prototype.main = function () {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
-    };
-    TestDataViewer.prototype.draw = function () {
-        var gen = new HtmlTableGen("table");
-        gen.addHeader("Value", "Timestamp");
-        for (var i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
-        }
-        this.window.content.appendChild(gen.generate());
-        //console.log("Here we should draw something, but you know, we are lazy");
-    };
-    TestDataViewer.prototype.dataUpdate = function () {
-        this.draw();
-    };
-    return TestDataViewer;
-}());
 var DataAssigner = (function () {
     function DataAssigner() {
         this.mk = new HtmlHelper();
@@ -126,10 +104,13 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
+        if (plot.plotData.ID == sensor.ID) {
+            radio.checked = true;
+        }
         radio.addEventListener("change", function (e) {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
-                plot.plotData = data;
+                plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
             });
         });
@@ -138,11 +119,17 @@ var DataAssigner = (function () {
     DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
+        for (var i = 0; i < plot.plotData.length; i++) {
+            if (plot.plotData[i].ID == sensor.ID) {
+                checkBox.checked = true;
+                break;
+            }
+        }
         checkBox.addEventListener("change", function (e) {
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, function (data) {
-                    plot.plotData.push(data);
+                    plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
                 });
             }
@@ -175,5 +162,62 @@ var DataAssigner = (function () {
         }
     };
     return DataAssigner;
+}());
+var TestDataViewer = (function () {
+    function TestDataViewer() {
+        this.plotType = "Test Data Viewer";
+    }
+    TestDataViewer.prototype.main = function () {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
+        kernel.senMan.register(this);
+    };
+    TestDataViewer.prototype.draw = function () {
+        var gen = new HtmlTableGen("table");
+        gen.addHeader("Value", "Timestamp");
+        for (var i = 0; i < this.plotData.getLength() && i < 10; i++) {
+            gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
+        }
+        this.window.content.appendChild(gen.generate());
+        //console.log("Here we should draw something, but you know, we are lazy");
+    };
+    TestDataViewer.prototype.dataUpdate = function () {
+        this.draw();
+    };
+    return TestDataViewer;
+}());
+var SensorSetSelector = (function () {
+    function SensorSetSelector() {
+        this.mk = new HtmlHelper();
+    }
+    SensorSetSelector.prototype.main = function () {
+        var _this = this;
+        this.wrapper = this.mk.tag("div");
+        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        requestAction("GetAvaiableSets", function (data) { return _this.drawData(data); });
+        this.window.content.appendChild(this.wrapper);
+    };
+    SensorSetSelector.prototype.drawData = function (data) {
+        this.wrapper.innerHTML = "";
+        var table = new HtmlTableGen("table selectable");
+        table.addHeader("File name", "File size", "Sensor reader");
+        var _loop_2 = function (a) {
+            table.addRow([
+                {
+                    "event": "click",
+                    "func": function (event) {
+                        //console.log("you clicked on: " + a.FileName);
+                        requestAction("LoadDataset?file=" + a.FullFileName, function (data) { });
+                        kernel.senMan.clearCache();
+                    }
+                }
+            ], a.FileName, a.Size, a.FileReader);
+        };
+        for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+            var a = data_1[_i];
+            _loop_2(a);
+        }
+        this.wrapper.appendChild(table.generate());
+    };
+    return SensorSetSelector;
 }());
 //# sourceMappingURL=TestDataViewer.js.map

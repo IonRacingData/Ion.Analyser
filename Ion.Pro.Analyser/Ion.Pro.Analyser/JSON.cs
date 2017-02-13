@@ -274,6 +274,10 @@ namespace NicroWare.Pro.DmxControl.JSON
         {
             if (type == null)
                 type = nodeVal.GetType();
+            if (type.IsGenericType && type.Name == "Nullable`1")
+            {
+                type = type.GenericTypeArguments[0];
+            }
             JSONNode temp = null;
             if (nodeVal == null)
                 temp = new JSONNull();
@@ -333,9 +337,18 @@ namespace NicroWare.Pro.DmxControl.JSON
 
         private static object GetObjectValue(double num, Type t)
         {
-
             if (doubleFixer.ContainsKey(t))
                 return doubleFixer[t](num);
+            else if (t.IsGenericType && t.Name == "Nullable`1")
+            {
+                Type newType = t.GenericTypeArguments[0];
+                if (doubleFixer.ContainsKey(newType))
+                {
+                    return doubleFixer[newType](num);
+                }
+                else
+                    throw new NotFiniteNumberException("num is not a number");
+            }
             else if (t.IsEnum)
             {
                 Type subt = Enum.GetUnderlyingType(t);

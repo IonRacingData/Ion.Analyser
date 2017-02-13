@@ -179,7 +179,15 @@ namespace Ion.Pro.Analyser
 
         public async Task ExecuteResultAsync(ActionContext context)
         {
-            StringResult result = new StringResult(JSONObject.Create(baseObject).ToJsonString(), MimeTypes.GetMimeType(".json"));
+            StringResult result = null;
+            try
+            {
+                result = new StringResult(JSONObject.Create(baseObject).ToJsonString(), MimeTypes.GetMimeType(".json"));
+            }
+            catch (Exception e)
+            {
+
+            }
             await result.ExecuteResultAsync(context);
         }
     }

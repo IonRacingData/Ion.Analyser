@@ -1,6 +1,22 @@
-var PlotData = (function () {
-    function PlotData(p) {
-        this.points = p;
+var Color = (function () {
+    function Color(r, g, b, a) {
+        this.a = null;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        if (a) {
+            this.a = a;
+        }
+    }
+    Color.prototype.toString = function () {
+        if (this.a) {
+            return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
+        }
+        else {
+            return "rgb(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ")";
+        }
+    };
+    Color.randomColor = function (lowLimit, highLimit) {
         var r = 0;
         var g = 0;
         var b = 0;
@@ -8,8 +24,15 @@ var PlotData = (function () {
             r = Math.floor(Math.random() * 256);
             g = Math.floor(Math.random() * 256);
             b = Math.floor(Math.random() * 256);
-        } while (r + g + b < 255 + 128);
-        this.color = "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";
+        } while (r + g + b > lowLimit && r + g + b < highLimit);
+        return new Color(r, g, b);
+    };
+    return Color;
+}());
+var PlotData = (function () {
+    function PlotData(p) {
+        this.points = p;
+        this.color = Color.randomColor(0, 255 + 128);
     }
     PlotData.prototype.getClosest = function (p) {
         return this.points[this.getIndexOf(p)];
@@ -43,6 +66,41 @@ var PlotData = (function () {
         }
     };
     return PlotData;
+}());
+var PlotDataHelper = (function () {
+    function PlotDataHelper() {
+    }
+    PlotDataHelper.getClosest = function (plotData, p) {
+        return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
+    };
+    PlotDataHelper.getIndexOf = function (plotData, p) {
+        var min = 0;
+        var max = plotData.getLength() - 1;
+        var half;
+        while (true) {
+            half = Math.floor((min + max) / 2);
+            if (half === min) {
+                var diffMin = p.x - plotData.getValue(min).x;
+                var diffMax = plotData.getValue(max).x - p.x;
+                if (diffMin < diffMax) {
+                    return min;
+                }
+                else {
+                    return max;
+                }
+            }
+            else if (p.x < plotData.getValue(half).x) {
+                max = half;
+            }
+            else if (p.x > plotData.getValue(half).x) {
+                min = half;
+            }
+            else {
+                return half;
+            }
+        }
+    };
+    return PlotDataHelper;
 }());
 var GPSPlotData = (function () {
     function GPSPlotData(p) {
@@ -94,5 +152,19 @@ var Point3D = (function () {
         return "x: " + this.x.toString() + "  y: " + this.y.toString() + "  z: " + this.z.toString();
     };
     return Point3D;
+}());
+var PlotDataViewer = (function () {
+    function PlotDataViewer(realData) {
+        this.realData = realData;
+        this.ID = realData.ID;
+        this.color = realData.color;
+    }
+    PlotDataViewer.prototype.getLength = function () {
+        return this.realData.points.length;
+    };
+    PlotDataViewer.prototype.getValue = function (index) {
+        return this.realData.points[index];
+    };
+    return PlotDataViewer;
 }());
 //# sourceMappingURL=PlotData.js.map

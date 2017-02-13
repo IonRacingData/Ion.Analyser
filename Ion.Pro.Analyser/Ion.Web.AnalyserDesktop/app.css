@@ -225,10 +225,39 @@ span.table-resize{
 
 .plot-canvas {    
     position: absolute;
-
-
     /*border: 1px solid black;*/
 }
 .plot-wrapper {
     position: relative;
 }
+
+.label-controller {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.bar-controller-wrapper {
+    display: flex;
+}
+
+.bar-controller-barWrapper1 {
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-end;
+}
+
+.bar-controller-barWrapper2 {
+    flex-grow: 1;
+}
+
+.bar-controller-bar1 {
+    background-color: blue;
+}
+
+.bar-controller-bar2 {
+    background-color: red;    
+}
+
+

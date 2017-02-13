@@ -1,34 +1,4 @@
-﻿class TestDataViewer implements IApplication, ISinglePlot {
-    application: Application;
-    window: AppWindow;
-    plotData: PlotData;
-    plotType: string = "Test Data Viewer";
-    plotWindow: AppWindow;
-
-    main(): void {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
-    }
-
-    draw(): void {
-        let gen = new HtmlTableGen("table");
-        gen.addHeader("Value", "Timestamp");
-
-        for (let i = 0; i < this.plotData.points.length && i < 10; i++) {
-            gen.addRow(this.plotData.points[i].x, this.plotData.points[i].y);
-        }
-
-        this.window.content.appendChild(gen.generate());
-
-        //console.log("Here we should draw something, but you know, we are lazy");
-    }
-
-    dataUpdate(): void {
-        this.draw();
-    }
-}
-
-class DataAssigner implements IApplication {
+﻿class DataAssigner implements IApplication {
     application: Application;
     window: AppWindow;
     mk = new HtmlHelper();
@@ -60,36 +30,32 @@ class DataAssigner implements IApplication {
             if (isMulti) {
                 tableGen.addRow([
                     {
-                        event: "click", func: (e: Event) =>
-                        {
+                        event: "click", func: (e: Event) => {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
                             }
                             last = this.findTableRow(<HTMLElement>e.target);
                             last.classList.add("selectedrow");
-                        
+
                             kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<IMultiPlot>curPlot, x));
                         }
                     },
                     {
-                        event: "mouseenter", func: (e: Event) =>
-                        {
+                        event: "mouseenter", func: (e: Event) => {
                             curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
-                        event: "mouseleave", func: (e: Event) =>
-                        {
+                        event: "mouseleave", func: (e: Event) => {
                             curPlot.plotWindow.highlight(false);
                         }
                     },
-                    ], curPlot.plotType, "Multi Plot");
+                ], curPlot.plotType, "Multi Plot");
             }
             else {
                 tableGen.addRow([
                     {
-                        event: "click", func: (e: Event) =>
-                        {
+                        event: "click", func: (e: Event) => {
                             if (last !== null) {
                                 last.classList.remove("selectedrow");
                             }
@@ -100,14 +66,12 @@ class DataAssigner implements IApplication {
                         },
                     },
                     {
-                        event: "mouseenter", func: (e: Event) =>
-                        {
+                        event: "mouseenter", func: (e: Event) => {
                             curPlot.plotWindow.highlight(true);
                         }
                     },
                     {
-                        event: "mouseleave", func: (e: Event) =>
-                        {
+                        event: "mouseleave", func: (e: Event) => {
                             curPlot.plotWindow.highlight(false);
                         }
                     }
@@ -152,10 +116,13 @@ class DataAssigner implements IApplication {
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
+        if (plot.plotData.ID == sensor.ID) {
+            radio.checked = true;
+        }
         radio.addEventListener("change", (e: Event) => {
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                plot.plotData = data;
+                plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
             });
         });
@@ -165,11 +132,18 @@ class DataAssigner implements IApplication {
     createMultiSensor(plot: IMultiPlot, sensor: SensorInformation): HTMLElement {
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
+        for (let i = 0; i < plot.plotData.length; i++) {
+            if (plot.plotData[i].ID == sensor.ID) {
+                checkBox.checked = true;
+                break;
+            }
+        }
+
         checkBox.addEventListener("change", (e: Event) => {
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                    plot.plotData.push(data);
+                    plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
                 });
             }
@@ -202,4 +176,82 @@ class DataAssigner implements IApplication {
             this.sensorTable.appendChild(this.mk.tag("br"));
         }
     }
+}
+
+class TestDataViewer implements IApplication, ISinglePlot {
+    application: Application;
+    window: AppWindow;
+    plotData: IPlotData;
+    plotType: string = "Test Data Viewer";
+    plotWindow: AppWindow;
+
+    main(): void {
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
+        kernel.senMan.register(this);
+    }
+
+    draw(): void {
+        let gen = new HtmlTableGen("table");
+        gen.addHeader("Value", "Timestamp");
+
+        for (let i = 0; i < this.plotData.getLength() && i < 10; i++) {
+            gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
+        }
+
+        this.window.content.appendChild(gen.generate());
+
+        //console.log("Here we should draw something, but you know, we are lazy");
+    }
+
+    dataUpdate(): void {
+        this.draw();
+    }
+}
+
+class SensorSetSelector implements IApplication {
+    public application: Application;
+    private window: AppWindow;
+    private mk = new HtmlHelper();
+    private wrapper: HTMLElement;
+
+    public main(): void {
+        this.wrapper = this.mk.tag("div");
+        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        requestAction("GetAvaiableSets", (data: SensorSetInformation[]) => this.drawData(data));
+        this.window.content.appendChild(this.wrapper);
+    }
+
+    private drawData(data: SensorSetInformation[]): void {
+        this.wrapper.innerHTML = "";
+        var table = new HtmlTableGen("table selectable");
+        
+        table.addHeader("File name", "File size", "Sensor reader");
+        for (let a of data) {
+            table.addRow(
+                [
+                    {
+                        "event": "click",
+                        "func": (event: Event) =>
+                        {
+                            //console.log("you clicked on: " + a.FileName);
+                            requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
+                            kernel.senMan.clearCache();
+                        }
+                    }
+                ],
+                a.FileName,
+                a.Size,
+                a.FileReader
+            );
+        }
+
+        this.wrapper.appendChild(table.generate());
+    }
+}
+
+interface SensorSetInformation {
+    FileName: string;
+    FullFileName: string;
+    Size: number;
+    FileReader: string;
 }

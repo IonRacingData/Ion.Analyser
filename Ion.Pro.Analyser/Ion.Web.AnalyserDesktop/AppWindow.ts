@@ -1,35 +1,43 @@
 ﻿class AppWindow implements IEventManager {
     app: Application;
-    title: string;
+    private _title: string;
+    get title(): string {
+        return this._title;
+    }
+    set title(value: string) {
+        this._title = value;
+        this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
+    }
+
     handle: HTMLElement;
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
     topMost: boolean = false;
 
-    eventMan: EventManager = new EventManager();
+    private eventMan: EventManager = new EventManager();
 
-    static event_move = "move";
-    static event_resize = "resize";
-    static event_minimize = "minimize";
-    static event_maximize = "maximize";
+    static readonly event_move = "move";
+    static readonly event_resize = "resize";
+    static readonly event_minimize = "minimize";
+    static readonly event_maximize = "maximize";
 
-    static event_close = "close";
+    static readonly event_close = "close";
 
     x: number;
     y: number;
 
-    deltaX: number;
-    deltaY: number;
+    private deltaX: number;
+    private deltaY: number;
 
-    storeX: number;
-    storeY: number;
+    private storeX: number;
+    private storeY: number;
 
     width: number;
     height: number;
 
-    storeWidth: number;
-    storeHeight: number;
+    private storeWidth: number;
+    private storeHeight: number;
 
     state: WindowState;
     prevState: WindowState;
@@ -55,6 +63,9 @@
         headerBar.addEventListener("mousedown", (e: MouseEvent) => this.header_mouseDown(e));
         resize.addEventListener("mousedown", (e: MouseEvent) => this.resize_mouseDown(e));
 
+        (<HTMLDivElement>headerBar).addEventListener("touchstart", (e: TouchEvent) => this.header_touchStart(e));
+        (<HTMLDivElement>resize).addEventListener("touchstart", (e: TouchEvent) => this.resize_touchStart(e));
+
         min.addEventListener("mousedown", (e: MouseEvent) => this.minimize_click(e));
         max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
         exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
@@ -67,11 +78,6 @@
         this.content = <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
     }
 
-    setTitle(title: string): void {
-        this.title = title;
-        this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
-    }
-
     addEventListener(type: string, listener: any) {
         this.eventMan.addEventListener(type, listener);
     }
@@ -82,11 +88,11 @@
 
 
     /* Event handlers */
-    main_mouseDown(e: MouseEvent): void {
+    private main_mouseDown(e: MouseEvent): void {
         this.winMan.selectWindow(this);
     }
 
-    header_mouseDown(e: MouseEvent): void {
+    private header_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
         console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX;
@@ -96,7 +102,18 @@
         this.winMan.selectWindow(this);
     }
 
-    resize_mouseDown(e: MouseEvent): void {
+    private header_touchStart(e: TouchEvent): void {
+        e.stopPropagation();
+        //e.preventDefault();
+        console.log(e);
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+
+        this.winMan.dragging = true;
+        this.winMan.selectWindow(this);
+    }
+
+    private resize_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
@@ -107,14 +124,26 @@
         this.winMan.selectWindow(this);
     }
 
-    minimize_click(e: MouseEvent): void {
+    private resize_touchStart(e: TouchEvent): void {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("resizeDown");
+        this.deltaX = this.width - e.targetTouches[0].pageX;
+        this.deltaY = this.height - e.targetTouches[0].pageY;
+        // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
+
+        this.winMan.resizing = true;
+        this.winMan.selectWindow(this);
+    }
+
+    private minimize_click(e: MouseEvent): void {
         e.stopPropagation();
         console.log("minimize");
         this.hide();
         this.changeStateTo(WindowState.MINIMIZED);
     }
 
-    maximize_click(e: MouseEvent): void {
+    private maximize_click(e: MouseEvent): void {
         e.stopPropagation();
         this.winMan.selectWindow(this);
         if (this.state === WindowState.MAXIMIZED) {
@@ -126,15 +155,58 @@
         console.log("maximize");
     }
 
-    close_click(e: MouseEvent): void {
+    private close_click(e: MouseEvent): void {
         e.stopPropagation();
         this.close();
     }
 
-    close() {
-        this.onClose();
-        this.app.onClose();
-        this.winMan.closeWindow(this);
+
+    /* Private stuff */
+    private restoreSize(): void {
+        this.setSize(this.width, this.height, false);
+        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
+
+        let curHandle = this.sizeHandle.parentElement
+        for (let i = 0; i < 3; i++) {
+            curHandle.style.width = null;
+            curHandle.style.height = null;
+            curHandle = curHandle.parentElement;
+        }
+    }
+
+    private restorePos(): void {
+        this.handle.style.left = this.x.toString() + "px";
+        this.handle.style.top = this.y.toString() + "px";
+    }
+
+    private removeSize(): void {
+        let curHandle = this.sizeHandle;
+        for (let i = 0; i < 4; i++) {
+            curHandle.style.width = "100%";
+            curHandle.style.height = "100%";
+            if (i == 3)
+                break;
+            curHandle = curHandle.parentElement;
+        }
+        curHandle.style.padding = "0";
+    }
+
+    private removeHeader() {
+        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = "none";
+    }
+
+    private restoreHeader() {
+        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = null;
+    }
+
+    private removePos(): void {
+        this.handle.style.left = null;
+        this.handle.style.top = null;
+    }
+
+    private changeStateTo(state: WindowState): void {
+        this.prevState = this.state;
+        this.state = state;
     }
 
     /*Events*/
@@ -150,7 +222,11 @@
         this.eventMan.raiseEvent(AppWindow.event_close, null);
     }
 
-    
+    close() {
+        this.onClose();
+        this.app.onClose();
+        this.winMan.closeWindow(this);
+    }
 
     show(): void {
         this.handle.style.display = "";
@@ -230,23 +306,6 @@
         this.onMove();
     }
 
-    setRelativePos(x: number, y: number, storePos: boolean = true): void {
-        if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
-            this.restore();
-            this.deltaX = -this.width / 2;
-        }
-        this.handle.style.left = (x + this.deltaX).toString() + "px";
-        this.handle.style.top = (y + this.deltaY).toString() + "px";
-        this.x = x + this.deltaX;
-        this.y = y + this.deltaY;
-        if (storePos) {
-            this.storeX = x + this.deltaX;
-            this.storeY = y + this.deltaY;
-        }
-        this.onMove();
-    }
-
-
     setSize(width: number, height: number, storeSize: boolean = true): void {
         /*if (width < 230)
             width = 230;
@@ -255,81 +314,12 @@
         this.sizeHandle.style.width = width.toString() + "px";
         this.sizeHandle.style.height = height.toString() + "px";
         this.width = width;
-        this.height = height; 
+        this.height = height;
         if (storeSize) {
             this.storeWidth = width;
             this.storeHeight = height;
         }
         this.onResize();
-    }    
-
-    setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
-        let newWidth = width + this.deltaX;
-        let newHeight = height + this.deltaY;
-
-        if (newWidth < 230)
-            newWidth = 230;
-        if (newHeight < 150)
-            newHeight = 150;
-        this.sizeHandle.style.width = (newWidth).toString() + "px";
-        this.sizeHandle.style.height = (newHeight).toString() + "px";
-        this.width = newWidth;
-        this.height = newHeight;
-        if (storeSize) {
-            this.storeWidth = newWidth;
-            this.storeHeight = newHeight;
-        }
-        this.onResize();
-    }
-
-
-    changeStateTo(state: WindowState): void {
-        this.prevState = this.state;
-        this.state = state;
-    }
-
-
-
-    restoreSize(): void {
-        this.setSize(this.width, this.height, false);
-        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
-
-        let curHandle = this.sizeHandle.parentElement
-        for (let i = 0; i < 3; i++) {
-            curHandle.style.width = null;
-            curHandle.style.height = null;
-            curHandle = curHandle.parentElement;
-        }
-    }
-
-    restorePos(): void {
-        this.handle.style.left = this.x.toString() + "px";
-        this.handle.style.top = this.y.toString() + "px";
-    }
-
-    removeSize(): void {
-        let curHandle = this.sizeHandle;
-        for (let i = 0; i < 4; i++) {
-            curHandle.style.width = "100%";
-            curHandle.style.height = "100%";
-            if (i == 3)
-                break;
-            curHandle = curHandle.parentElement;
-        }
-        curHandle.style.padding = "0";
-    }
-
-    removeHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = "none";
-    }
-
-    restoreHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = null;
-    }
-
-    removePos(): void {
-        this.handle.style.left = null;
-        this.handle.style.top = null;
     }
 
     changeWindowMode(mode: WindowMode): void {
@@ -362,6 +352,43 @@
             (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "none";
         }
     }
+
+
+
+    __setRelativePos(x: number, y: number, storePos: boolean = true): void {
+        if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
+            this.restore();
+            this.deltaX = -this.width / 2;
+        }
+        this.handle.style.left = (x + this.deltaX).toString() + "px";
+        this.handle.style.top = (y + this.deltaY).toString() + "px";
+        this.x = x + this.deltaX;
+        this.y = y + this.deltaY;
+        if (storePos) {
+            this.storeX = x + this.deltaX;
+            this.storeY = y + this.deltaY;
+        }
+        this.onMove();
+    }
+    
+    __setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
+        let newWidth = width + this.deltaX;
+        let newHeight = height + this.deltaY;
+
+        if (newWidth < 230)
+            newWidth = 230;
+        if (newHeight < 150)
+            newHeight = 150;
+        this.sizeHandle.style.width = (newWidth).toString() + "px";
+        this.sizeHandle.style.height = (newHeight).toString() + "px";
+        this.width = newWidth;
+        this.height = newHeight;
+        if (storeSize) {
+            this.storeWidth = newWidth;
+            this.storeHeight = newHeight;
+        }
+        this.onResize();
+    }    
 }
 
 enum WindowMode {

@@ -1,13 +1,15 @@
 ﻿class SensorManager implements IEventManager {
-    dataCache: ISensorPackage[][] = [];
-    plotCache: PlotData[] = [];
+    private dataCache: ISensorPackage[][] = [];
+    private plotCache: PlotData[] = [];
+
+    plotter: IPlot[] = [];
 
 
-    globalPlot: ISensorPackage[];
-    globalId: number;
+    private globalPlot: ISensorPackage[];
+    private globalId: number;
 
-    static event_globalPlot = "globalPlot";
-    static event_registerIPlot = "registerIPlot";
+    static readonly event_globalPlot = "globalPlot";
+    static readonly event_registerIPlot = "registerIPlot";
 
     constructor() {
         kernel.netMan.registerService(10, (data: any) => {
@@ -31,7 +33,7 @@
         });
     }
 
-    eventManager: EventManager = new EventManager();
+    private eventManager: EventManager = new EventManager();
 
     getInfos(callback: (ids: SensorInformation[]) => void): void {
         requestAction("GetIds", callback);
@@ -85,7 +87,7 @@
         }
     }
 
-    loadPlotData(id: number, callback: (data: PlotData) => void): void {
+    private loadPlotData(id: number, callback: (data: PlotData) => void): void {
         this.loadData(id, (data: ISensorPackage[]): void => {
             let plot = this.convertData(data);
             this.plotCache[id] = plot;
@@ -93,7 +95,7 @@
         });
     }
 
-    convertData(data: ISensorPackage[]): PlotData {
+    private convertData(data: ISensorPackage[]): PlotData {
         if (data.length < 1)
             return null;
         let id = data[0].ID;
@@ -107,7 +109,7 @@
 
     }
 
-    loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
+    private loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
         kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
             let realData = this.convertToSensorPackage(data.Sensors);
             console.log(realData);
@@ -120,7 +122,7 @@
         });*/
     }
 
-    convertToSensorPackage(str: string): ISensorPackage[] {
+    private convertToSensorPackage(str: string): ISensorPackage[] {
         let raw = atob(str);
         let ret: ISensorPackage[] = [];
         for (let i = 0; i < raw.length / 28; i++) {
@@ -128,20 +130,32 @@
             console.log(raw.charCodeAt(i * 28 + 1));
             console.log(raw.charCodeAt(i * 28 + 2));
             console.log(raw.charCodeAt(i * 28 + 3));*/
+            let buf = new ArrayBuffer(8);
+            let insert = new Uint8Array(buf);
+            insert[0] = raw.charCodeAt(i * 28 + 4);
+            insert[1] = raw.charCodeAt(i * 28 + 5);
+            insert[2] = raw.charCodeAt(i * 28 + 6);
+            insert[3] = raw.charCodeAt(i * 28 + 7);
+            insert[4] = raw.charCodeAt(i * 28 + 8);
+            insert[5] = raw.charCodeAt(i * 28 + 9);
+            insert[6] = raw.charCodeAt(i * 28 + 10);
+            insert[7] = raw.charCodeAt(i * 28 + 11);
+            let output = new Float64Array(buf);
+
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                 | raw.charCodeAt(i * 28 + 1) << 8
                 | raw.charCodeAt(i * 28 + 2) << 16
                 | raw.charCodeAt(i * 28 + 3) << 24,
-
-                Value: raw.charCodeAt(i * 28 + 4)
+                Value: output[0],
+                /*Value: raw.charCodeAt(i * 28 + 4)
                 | raw.charCodeAt(i * 28 + 5) << 8
                 | raw.charCodeAt(i * 28 + 6) << 16
                 | raw.charCodeAt(i * 28 + 7) << 24
                 | raw.charCodeAt(i * 28 + 8) << 32
                 | raw.charCodeAt(i * 28 + 9) << 40
                 | raw.charCodeAt(i * 28 + 10) << 48
-                | raw.charCodeAt(i * 28 + 11) << 56,
+                | raw.charCodeAt(i * 28 + 11) << 56,*/
 
                 TimeStamp:
                   raw.charCodeAt(i * 28 + 12)
@@ -156,6 +170,21 @@
             } 
         }
         return ret;
+    }
+
+    public clearCache(): void {
+        this.dataCache = [];
+        this.plotCache = [];
+        for (let a of this.plotter) {
+            if (Array.isArray((<any>a).plotData)) {
+                (<IMultiPlot>a).plotData.splice(0);
+                (<IMultiPlot>a).dataUpdate();
+            }
+            else {
+                (<ISinglePlot>a).plotData = null;
+                (<ISinglePlot>a).dataUpdate();
+            }
+        }
     }
 
     setGlobal(id: number) {
@@ -177,7 +206,7 @@
         this.eventManager.removeEventListener(type, listener);
     }
 
-    plotter: IPlot[] = [];
+    
     
     register(plotter: IPlot): void {
         this.plotter.push(plotter);
@@ -214,10 +243,63 @@ class Multicallback {
 }
 
 class SensorInformation {
-    ID: number;
-    Key: string;
-    Name: string;
-    Unit: string;
+    public ID: number;
+    public Key: string;
+    public Name: string;
+    public Unit: string;
+    public ValueInfo: SensorValueInformation;
+}
+
+class SensorValueInformation {
+    public Key: string;
+    public Unit: string;
+    public Resolution: number;
+
+    public Signed?: boolean;
+    public MinValue?: number;
+    public MaxValue?: number;
+    public MinDisplay?: number;
+    public MaxDisplay?: number;
+}
+
+class SensorInfoHelper {
+    public static maxValue(info: SensorInformation): number {
+        let val = 0;
+        let temp = info.ValueInfo;
+        if (temp.MaxDisplay) {
+            val = temp.MaxDisplay;
+        }
+        else if (temp.MaxValue) {
+            val = temp.MaxValue;
+        }
+        else {
+            val = (1 << temp.Resolution) - 1;
+        }
+        return val;
+    }
+
+    public static minValue(info: SensorInformation): number {
+        let val = 0;
+        let temp = info.ValueInfo;
+        if (temp.MinDisplay) {
+            val = temp.MinDisplay;
+        }
+        else if (temp.MinValue) {
+            val = temp.MinValue;
+        }
+        else if (temp.Signed) {
+            val = -SensorInfoHelper.maxValue(info) - 1;
+        }
+        return val;
+    }
+
+    public static getPercent(info: SensorInformation, p: Point): Point {
+        let min = SensorInfoHelper.minValue(info);
+        let max = SensorInfoHelper.maxValue(info);
+
+        let newVal = (p.y - min) / (max - min);
+        return new Point(p.x, newVal);
+    }
 }
 
 interface IPlot {
@@ -227,9 +309,9 @@ interface IPlot {
 }
 
 interface ISinglePlot extends IPlot {
-    plotData: PlotData;
+    plotData: IPlotData;
 }
 
 interface IMultiPlot extends IPlot {
-    plotData: PlotData[];
+    plotData: IPlotData[];
 }

@@ -32,7 +32,10 @@ namespace Ion.Pro.Analyser
 
         public void RegisterClient(ComBusClient client)
         {
-            ConnectedClients.Add(client);
+            lock (ConnectedClients)
+            {
+                ConnectedClients.Add(client);
+            }
             client.Id = NodeId++;
             client.ComBus = this;
             Console.WriteLine($"Registerd client: {client.Id} {client.Name} type: {client.GetType().Name}");
@@ -46,8 +49,12 @@ namespace Ion.Pro.Analyser
                 Console.WriteLine("Detecting empty message, not sending it");
                 return;
             }
-                
-            foreach (ComBusClient client in ConnectedClients)
+            ComBusClient[] currentClients = null;
+            lock (ConnectedClients)
+            {
+                currentClients = ConnectedClients.ToArray();
+            }
+            foreach (ComBusClient client in currentClients) 
             {
                 if (message.NodeId != client.Id)
                 {
@@ -58,7 +65,10 @@ namespace Ion.Pro.Analyser
 
         public void DeregisterClient(ComBusClient client)
         {
-            ConnectedClients.Remove(client);
+            lock (ConnectedClients)
+            {
+                ConnectedClients.Remove(client);
+            }
             Console.WriteLine($"Deregisterd client: {client.Id} {client.Name} type: {client.GetType().Name}");
         }
     }
@@ -158,7 +168,17 @@ namespace Ion.Pro.Analyser
                 this.Closed = true;
                 return null;
             }
-            return client.ReadString();
+            string result = null;
+            try
+            {
+                result = client.ReadString();
+            }
+            catch
+            {
+                ComBus.DeregisterClient(this);
+                this.Closed = true;
+            }
+            return result;
         }
 
         public override void WriteString(string s)
@@ -169,7 +189,16 @@ namespace Ion.Pro.Analyser
                 this.Closed = true;
                 return;
             }
-            this.client.WriteString(s);
+            try
+            {
+
+                this.client.WriteString(s);
+            }
+            catch
+            {
+                ComBus.DeregisterClient(this);
+                this.Closed = true;
+            }
         }
 
         public override void Close()

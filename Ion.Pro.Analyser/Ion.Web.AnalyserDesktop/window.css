@@ -39,8 +39,12 @@
 }
 
 .window-bottom-right {
-    right: 0;
+    /*right: 0;*/
     cursor: nwse-resize;
+    float: right;
+    position: relative;
+    right: -4px;
+    bottom: 4px;
 }
 
 .window-left { 

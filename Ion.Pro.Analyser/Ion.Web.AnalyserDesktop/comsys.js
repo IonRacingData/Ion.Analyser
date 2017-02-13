@@ -49,7 +49,6 @@ var NetworkManager = (function () {
         this.socket.send(str);
     };
     NetworkManager.prototype.receiveMessage = function (ev) {
-        console.log(ev);
         var message = JSON.parse(ev.data);
         if (message.Status == ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
@@ -61,6 +60,7 @@ var NetworkManager = (function () {
             }
         }
         else if (message.Status == ComMessageStatus.OK200) {
+            console.log(ev);
             if (this.callback[message.MessageId]) {
                 this.callback[message.MessageId](JSON.parse(message.Data));
             }

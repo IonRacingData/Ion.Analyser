@@ -16,6 +16,8 @@ var AppWindow = (function () {
         var resize = handle.getElementsByClassName("window-bottom-right")[0];
         headerBar.addEventListener("mousedown", function (e) { return _this.header_mouseDown(e); });
         resize.addEventListener("mousedown", function (e) { return _this.resize_mouseDown(e); });
+        headerBar.addEventListener("touchstart", function (e) { return _this.header_touchStart(e); });
+        resize.addEventListener("touchstart", function (e) { return _this.resize_touchStart(e); });
         min.addEventListener("mousedown", function (e) { return _this.minimize_click(e); });
         max.addEventListener("mousedown", function (e) { return _this.maximize_click(e); });
         exit.addEventListener("mousedown", function (e) { return _this.close_click(e); });
@@ -24,10 +26,17 @@ var AppWindow = (function () {
         this.setSize(500, 400);
         this.content = this.handle.getElementsByClassName("window-body")[0];
     }
-    AppWindow.prototype.setTitle = function (title) {
-        this.title = title;
-        this.handle.getElementsByClassName("window-title")[0].innerHTML = title;
-    };
+    Object.defineProperty(AppWindow.prototype, "title", {
+        get: function () {
+            return this._title;
+        },
+        set: function (value) {
+            this._title = value;
+            this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     AppWindow.prototype.addEventListener = function (type, listener) {
         this.eventMan.addEventListener(type, listener);
     };
@@ -46,11 +55,30 @@ var AppWindow = (function () {
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
     };
+    AppWindow.prototype.header_touchStart = function (e) {
+        e.stopPropagation();
+        //e.preventDefault();
+        console.log(e);
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+        this.winMan.dragging = true;
+        this.winMan.selectWindow(this);
+    };
     AppWindow.prototype.resize_mouseDown = function (e) {
         e.stopPropagation();
         console.log("resizeDown");
         this.deltaX = this.width - e.pageX;
         this.deltaY = this.height - e.pageY;
+        // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
+        this.winMan.resizing = true;
+        this.winMan.selectWindow(this);
+    };
+    AppWindow.prototype.resize_touchStart = function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("resizeDown");
+        this.deltaX = this.width - e.targetTouches[0].pageX;
+        this.deltaY = this.height - e.targetTouches[0].pageY;
         // console.log(this.sizeHandle.offsetLeft.toString() + " " + this.sizeHandle.offsetTop.toString());
         this.winMan.resizing = true;
         this.winMan.selectWindow(this);
@@ -76,10 +104,45 @@ var AppWindow = (function () {
         e.stopPropagation();
         this.close();
     };
-    AppWindow.prototype.close = function () {
-        this.onClose();
-        this.app.onClose();
-        this.winMan.closeWindow(this);
+    /* Private stuff */
+    AppWindow.prototype.restoreSize = function () {
+        this.setSize(this.width, this.height, false);
+        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
+        var curHandle = this.sizeHandle.parentElement;
+        for (var i = 0; i < 3; i++) {
+            curHandle.style.width = null;
+            curHandle.style.height = null;
+            curHandle = curHandle.parentElement;
+        }
+    };
+    AppWindow.prototype.restorePos = function () {
+        this.handle.style.left = this.x.toString() + "px";
+        this.handle.style.top = this.y.toString() + "px";
+    };
+    AppWindow.prototype.removeSize = function () {
+        var curHandle = this.sizeHandle;
+        for (var i = 0; i < 4; i++) {
+            curHandle.style.width = "100%";
+            curHandle.style.height = "100%";
+            if (i == 3)
+                break;
+            curHandle = curHandle.parentElement;
+        }
+        curHandle.style.padding = "0";
+    };
+    AppWindow.prototype.removeHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = "none";
+    };
+    AppWindow.prototype.restoreHeader = function () {
+        this.handle.getElementsByClassName("window-header")[0].style.display = null;
+    };
+    AppWindow.prototype.removePos = function () {
+        this.handle.style.left = null;
+        this.handle.style.top = null;
+    };
+    AppWindow.prototype.changeStateTo = function (state) {
+        this.prevState = this.state;
+        this.state = state;
     };
     /*Events*/
     AppWindow.prototype.onResize = function () {
@@ -90,6 +153,11 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.onClose = function () {
         this.eventMan.raiseEvent(AppWindow.event_close, null);
+    };
+    AppWindow.prototype.close = function () {
+        this.onClose();
+        this.app.onClose();
+        this.winMan.closeWindow(this);
     };
     AppWindow.prototype.show = function () {
         this.handle.style.display = "";
@@ -161,22 +229,6 @@ var AppWindow = (function () {
         }
         this.onMove();
     };
-    AppWindow.prototype.setRelativePos = function (x, y, storePos) {
-        if (storePos === void 0) { storePos = true; }
-        if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
-            this.restore();
-            this.deltaX = -this.width / 2;
-        }
-        this.handle.style.left = (x + this.deltaX).toString() + "px";
-        this.handle.style.top = (y + this.deltaY).toString() + "px";
-        this.x = x + this.deltaX;
-        this.y = y + this.deltaY;
-        if (storePos) {
-            this.storeX = x + this.deltaX;
-            this.storeY = y + this.deltaY;
-        }
-        this.onMove();
-    };
     AppWindow.prototype.setSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
         /*if (width < 230)
@@ -192,63 +244,6 @@ var AppWindow = (function () {
             this.storeHeight = height;
         }
         this.onResize();
-    };
-    AppWindow.prototype.setRelativeSize = function (width, height, storeSize) {
-        if (storeSize === void 0) { storeSize = true; }
-        var newWidth = width + this.deltaX;
-        var newHeight = height + this.deltaY;
-        if (newWidth < 230)
-            newWidth = 230;
-        if (newHeight < 150)
-            newHeight = 150;
-        this.sizeHandle.style.width = (newWidth).toString() + "px";
-        this.sizeHandle.style.height = (newHeight).toString() + "px";
-        this.width = newWidth;
-        this.height = newHeight;
-        if (storeSize) {
-            this.storeWidth = newWidth;
-            this.storeHeight = newHeight;
-        }
-        this.onResize();
-    };
-    AppWindow.prototype.changeStateTo = function (state) {
-        this.prevState = this.state;
-        this.state = state;
-    };
-    AppWindow.prototype.restoreSize = function () {
-        this.setSize(this.width, this.height, false);
-        this.sizeHandle.parentElement.parentElement.style.padding = "8px";
-        var curHandle = this.sizeHandle.parentElement;
-        for (var i = 0; i < 3; i++) {
-            curHandle.style.width = null;
-            curHandle.style.height = null;
-            curHandle = curHandle.parentElement;
-        }
-    };
-    AppWindow.prototype.restorePos = function () {
-        this.handle.style.left = this.x.toString() + "px";
-        this.handle.style.top = this.y.toString() + "px";
-    };
-    AppWindow.prototype.removeSize = function () {
-        var curHandle = this.sizeHandle;
-        for (var i = 0; i < 4; i++) {
-            curHandle.style.width = "100%";
-            curHandle.style.height = "100%";
-            if (i == 3)
-                break;
-            curHandle = curHandle.parentElement;
-        }
-        curHandle.style.padding = "0";
-    };
-    AppWindow.prototype.removeHeader = function () {
-        this.handle.getElementsByClassName("window-header")[0].style.display = "none";
-    };
-    AppWindow.prototype.restoreHeader = function () {
-        this.handle.getElementsByClassName("window-header")[0].style.display = null;
-    };
-    AppWindow.prototype.removePos = function () {
-        this.handle.style.left = null;
-        this.handle.style.top = null;
     };
     AppWindow.prototype.changeWindowMode = function (mode) {
         switch (mode) {
@@ -278,6 +273,40 @@ var AppWindow = (function () {
         else {
             this.handle.getElementsByClassName("window-overlay")[0].style.display = "none";
         }
+    };
+    AppWindow.prototype.__setRelativePos = function (x, y, storePos) {
+        if (storePos === void 0) { storePos = true; }
+        if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
+            this.restore();
+            this.deltaX = -this.width / 2;
+        }
+        this.handle.style.left = (x + this.deltaX).toString() + "px";
+        this.handle.style.top = (y + this.deltaY).toString() + "px";
+        this.x = x + this.deltaX;
+        this.y = y + this.deltaY;
+        if (storePos) {
+            this.storeX = x + this.deltaX;
+            this.storeY = y + this.deltaY;
+        }
+        this.onMove();
+    };
+    AppWindow.prototype.__setRelativeSize = function (width, height, storeSize) {
+        if (storeSize === void 0) { storeSize = true; }
+        var newWidth = width + this.deltaX;
+        var newHeight = height + this.deltaY;
+        if (newWidth < 230)
+            newWidth = 230;
+        if (newHeight < 150)
+            newHeight = 150;
+        this.sizeHandle.style.width = (newWidth).toString() + "px";
+        this.sizeHandle.style.height = (newHeight).toString() + "px";
+        this.width = newWidth;
+        this.height = newHeight;
+        if (storeSize) {
+            this.storeWidth = newWidth;
+            this.storeHeight = newHeight;
+        }
+        this.onResize();
     };
     return AppWindow;
 }());

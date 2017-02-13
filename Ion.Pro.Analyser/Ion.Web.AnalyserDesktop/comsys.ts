@@ -60,9 +60,8 @@ class NetworkManager {
     }
 
     receiveMessage(ev: MessageEvent) {
-        console.log(ev);
         let message: IComMessage = JSON.parse(ev.data);
-        
+
         if (message.Status == ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
                 this.serviceCallback[message.MessageId](JSON.parse(message.Data));
@@ -73,6 +72,7 @@ class NetworkManager {
             }
         }
         else if (message.Status == ComMessageStatus.OK200) {
+            console.log(ev);
             if (this.callback[message.MessageId]) {
                 this.callback[message.MessageId](JSON.parse(message.Data));
             }

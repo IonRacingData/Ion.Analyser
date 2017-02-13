@@ -1,4 +1,5 @@
 ﻿using Ion.Pro.Analyser.Data;
+using Ion.Pro.Analyser.SenSys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,17 @@ namespace Ion.Pro.Analyser.Controllers
                 sensorData = SensorDataStore.GetDefault().GetViews(id);
             }
             return Json(sensorData);
+        }
+
+        public IActionResult GetAvaiableSets()
+        {
+            return Json(SensorDataStore.GetDefault().AvailableDataSets());
+        }
+
+        public IActionResult LoadDataset(string file)
+        {
+            SensorDataStore.GetDefault().LoadNewData(file);
+            return String("OK");
         }
     }
 }

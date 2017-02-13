@@ -1,17 +1,24 @@
-var GaugePlot = (function () {
-    function GaugePlot(width, height, min, max, step) {
-        this.padding = 5;
-        this.totalAngle = (3 * Math.PI) / 2;
-        this.startAngle = -(3 * Math.PI) / 4;
-        this.color = "black";
-        this.needleColor = "black";
-        this.percent = 0;
-        this.size = Math.min(width, height);
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GaugeController = (function (_super) {
+    __extends(GaugeController, _super);
+    function GaugeController(width, height, min, max, step) {
+        var _this = _super.call(this) || this;
+        _this.padding = 5;
+        _this.totalAngle = (3 * Math.PI) / 2;
+        _this.startAngle = -(3 * Math.PI) / 4;
+        _this.color = "black";
+        _this.needleColor = "black";
+        _this.size = Math.min(width, height);
         var labels = [];
         for (var i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
-        this.labels = labels;
+        _this.labels = labels;
+        // temp stylesheet thingy
         var ss;
         var all = document.styleSheets;
         for (var i = 0; i < all.length; i++) {
@@ -21,26 +28,26 @@ var GaugePlot = (function () {
                 for (var j = 0; j < rules.length; j++) {
                     var rule = rules[j];
                     if (rule.selectorText === ".gauge-plot") {
-                        this.color = rule.style.color;
-                        this.needleColor = rule.style.borderColor;
+                        _this.color = rule.style.color;
+                        _this.needleColor = rule.style.borderColor;
                         break;
                     }
                 }
                 break;
             }
         }
+        return _this;
     }
-    GaugePlot.prototype.generate = function () {
-        this.wrapper = document.createElement("div");
-        this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["main", "needle", "center"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxNeedle = new ContextFixer(this.canvas.canvases["needle"]);
-        this.ctxCenter = new ContextFixer(this.canvas.canvases["center"]);
+    GaugeController.prototype.generate = function () {
+        this.wrapper = this.mk.tag("div", "plot-wrapper");
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
+        this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
         this.setSize(this.size, this.size);
         return this.wrapper;
     };
-    GaugePlot.prototype.draw = function () {
+    GaugeController.prototype.draw = function () {
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         var radius = this.size / 2;
@@ -73,12 +80,12 @@ var GaugePlot = (function () {
         }
         this.drawNeedle();
     };
-    GaugePlot.prototype.drawNeedle = function () {
+    GaugeController.prototype.drawNeedle = function () {
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         var radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-        var ang = (this.percent / 100) * this.totalAngle;
+        var ang = (this.value / 100) * this.totalAngle;
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
@@ -87,19 +94,19 @@ var GaugePlot = (function () {
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
     };
-    GaugePlot.prototype.setValue = function (percent) {
+    GaugeController.prototype.setValue = function (percent) {
         percent = percent > 100 ? 100 : percent;
         percent = percent < 0 ? 0 : percent;
-        this.percent = percent;
+        this.value = percent;
         this.drawNeedle();
     };
-    GaugePlot.prototype.setSize = function (width, height) {
-        this.size = Math.min(width, height);
-        this.offsetX = (width - this.size) / 2;
-        this.offsetY = (height - this.size) / 2 + (height * 0.05);
-        this.canvas.setSize(width, height);
+    GaugeController.prototype.onSizeChange = function () {
+        this.size = Math.min(this.width, this.height);
+        this.offsetX = (this.width - this.size) / 2;
+        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     };
-    return GaugePlot;
-}());
-//# sourceMappingURL=GaugePlot.js.map
+    return GaugeController;
+}(SingleValueCanvasController));
+//# sourceMappingURL=GaugeController.js.map

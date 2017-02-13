@@ -1,21 +1,29 @@
-var GPSPlot = (function () {
-    function GPSPlot(d) {
-        this.movePoint = new Point(0, 0);
-        this.scalePoint = new Point(1, 1);
-        this.color = "white";
-        this.posData = d;
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GPSController = (function (_super) {
+    __extends(GPSController, _super);
+    function GPSController(d) {
+        var _this = _super.call(this) || this;
+        _this.color = "white";
+        _this.movePoint = new Point(0, 0);
+        _this.scalePoint = new Point(1, 1);
+        _this.posData = d;
+        return _this;
     }
     // temp
-    GPSPlot.prototype.update = function (d) {
+    GPSController.prototype.update = function (d) {
         this.posData = d;
         this.draw();
     };
-    GPSPlot.prototype.generate = function () {
+    GPSController.prototype.generate = function () {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["main"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.padding = this.width * 0.05;
@@ -24,16 +32,14 @@ var GPSPlot = (function () {
         this.relSize = null;
         return this.wrapper;
     };
-    GPSPlot.prototype.setSize = function (width, height) {
-        this.canvas.setSize(width, height);
-        this.width = width;
-        this.height = height;
+    GPSController.prototype.onSizeChange = function () {
+        this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
         this.width -= this.padding * 2;
         this.height -= this.padding * 2;
         this.draw();
     };
-    GPSPlot.prototype.draw = function () {
+    GPSController.prototype.draw = function () {
         var offsetX;
         var offsetY;
         this.ctxMain.clear();
@@ -58,7 +64,7 @@ var GPSPlot = (function () {
         }
         this.ctxMain.stroke();
     };
-    GPSPlot.prototype.findMinMax = function () {
+    GPSController.prototype.findMinMax = function () {
         if (this.relSize === null && this.posData.points.length > 0) {
             this.relSize = { min: null, max: null };
             this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
@@ -72,7 +78,7 @@ var GPSPlot = (function () {
             this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
         }
     };
-    GPSPlot.prototype.rescale = function () {
+    GPSController.prototype.rescale = function () {
         var newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
         var newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
         this.absWidth = newWidth;
@@ -87,19 +93,6 @@ var GPSPlot = (function () {
         sec.y = this.height - sec.y;
         this.movePoint = this.movePoint.sub(sec);
     };
-    GPSPlot.prototype.getRelative = function (p) {
-        var moved = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        var scaled = moved.divide(this.scalePoint);
-        return scaled;
-    };
-    GPSPlot.prototype.getAbsolute = function (p) {
-        var scaled = p.multiply(this.scalePoint);
-        var moved = scaled.add(this.movePoint);
-        return new Point(moved.x, this.height - moved.y);
-    };
-    GPSPlot.prototype.getMousePoint = function (e) {
-        return new Point(e.layerX, e.layerY);
-    };
-    return GPSPlot;
-}());
-//# sourceMappingURL=GPSPlot.js.map
+    return GPSController;
+}(CanvasController));
+//# sourceMappingURL=GPSController.js.map

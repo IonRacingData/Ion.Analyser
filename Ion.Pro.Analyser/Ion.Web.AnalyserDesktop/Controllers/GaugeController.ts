@@ -1,6 +1,4 @@
-﻿class GaugePlot {
-    public wrapper: HTMLDivElement;
-    private canvas: LayeredCanvas;
+﻿class GaugeController extends SingleValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxNeedle: ContextFixer;
     private ctxCenter: ContextFixer;
@@ -13,17 +11,19 @@
     private offsetX: number;
     private offsetY: number;   
     private color: string = "black";
-    private needleColor: string = "black";   
-    private percent: number = 0; 
+    private needleColor: string = "black";    
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
+        super();
         this.size = Math.min(width, height);
         let labels: string[] = [];
         for (let i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
         this.labels = labels;
-        
+
+        // temp stylesheet thingy
+
         let ss: CSSStyleSheet;
         let all: StyleSheetList = document.styleSheets;
         for (let i = 0; i < all.length; i++) {
@@ -46,18 +46,17 @@
         
     }
 
-    generate(): HTMLDivElement {
-        this.wrapper = document.createElement("div");
-        this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper, ["main", "needle", "center"]);
-        this.ctxMain = new ContextFixer(this.canvas.canvases["main"]);
-        this.ctxNeedle = new ContextFixer(this.canvas.canvases["needle"]);
-        this.ctxCenter = new ContextFixer(this.canvas.canvases["center"]);
+    generate(): HTMLElement {        
+        this.wrapper = this.mk.tag("div", "plot-wrapper");
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
+        this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
 
         this.setSize(this.size, this.size);
         return this.wrapper;
     }
-
+        
     draw(): void {
 
         this.ctxMain.fillStyle = this.color;
@@ -94,9 +93,7 @@
             this.ctxMain.rotate(ang);
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
-        }
-
-        
+        }        
 
         this.drawNeedle();     
         
@@ -109,7 +106,7 @@
         let radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
     
-        let ang = (this.percent / 100) * this.totalAngle;
+        let ang = (this.value / 100) * this.totalAngle;
 
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
@@ -118,21 +115,20 @@
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
-
     }
 
     setValue(percent: number): void {
         percent = percent > 100 ? 100 : percent;
         percent = percent < 0 ? 0 : percent;
-        this.percent = percent;
+        this.value = percent;
         this.drawNeedle();
-    }
+    }    
 
-    setSize(width: number, height: number): void {
-        this.size = Math.min(width, height);
-        this.offsetX = (width - this.size) / 2;
-        this.offsetY = (height - this.size) / 2 + (height * 0.05);
-        this.canvas.setSize(width, height);        
+    protected onSizeChange(): void {
+        this.size = Math.min(this.width, this.height);
+        this.offsetX = (this.width - this.size) / 2;
+        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
+        this.canvas.setSize(this.width, this.height);
         this.draw();
     }
 }

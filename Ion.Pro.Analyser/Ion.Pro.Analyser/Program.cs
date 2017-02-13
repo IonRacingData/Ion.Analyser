@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Ion.Pro.Analyser.Data;
+using Ion.Pro.Analyser.SenSys;
 
 namespace Ion.Pro.Analyser
 {
@@ -19,14 +20,23 @@ namespace Ion.Pro.Analyser
     }
 
     class Program
-    {        
+    {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.OffLine;
+        static RunMode runMode = RunMode.LiveTest;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
         public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
         //public static string ContentPath = "html/";
+        public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
+
+        static string[] files = new string[]
+        {
+            "../../Data/Sets/126_usart_data.log16",
+            "../../Data/freq.log16",
+            "../../Data/stiangps.gpx",
+            "../../Data/fredrikgps.gpx"
+        };
 
         static void Main(string[] args)
         {
@@ -34,6 +44,7 @@ namespace Ion.Pro.Analyser
             Console.WriteLine("Ion Analyser Server");
             try
             {
+                InitSensorStore();
                 InsertSensorTestData();
                 InitControllers();
                 HttpServer server = new HttpServer();
@@ -47,14 +58,27 @@ namespace Ion.Pro.Analyser
             Console.Read();
         }
 
+        static void InitSensorStore()
+        {
+            Store.SensorLocations.Add("../../Data/Sets");
+            Store.SensorLocations.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DataLog"));
+
+            SensorDataStore.GetDefault().ReaderLinker.Add("log", typeof(LegacySensorReader));
+            SensorDataStore.GetDefault().ReaderLinker.Add("log16", typeof(LegacySensorReader));
+            SensorDataStore.GetDefault().ReaderLinker.Add("gpscsv", typeof(GPSDataReader));
+            SensorDataStore.GetDefault().ReaderLinker.Add("gpx", typeof(GPXDataReader));
+
+        }
+
+
+
         static void InsertSensorTestData()
         {
-            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
-            ISensorReader gpsReader = new GPSDataReader("../../Data/GPS_DataFile.csv", 2, 2);
-            ISensorReader gpsReader2 = new GPXDataReader("../../Data/stiangps.gpx");
-            ISensorReader gpsReader3 = new GPXDataReader("../../Data/fredrikgps.gpx");
-            //LegacySensorReader reader = new LegacySensorReader("Data/126_usart_data.iondata");
+            List<ISensorReader> readers = new List<ISensorReader>();
+            readers.Add(Store.GetSensorReader("../../Data/GPS_DataFile.gpscsv", 2, 2));
 
+
+            readers.AddRange(Store.GetSensorReader(files));
             ComBus.GetDefault().RegisterClient(new SensorComService());
 
             SensorDataStore store = SensorDataStore.GetDefault();
@@ -62,10 +86,12 @@ namespace Ion.Pro.Analyser
             switch (runMode)
             {
                 case RunMode.OffLine:
-                    store.AddRange(reader.ReadPackages());
-                    store.AddRange(gpsReader.ReadPackages());
-                    store.AddRange(gpsReader2.ReadPackages());
-                    store.AddRange(gpsReader3.ReadPackages());
+                    foreach (ISensorReader reader in readers)
+                    {
+                        if (reader == null)
+                            continue;
+                        store.AddRange(reader.ReadPackages());
+                    }
                     break;
                 case RunMode.LiveTest:
                     Task.Run(() => DataInserter());
@@ -84,20 +110,31 @@ namespace Ion.Pro.Analyser
             }
         }
 
+
+
         static void DataInserter()
         {
             DateTime begin = DateTime.Now;
-            ISensorReader reader = new LegacySensorReader("../../Data/126_usart_data.iondata");
+            ISensorReader reader = Store.GetSensorReader("../../Data/Sets/126_usart_data.log16");
+            //ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
             SensorPackage[] all = reader.ReadPackages();
             int i = 0;
-            while (i < all.Length - 1)
+            try
             {
-                //Console.WriteLine("Tick");
-                SensorPackage pack = all[i];
-                SensorDataStore.GetDefault().AddLive(pack);
-                //Console.WriteLine("At: " + pack.TimeStamp.ToString());
-                System.Threading.Thread.Sleep((int)(all[i+1].TimeStamp - all[i].TimeStamp));
-                i++;
+                while (i < all.Length - 1)
+                {
+                    //Console.WriteLine("Tick");
+                    SensorPackage pack = all[i];
+                    //pack.TimeStamp *= 1000;
+                    SensorDataStore.GetDefault().AddLive(pack);
+                    //Console.WriteLine("At: " + pack.TimeStamp.ToString());
+                    System.Threading.Thread.Sleep((int)(all[i + 1].TimeStamp - all[i].TimeStamp));
+                    i++;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
@@ -294,7 +331,7 @@ namespace Ion.Pro.Analyser
             SensorDataStore.GetDefault().DataReceived += SensorComService_DataReceived;
         }
 
-        List<SensorPackage> SendCache = new List<SensorPackage>();
+        List<RealSensorPackage> SendCache = new List<RealSensorPackage>();
 
         DateTime lastSend = new DateTime();
 
@@ -302,10 +339,10 @@ namespace Ion.Pro.Analyser
         {
             DateTime current = DateTime.Now;
             SendCache.Add(e.Package);
-            if ((current - lastSend).TotalMilliseconds > 30)
+            if ((current - lastSend).TotalMilliseconds > 100)
             {
                 List<byte> allBytes = new List<byte>();
-                foreach (SensorPackage sp in SendCache)
+                foreach (RealSensorPackage sp in SendCache)
                 {
                     allBytes.AddRange(sp.GetBinary());
                 }

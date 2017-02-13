@@ -1,0 +1,47 @@
+﻿{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"title": "JSON Schema for my JSON file format",
+
+	"type": "array",
+
+  "items": {
+    "type": "object",
+    "properties": {
+      "Key": {
+        "type": "string",
+        "description": "The unique key for sensor package, defined in sensor.json"
+      },
+      "Unit": {
+        "type": "string",
+        "description": "The unit of the real value"
+      },
+      "Resolution": {
+        "type": "number",
+        "description": "Number of bits used in the signal"
+      },
+
+
+      "Signed": {
+        "type": "boolean",
+        "description": "If the raw value is signed or not"
+      },
+
+      "MinValue": {
+        "type": "number",
+        "description": "The minimum value of the real value"
+      },
+      "MaxValue": {
+        "type": "number",
+        "description": "The maximum value of the real value"
+      },
+      "MinDisplay": {
+        "type": "number",
+        "description": "The Minimum display value"
+      },
+      "MaxDisplay": {
+        "type": "number",
+        "description": "The Maximum display value"
+      }
+    }
+  }
+}

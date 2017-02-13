@@ -3,8 +3,8 @@ var SensorManager = (function () {
         var _this = this;
         this.dataCache = [];
         this.plotCache = [];
-        this.eventManager = new EventManager();
         this.plotter = [];
+        this.eventManager = new EventManager();
         kernel.netMan.registerService(10, function (data) {
             var dataArray = _this.convertToSensorPackage(data.Sensors);
             for (var j = 0; j < dataArray.length; j++) {
@@ -112,19 +112,31 @@ var SensorManager = (function () {
             console.log(raw.charCodeAt(i * 28 + 1));
             console.log(raw.charCodeAt(i * 28 + 2));
             console.log(raw.charCodeAt(i * 28 + 3));*/
+            var buf = new ArrayBuffer(8);
+            var insert = new Uint8Array(buf);
+            insert[0] = raw.charCodeAt(i * 28 + 4);
+            insert[1] = raw.charCodeAt(i * 28 + 5);
+            insert[2] = raw.charCodeAt(i * 28 + 6);
+            insert[3] = raw.charCodeAt(i * 28 + 7);
+            insert[4] = raw.charCodeAt(i * 28 + 8);
+            insert[5] = raw.charCodeAt(i * 28 + 9);
+            insert[6] = raw.charCodeAt(i * 28 + 10);
+            insert[7] = raw.charCodeAt(i * 28 + 11);
+            var output = new Float64Array(buf);
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                     | raw.charCodeAt(i * 28 + 1) << 8
                     | raw.charCodeAt(i * 28 + 2) << 16
                     | raw.charCodeAt(i * 28 + 3) << 24,
-                Value: raw.charCodeAt(i * 28 + 4)
-                    | raw.charCodeAt(i * 28 + 5) << 8
-                    | raw.charCodeAt(i * 28 + 6) << 16
-                    | raw.charCodeAt(i * 28 + 7) << 24
-                    | raw.charCodeAt(i * 28 + 8) << 32
-                    | raw.charCodeAt(i * 28 + 9) << 40
-                    | raw.charCodeAt(i * 28 + 10) << 48
-                    | raw.charCodeAt(i * 28 + 11) << 56,
+                Value: output[0],
+                /*Value: raw.charCodeAt(i * 28 + 4)
+                | raw.charCodeAt(i * 28 + 5) << 8
+                | raw.charCodeAt(i * 28 + 6) << 16
+                | raw.charCodeAt(i * 28 + 7) << 24
+                | raw.charCodeAt(i * 28 + 8) << 32
+                | raw.charCodeAt(i * 28 + 9) << 40
+                | raw.charCodeAt(i * 28 + 10) << 48
+                | raw.charCodeAt(i * 28 + 11) << 56,*/
                 TimeStamp: raw.charCodeAt(i * 28 + 12)
                     | raw.charCodeAt(i * 28 + 13) << 8
                     | raw.charCodeAt(i * 28 + 14) << 16
@@ -136,6 +148,21 @@ var SensorManager = (function () {
             };
         }
         return ret;
+    };
+    SensorManager.prototype.clearCache = function () {
+        this.dataCache = [];
+        this.plotCache = [];
+        for (var _i = 0, _a = this.plotter; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (Array.isArray(a.plotData)) {
+                a.plotData.splice(0);
+                a.dataUpdate();
+            }
+            else {
+                a.plotData = null;
+                a.dataUpdate();
+            }
+        }
     };
     SensorManager.prototype.setGlobal = function (id) {
         var _this = this;
@@ -191,5 +218,49 @@ var SensorInformation = (function () {
     function SensorInformation() {
     }
     return SensorInformation;
+}());
+var SensorValueInformation = (function () {
+    function SensorValueInformation() {
+    }
+    return SensorValueInformation;
+}());
+var SensorInfoHelper = (function () {
+    function SensorInfoHelper() {
+    }
+    SensorInfoHelper.maxValue = function (info) {
+        var val = 0;
+        var temp = info.ValueInfo;
+        if (temp.MaxDisplay) {
+            val = temp.MaxDisplay;
+        }
+        else if (temp.MaxValue) {
+            val = temp.MaxValue;
+        }
+        else {
+            val = (1 << temp.Resolution) - 1;
+        }
+        return val;
+    };
+    SensorInfoHelper.minValue = function (info) {
+        var val = 0;
+        var temp = info.ValueInfo;
+        if (temp.MinDisplay) {
+            val = temp.MinDisplay;
+        }
+        else if (temp.MinValue) {
+            val = temp.MinValue;
+        }
+        else if (temp.Signed) {
+            val = -SensorInfoHelper.maxValue(info) - 1;
+        }
+        return val;
+    };
+    SensorInfoHelper.getPercent = function (info, p) {
+        var min = SensorInfoHelper.minValue(info);
+        var max = SensorInfoHelper.maxValue(info);
+        var newVal = (p.y - min) / (max - min);
+        return new Point(p.x, newVal);
+    };
+    return SensorInfoHelper;
 }());
 //# sourceMappingURL=sensys.js.map
