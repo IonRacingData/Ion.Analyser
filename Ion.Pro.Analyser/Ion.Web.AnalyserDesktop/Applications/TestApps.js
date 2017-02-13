@@ -53,12 +53,12 @@ var LineChartTester = (function () {
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
-        this.lineChart = new LineChartController(this.plotData);
+        this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
     };
     LineChartTester.prototype.dataUpdate = function () {
-        this.lineChart.draw();
+        this.lineChart.setData(this.plotData);
     };
     LineChartTester.prototype.createEvents = function (eh) {
         var _this = this;
@@ -214,29 +214,5 @@ var BarTester = (function () {
         });
     };
     return BarTester;
-}());
-var AccBarTester = (function () {
-    function AccBarTester() {
-        this.val = 0;
-    }
-    AccBarTester.prototype.main = function () {
-        var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
-        this.window.content.style.overflow = "hidden";
-        this.accBar = new AccBarController(this.window.width, this.window.height);
-        var accBarWrapper = this.accBar.generate();
-        this.window.content.appendChild(accBarWrapper);
-        this.accBar.setValue(this.val);
-        accBarWrapper.addEventListener("wheel", function (e) {
-            _this.val -= e.deltaY / 10;
-            _this.val = _this.val > 100 ? 100 : _this.val;
-            _this.val = _this.val < -100 ? -100 : _this.val;
-            _this.accBar.setValue(_this.val);
-        });
-        this.window.addEventListener(AppWindow.event_resize, function () {
-            _this.accBar.setSize(_this.window.width, _this.window.height);
-        });
-    };
-    return AccBarTester;
 }());
 //# sourceMappingURL=TestApps.js.map

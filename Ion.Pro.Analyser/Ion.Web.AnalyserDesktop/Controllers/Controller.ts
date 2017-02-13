@@ -10,11 +10,16 @@
         this.onSizeChange();
     }
     protected abstract onSizeChange(): void;
+    protected onDataChange(): void { }; 
     public abstract generate(): HTMLElement;
 }
 
 abstract class SingleValueController extends Controller {
     protected value: number;
+    protected data: IPlotData;
+    public setData(d: IPlotData) {
+        this.data = d;
+    }
     public abstract setValue(value: number): void;
 }
 
@@ -40,6 +45,14 @@ abstract class CanvasController extends Controller {
     }
 
     protected abstract draw(): void;
+}
+
+abstract class MultiValueCanvasController extends CanvasController {
+    protected data: IPlotData[];
+    public setData(d: IPlotData[]): void {
+        this.data = d;
+        this.onDataChange();
+    }
 }
 
 abstract class SingleValueCanvasController extends CanvasController {

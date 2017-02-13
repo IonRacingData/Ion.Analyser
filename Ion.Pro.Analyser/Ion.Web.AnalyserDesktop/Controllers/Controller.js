@@ -12,6 +12,8 @@ var Controller = (function () {
         this.height = height;
         this.onSizeChange();
     };
+    Controller.prototype.onDataChange = function () { };
+    ;
     return Controller;
 }());
 var SingleValueController = (function (_super) {
@@ -19,6 +21,9 @@ var SingleValueController = (function (_super) {
     function SingleValueController() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    SingleValueController.prototype.setData = function (d) {
+        this.data = d;
+    };
     return SingleValueController;
 }(Controller));
 var CanvasController = (function (_super) {
@@ -41,6 +46,17 @@ var CanvasController = (function (_super) {
     };
     return CanvasController;
 }(Controller));
+var MultiValueCanvasController = (function (_super) {
+    __extends(MultiValueCanvasController, _super);
+    function MultiValueCanvasController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MultiValueCanvasController.prototype.setData = function (d) {
+        this.data = d;
+        this.onDataChange();
+    };
+    return MultiValueCanvasController;
+}(CanvasController));
 var SingleValueCanvasController = (function (_super) {
     __extends(SingleValueCanvasController, _super);
     function SingleValueCanvasController() {

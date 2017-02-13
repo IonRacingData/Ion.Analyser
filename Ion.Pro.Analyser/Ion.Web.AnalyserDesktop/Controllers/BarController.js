@@ -5,11 +5,18 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var BarController = (function (_super) {
     __extends(BarController, _super);
-    function BarController(width, height) {
+    function BarController(width, height, horisontal) {
         var _this = _super.call(this) || this;
+        _this.horizontal = false;
         _this.wrapper = _this.mk.tag("div", "bar-controller-wrapper");
-        _this.bar = _this.mk.tag("div", "bar-controller");
-        _this.wrapper.appendChild(_this.bar);
+        _this.barWrapper1 = _this.mk.tag("div", "bar-controller-barWrapper1");
+        _this.barWrapper2 = _this.mk.tag("div", "bar-controller-barWrapper2");
+        _this.wrapper.appendChild(_this.barWrapper1);
+        _this.wrapper.appendChild(_this.barWrapper2);
+        _this.bar1 = _this.mk.tag("div", "bar-controller-bar1");
+        _this.bar2 = _this.mk.tag("div", "bar-controller-bar2");
+        _this.barWrapper1.appendChild(_this.bar1);
+        _this.barWrapper2.appendChild(_this.bar2);
         _this.setSize(width, height);
         return _this;
     }
@@ -17,10 +24,19 @@ var BarController = (function (_super) {
         return this.wrapper;
     };
     BarController.prototype.setValue = function (percent) {
-        percent = percent < 0 ? 0 : percent;
-        percent = percent > 100 ? 100 : percent;
+        percent = percent < -1 ? -1 : percent;
+        percent = percent > 1 ? 1 : percent;
         this.value = percent;
-        this.bar.style.height = this.value + "%";
+        if (this.value < 0) {
+            this.doubleBar();
+        }
+        else {
+            this.singleBar();
+        }
+    };
+    BarController.prototype.doubleBar = function () {
+    };
+    BarController.prototype.singleBar = function () {
     };
     BarController.prototype.onSizeChange = function () {
         this.wrapper.style.width = this.width + "px";

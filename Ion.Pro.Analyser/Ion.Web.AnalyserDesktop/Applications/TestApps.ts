@@ -58,21 +58,19 @@ class LineChartTester implements IApplication, IMultiPlot {
     plotData: IPlotData[] = [];
     plotType: string = "Plot";
     plotWindow: AppWindow;
-    update
-
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
-        this.lineChart = new LineChartController(this.plotData);
+        this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
     }
 
     dataUpdate() {
-        this.lineChart.draw();
+        this.lineChart.setData(this.plotData);
     }
 
     createEvents(eh: EventHandler) {
@@ -124,7 +122,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
         this.window.content.style.overflow = "hidden";
-        kernel.senMan.register(this);                
+        kernel.senMan.register(this);
 
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
@@ -251,35 +249,6 @@ class BarTester {
 
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.bar.setSize(this.window.width, this.window.height);
-        });
-    }
-
-
-}
-
-class AccBarTester {
-    application: Application;
-    window: AppWindow;
-    accBar: AccBarController;
-    val: number = 0;
-
-    main() {
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
-        this.window.content.style.overflow = "hidden";
-        this.accBar = new AccBarController(this.window.width, this.window.height);
-        let accBarWrapper = this.accBar.generate();
-        this.window.content.appendChild(accBarWrapper);
-        this.accBar.setValue(this.val);
-
-        accBarWrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 10;
-            this.val = this.val > 100 ? 100 : this.val;
-            this.val = this.val < -100 ? -100 : this.val;
-            this.accBar.setValue(this.val);
-        });
-
-        this.window.addEventListener(AppWindow.event_resize, () => {
-            this.accBar.setSize(this.window.width, this.window.height);
         });
     }
 
