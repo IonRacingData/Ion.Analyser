@@ -12,24 +12,27 @@
     static readonly event_registerIPlot = "registerIPlot";
 
     constructor() {
-        kernel.netMan.registerService(10, (data: any) => this.handleService(data.Sensors));
+        kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
     }
 
     private handleService(data: ISensorPackage[]) {
+
         for (let j = 0; j < data.length; j++) {
             let realData = data[j];
             let sensId = realData.ID;
+
             if (!this.dataCache[sensId]) {
                 this.dataCache[sensId] = [];
             }
             this.dataCache[sensId].push(realData);
+
             if (!this.plotCache[sensId]) {
                 this.plotCache[sensId] = new PlotData([]);
-                this.plotCache[sensId].ID = sensId;
+                //this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
-            this.updateAllPlotters();
         }
+        this.updateAllPlotters();
     }
 
     private updateAllPlotters() {

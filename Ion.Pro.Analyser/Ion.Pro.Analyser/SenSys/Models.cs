@@ -29,11 +29,11 @@ namespace Ion.Pro.Analyser.SenSys
         public long? MinDisplay { get; set; }
         public long? MaxDisplay { get; set; }
 
-        public double ConvertToPercent(int rawValue)
+        public double ConvertToPercent(long rawValue)
         {
             if (Signed != null && Signed.Value)
             {
-                int shift = 0;
+                long shift = 0;
                 if (rawValue >> Resolution > 0)
                     shift = (-1 << Resolution);
                 return ((double)(shift | rawValue)) / (double)(((long)1 << Resolution) - 1);
@@ -44,7 +44,7 @@ namespace Ion.Pro.Analyser.SenSys
             }
         }
 
-        public double ConvertValue(int rawValue)
+        public double ConvertValue(long rawValue)
         {
             if (Signed != null && MaxValue != null)
             {

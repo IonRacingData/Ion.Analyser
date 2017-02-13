@@ -5,7 +5,7 @@ var SensorManager = (function () {
         this.plotCache = [];
         this.plotter = [];
         this.eventManager = new EventManager();
-        kernel.netMan.registerService(10, function (data) { return _this.handleService(data.Sensors); });
+        kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
     }
     SensorManager.prototype.handleService = function (data) {
         for (var j = 0; j < data.length; j++) {
@@ -17,11 +17,10 @@ var SensorManager = (function () {
             this.dataCache[sensId].push(realData);
             if (!this.plotCache[sensId]) {
                 this.plotCache[sensId] = new PlotData([]);
-                this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
-            this.updateAllPlotters();
         }
+        this.updateAllPlotters();
     };
     SensorManager.prototype.updateAllPlotters = function () {
         for (var i = 0; i < this.plotter.length; i++) {

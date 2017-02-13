@@ -10,7 +10,7 @@
     private marking: IMarking;
     private displayGrid = true;
     private stickyAxes = true;
-    private autoScroll = true;
+    private autoScroll = false;
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";//"black"; // "black";
     private mainColor = "white";
