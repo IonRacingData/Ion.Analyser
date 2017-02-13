@@ -34,9 +34,10 @@ namespace Ion.Pro.Analyser.SenSys
             if (Signed != null && Signed.Value)
             {
                 long shift = 0;
-                if (rawValue >> Resolution > 0)
-                    shift = (-1 << Resolution);
-                return ((double)(shift | rawValue)) / (double)(((long)1 << Resolution) - 1);
+                int resCor = Resolution - 1;
+                if (rawValue >> resCor > 0)
+                    shift = (-1 << resCor);
+                return ((double)(shift | rawValue)) / (double)(((long)1 << resCor) - 1);
             }
             else
             {

@@ -62,6 +62,7 @@
     <None Include="App.config" />
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\freq.log16" />
+    <None Include="Data\sinus.log16" />
     <None Include="Sensors\SensorInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -88,7 +89,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Sensors_4Sensor_1json__JSONSchema="sensorTypeDef.json" Sensors_4SensorInfo_1json__JSONSchema="sensorInfoTypeDef.json" />
+      <UserProperties Sensors_4SensorInfo_1json__JSONSchema="sensorInfoTypeDef.json" Sensors_4Sensor_1json__JSONSchema="sensorTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
