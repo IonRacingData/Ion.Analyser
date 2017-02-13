@@ -59,24 +59,23 @@ var BarController = (function (_super) {
         this.wrapper.style.height = this.height + "px";
     };
     BarController.prototype.onDataChange = function () {
+        var val = this.value * 100;
         if (this.horizontal) {
             if (this.double) {
-                var val = this.value * 100;
                 this.bar2.style.width = val < 0 ? 0 + "%" : val + "%";
                 this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : 0 + "%";
             }
             else {
-                this.bar1.style.width = this.value * 100 + "%";
+                this.bar1.style.width = val < 0 ? 0 + "%" : val + "%";
             }
         }
         else {
             if (this.double) {
-                var val = this.value * 100;
                 this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
                 this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : 0 + "%";
             }
             else {
-                this.bar1.style.height = this.value * 100 + "%";
+                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
             }
         }
     };

@@ -199,7 +199,7 @@ var BarTester = (function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height, false, true);
+        this.bar = new BarController(this.window.width, this.window.height, true, true);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         this.bar.setValue(this.val);

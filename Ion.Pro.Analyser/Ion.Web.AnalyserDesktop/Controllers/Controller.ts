@@ -10,7 +10,7 @@
         this.onSizeChange();
     }
     protected abstract onSizeChange(): void;
-    protected onDataChange(): void { }; 
+    protected onDataChange(): void { }; // to be abstract
     public abstract generate(): HTMLElement;
 }
 

@@ -67,24 +67,24 @@
     }
 
     protected onDataChange(): void {
+        let val = this.value * 100;
+
         if (this.horizontal) {
             if (this.double) {
-                let val = this.value * 100;
                 this.bar2.style.width = val < 0 ? 0 + "%" : val + "%";
                 this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : 0 + "%";
             }
             else {
-                this.bar1.style.width = this.value * 100 + "%";
+                this.bar1.style.width = val < 0 ? 0 + "%" : val + "%";
             }
         }
         else {
             if (this.double) {
-                let val = this.value * 100;
                 this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
                 this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : 0 + "%";
             }
             else {
-                this.bar1.style.height = this.value * 100 + "%";
+                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
             }
         }
     }

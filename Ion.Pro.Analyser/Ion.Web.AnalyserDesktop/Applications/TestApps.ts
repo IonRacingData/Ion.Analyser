@@ -235,7 +235,7 @@ class BarTester {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
         this.window.content.style.overflow = "hidden";
-        this.bar = new BarController(this.window.width, this.window.height, false, true);
+        this.bar = new BarController(this.window.width, this.window.height, true, true);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         this.bar.setValue(this.val);        

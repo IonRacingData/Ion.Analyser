@@ -176,23 +176,25 @@ var LineChartController = (function (_super) {
         }
     };
     LineChartController.prototype.selectPoint = function (e) {
-        //var mp: Point = this.getMousePoint(e);
-        var mp = e;
-        var p = null;
-        for (var i = 0; i < this.data.length; i++) {
-            //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
-            var closest = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
-            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
-                p = closest;
+        if (this.data) {
+            //var mp: Point = this.getMousePoint(e);
+            var mp = e;
+            var p = null;
+            for (var i = 0; i < this.data.length; i++) {
+                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                var closest = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
+                if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
+                    p = closest;
+                }
             }
+            if (p !== null) {
+                this.selectedPoint = p;
+            }
+            else {
+                this.selectedPoint = null;
+            }
+            this.draw();
         }
-        if (p !== null) {
-            this.selectedPoint = p;
-        }
-        else {
-            this.selectedPoint = null;
-        }
-        this.draw();
     };
     LineChartController.prototype.zoom = function (e) {
         e.preventDefault();

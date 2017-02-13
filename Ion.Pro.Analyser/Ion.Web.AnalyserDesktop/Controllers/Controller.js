@@ -13,7 +13,7 @@ var Controller = (function () {
         this.onSizeChange();
     };
     Controller.prototype.onDataChange = function () { };
-    ;
+    ; // to be abstract
     return Controller;
 }());
 var SingleValueController = (function (_super) {

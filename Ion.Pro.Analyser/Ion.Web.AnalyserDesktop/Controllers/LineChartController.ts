@@ -195,25 +195,28 @@
     }
 
     private selectPoint(e: Point): void {
-        //var mp: Point = this.getMousePoint(e);
-        var mp = e;
-        var p: Point = null;
-        for (let i: number = 0; i < this.data.length; i++) {
-            //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
-            var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
-            if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
-                p = closest;
+        if (this.data) {
+            //var mp: Point = this.getMousePoint(e);
+            var mp = e;
+            var p: Point = null;
+            for (let i: number = 0; i < this.data.length; i++) {
+                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
+                if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
+                    p = closest;
+                }
             }
-        }
 
-        if (p !== null) {
-            this.selectedPoint = p;
-        }
-        else {
-            this.selectedPoint = null;
-        }
+            if (p !== null) {
+                this.selectedPoint = p;
+            }
+            else {
+                this.selectedPoint = null;
+            }
 
-        this.draw();
+            this.draw();
+
+        }
     }
 
     private zoom(e: WheelEvent): void {
