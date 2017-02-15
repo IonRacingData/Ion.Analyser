@@ -43,7 +43,7 @@ abstract class SingleValueController extends Controller {
         }
     }
 
-    public setValue(value: number): void { }
+    public setValue(value: number): void { }    
 }
 
 abstract class CanvasController extends Controller {
@@ -79,10 +79,35 @@ abstract class CanvasController extends Controller {
 
 abstract class MultiValueCanvasController extends CanvasController {
     protected data: IPlotData[];
+    protected sensorInfos: { [id: string]: SensorInformation } = {};
+    private lastDataLength: number = 0;
+
     public setData(d: IPlotData[]): void {
         this.data = d;
+        if (this.lastDataLength !== this.data.length) {
+            this.lastDataLength = this.data.length;
+            kernel.senMan.getInfos((infos: SensorInformation[]) => {                
+                this.updateSensorInfos(infos);
+            });
+        }
         this.onDataChange();
     }
+
+    private updateSensorInfos(infos: SensorInformation[]) {
+        this.sensorInfos = {};
+
+        for (let i of infos) {
+            for (let d of this.data) {
+                if (d.ID === i.ID) {
+                    this.sensorInfos[i.ID.toString()] = i;
+                }
+            }
+        }
+        console.log(this.sensorInfos);
+        this.onSensorChange();
+    }
+
+    protected onSensorChange(): void { }
 }
 
 abstract class SingleValueCanvasController extends CanvasController {

@@ -8,14 +8,13 @@
     private selectedPoint: Point = null;
     private isMarking = false;
     private marking: IMarking;
-    private displayGrid = true;
-    private stickyAxes = true;
-    private autoScroll = false;
+    private displayGrid: boolean = true;
+    private stickyAxes: boolean = true;
+    private autoScroll: boolean = false;
+    private autoScroll_plotMoved: boolean = false;
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";//"black"; // "black";
     private mainColor = "white";
-    private sensorInfos: SensorInformation[] = [];
-    private sensorIDs: number[] = [];
 
     constructor() {
         super();
@@ -68,58 +67,23 @@
     }
 
     protected onDataChange(): void {
-        if (this.autoScroll) {
+        if (this.autoScroll && !this.mouseDown) {
             this.moveToLastPoint();
-        }
-
-        if (this.data.length === 0) {
-            if (this.sensorIDs.length > 0) {
-                this.sensorInfos = [];
-                this.sensorIDs = [];
-
-                console.log(this.sensorInfos);
-                console.log(this.sensorIDs);
+            if (this.autoScroll_plotMoved) {
+                this.autoScroll_plotMoved = false;
+                this.autoScaleY();                
             }
         }
-        else {
 
-            let ids: number[] = [];
-            for (let d of this.data) {
-                ids.push(d.ID);
-            }
-
-            for (let i = 0; i < ids.length; i++) {
-                if (ids[i] !== this.sensorIDs[i]) {
-                    kernel.senMan.getInfos((infos: SensorInformation[]) => {
-                        this.updateSensorInfos(infos);                        
-                    });         
-                    break;
-                }
-            }
-        }
-        
         this.draw();
     }
 
-    private updateSensorInfos(infos: SensorInformation[]) {
-        this.sensorInfos = [];
-        this.sensorIDs = [];
-        for (let i of infos) {
-            for (let d of this.data) {
-                if (d.ID === i.ID) {
-                    this.sensorInfos.push(i);
-                }
-            }
+    protected onSensorChange(): void {
+        if (this.data.length > 0) {
+            this.autoScaleY();            
         }
-
-        for (let i = 0; i < this.data.length; i++) {
-            this.sensorIDs.push(this.data[i].ID);
-        }
-        this.requestingSensorInfos = false;
-        console.log(this.sensorInfos);
-        console.log(this.sensorIDs);
     }
-
+    
     private moveToLastPoint(): void {
         if (this.data[0]) {
             let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
@@ -431,15 +395,36 @@
     }
 
     private autoScaleY(): void {
-        let maxPlotHeight: number;
-        let min: number;
-        let max: number
-        for (let i = 0; i < this.data.length; i++) {
-            
-        }
-        //let ratio: number = this.height / 
-    }
+        let min: number = 0;
+        let max: number = 0;
 
+        for (let i = 0; i < this.data.length; i++) {
+            let info = this.sensorInfos[this.data[i].ID.toString()];
+            let dmin: number = SensorInfoHelper.minValue(info);
+            let dmax: number = SensorInfoHelper.maxValue(info);            
+            min = dmin < min ? dmin : min;
+            max = dmax > max ? dmax : max;
+        }
+
+        if (min !== max) {
+            let padding: number = (max - min) * 0.2;
+            min -= padding / 2;
+            max += padding / 2;
+            let minAbs: number = this.getAbsolute(new Point(0, min)).y;
+            let maxAbs: number = this.getAbsolute(new Point(0, max)).y;
+            let plotHeight = Math.abs(maxAbs - minAbs);
+
+            let ratio: number = this.height / plotHeight;
+            let first = min;
+            this.scalePoint.y *= ratio;
+            let sec = this.getAbsolute(new Point(0, first)).y;
+            sec = this.height - sec;
+            this.movePoint.y -= sec;
+
+            this.draw();            
+        }
+
+    }
 
     private wrapper_keyDown(e: KeyboardEvent) {
         switch (e.key) {
@@ -484,6 +469,7 @@
                 this.drawMarking();
             }
             else {
+                this.autoScroll_plotMoved = true;
                 this.isDragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();

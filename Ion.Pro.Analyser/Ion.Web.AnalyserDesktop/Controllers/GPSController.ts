@@ -1,6 +1,6 @@
 ﻿class GPSController extends CanvasController {
-    posData: GPSPlotData;    
-    ctxMain: ContextFixer;        
+    posData: GPSPlotData;
+    ctxMain: ContextFixer;
     relSize: IRelativeSize;
     padding: number;
     absWidth: number;
@@ -30,7 +30,7 @@
         this.relSize = null;
         
         return this.wrapper;
-    }    
+    }
 
     protected onSizeChange(): void {
         this.canvas.setSize(this.width, this.height);
@@ -91,9 +91,9 @@
         }
     }
 
-    private rescale(): void {         
+    private rescale(): void {
 
-        let newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;        
+        let newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
         let newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
         this.absWidth = newWidth;
         this.absHeight = newHeight;
@@ -109,7 +109,7 @@
         var sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
 
-        this.movePoint = this.movePoint.sub(sec);        
+        this.movePoint = this.movePoint.sub(sec);
     }
 
     public setData(d: GPSPlotData): void {
@@ -123,7 +123,7 @@
     }
 }
 
-interface IRelativeSize {   
+interface IRelativeSize {
     min: Point;
     max: Point;
 }

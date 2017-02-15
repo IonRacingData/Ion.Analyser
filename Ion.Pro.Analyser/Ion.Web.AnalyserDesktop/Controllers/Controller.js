@@ -76,12 +76,37 @@ var CanvasController = (function (_super) {
 var MultiValueCanvasController = (function (_super) {
     __extends(MultiValueCanvasController, _super);
     function MultiValueCanvasController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.sensorInfos = {};
+        _this.lastDataLength = 0;
+        return _this;
     }
     MultiValueCanvasController.prototype.setData = function (d) {
+        var _this = this;
         this.data = d;
+        if (this.lastDataLength !== this.data.length) {
+            this.lastDataLength = this.data.length;
+            kernel.senMan.getInfos(function (infos) {
+                _this.updateSensorInfos(infos);
+            });
+        }
         this.onDataChange();
     };
+    MultiValueCanvasController.prototype.updateSensorInfos = function (infos) {
+        this.sensorInfos = {};
+        for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
+            var i = infos_1[_i];
+            for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
+                var d = _b[_a];
+                if (d.ID === i.ID) {
+                    this.sensorInfos[i.ID.toString()] = i;
+                }
+            }
+        }
+        console.log(this.sensorInfos);
+        this.onSensorChange();
+    };
+    MultiValueCanvasController.prototype.onSensorChange = function () { };
     return MultiValueCanvasController;
 }(CanvasController));
 var SingleValueCanvasController = (function (_super) {

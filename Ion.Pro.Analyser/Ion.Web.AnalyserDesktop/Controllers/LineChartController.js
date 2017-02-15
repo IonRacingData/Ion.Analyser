@@ -14,12 +14,10 @@ var LineChartController = (function (_super) {
         _this.displayGrid = true;
         _this.stickyAxes = true;
         _this.autoScroll = false;
+        _this.autoScroll_plotMoved = false;
         _this.gridColor = "rgba(100,100,100,0.3)";
         _this.axisColor = "white"; //"black"; // "black";
         _this.mainColor = "white";
-        _this.sensorInfos = [];
-        _this.sensorIDs = [];
-        _this.requestingSensorInfos = false;
         _this.movePoint = new Point(50, 50);
         _this.scalePoint = new Point(0.05, 6);
         return _this;
@@ -61,54 +59,19 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.onDataChange = function () {
-        var _this = this;
-        if (this.autoScroll) {
+        if (this.autoScroll && !this.mouseDown) {
             this.moveToLastPoint();
-        }
-        if (this.data.length === 0 && !this.requestingSensorInfos) {
-            if (this.sensorIDs.length > 0) {
-                this.sensorInfos = [];
-                this.sensorIDs = [];
-                console.log(this.sensorInfos);
-                console.log(this.sensorIDs);
-            }
-        }
-        else {
-            var ids = [];
-            for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
-                var d = _a[_i];
-                ids.push(d.ID);
-            }
-            for (var i = 0; i < ids.length; i++) {
-                if (ids[i] !== this.sensorIDs[i]) {
-                    this.requestingSensorInfos = true;
-                    kernel.senMan.getInfos(function (infos) {
-                        _this.updateSensorInfos(infos);
-                    });
-                    break;
-                }
+            if (this.autoScroll_plotMoved) {
+                this.autoScroll_plotMoved = false;
+                this.autoScaleY();
             }
         }
         this.draw();
     };
-    LineChartController.prototype.updateSensorInfos = function (infos) {
-        this.sensorInfos = [];
-        this.sensorIDs = [];
-        for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
-            var i = infos_1[_i];
-            for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
-                var d = _b[_a];
-                if (d.ID === i.ID) {
-                    this.sensorInfos.push(i);
-                }
-            }
+    LineChartController.prototype.onSensorChange = function () {
+        if (this.data.length > 0) {
+            this.autoScaleY();
         }
-        for (var i = 0; i < this.data.length; i++) {
-            this.sensorIDs.push(this.data[i].ID);
-        }
-        this.requestingSensorInfos = false;
-        console.log(this.sensorInfos);
-        console.log(this.sensorIDs);
     };
     LineChartController.prototype.moveToLastPoint = function () {
         if (this.data[0]) {
@@ -360,12 +323,30 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.autoScaleY = function () {
-        var maxPlotHeight;
-        var min;
-        var max;
+        var min = 0;
+        var max = 0;
         for (var i = 0; i < this.data.length; i++) {
+            var info = this.sensorInfos[this.data[i].ID.toString()];
+            var dmin = SensorInfoHelper.minValue(info);
+            var dmax = SensorInfoHelper.maxValue(info);
+            min = dmin < min ? dmin : min;
+            max = dmax > max ? dmax : max;
         }
-        //let ratio: number = this.height / 
+        if (min !== max) {
+            var padding = (max - min) * 0.2;
+            min -= padding / 2;
+            max += padding / 2;
+            var minAbs = this.getAbsolute(new Point(0, min)).y;
+            var maxAbs = this.getAbsolute(new Point(0, max)).y;
+            var plotHeight = Math.abs(maxAbs - minAbs);
+            var ratio = this.height / plotHeight;
+            var first = min;
+            this.scalePoint.y *= ratio;
+            var sec = this.getAbsolute(new Point(0, first)).y;
+            sec = this.height - sec;
+            this.movePoint.y -= sec;
+            this.draw();
+        }
     };
     LineChartController.prototype.wrapper_keyDown = function (e) {
         switch (e.key) {
@@ -407,6 +388,7 @@ var LineChartController = (function (_super) {
                 this.drawMarking();
             }
             else {
+                this.autoScroll_plotMoved = true;
                 this.isDragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();
