@@ -12,14 +12,13 @@ var Controller = (function () {
         this.height = height;
         this.onSizeChange();
     };
-    Controller.prototype.onDataChange = function () { };
-    ; // to be abstract
     return Controller;
 }());
 var SingleValueController = (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.percent = 0;
         _this.value = 0;
         _this.lastID = -1;
         return _this;
@@ -38,7 +37,8 @@ var SingleValueController = (function (_super) {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.value = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
                 }
                 this.onDataChange();
             }
@@ -65,6 +65,12 @@ var CanvasController = (function (_super) {
     CanvasController.prototype.getMousePoint = function (e) {
         return new Point(e.layerX, e.layerY);
     };
+    CanvasController.prototype.getTouchPoint = function (e) {
+        if (e.touches.length > 0)
+            return new Point(e.touches[0].clientX, e.touches[0].clientY);
+        else
+            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    };
     return CanvasController;
 }(Controller));
 var MultiValueCanvasController = (function (_super) {
@@ -81,8 +87,33 @@ var MultiValueCanvasController = (function (_super) {
 var SingleValueCanvasController = (function (_super) {
     __extends(SingleValueCanvasController, _super);
     function SingleValueCanvasController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.percent = 0;
+        _this.value = 0;
+        _this.lastID = -1;
+        return _this;
     }
+    SingleValueCanvasController.prototype.setData = function (d) {
+        var _this = this;
+        this.data = d;
+        if (this.data) {
+            var curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, function (i) {
+                    _this.lastSensorInfo = i;
+                    _this.lastID = _this.data.ID;
+                    _this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                }
+                this.onDataChange();
+            }
+        }
+    };
     return SingleValueCanvasController;
 }(CanvasController));
 //# sourceMappingURL=Controller.js.map

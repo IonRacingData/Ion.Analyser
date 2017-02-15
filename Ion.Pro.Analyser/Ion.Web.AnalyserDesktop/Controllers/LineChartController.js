@@ -17,6 +17,9 @@ var LineChartController = (function (_super) {
         _this.gridColor = "rgba(100,100,100,0.3)";
         _this.axisColor = "white"; //"black"; // "black";
         _this.mainColor = "white";
+        _this.sensorInfos = [];
+        _this.sensorIDs = [];
+        _this.requestingSensorInfos = false;
         _this.movePoint = new Point(50, 50);
         _this.scalePoint = new Point(0.05, 6);
         return _this;
@@ -35,118 +38,14 @@ var LineChartController = (function (_super) {
         this.wrapper.addEventListener("mousedown", function (e) { return _this.wrapper_mouseDown(e); });
         this.wrapper.addEventListener("mousemove", function (e) { return _this.wrapper_mouseMove(e); });
         this.wrapper.addEventListener("mouseup", function (e) { return _this.wrapper_mouseUp(e); });
+        this.wrapper.addEventListener("mouseleave", function (e) { return _this.wrapper_mouseLeave(e); });
         this.wrapper.addEventListener("touchstart", function (e) { return _this.wrapper_touchStart(e); });
         this.wrapper.addEventListener("touchmove", function (e) { return _this.wrapper_touchMove(e); });
         this.wrapper.addEventListener("touchend", function (e) { return _this.wrapper_touchEnd(e); });
-        this.wrapper.addEventListener("mouseleave", function () {
-            _this.mouseDown = false;
-            _this.isMarking = false;
-            _this.ctxMarking.clear();
-        });
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.wrapper.addEventListener("keydown", function (e) { return _this.wrapper_keyDown(e); });
         this.draw();
         return this.wrapper;
-    };
-    LineChartController.prototype.wrapper_keyDown = function (e) {
-        switch (e.key) {
-            case "g":
-                this.displayGrid = this.displayGrid === true ? false : true;
-                break;
-            case "r":
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
-                break;
-            case "a":
-                this.stickyAxes = this.stickyAxes === true ? false : true;
-                break;
-            case "k":
-                this.autoScroll = this.autoScroll === true ? false : true;
-                break;
-        }
-        this.draw();
-    };
-    LineChartController.prototype.wrapper_mouseDown = function (e) {
-        e.preventDefault();
-        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
-        this.mouseDown = true;
-        if (e.altKey) {
-            this.isMarking = true;
-            var mousePoint = this.getMousePoint(e);
-            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-            console.log(this.marking.firstPoint);
-        }
-    };
-    LineChartController.prototype.wrapper_mouseMove = function (e) {
-        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
-            if (this.isMarking) {
-                this.marking.secondPoint = this.getMousePoint(e);
-                this.drawMarking();
-            }
-            else {
-                this.isDragging = true;
-                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
-                this.draw();
-            }
-        }
-    };
-    LineChartController.prototype.wrapper_mouseUp = function (e) {
-        this.wrapper.focus();
-        this.mouseDown = false;
-        if (this.isDragging) {
-            this.isDragging = false;
-        }
-        else if (this.isMarking) {
-            this.isMarking = false;
-            if (this.marking.width !== 0 && this.marking.height !== 0) {
-                this.zoomByMarking();
-            }
-        }
-        else {
-            this.selectPoint(this.getMousePoint(e));
-        }
-    };
-    LineChartController.prototype.wrapper_touchStart = function (e) {
-        e.preventDefault();
-        console.log(e);
-        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
-        this.mouseDown = true;
-        if (e.altKey) {
-            this.isMarking = true;
-            var mousePoint = this.getTouchPoint(e);
-            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-            console.log(this.marking.firstPoint);
-        }
-    };
-    LineChartController.prototype.wrapper_touchMove = function (e) {
-        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
-            if (this.isMarking) {
-                this.marking.secondPoint = this.getTouchPoint(e);
-                this.drawMarking();
-            }
-            else {
-                this.isDragging = true;
-                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
-                this.draw();
-            }
-        }
-    };
-    LineChartController.prototype.wrapper_touchEnd = function (e) {
-        console.log(e);
-        this.wrapper.focus();
-        this.mouseDown = false;
-        if (this.isDragging) {
-            this.isDragging = false;
-        }
-        else if (this.isMarking) {
-            this.isMarking = false;
-            if (this.marking.width !== 0 && this.marking.height !== 0) {
-                this.zoomByMarking();
-            }
-        }
-        else {
-            this.selectPoint(this.getTouchPoint(e));
-        }
     };
     LineChartController.prototype.drawMarking = function () {
         this.ctxMarking.clear();
@@ -162,10 +61,54 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.onDataChange = function () {
+        var _this = this;
         if (this.autoScroll) {
             this.moveToLastPoint();
         }
+        if (this.data.length === 0 && !this.requestingSensorInfos) {
+            if (this.sensorIDs.length > 0) {
+                this.sensorInfos = [];
+                this.sensorIDs = [];
+                console.log(this.sensorInfos);
+                console.log(this.sensorIDs);
+            }
+        }
+        else {
+            var ids = [];
+            for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                var d = _a[_i];
+                ids.push(d.ID);
+            }
+            for (var i = 0; i < ids.length; i++) {
+                if (ids[i] !== this.sensorIDs[i]) {
+                    this.requestingSensorInfos = true;
+                    kernel.senMan.getInfos(function (infos) {
+                        _this.updateSensorInfos(infos);
+                    });
+                    break;
+                }
+            }
+        }
         this.draw();
+    };
+    LineChartController.prototype.updateSensorInfos = function (infos) {
+        this.sensorInfos = [];
+        this.sensorIDs = [];
+        for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
+            var i = infos_1[_i];
+            for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
+                var d = _b[_a];
+                if (d.ID === i.ID) {
+                    this.sensorInfos.push(i);
+                }
+            }
+        }
+        for (var i = 0; i < this.data.length; i++) {
+            this.sensorIDs.push(this.data[i].ID);
+        }
+        this.requestingSensorInfos = false;
+        console.log(this.sensorInfos);
+        console.log(this.sensorIDs);
     };
     LineChartController.prototype.moveToLastPoint = function () {
         if (this.data[0]) {
@@ -229,12 +172,6 @@ var LineChartController = (function (_super) {
         this.movePoint = this.movePoint.add(move);
         this.draw();
     };
-    LineChartController.prototype.getTouchPoint = function (e) {
-        if (e.touches.length > 0)
-            return new Point(e.touches[0].clientX, e.touches[0].clientY);
-        else
-            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    };
     LineChartController.prototype.draw = function () {
         this.ctxMain.clear();
         this.drawXAxis();
@@ -297,7 +234,7 @@ var LineChartController = (function (_super) {
         this.ctxMain.moveTo(0, y);
         this.ctxMain.lineTo(this.width, y);
         this.ctxMain.stroke();
-        var stepping = this.calculateSteps(this.scalePoint.x);
+        var stepping = this.calculateSteps(this.scalePoint.x * 1000);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
@@ -305,21 +242,22 @@ var LineChartController = (function (_super) {
             this.ctxMain.beginPath();
             var absX = i + this.movePoint.x % steps;
             var transformer = this.getRelative(new Point(absX, y));
-            var number;
+            var num;
             var numWidth;
             var numOffset;
-            if (Math.abs(transformer.x).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
-                number = "     0";
+            var val = transformer.x / 1000;
+            if (Math.abs(val).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
+                num = "     0";
             }
             else if (Math.abs(scale) > 5) {
-                number = transformer.x.toExponential(2);
+                num = val.toExponential(2);
             }
             else {
-                number = transformer.x.toFixed(decimalPlaces);
+                num = val.toFixed(decimalPlaces);
             }
-            numWidth = this.ctxMain.measureText(number);
+            numWidth = this.ctxMain.measureText(num);
             numOffset = y === this.height ? y - 15 : y + 15;
-            this.ctxMain.fillText(number, absX - (numWidth / 2), numOffset);
+            this.ctxMain.fillText(num, absX - (numWidth / 2), numOffset);
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
             if (this.displayGrid) {
@@ -420,6 +358,118 @@ var LineChartController = (function (_super) {
         sec.y = this.height - sec.y;
         this.movePoint = this.movePoint.sub(sec);
         this.draw();
+    };
+    LineChartController.prototype.autoScaleY = function () {
+        var maxPlotHeight;
+        var min;
+        var max;
+        for (var i = 0; i < this.data.length; i++) {
+        }
+        //let ratio: number = this.height / 
+    };
+    LineChartController.prototype.wrapper_keyDown = function (e) {
+        switch (e.key) {
+            case "g":
+                this.displayGrid = this.displayGrid === true ? false : true;
+                break;
+            case "r":
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                break;
+            case "a":
+                this.stickyAxes = this.stickyAxes === true ? false : true;
+                break;
+            case "k":
+                this.autoScroll = this.autoScroll === true ? false : true;
+                break;
+        }
+        this.draw();
+    };
+    LineChartController.prototype.wrapper_mouseLeave = function (e) {
+        this.mouseDown = false;
+        this.isMarking = false;
+        this.ctxMarking.clear();
+    };
+    LineChartController.prototype.wrapper_mouseDown = function (e) {
+        e.preventDefault();
+        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint = this.getMousePoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+        }
+    };
+    LineChartController.prototype.wrapper_mouseMove = function (e) {
+        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getMousePoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
+                this.draw();
+            }
+        }
+    };
+    LineChartController.prototype.wrapper_mouseUp = function (e) {
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getMousePoint(e));
+        }
+    };
+    LineChartController.prototype.wrapper_touchStart = function (e) {
+        e.preventDefault();
+        console.log(e);
+        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint = this.getTouchPoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    };
+    LineChartController.prototype.wrapper_touchMove = function (e) {
+        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getTouchPoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
+                this.draw();
+            }
+        }
+    };
+    LineChartController.prototype.wrapper_touchEnd = function (e) {
+        console.log(e);
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getTouchPoint(e));
+        }
     };
     return LineChartController;
 }(MultiValueCanvasController));

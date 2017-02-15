@@ -115,7 +115,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     window: AppWindow;
     gauge: GaugeController;
     val: number = 0;
-    plotType: string = "GaugePlot";
+    plotType: string = "Gauge";
     plotWindow: AppWindow;
     plotData: IPlotData;
 
@@ -130,25 +130,16 @@ class GaugeTester implements IApplication, ISinglePlot {
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.gauge.setSize(this.window.width, this.window.height);
         });
-
     }
 
-    drawMeter() {
-        //this.window.content.innerHTML = "";                        
+    drawMeter() {        
         this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
         let gaugeWrapper = this.gauge.generate();
         this.window.content.appendChild(gaugeWrapper);
-
-        gaugeWrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 3;
-            this.val = this.val > 100 ? 100 : this.val;
-            this.val = this.val < 0 ? 0 : this.val;
-            this.gauge.setValue(this.val);
-        });
     }
 
     dataUpdate() {
-        this.gauge.setValue((this.plotData.getValue(this.plotData.getLength() - 1).y / 200) * 100);
+        this.gauge.setData(this.plotData);
     }
 }
 
@@ -162,43 +153,27 @@ class GPSPlotTester implements IApplication {
     main() {
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
         this.window.content.style.overflow = "hidden";
-
-        /*let slider = document.createElement("input");
-        slider.setAttribute("type", "range");
-        //slider.style.marginTop = "200px";
-        slider.setAttribute("value", "0");
-        this.window.content.appendChild(slider);
-        slider.addEventListener("input", () => {
-            let val = parseInt(slider.value);
-            let p: Point3D[] = [];
-            p = this.points.slice(0, (this.points.length * val) / 100);
-            this.update(p);
-        });*/
+        this.plot = new GPSController(this.window.width, this.window.height);
+        this.window.content.appendChild(this.plot.generate());
+        
         kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
-            this.draw(this.points);
+            this.testData = new GPSPlotData(this.points);
+            this.draw();
         });
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.plot.setSize(this.window.width, this.window.height);
         });
     }
 
-    draw(p: Point3D[]): void {                
-        this.testData = new GPSPlotData(p);
-        this.plot = new GPSController(this.testData);
-        //console.log(this.testData);
-        this.window.content.appendChild(this.plot.generate());
+    draw(): void {
+        this.plot.setData(this.testData);
         this.plot.setSize(this.window.width, this.window.height);
-        //this.plot.draw();
     }
 
-    update(p: Point3D[]): void {
-        this.testData = new GPSPlotData(p);
-        this.plot.update(this.testData);
-    }   
-    
+        
 }
 
 class LabelTester implements ISinglePlot {
@@ -252,18 +227,7 @@ class BarTester implements ISinglePlot {
         kernel.senMan.register(this);
         this.bar = new BarController(this.window.width, this.window.height, true, true);
         let barWrapper = this.bar.generate();
-        this.window.content.appendChild(barWrapper);
-        //this.bar.setValue(this.val);
-
-        // for testing    
-        /*
-        barWrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 100;
-            this.val = this.val > 1 ? 1 : this.val;
-            this.val = this.val < -1 ? -1 : this.val;
-            this.bar.setValue(this.val);
-        });
-        */
+        this.window.content.appendChild(barWrapper);        
 
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.bar.setSize(this.window.width, this.window.height);

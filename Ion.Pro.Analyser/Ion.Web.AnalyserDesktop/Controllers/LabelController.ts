@@ -28,7 +28,7 @@
     }
 
     protected onDataChange(): void {
-        let val = this.value * 100;
+        let val = this.percent * 100;
         this.textWrapper.innerHTML = val.toFixed(2);
         this.adjustFontSize();
     }

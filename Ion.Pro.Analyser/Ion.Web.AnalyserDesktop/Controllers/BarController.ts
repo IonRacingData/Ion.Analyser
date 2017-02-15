@@ -44,9 +44,9 @@
         }
         else {
             this.wrapper.style.flexDirection = "column";
-            this.bar1.style.width = 100 + "%";
+            this.bar1.style.width = "100%";
             if (this.double) {
-                this.bar2.style.width = 100 + "%";
+                this.bar2.style.width = "100%";
             }
         }
 
@@ -60,24 +60,24 @@
 
     protected onDataChange(): void {
         
-        let val = this.value * 100;
+        let val = this.percent * 100;
         if (this.double) {
             val = (val - 50) * 2;
         }
 
         if (this.horizontal) {
             if (this.double) {
-                this.bar2.style.width = val < 0 ? 0 + "%" : val + "%";
-                this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : 0 + "%";
+                this.bar2.style.width = val < 0 ? "0%" : val + "%";
+                this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : "0%";
             }
             else {
-                this.bar1.style.width = val < 0 ? 0 + "%" : val + "%";
+                this.bar1.style.width = val < 0 ? "0%" : val + "%";
             }
         }
         else {
             if (this.double) {
-                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
-                this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : 0 + "%";
+                this.bar1.style.height = val < 0 ? "0%" : val + "%";
+                this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : "0%";
             }
             else {
                 this.bar1.style.height = val < 0 ? "0%" : val + "%";
