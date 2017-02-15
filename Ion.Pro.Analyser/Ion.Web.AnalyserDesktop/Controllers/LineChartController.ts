@@ -10,22 +10,26 @@
     private marking: IMarking;
     private displayGrid: boolean = true;
     private stickyAxes: boolean = true;
+    private scalePoint_start: Point = new Point(0.05, 6);
+    private movePoint_start: Point = new Point(50, 50);
     private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
     private gridColor = "rgba(100,100,100,0.3)";
-    private axisColor = "white";//"black"; // "black";
+    private axisColor = "white";
     private mainColor = "white";
+    private defaultCursor: string = "default";
 
     constructor() {
         super();
-        this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(0.05, 6);
+        this.movePoint = this.movePoint_start.copy();
+        this.scalePoint = this.scalePoint_start.copy();
     }
 
     generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
+        this.wrapper.style.cursor = this.defaultCursor;
 
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
@@ -46,6 +50,7 @@
 
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
+        this.wrapper.addEventListener("keyup", (e: KeyboardEvent) => this.wrapper_keyUp(e));
 
         this.draw();
         return this.wrapper;
@@ -421,19 +426,21 @@
             sec = this.height - sec;
             this.movePoint.y -= sec;
 
-            this.draw();            
+            this.scalePoint_start.y = this.scalePoint.y;
+            this.movePoint_start.y = this.movePoint.y;
+            this.draw();
         }
 
     }
 
-    private wrapper_keyDown(e: KeyboardEvent) {
+    private wrapper_keyDown(e: KeyboardEvent): void {
         switch (e.key) {
             case "g":
                 this.displayGrid = this.displayGrid === true ? false : true;
                 break;
             case "r":
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
+                this.scalePoint = this.scalePoint_start.copy();
+                this.movePoint = this.movePoint_start.copy();
                 break;
             case "a":
                 this.stickyAxes = this.stickyAxes === true ? false : true;
@@ -441,13 +448,27 @@
             case "k":
                 this.autoScroll = this.autoScroll === true ? false : true;
                 break;
+            case "Control":
+                this.wrapper.style.cursor = "w-resize";
+                break;
+            case "Alt":
+                this.wrapper.style.cursor = "crosshair";
+                break;
+            case "Shift":
+                this.wrapper.style.cursor = "n-resize";
+                break;
         }
         this.draw();
+    }
+
+    private wrapper_keyUp(e: KeyboardEvent): void {
+        this.wrapper.style.cursor = this.defaultCursor;
     }
 
     private wrapper_mouseLeave(e: MouseEvent) {
         this.mouseDown = false;
         this.isMarking = false;
+        this.wrapper.style.cursor = "default";
         this.ctxMarking.clear();
     }
 
@@ -469,7 +490,7 @@
                 this.drawMarking();
             }
             else {
-                this.autoScroll_plotMoved = true;
+                this.autoScroll_plotMoved = true;                                
                 this.isDragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();
@@ -482,7 +503,7 @@
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
-            this.isDragging = false;
+            this.isDragging = false;            
         }
         else if (this.isMarking) {
             this.isMarking = false;
@@ -493,6 +514,7 @@
         else {
             this.selectPoint(this.getMousePoint(e));
         }
+        this.wrapper.style.cursor = this.defaultCursor;
     }
 
     private wrapper_touchStart(e: TouchEvent): void {

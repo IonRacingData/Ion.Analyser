@@ -125,6 +125,9 @@ var Point = (function () {
     Point.prototype.divide = function (p) {
         return new Point(this.x / p.x, this.y / p.y);
     };
+    Point.prototype.copy = function () {
+        return new Point(this.x, this.y);
+    };
     Point.prototype.toString = function () {
         return "x: " + this.x.toString() + "  y: " + this.y.toString();
     };

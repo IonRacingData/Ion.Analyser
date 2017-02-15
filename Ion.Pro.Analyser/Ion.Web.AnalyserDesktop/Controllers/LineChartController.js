@@ -13,13 +13,16 @@ var LineChartController = (function (_super) {
         _this.isMarking = false;
         _this.displayGrid = true;
         _this.stickyAxes = true;
+        _this.scalePoint_start = new Point(0.05, 6);
+        _this.movePoint_start = new Point(50, 50);
         _this.autoScroll = false;
         _this.autoScroll_plotMoved = false;
         _this.gridColor = "rgba(100,100,100,0.3)";
-        _this.axisColor = "white"; //"black"; // "black";
+        _this.axisColor = "white";
         _this.mainColor = "white";
-        _this.movePoint = new Point(50, 50);
-        _this.scalePoint = new Point(0.05, 6);
+        _this.defaultCursor = "default";
+        _this.movePoint = _this.movePoint_start.copy();
+        _this.scalePoint = _this.scalePoint_start.copy();
         return _this;
     }
     LineChartController.prototype.generate = function () {
@@ -27,6 +30,7 @@ var LineChartController = (function (_super) {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
+        this.wrapper.style.cursor = this.defaultCursor;
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
@@ -42,6 +46,7 @@ var LineChartController = (function (_super) {
         this.wrapper.addEventListener("touchend", function (e) { return _this.wrapper_touchEnd(e); });
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.wrapper.addEventListener("keydown", function (e) { return _this.wrapper_keyDown(e); });
+        this.wrapper.addEventListener("keyup", function (e) { return _this.wrapper_keyUp(e); });
         this.draw();
         return this.wrapper;
     };
@@ -345,6 +350,8 @@ var LineChartController = (function (_super) {
             var sec = this.getAbsolute(new Point(0, first)).y;
             sec = this.height - sec;
             this.movePoint.y -= sec;
+            this.scalePoint_start.y = this.scalePoint.y;
+            this.movePoint_start.y = this.movePoint.y;
             this.draw();
         }
     };
@@ -354,8 +361,8 @@ var LineChartController = (function (_super) {
                 this.displayGrid = this.displayGrid === true ? false : true;
                 break;
             case "r":
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
+                this.scalePoint = this.scalePoint_start.copy();
+                this.movePoint = this.movePoint_start.copy();
                 break;
             case "a":
                 this.stickyAxes = this.stickyAxes === true ? false : true;
@@ -363,12 +370,25 @@ var LineChartController = (function (_super) {
             case "k":
                 this.autoScroll = this.autoScroll === true ? false : true;
                 break;
+            case "Control":
+                this.wrapper.style.cursor = "w-resize";
+                break;
+            case "Alt":
+                this.wrapper.style.cursor = "crosshair";
+                break;
+            case "Shift":
+                this.wrapper.style.cursor = "n-resize";
+                break;
         }
         this.draw();
+    };
+    LineChartController.prototype.wrapper_keyUp = function (e) {
+        this.wrapper.style.cursor = this.defaultCursor;
     };
     LineChartController.prototype.wrapper_mouseLeave = function (e) {
         this.mouseDown = false;
         this.isMarking = false;
+        this.wrapper.style.cursor = "default";
         this.ctxMarking.clear();
     };
     LineChartController.prototype.wrapper_mouseDown = function (e) {
@@ -410,6 +430,7 @@ var LineChartController = (function (_super) {
         else {
             this.selectPoint(this.getMousePoint(e));
         }
+        this.wrapper.style.cursor = this.defaultCursor;
     };
     LineChartController.prototype.wrapper_touchStart = function (e) {
         e.preventDefault();

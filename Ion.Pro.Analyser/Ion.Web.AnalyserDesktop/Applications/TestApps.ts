@@ -115,7 +115,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     window: AppWindow;
     gauge: GaugeController;
     val: number = 0;
-    plotType: string = "Gauge";
+    plotType: string = "Gauge"; 
     plotWindow: AppWindow;
     plotData: IPlotData;
 
