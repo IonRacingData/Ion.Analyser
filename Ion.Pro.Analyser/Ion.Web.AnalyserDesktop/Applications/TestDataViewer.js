@@ -108,10 +108,12 @@ var DataAssigner = (function () {
             radio.checked = true;
         }
         radio.addEventListener("change", function (e) {
+            radio.disabled = true;
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
                 plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
+                radio.disabled = false;
             });
         });
         return radio;
@@ -126,11 +128,13 @@ var DataAssigner = (function () {
             }
         }
         checkBox.addEventListener("change", function (e) {
+            checkBox.disabled = true;
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, function (data) {
                     plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
+                    checkBox.disabled = false;
                 });
             }
             else {
@@ -138,6 +142,7 @@ var DataAssigner = (function () {
                     if (plot.plotData[i].ID == sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
+                        checkBox.disabled = false;
                         break;
                     }
                 }

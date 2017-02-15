@@ -51,18 +51,51 @@ var WindowManager = (function () {
                 this.activeWindow.tile(TileState.RIGHT);
             }
             this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
+            var appWindow = this.getWindowAt(x, y, true);
+            if (appWindow) {
+                appWindow.handleGlobalDrag(x, y, this.activeWindow);
+            }
         }
         else if (this.resizing) {
             this.activeWindow.__setRelativeSize(x, y);
         }
     };
+    WindowManager.prototype.getWindowAt = function (x, y, ignoreActive) {
+        for (var i = this.order.length - 1; i >= 0; i--) {
+            var curWindow = this.windows[i];
+            if (ignoreActive && curWindow === this.activeWindow)
+                continue;
+            if (this.intersects(x, y, curWindow)) {
+                return curWindow;
+            }
+        }
+        return null;
+    };
+    WindowManager.prototype.intersects = function (x, y, window) {
+        return x > window.x
+            && x < window.x + window.totalWidth
+            && y > window.y
+            && y < window.y + window.totalHeight;
+    };
     WindowManager.prototype.mouseUp = function (e) {
         //console.log(e);
+        var x = e.layerX;
+        var y = e.layerY;
+        var appWindow = this.getWindowAt(x, y, true);
+        if (appWindow) {
+            appWindow.handleGlobalRelease(x, y, this.activeWindow);
+        }
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.touchEnd = function (e) {
+        var x = e.touches[0].pageX;
+        var y = e.touches[0].pageY;
+        var appWindow = this.getWindowAt(x, y, true);
+        if (appWindow) {
+            appWindow.handleGlobalRelease(x, y, this.activeWindow);
+        }
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });

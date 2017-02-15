@@ -9,7 +9,15 @@
         this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
     }
 
+    get totalWidth(): number {
+        return this.windowElement.clientWidth;
+    }
+    get totalHeight(): number {
+        return this.windowElement.clientHeight;
+    }
+
     handle: HTMLElement;
+    private windowElement: HTMLElement;
     moveHandle: HTMLElement;
     sizeHandle: HTMLElement;
     winMan: WindowManager;
@@ -21,6 +29,11 @@
     static readonly event_resize = "resize";
     static readonly event_minimize = "minimize";
     static readonly event_maximize = "maximize";
+    static readonly event_mouseMove = "mouseMove";
+
+
+    static readonly event_dragOver = "dragOver";
+    static readonly event_dragRelease = "dragRelease";
 
     static readonly event_close = "close";
 
@@ -38,6 +51,8 @@
 
     private storeWidth: number;
     private storeHeight: number;
+
+    private outerBoxMargin: number = 8;
 
     state: WindowState;
     prevState: WindowState;
@@ -70,12 +85,16 @@
         max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
         exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
 
+
+
         this.handle.window = this;
 
         this.setPos(300, 50);
         this.setSize(500, 400);
+        this.windowElement = <HTMLElement>handle.getElementsByClassName("window")[0];
+        this.content = this.sizeHandle;//<HTMLElement>this.handle.getElementsByClassName("window-body")[0];
 
-        this.content = <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content.addEventListener("mousemove", (e: MouseEvent) => this.content_mouseMove(e));
     }
 
     addEventListener(type: string, listener: any) {
@@ -86,6 +105,9 @@
         this.eventMan.removeEventListener(type, listener);
     }
 
+    private content_mouseMove(e: MouseEvent): void {
+        this.onMouseMove(e.layerX, e.layerY);
+    }
 
     /* Event handlers */
     private main_mouseDown(e: MouseEvent): void {
@@ -94,9 +116,9 @@
 
     private header_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
-        console.log("headerDown");
-        this.deltaX = this.handle.offsetLeft - e.pageX;
-        this.deltaY = this.handle.offsetTop - e.pageY;
+        //console.log("headerDown");
+        this.deltaX = this.handle.offsetLeft - e.pageX + this.outerBoxMargin;
+        this.deltaY = this.handle.offsetTop - e.pageY + this.outerBoxMargin;
 
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
@@ -106,8 +128,8 @@
         e.stopPropagation();
         //e.preventDefault();
         console.log(e);
-        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
-        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX + this.outerBoxMargin;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY + this.outerBoxMargin;
 
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
@@ -158,6 +180,14 @@
     private close_click(e: MouseEvent): void {
         e.stopPropagation();
         this.close();
+    }
+
+    public handleGlobalDrag(x: number, y: number, window: AppWindow): void {
+        this.onDragOver(x - this.x, y - this.y - 30, window);
+    }
+
+    public handleGlobalRelease(x: number, y: number, window: AppWindow): void {
+        this.onDragRelease(x - this.x, y - this.y - 30, window);
     }
 
 
@@ -220,6 +250,19 @@
 
     onClose(): void {
         this.eventMan.raiseEvent(AppWindow.event_close, null);
+    }
+
+    onMouseMove(x: number, y: number): void {
+        this.eventMan.raiseEvent(AppWindow.event_mouseMove, new AppMouseEvent(x, y));
+    }
+
+    onDragOver(x: number, y: number, window: AppWindow): void {
+        this.eventMan.raiseEvent(AppWindow.event_dragOver, new AppMouseDragEvent(x, y, window));
+    }
+
+    onDragRelease(x: number, y: number, window: AppWindow): void {
+        console.log("Release");
+        this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
     }
 
     close() {
@@ -294,9 +337,8 @@
     }
 
     setPos(x: number, y: number, storePos: boolean = true): void {
-        var outerBoxMargin: number = 8;
-        this.moveHandle.style.left = (x - outerBoxMargin).toString() + "px";
-        this.moveHandle.style.top = (y - outerBoxMargin).toString() + "px";
+        this.moveHandle.style.left = (x - this.outerBoxMargin).toString() + "px";
+        this.moveHandle.style.top = (y - this.outerBoxMargin).toString() + "px";
         this.x = x;
         this.y = y;
         if (storePos) {
@@ -356,12 +398,13 @@
 
 
     __setRelativePos(x: number, y: number, storePos: boolean = true): void {
+        
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
         }
-        this.handle.style.left = (x + this.deltaX).toString() + "px";
-        this.handle.style.top = (y + this.deltaY).toString() + "px";
+        this.moveHandle.style.left = (x + this.deltaX - this.outerBoxMargin).toString() + "px";
+        this.moveHandle.style.top = (y + this.deltaY - this.outerBoxMargin).toString() + "px";
         this.x = x + this.deltaX;
         this.y = y + this.deltaY;
         if (storePos) {
@@ -389,6 +432,25 @@
         }
         this.onResize();
     }    
+}
+
+class AppMouseEvent implements EventData {
+    public x: number;
+    public y: number;
+
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class AppMouseDragEvent extends AppMouseEvent {
+    public window: AppWindow;
+
+    constructor(x: number, y: number, window: AppWindow) {
+        super(x, y);
+        this.window = window;
+    }
 }
 
 enum WindowMode {

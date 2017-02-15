@@ -1,8 +1,14 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
         this.topMost = false;
         this.eventMan = new EventManager();
+        this.outerBoxMargin = 8;
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
@@ -24,7 +30,9 @@ var AppWindow = (function () {
         this.handle.window = this;
         this.setPos(300, 50);
         this.setSize(500, 400);
-        this.content = this.handle.getElementsByClassName("window-body")[0];
+        this.windowElement = handle.getElementsByClassName("window")[0];
+        this.content = this.sizeHandle; //<HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content.addEventListener("mousemove", function (e) { return _this.content_mouseMove(e); });
     }
     Object.defineProperty(AppWindow.prototype, "title", {
         get: function () {
@@ -37,11 +45,28 @@ var AppWindow = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(AppWindow.prototype, "totalWidth", {
+        get: function () {
+            return this.windowElement.clientWidth;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AppWindow.prototype, "totalHeight", {
+        get: function () {
+            return this.windowElement.clientHeight;
+        },
+        enumerable: true,
+        configurable: true
+    });
     AppWindow.prototype.addEventListener = function (type, listener) {
         this.eventMan.addEventListener(type, listener);
     };
     AppWindow.prototype.removeEventListener = function (type, listener) {
         this.eventMan.removeEventListener(type, listener);
+    };
+    AppWindow.prototype.content_mouseMove = function (e) {
+        this.onMouseMove(e.layerX, e.layerY);
     };
     /* Event handlers */
     AppWindow.prototype.main_mouseDown = function (e) {
@@ -49,9 +74,9 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.header_mouseDown = function (e) {
         e.stopPropagation();
-        console.log("headerDown");
-        this.deltaX = this.handle.offsetLeft - e.pageX;
-        this.deltaY = this.handle.offsetTop - e.pageY;
+        //console.log("headerDown");
+        this.deltaX = this.handle.offsetLeft - e.pageX + this.outerBoxMargin;
+        this.deltaY = this.handle.offsetTop - e.pageY + this.outerBoxMargin;
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
     };
@@ -59,8 +84,8 @@ var AppWindow = (function () {
         e.stopPropagation();
         //e.preventDefault();
         console.log(e);
-        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX;
-        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY;
+        this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX + this.outerBoxMargin;
+        this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY + this.outerBoxMargin;
         this.winMan.dragging = true;
         this.winMan.selectWindow(this);
     };
@@ -103,6 +128,12 @@ var AppWindow = (function () {
     AppWindow.prototype.close_click = function (e) {
         e.stopPropagation();
         this.close();
+    };
+    AppWindow.prototype.handleGlobalDrag = function (x, y, window) {
+        this.onDragOver(x - this.x, y - this.y - 30, window);
+    };
+    AppWindow.prototype.handleGlobalRelease = function (x, y, window) {
+        this.onDragRelease(x - this.x, y - this.y - 30, window);
     };
     /* Private stuff */
     AppWindow.prototype.restoreSize = function () {
@@ -153,6 +184,16 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.onClose = function () {
         this.eventMan.raiseEvent(AppWindow.event_close, null);
+    };
+    AppWindow.prototype.onMouseMove = function (x, y) {
+        this.eventMan.raiseEvent(AppWindow.event_mouseMove, new AppMouseEvent(x, y));
+    };
+    AppWindow.prototype.onDragOver = function (x, y, window) {
+        this.eventMan.raiseEvent(AppWindow.event_dragOver, new AppMouseDragEvent(x, y, window));
+    };
+    AppWindow.prototype.onDragRelease = function (x, y, window) {
+        console.log("Release");
+        this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
     };
     AppWindow.prototype.close = function () {
         this.onClose();
@@ -218,9 +259,8 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.setPos = function (x, y, storePos) {
         if (storePos === void 0) { storePos = true; }
-        var outerBoxMargin = 8;
-        this.moveHandle.style.left = (x - outerBoxMargin).toString() + "px";
-        this.moveHandle.style.top = (y - outerBoxMargin).toString() + "px";
+        this.moveHandle.style.left = (x - this.outerBoxMargin).toString() + "px";
+        this.moveHandle.style.top = (y - this.outerBoxMargin).toString() + "px";
         this.x = x;
         this.y = y;
         if (storePos) {
@@ -280,8 +320,8 @@ var AppWindow = (function () {
             this.restore();
             this.deltaX = -this.width / 2;
         }
-        this.handle.style.left = (x + this.deltaX).toString() + "px";
-        this.handle.style.top = (y + this.deltaY).toString() + "px";
+        this.moveHandle.style.left = (x + this.deltaX - this.outerBoxMargin).toString() + "px";
+        this.moveHandle.style.top = (y + this.deltaY - this.outerBoxMargin).toString() + "px";
         this.x = x + this.deltaX;
         this.y = y + this.deltaY;
         if (storePos) {
@@ -314,7 +354,26 @@ AppWindow.event_move = "move";
 AppWindow.event_resize = "resize";
 AppWindow.event_minimize = "minimize";
 AppWindow.event_maximize = "maximize";
+AppWindow.event_mouseMove = "mouseMove";
+AppWindow.event_dragOver = "dragOver";
+AppWindow.event_dragRelease = "dragRelease";
 AppWindow.event_close = "close";
+var AppMouseEvent = (function () {
+    function AppMouseEvent(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return AppMouseEvent;
+}());
+var AppMouseDragEvent = (function (_super) {
+    __extends(AppMouseDragEvent, _super);
+    function AppMouseDragEvent(x, y, window) {
+        var _this = _super.call(this, x, y) || this;
+        _this.window = window;
+        return _this;
+    }
+    return AppMouseDragEvent;
+}(AppMouseEvent));
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";

@@ -120,10 +120,12 @@
             radio.checked = true;
         }
         radio.addEventListener("change", (e: Event) => {
+            radio.disabled = true;
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
                 plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
+                radio.disabled = false;
             });
         });
         return radio;
@@ -140,11 +142,13 @@
         }
 
         checkBox.addEventListener("change", (e: Event) => {
+            checkBox.disabled = true;
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
                     plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
+                    checkBox.disabled = false;
                 });
             }
             else {
@@ -152,6 +156,7 @@
                     if (plot.plotData[i].ID == sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
+                        checkBox.disabled = false;
                         break;
                     }
                 }
