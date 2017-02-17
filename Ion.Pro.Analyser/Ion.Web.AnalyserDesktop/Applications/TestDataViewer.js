@@ -20,7 +20,7 @@ var DataAssigner = (function () {
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
         var last = null;
-        //let selectedPlot: IPlot = null;
+        // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         var _loop_1 = function (i) {
             var curPlot = senMan.plotter[i];
@@ -104,7 +104,7 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID == sensor.ID) {
+        if (plot.plotData && plot.plotData.ID === sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", function (e) {
@@ -122,7 +122,7 @@ var DataAssigner = (function () {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
         for (var i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID == sensor.ID) {
+            if (plot.plotData[i].ID === sensor.ID) {
                 checkBox.checked = true;
                 break;
             }
@@ -139,7 +139,7 @@ var DataAssigner = (function () {
             }
             else {
                 for (var i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID == sensor.ID) {
+                    if (plot.plotData[i].ID === sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;
@@ -171,6 +171,7 @@ var DataAssigner = (function () {
 var TestDataViewer = (function () {
     function TestDataViewer() {
         this.plotType = "Test Data Viewer";
+        this.plotDataType = PlotType.I1D;
     }
     TestDataViewer.prototype.main = function () {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
@@ -183,7 +184,7 @@ var TestDataViewer = (function () {
             gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
         }
         this.window.content.appendChild(gen.generate());
-        //console.log("Here we should draw something, but you know, we are lazy");
+        // console.log("Here we should draw something, but you know, we are lazy");
     };
     TestDataViewer.prototype.dataUpdate = function () {
         this.draw();
@@ -210,7 +211,7 @@ var SensorSetSelector = (function () {
                 {
                     "event": "click",
                     "func": function (event) {
-                        //console.log("you clicked on: " + a.FileName);
+                        // console.log("you clicked on: " + a.FileName);
                         requestAction("LoadDataset?file=" + a.FullFileName, function (data) { });
                         kernel.senMan.clearCache();
                     }

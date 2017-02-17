@@ -2,7 +2,7 @@ function requestAction(action, callback) {
     var request = new XMLHttpRequest();
     request.responseType = "json";
     request.onreadystatechange = function () {
-        if (request.readyState == 4 && request.status == 200) {
+        if (request.readyState === 4 && request.status === 200) {
             callback(request.response);
         }
     };
@@ -19,8 +19,8 @@ var NetworkManager = (function () {
         this.socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
         this.socket.onmessage = function (ev) {
             _this.receiveMessage(ev);
-            //console.log(ev);
-            //console.log(ev.data);
+            // console.log(ev);
+            // console.log(ev.data);
         };
         this.socket.onopen = function (ev) {
             _this.isReady = true;
@@ -50,7 +50,7 @@ var NetworkManager = (function () {
     };
     NetworkManager.prototype.receiveMessage = function (ev) {
         var message = JSON.parse(ev.data);
-        if (message.Status == ComMessageStatus.Request110) {
+        if (message.Status === ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
                 this.serviceCallback[message.MessageId](JSON.parse(message.Data));
             }
@@ -59,7 +59,7 @@ var NetworkManager = (function () {
                 console.log(ev);
             }
         }
-        else if (message.Status == ComMessageStatus.OK200) {
+        else if (message.Status === ComMessageStatus.OK200) {
             console.log(ev);
             if (this.callback[message.MessageId]) {
                 this.callback[message.MessageId](JSON.parse(message.Data));

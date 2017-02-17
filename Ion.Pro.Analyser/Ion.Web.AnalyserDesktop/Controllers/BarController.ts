@@ -1,4 +1,4 @@
-﻿class BarController extends SingleValueController {    
+﻿class BarController extends SingleValueController {
     private bar1: HTMLElement;
     private bar2: HTMLElement;
     private barWrapper1: HTMLElement;
@@ -16,7 +16,7 @@
         if (double) {
             this.double = double;
         }
-        
+
         this.setSize(width, height);
     }
 

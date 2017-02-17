@@ -184,7 +184,7 @@ namespace Ion.Pro.Analyser
             }
         }
 
-        static HttpAction testAction = null;
+        //static HttpAction testAction = null;
         static SessionService service = new SessionService();
 
         public static async Task WebHandlerAsync(HttpWrapper wrapper)

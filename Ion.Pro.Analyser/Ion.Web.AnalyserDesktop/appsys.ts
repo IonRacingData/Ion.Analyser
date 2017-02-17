@@ -32,7 +32,7 @@
     removeEventListener(type: string, listener: any): void {
         this.eventManager.removeEventListener(type, listener);
     }
-    
+
 
     closeApplication(app: Application): void {
         this.appList.splice(this.appList.indexOf(app), 1);

@@ -1,6 +1,6 @@
-﻿var kernel: Kernel;
+﻿var kernel: IKernel;
 
-interface Kernel {
+interface IKernel {
     winMan: WindowManager;
     appMan: ApplicationManager;
     netMan: NetworkManager;
@@ -8,7 +8,7 @@ interface Kernel {
 }
 
 function startUp() {
-    
+
 
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
@@ -44,11 +44,12 @@ function startUp() {
 
 function registerLaunchers() {
 
-    
+
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
 
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
@@ -63,14 +64,15 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
 }
 
-interface EventTarget extends IEventManager
-{
+/* tslint:disable:interface-name */
+interface EventTarget extends IEventManager {
 
 }
 
 interface HTMLElement {
     window: AppWindow;
 }
+/* tslint:enable:interface-name */
 
 class Launcher {
     mainFunction: new () => IApplication;

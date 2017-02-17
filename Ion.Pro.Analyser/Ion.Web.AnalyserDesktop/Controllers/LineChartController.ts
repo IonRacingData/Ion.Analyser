@@ -1,4 +1,4 @@
-﻿class LineChartController extends MultiValueCanvasController{
+﻿class LineChartController extends MultiValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
     private mouseMod: Point;
@@ -12,7 +12,7 @@
     private stickyAxes = true;
     private autoScroll = false;
     private gridColor = "rgba(100,100,100,0.3)";
-    private axisColor = "white";//"black"; // "black";
+    private axisColor = "white";// "black"; // "black";
     private mainColor = "white";
 
     constructor() {
@@ -58,16 +58,16 @@
         switch (e.key) {
             case "g":
                 this.displayGrid = this.displayGrid === true ? false : true;
-                break;               
+                break;
             case "r":
                 this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);                
+                this.movePoint = new Point(50, 50);
                 break;
             case "a":
-                this.stickyAxes = this.stickyAxes === true ? false : true;                
+                this.stickyAxes = this.stickyAxes === true ? false : true;
                 break;
             case "k":
-                this.autoScroll = this.autoScroll === true ? false : true;                
+                this.autoScroll = this.autoScroll === true ? false : true;
                 break;
         }
         this.draw();
@@ -178,7 +178,7 @@
         this.draw();
     }
 
-    protected onDataChange(): void {        
+    protected onDataChange(): void {
         if (this.autoScroll) {
             this.moveToLastPoint();
         }
@@ -196,11 +196,11 @@
 
     private selectPoint(e: Point): void {
         if (this.data) {
-            //var mp: Point = this.getMousePoint(e);
+            // var mp: Point = this.getMousePoint(e);
             var mp = e;
             var p: Point = null;
             for (let i: number = 0; i < this.data.length; i++) {
-                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
@@ -253,17 +253,19 @@
         var move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
         this.movePoint = this.movePoint.add(move);
         this.draw();
-    }    
+    }
 
     getTouchPoint(e: TouchEvent): Point {
-        if (e.touches.length > 0)
+        if (e.touches.length > 0) {
             return new Point(e.touches[0].clientX, e.touches[0].clientY);
-        else
+        }
+        else {
             return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
     }
 
     protected draw(): void {
-        this.ctxMain.clear();        
+        this.ctxMain.clear();
 
         this.drawXAxis();
         this.drawYAxis();
@@ -271,7 +273,7 @@
         if (this.data) {
 
             for (var d: number = 0; d < this.data.length; d++) {
-                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
@@ -315,7 +317,7 @@
                 this.ctxMain.stroke();
                 this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
             }
-        }        
+        }
     }
 
     private drawXAxis(): void {
@@ -468,7 +470,7 @@
         }
 
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
-    }    
+    }
 
     private zoomByMarking(): void {
         this.ctxMarking.clear();
@@ -566,7 +568,7 @@ class ContextFixer {
         let newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {        
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     }
@@ -591,7 +593,7 @@ class LayeredCanvas {
     }
 
     addCanvas(): HTMLCanvasElement {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");
         this.wrapper.appendChild(canvas);
         this.canvases.push(canvas);
         return canvas;

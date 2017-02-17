@@ -1,4 +1,6 @@
-﻿class SensorManager implements IEventManager {
+﻿/*jshint bitwise: false*/
+
+class SensorManager implements IEventManager {
     private dataCache: ISensorPackage[][] = [];
     private plotCache: PlotData[] = [];
 
@@ -28,7 +30,7 @@
 
             if (!this.plotCache[sensId]) {
                 this.plotCache[sensId] = new PlotData([]);
-                //this.plotCache[sensId].ID = sensId;
+                // this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
         }
@@ -77,7 +79,7 @@
         this.getLoadedIds(multiBack.createCallback());
     }
 
-    getData(id: number, callback: (data: ISensorPackage[]) => void): void{
+    getData(id: number, callback: (data: ISensorPackage[]) => void): void {
         if (!this.dataCache[id]) {
             this.loadData(id, callback);
         }
@@ -104,8 +106,9 @@
     }
 
     private convertData(data: ISensorPackage[]): PlotData {
-        if (data.length < 1)
+        if (data.length < 1) {
             return null;
+        }
         let id = data[0].ID;
         let p: Point[] = [];
         for (let i = 0; i < data.length; i++) {
@@ -149,7 +152,7 @@
             insert[6] = raw.charCodeAt(i * 28 + 10);
             insert[7] = raw.charCodeAt(i * 28 + 11);
             let output = new Float64Array(buf);
-
+            /* tslint:disable:no-bitwise */
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                 | raw.charCodeAt(i * 28 + 1) << 8
@@ -166,7 +169,7 @@
                 | raw.charCodeAt(i * 28 + 11) << 56,*/
 
                 TimeStamp:
-                  raw.charCodeAt(i * 28 + 12)
+                raw.charCodeAt(i * 28 + 12)
                 | raw.charCodeAt(i * 28 + 13) << 8
                 | raw.charCodeAt(i * 28 + 14) << 16
                 | raw.charCodeAt(i * 28 + 15) << 24
@@ -174,8 +177,10 @@
                 | raw.charCodeAt(i * 28 + 17) << 40
                 | raw.charCodeAt(i * 28 + 18) << 48
                 | raw.charCodeAt(i * 28 + 19) << 56,
-                
-            } 
+
+            };
+
+            /* tslint:enable:no-bitwise */
         }
         return ret;
     }
@@ -198,7 +203,7 @@
     public getSensorInfo(data: IPlotData, callback: (data: SensorInformation) => void) {
         this.getLoadedInfos((all: SensorInformation[]) => {
             for (let i = 0; i < all.length; i++) {
-                if (all[i].ID == data.ID) {
+                if (all[i].ID === data.ID) {
                     callback(all[i]);
                     break;
                 }
@@ -215,7 +220,7 @@
     }
 
     addEventListener(type: string, listener: any) {
-        if (type == SensorManager.event_globalPlot && this.globalPlot != null) {
+        if (type === SensorManager.event_globalPlot && this.globalPlot != null) {
             listener(this.globalPlot);
         }
         this.eventManager.addEventListener(type, listener);
@@ -225,10 +230,15 @@
         this.eventManager.removeEventListener(type, listener);
     }
 
-    
-    
+    private plotLinker: IPlot[][] = [];
+
     register(plotter: IPlot): void {
         this.plotter.push(plotter);
+        if (!this.plotLinker[plotter.plotDataType]) {
+            this.plotLinker[plotter.plotDataType] = [];
+        }
+        this.plotLinker[plotter.plotDataType].push(plotter);
+
         this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     }
 }
@@ -255,7 +265,7 @@ class Multicallback {
     }
 
     checkReturn() {
-        if (this.count == this.returned) {
+        if (this.count === this.returned) {
             this.callback.apply(null, this.responses);
         }
     }
@@ -292,7 +302,9 @@ class SensorInfoHelper {
             val = temp.MaxValue;
         }
         else {
+            /* tslint:disable:no-bitwise */
             val = (1 << temp.Resolution) - 1;
+            /* tslint:enable:no-bitwise */
         }
         return val;
     }
@@ -321,11 +333,19 @@ class SensorInfoHelper {
     }
 }
 
+enum PlotType {
+    I1D,
+    I2D,
+    I3D
+}
+
 interface IPlot {
     dataUpdate();
     plotType: string;
+    plotDataType: PlotType;
     plotWindow: AppWindow;
 }
+
 
 interface ISinglePlot extends IPlot {
     plotData: IPlotData;

@@ -21,7 +21,7 @@
         let tableGen = new HtmlTableGen("table selectable");
         let senMan: SensorManager = kernel.senMan;
         let last: HTMLElement = null;
-        //let selectedPlot: IPlot = null;
+        // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.plotter.length; i++) {
             let curPlot = senMan.plotter[i];
@@ -116,7 +116,7 @@
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID == sensor.ID) {
+        if (plot.plotData && plot.plotData.ID === sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", (e: Event) => {
@@ -135,7 +135,7 @@
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
         for (let i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID == sensor.ID) {
+            if (plot.plotData[i].ID === sensor.ID) {
                 checkBox.checked = true;
                 break;
             }
@@ -153,7 +153,7 @@
             }
             else {
                 for (let i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID == sensor.ID) {
+                    if (plot.plotData[i].ID === sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;
@@ -162,7 +162,7 @@
                 }
             }
         });
-        return checkBox
+        return checkBox;
     }
 
     drawSensors<T extends IPlot>(plot: T, info: SensorInformation[], drawMethod: (plot: T, sensor: SensorInformation) => HTMLElement) {
@@ -186,9 +186,10 @@
 class TestDataViewer implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
-    plotData: IPlotData;
+    plotData: IPlotData1;
     plotType: string = "Test Data Viewer";
     plotWindow: AppWindow;
+    plotDataType = PlotType.I1D;
 
     main(): void {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
@@ -205,7 +206,7 @@ class TestDataViewer implements IApplication, ISinglePlot {
 
         this.window.content.appendChild(gen.generate());
 
-        //console.log("Here we should draw something, but you know, we are lazy");
+        // console.log("Here we should draw something, but you know, we are lazy");
     }
 
     dataUpdate(): void {
@@ -222,23 +223,22 @@ class SensorSetSelector implements IApplication {
     public main(): void {
         this.wrapper = this.mk.tag("div");
         this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
-        requestAction("GetAvaiableSets", (data: SensorSetInformation[]) => this.drawData(data));
+        requestAction("GetAvaiableSets", (data: ISensorSetInformation[]) => this.drawData(data));
         this.window.content.appendChild(this.wrapper);
     }
 
-    private drawData(data: SensorSetInformation[]): void {
+    private drawData(data: ISensorSetInformation[]): void {
         this.wrapper.innerHTML = "";
         var table = new HtmlTableGen("table selectable");
-        
+
         table.addHeader("File name", "File size", "Sensor reader");
         for (let a of data) {
             table.addRow(
                 [
                     {
                         "event": "click",
-                        "func": (event: Event) =>
-                        {
-                            //console.log("you clicked on: " + a.FileName);
+                        "func": (event: Event) => {
+                            // console.log("you clicked on: " + a.FileName);
                             requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
                             kernel.senMan.clearCache();
                         }
@@ -254,7 +254,7 @@ class SensorSetSelector implements IApplication {
     }
 }
 
-interface SensorSetInformation {
+interface ISensorSetInformation {
     FileName: string;
     FullFileName: string;
     Size: number;

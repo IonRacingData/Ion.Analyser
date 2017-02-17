@@ -15,7 +15,7 @@ var LineChartController = (function (_super) {
         _this.stickyAxes = true;
         _this.autoScroll = false;
         _this.gridColor = "rgba(100,100,100,0.3)";
-        _this.axisColor = "white"; //"black"; // "black";
+        _this.axisColor = "white"; // "black"; // "black";
         _this.mainColor = "white";
         _this.movePoint = new Point(50, 50);
         _this.scalePoint = new Point(0.05, 6);
@@ -177,11 +177,11 @@ var LineChartController = (function (_super) {
     };
     LineChartController.prototype.selectPoint = function (e) {
         if (this.data) {
-            //var mp: Point = this.getMousePoint(e);
+            // var mp: Point = this.getMousePoint(e);
             var mp = e;
             var p = null;
             for (var i = 0; i < this.data.length; i++) {
-                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
@@ -230,10 +230,12 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.getTouchPoint = function (e) {
-        if (e.touches.length > 0)
+        if (e.touches.length > 0) {
             return new Point(e.touches[0].clientX, e.touches[0].clientY);
-        else
+        }
+        else {
             return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
     };
     LineChartController.prototype.draw = function () {
         this.ctxMain.clear();
@@ -241,7 +243,7 @@ var LineChartController = (function (_super) {
         this.drawYAxis();
         if (this.data) {
             for (var d = 0; d < this.data.length; d++) {
-                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;

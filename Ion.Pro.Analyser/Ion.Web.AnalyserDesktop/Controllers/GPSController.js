@@ -59,7 +59,7 @@ var GPSController = (function (_super) {
             offsetX = (this.width - this.absWidth) / 2;
             offsetY = (this.height - this.absHeight) / 2;
             var absPoint = this.getAbsolute(relPoint);
-            //this.ctxMain.fillRect(absPoint.x - 1 + this.padding + offsetX, absPoint.y - 1 + this.padding - offsetY, 2, 2);             
+            // this.ctxMain.fillRect(absPoint.x - 1 + this.padding + offsetX, absPoint.y - 1 + this.padding - offsetY, 2, 2);             
             this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
         }
         this.ctxMain.stroke();

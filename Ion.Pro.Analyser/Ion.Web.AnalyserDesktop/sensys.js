@@ -1,3 +1,4 @@
+/*jshint bitwise: false*/
 var SensorManager = (function () {
     function SensorManager() {
         var _this = this;
@@ -5,6 +6,7 @@ var SensorManager = (function () {
         this.plotCache = [];
         this.plotter = [];
         this.eventManager = new EventManager();
+        this.plotLinker = [];
         kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
     }
     SensorManager.prototype.handleService = function (data) {
@@ -83,8 +85,9 @@ var SensorManager = (function () {
         });
     };
     SensorManager.prototype.convertData = function (data) {
-        if (data.length < 1)
+        if (data.length < 1) {
             return null;
+        }
         var id = data[0].ID;
         var p = [];
         for (var i = 0; i < data.length; i++) {
@@ -126,6 +129,7 @@ var SensorManager = (function () {
             insert[6] = raw.charCodeAt(i * 28 + 10);
             insert[7] = raw.charCodeAt(i * 28 + 11);
             var output = new Float64Array(buf);
+            /* tslint:disable:no-bitwise */
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                     | raw.charCodeAt(i * 28 + 1) << 8
@@ -170,7 +174,7 @@ var SensorManager = (function () {
     SensorManager.prototype.getSensorInfo = function (data, callback) {
         this.getLoadedInfos(function (all) {
             for (var i = 0; i < all.length; i++) {
-                if (all[i].ID == data.ID) {
+                if (all[i].ID === data.ID) {
                     callback(all[i]);
                     break;
                 }
@@ -186,7 +190,7 @@ var SensorManager = (function () {
         });
     };
     SensorManager.prototype.addEventListener = function (type, listener) {
-        if (type == SensorManager.event_globalPlot && this.globalPlot != null) {
+        if (type === SensorManager.event_globalPlot && this.globalPlot != null) {
             listener(this.globalPlot);
         }
         this.eventManager.addEventListener(type, listener);
@@ -196,6 +200,10 @@ var SensorManager = (function () {
     };
     SensorManager.prototype.register = function (plotter) {
         this.plotter.push(plotter);
+        if (!this.plotLinker[plotter.plotDataType]) {
+            this.plotLinker[plotter.plotDataType] = [];
+        }
+        this.plotLinker[plotter.plotDataType].push(plotter);
         this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     };
     return SensorManager;
@@ -221,7 +229,7 @@ var Multicallback = (function () {
         };
     };
     Multicallback.prototype.checkReturn = function () {
-        if (this.count == this.returned) {
+        if (this.count === this.returned) {
             this.callback.apply(null, this.responses);
         }
     };
@@ -250,6 +258,7 @@ var SensorInfoHelper = (function () {
             val = temp.MaxValue;
         }
         else {
+            /* tslint:disable:no-bitwise */
             val = (1 << temp.Resolution) - 1;
         }
         return val;
@@ -276,4 +285,10 @@ var SensorInfoHelper = (function () {
     };
     return SensorInfoHelper;
 }());
+var PlotType;
+(function (PlotType) {
+    PlotType[PlotType["I1D"] = 0] = "I1D";
+    PlotType[PlotType["I2D"] = 1] = "I2D";
+    PlotType[PlotType["I3D"] = 2] = "I3D";
+})(PlotType || (PlotType = {}));
 //# sourceMappingURL=sensys.js.map

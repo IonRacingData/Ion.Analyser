@@ -5,10 +5,12 @@ interface IEventTag {
     func: (e: Event) => void;
 }
 
+/* tslint:disable:interface-name */
 interface HTMLSpanElement {
     deltaX: number;
     deltaY: number;
 }
+/* tslint:enable:interface-name */
 
 class HtmlHelper {
     tag(tag: string, className: any = "", events: IEventTag[] = null, innerHTML: string = ""): HTMLElement {

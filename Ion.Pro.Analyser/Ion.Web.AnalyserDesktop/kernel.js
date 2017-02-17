@@ -25,6 +25,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
@@ -35,6 +36,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
 }
+/* tslint:enable:interface-name */
 var Launcher = (function () {
     function Launcher(mainFunction, name) {
         this.mainFunction = mainFunction;

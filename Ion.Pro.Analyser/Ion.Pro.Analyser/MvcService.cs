@@ -56,6 +56,11 @@ namespace Ion.Pro.Analyser
         {
             return new ErrorResult(code, data);
         }
+
+        public IActionResult File(byte[] data, string file, bool forceDownload)
+        {
+            return new FileResult(data, file, forceDownload);
+        }
     }
 
     public interface IActionResult
@@ -138,32 +143,52 @@ namespace Ion.Pro.Analyser
     public class FileResult : IActionResult
     {
         string file;
-        bool forceDownload;
+        bool forceDownload = false;
+        bool inMemoryFile = false;
+        byte[] data;
 
-        public FileResult(string file)
-            : this(file, false)
+        public FileResult(string path)
+            : this(path, false)
         {
 
         }
 
-        public FileResult(string file, bool forceDownload)
+        public FileResult(string path, bool forceDownload)
         {
-            this.file = file;
+            this.file = path;
+            this.forceDownload = forceDownload;
+        }
+
+        public FileResult(byte[] data, string filename, bool forceDownload)
+        {
+            inMemoryFile = true;
+            this.data = data;
+            this.file = filename;
             this.forceDownload = forceDownload;
         }
 
         public async Task ExecuteResultAsync(ActionContext context)
         {
             FileInfo fi = new FileInfo(file);
-            if (fi.Exists)
+            if (inMemoryFile)
             {
-                context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(fi.Extension);
-                context.HttpContext.Response.Data = await Task.FromResult(ServiceManager.GetFileService().ReadAllBytes(fi.FullName));
+                context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(forceDownload ? "binary" : fi.Extension);
+                context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "Content-Disposition: attachment; filename=\"" + fi.Name + "\"");
+                context.HttpContext.Response.Data = await Task.FromResult(data);
             }
             else
             {
-                ErrorResult result = new ErrorResult(HttpStatus.NotFound404, fi.FullName + " was not found");
-                await result.ExecuteResultAsync(context);
+                if (fi.Exists)
+                {
+                    context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(forceDownload ? "binary" : fi.Extension);
+                    context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "Content-Disposition: attachment; filename=\"" + fi.Name + "\"");
+                    context.HttpContext.Response.Data = await Task.FromResult(ServiceManager.GetFileService().ReadAllBytes(fi.FullName));
+                }
+                else
+                {
+                    ErrorResult result = new ErrorResult(HttpStatus.NotFound404, fi.FullName + " was not found");
+                    await result.ExecuteResultAsync(context);
+                }
             }
         }
     }
@@ -186,7 +211,7 @@ namespace Ion.Pro.Analyser
             }
             catch (Exception e)
             {
-
+                System.Diagnostics.Debug.WriteLine(e);
             }
             await result.ExecuteResultAsync(context);
         }

@@ -42,11 +42,84 @@ var DataViewer = (function () {
     };
     return DataViewer;
 }());
+var CsvGenerator = (function () {
+    function CsvGenerator() {
+        this.mk = new HtmlHelper();
+    }
+    CsvGenerator.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "CSV Creator");
+        this.draw();
+    };
+    CsvGenerator.prototype.createInput = function (inputType, name, value, checked, disabled) {
+        if (checked === void 0) { checked = false; }
+        if (disabled === void 0) { disabled = false; }
+        var input = this.mk.tag("input");
+        input.type = inputType;
+        input.checked = checked;
+        input.name = name;
+        input.value = value;
+        input.disabled = disabled;
+        return input;
+    };
+    CsvGenerator.prototype.createContainer = function (container) {
+        var childs = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            childs[_i - 1] = arguments[_i];
+        }
+        var element = this.mk.tag(container);
+        for (var _a = 0, childs_1 = childs; _a < childs_1.length; _a++) {
+            var a = childs_1[_a];
+            if (Array.isArray(a)) {
+                for (var _b = 0, a_1 = a; _b < a_1.length; _b++) {
+                    var b = a_1[_b];
+                    element.appendChild(b);
+                }
+            }
+            else {
+                element.appendChild(a);
+            }
+        }
+        return element;
+    };
+    CsvGenerator.prototype.createFieldSet = function (legende) {
+        var childs = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            childs[_i - 1] = arguments[_i];
+        }
+        return this.createContainer("fieldset", this.mk.tag("legend", "", null, legende), childs);
+    };
+    CsvGenerator.prototype.createLabelWithContent = function () {
+        var childs = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            childs[_i] = arguments[_i];
+        }
+        return this.createContainer("label", childs);
+    };
+    CsvGenerator.prototype.draw = function () {
+        var form = this.mk.tag("form");
+        form.action = "/test/csv";
+        form.method = "GET";
+        // let formatFields = <HTMLFieldSetElement>this.mk.tag("fieldset");
+        // formatFields.appendChild(this.mk.tag("legende", "", null, "Format"));
+        var formatFields = this.createFieldSet("Format", this.createLabelWithContent(this.createInput("radio", "encoding", "nor", true), this.mk.tag("span", "", null, "Semicolon seperated")), this.mk.tag("br"), this.createLabelWithContent(this.createInput("radio", "encoding", "int"), this.mk.tag("span", "", null, "Comma seperated")));
+        var valueFields = this.createFieldSet("Values", this.createLabelWithContent(this.createInput("radio", "values", "real", true), this.mk.tag("span", "", null, "Real Values")), this.mk.tag("br"), this.createLabelWithContent(this.createInput("radio", "values", "raw", false, true), this.mk.tag("span", "disabled", null, "Raw Values")));
+        var titleLabel = this.createLabelWithContent(this.createInput("checkbox", "title", "checked", true), this.mk.tag("span", "", null, "Raw Values"));
+        var submit = this.createInput("submit", "", "Download csv");
+        form.appendChild(formatFields);
+        form.appendChild(valueFields);
+        form.appendChild(titleLabel);
+        form.appendChild(this.mk.tag("br"));
+        form.appendChild(submit);
+        this.window.content.appendChild(form);
+    };
+    return CsvGenerator;
+}());
 var LineChartTester = (function () {
     function LineChartTester() {
         this.eh = new EventHandler();
         this.plotData = [];
         this.plotType = "Plot";
+        this.plotDataType = PlotType.I1D;
     }
     LineChartTester.prototype.main = function () {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
@@ -96,6 +169,7 @@ var GaugeTester = (function () {
     function GaugeTester() {
         this.val = 0;
         this.plotType = "GaugePlot";
+        this.plotDataType = PlotType.I1D;
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
@@ -110,7 +184,7 @@ var GaugeTester = (function () {
     };
     GaugeTester.prototype.drawMeter = function () {
         var _this = this;
-        //this.window.content.innerHTML = "";                        
+        // this.window.content.innerHTML = "";                        
         this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
         var gaugeWrapper = this.gauge.generate();
         this.window.content.appendChild(gaugeWrapper);
@@ -158,10 +232,10 @@ var GPSPlotTester = (function () {
     GPSPlotTester.prototype.draw = function (p) {
         this.testData = new GPSPlotData(p);
         this.plot = new GPSController(this.testData);
-        //console.log(this.testData);
+        // console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
         this.plot.setSize(this.window.width, this.window.height);
-        //this.plot.draw();
+        // this.plot.draw();
     };
     GPSPlotTester.prototype.update = function (p) {
         this.testData = new GPSPlotData(p);

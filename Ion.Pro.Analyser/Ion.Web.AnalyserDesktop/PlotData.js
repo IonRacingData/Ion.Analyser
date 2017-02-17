@@ -153,8 +153,30 @@ var Point3D = (function () {
     };
     return Point3D;
 }());
+var Point4D = (function () {
+    function Point4D(x, y, z, i) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.i = i;
+    }
+    Point4D.prototype.add = function (p) {
+        return new Point4D(this.x + p.x, this.y + p.y, this.z + p.z, this.i + p.i);
+    };
+    Point4D.prototype.sub = function (p) {
+        return new Point4D(this.x - p.x, this.y - p.y, this.z - p.z, this.i - p.i);
+    };
+    Point4D.prototype.multiply = function (p) {
+        return new Point4D(this.x * p.x, this.y * p.y, this.z * p.z, this.i * p.i);
+    };
+    Point4D.prototype.divide = function (p) {
+        return new Point4D(this.x / p.x, this.y / p.y, this.z / p.z, this.i / p.i);
+    };
+    return Point4D;
+}());
 var PlotDataViewer = (function () {
     function PlotDataViewer(realData) {
+        this.__isPlotData1 = {};
         this.realData = realData;
         this.ID = realData.ID;
         this.color = realData.color;

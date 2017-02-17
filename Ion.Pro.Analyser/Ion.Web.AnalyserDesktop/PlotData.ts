@@ -24,7 +24,7 @@
     }
 
     public static randomColor(lowLimit: number, highLimit: number): Color {
-        
+
         let r = 0;
         let g = 0;
         let b = 0;
@@ -86,11 +86,11 @@ class PlotData {
 }
 
 class PlotDataHelper {
-    public static getClosest(plotData: IPlotData, p: Point): Point {
+    public static getClosest(plotData: IPlotData1, p: Point): Point {
         return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
     }
 
-    public static getIndexOf(plotData: IPlotData, p: Point): number {
+    public static getIndexOf(plotData: IPlotData1, p: Point): number {
         var min: number = 0;
         var max: number = plotData.getLength() - 1;
         var half: number;
@@ -128,7 +128,14 @@ class GPSPlotData {
     }
 }
 
-class Point {
+interface IPoint<T> {
+    add(p: T): T;
+    sub(p: T): T;
+    multiply(p: T): T;
+    divide(p: T): T;
+}
+
+class Point implements IPoint<Point> {
 
     x: number;
     y: number;
@@ -155,12 +162,12 @@ class Point {
     }
 
     toString(): string {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();        
+        return "x: " + this.x.toString() + "  y: " + this.y.toString();
     }
 }
 
-class Point3D {
-    x: number; 
+class Point3D implements IPoint<Point3D> {
+    x: number;
     y: number;
     z: number;
 
@@ -191,15 +198,62 @@ class Point3D {
     }
 }
 
+class Point4D implements IPoint<Point4D> {
+    public x: number;
+    public y: number;
+    public z: number;
+    public i: number;
+
+    constructor(x: number, y: number, z: number, i: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.i = i;
+    }
+
+    add(p: Point4D): Point4D {
+        return new Point4D(this.x + p.x, this.y + p.y, this.z + p.z, this.i + p.i);
+    }
+
+    sub(p: Point4D): Point4D {
+        return new Point4D(this.x - p.x, this.y - p.y, this.z - p.z, this.i - p.i);
+    }
+
+    multiply(p: Point4D): Point4D {
+        return new Point4D(this.x * p.x, this.y * p.y, this.z * p.z, this.i * p.i);
+    }
+
+    divide(p: Point4D): Point4D {
+        return new Point4D(this.x / p.x, this.y / p.y, this.z / p.z, this.i / p.i);
+    }
+}
+
 interface IPlotData {
     ID: number;
     color: Color;
 
     getLength(): number;
-    getValue(index: number): Point;
 }
 
-class PlotDataViewer implements IPlotData {
+interface IPlotDataBase<T extends IPoint<T>> extends IPlotData {
+    getValue(index: number): T;
+}
+
+interface IPlotData1 extends IPlotDataBase<Point> {
+    __isPlotData1: any;
+}
+
+interface IPlotData2 extends IPlotDataBase<Point3D> {
+    __isPlotData2: any;
+}
+
+interface IPlotData3 extends IPlotDataBase<Point4D> {
+    __isPlotData3: any;
+}
+
+class PlotDataViewer implements IPlotData1 {
+    public __isPlotData1: any = {};
+
     public ID: number;
     public color: Color;
     private realData: PlotData;

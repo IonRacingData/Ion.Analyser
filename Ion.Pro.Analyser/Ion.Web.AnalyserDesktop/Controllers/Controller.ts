@@ -16,8 +16,8 @@
 
 abstract class SingleValueController extends Controller {
     protected value: number;
-    protected data: IPlotData;
-    public setData(d: IPlotData) {
+    protected data: IPlotData1;
+    public setData(d: IPlotData1) {
         this.data = d;
     }
     public abstract setValue(value: number): void;
@@ -48,8 +48,8 @@ abstract class CanvasController extends Controller {
 }
 
 abstract class MultiValueCanvasController extends CanvasController {
-    protected data: IPlotData[];
-    public setData(d: IPlotData[]): void {
+    protected data: IPlotData1[];
+    public setData(d: IPlotData1[]): void {
         this.data = d;
         this.onDataChange();
     }

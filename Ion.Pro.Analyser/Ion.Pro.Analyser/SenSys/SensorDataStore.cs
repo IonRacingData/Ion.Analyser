@@ -1,6 +1,7 @@
 ﻿using NicroWare.Pro.DmxControl.JSON;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -63,6 +64,42 @@ namespace Ion.Pro.Analyser.SenSys
             {
                 Console.WriteLine("The file: " + fi.FullName + " does not exist");
             }
+        }
+
+        public string CreateCsv(bool norFormat, bool includeTitle)
+        {
+            char seperator = ',';
+            IFormatProvider provider = NumberFormatInfo.InvariantInfo;
+            if (norFormat)
+            {
+                seperator = ';';
+                provider = new CultureInfo("no-NB");
+            }
+            int largestDataSet = 0;
+            StringBuilder sb = new StringBuilder();
+            List<List<RealSensorPackage>> allValues = new List<List<RealSensorPackage>>();
+            foreach(KeyValuePair<int, List<RealSensorPackage>> pair in indexedPackages)
+            {
+                string name = "Unknown (" + pair.Key.ToString() + ")";
+                if (sensorIdMapping.ContainsKey(pair.Key))
+                {
+                    SensorInformation si = sensorIdMapping[pair.Key];
+                    name = si.Name;
+                }
+                if (includeTitle) sb.Append(name + seperator);
+                largestDataSet = Math.Max(largestDataSet, pair.Value.Count);
+                allValues.Add(pair.Value);
+            }
+            if (includeTitle) sb.AppendLine();
+            for (int i = 0; i < largestDataSet; i++)
+            {
+                for (int j = 0; j < allValues.Count; j++)
+                {
+                    sb.Append((allValues[j].Count > i ? allValues[j][i].Value.ToString(provider) : "") + seperator);
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
 
         public ISensorReader GetSensorReader(string file, params object[] extraParam)

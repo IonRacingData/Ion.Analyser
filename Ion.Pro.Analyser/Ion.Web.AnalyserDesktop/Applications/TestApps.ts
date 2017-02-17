@@ -1,7 +1,7 @@
 ﻿class DataViewer implements IApplication {
     application: Application;
     window: AppWindow;
-    data: ISensorPackage[]; 
+    data: ISensorPackage[];
 
     innerTable: HTMLElement;
     main(): void {
@@ -19,8 +19,7 @@
             let curValue = data[i];
             table.addRow([
                 {
-                    event: "click", func: () =>
-                    {
+                    event: "click", func: () => {
                         kernel.senMan.setGlobal(curValue.ID);
                     }
                 },
@@ -49,15 +48,116 @@
     }
 }
 
+class CsvGenerator implements IApplication {
+    public application: Application;
+    private window: AppWindow;
+    private mk: HtmlHelper = new HtmlHelper();
+
+    public main() {
+        this.window = kernel.winMan.createWindow(this.application, "CSV Creator");
+        this.draw();
+    }
+
+    private createInput(inputType: string,
+                        name: string,
+                        value: string,
+                        checked: boolean = false,
+                        disabled: boolean = false): HTMLInputElement {
+
+        let input = <HTMLInputElement>this.mk.tag("input");
+        input.type = inputType;
+        input.checked = checked;
+        input.name = name;
+        input.value = value;
+        input.disabled = disabled;
+        return input;
+    }
+
+    private createContainer<T extends HTMLElement>(container: string, ...childs: (Node | Node[])[]): T {
+        let element = <T>this.mk.tag(container);
+        for (let a of childs) {
+            if (Array.isArray(a)) {
+                for (let b of a) {
+                    element.appendChild(b);
+                }
+            }
+            else {
+                element.appendChild(a);
+            }
+        }
+        return element;
+    }
+
+    private createFieldSet(legende: string, ...childs: Node[]): HTMLFieldSetElement {
+        return this.createContainer<HTMLFieldSetElement>(
+            "fieldset",
+            this.mk.tag("legend", "", null, legende),
+            childs
+        );
+    }
+
+    private createLabelWithContent(...childs: Node[]): HTMLLabelElement {
+        return this.createContainer<HTMLLabelElement>("label", childs);
+    }
+
+    public draw() {
+        let form = <HTMLFormElement>this.mk.tag("form");
+        form.action = "/test/csv";
+        form.method = "GET";
+        // let formatFields = <HTMLFieldSetElement>this.mk.tag("fieldset");
+        // formatFields.appendChild(this.mk.tag("legende", "", null, "Format"));
+
+        let formatFields = this.createFieldSet(
+            "Format",
+            this.createLabelWithContent(
+                this.createInput("radio", "encoding", "nor", true),
+                this.mk.tag("span", "", null, "Semicolon seperated")
+            ),
+            this.mk.tag("br"),
+            this.createLabelWithContent(
+                this.createInput("radio", "encoding", "int"),
+                this.mk.tag("span", "", null, "Comma seperated")
+            ),
+        );
+        let valueFields = this.createFieldSet(
+            "Values",
+            this.createLabelWithContent(
+                this.createInput("radio", "values", "real", true),
+                this.mk.tag("span", "", null, "Real Values")
+            ),
+            this.mk.tag("br"),
+            this.createLabelWithContent(
+                this.createInput("radio", "values", "raw", false, true),
+                this.mk.tag("span", "disabled", null, "Raw Values")
+            ),
+        );
+        let titleLabel = this.createLabelWithContent(
+            this.createInput("checkbox", "title", "checked", true),
+            this.mk.tag("span", "", null, "Raw Values")
+        );
+        let submit = this.createInput("submit", "", "Download csv");
+
+
+        form.appendChild(formatFields);
+        form.appendChild(valueFields);
+        form.appendChild(titleLabel);
+        form.appendChild(this.mk.tag("br"));
+        form.appendChild(submit);
+
+        this.window.content.appendChild(form);
+    }
+}
+
 class LineChartTester implements IApplication, IMultiPlot {
     application: Application;
     window: AppWindow;
     lineChart: LineChartController;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
-    plotData: IPlotData[] = [];
+    plotData: IPlotData1[] = [];
     plotType: string = "Plot";
     plotWindow: AppWindow;
+    plotDataType = PlotType.I1D;
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
@@ -117,7 +217,8 @@ class GaugeTester implements IApplication, ISinglePlot {
     val: number = 0;
     plotType: string = "GaugePlot";
     plotWindow: AppWindow;
-    plotData: IPlotData;
+    plotData: IPlotData1;
+    plotDataType = PlotType.I1D;
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
@@ -126,7 +227,7 @@ class GaugeTester implements IApplication, ISinglePlot {
 
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-        
+
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.gauge.setSize(this.window.width, this.window.height);
         });
@@ -134,7 +235,7 @@ class GaugeTester implements IApplication, ISinglePlot {
     }
 
     drawMeter() {
-        //this.window.content.innerHTML = "";                        
+        // this.window.content.innerHTML = "";                        
         this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
         let gaugeWrapper = this.gauge.generate();
         this.window.content.appendChild(gaugeWrapper);
@@ -185,20 +286,20 @@ class GPSPlotTester implements IApplication {
         });
     }
 
-    draw(p: Point3D[]): void {                
+    draw(p: Point3D[]): void {
         this.testData = new GPSPlotData(p);
         this.plot = new GPSController(this.testData);
-        //console.log(this.testData);
+        // console.log(this.testData);
         this.window.content.appendChild(this.plot.generate());
         this.plot.setSize(this.window.width, this.window.height);
-        //this.plot.draw();
+        // this.plot.draw();
     }
 
     update(p: Point3D[]): void {
         this.testData = new GPSPlotData(p);
         this.plot.update(this.testData);
-    }   
-    
+    }
+
 }
 
 class LabelTester {
@@ -238,7 +339,7 @@ class BarTester {
         this.bar = new BarController(this.window.width, this.window.height, true, true);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
-        this.bar.setValue(this.val);        
+        this.bar.setValue(this.val);
 
         // for testing    
         barWrapper.addEventListener("wheel", (e: WheelEvent) => {
