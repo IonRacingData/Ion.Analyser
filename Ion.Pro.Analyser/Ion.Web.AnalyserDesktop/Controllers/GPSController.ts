@@ -1,12 +1,10 @@
 ﻿class GPSController extends CanvasController {
-    posData: GPSPlotData;
-    ctxMain: ContextFixer;
-    relSize: IRelativeSize;
+    private posData: GPSPlotData;
+    private ctxMain: ContextFixer;
+    private relSize: IRelativeSize;
     private plotWidth: number;
     private plotHeight: number;
-    padding: number;
-    absWidth: number;
-    absHeight: number;
+    private padding: number;
     color: string = "white";
 
     constructor(width: number, height: number) {
@@ -59,19 +57,16 @@
             offsetX = (this.width - this.plotWidth) / 2;
             offsetY = (this.height - this.plotHeight) / 2;
 
-            console.log(offsetX, offsetY);
-            this.padding = 0;
-
             if (this.posData.points.length > 0) {
                 let firstPoint: Point = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
-                this.ctxMain.lineTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
             for (let i = 0; i < this.posData.points.length; i++) {
 
                 let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);                
                 let absPoint: Point = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
             this.ctxMain.stroke();

@@ -45,16 +45,14 @@ var GPSController = (function (_super) {
             this.rescale();
             offsetX = (this.width - this.plotWidth) / 2;
             offsetY = (this.height - this.plotHeight) / 2;
-            console.log(offsetX, offsetY);
-            this.padding = 0;
             if (this.posData.points.length > 0) {
                 var firstPoint = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
-                this.ctxMain.lineTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
             for (var i = 0; i < this.posData.points.length; i++) {
                 var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
                 var absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
             }
             this.ctxMain.stroke();
         }
