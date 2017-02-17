@@ -225,7 +225,7 @@ class BarTester implements ISinglePlot {
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, true, true);
+        this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);        
 

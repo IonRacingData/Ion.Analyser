@@ -28,7 +28,7 @@ var SingleValueController = (function (_super) {
         this.data = d;
         if (this.data) {
             var curID = this.data.ID;
-            if (curID != this.lastID) {
+            if (curID !== this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, function (i) {
                     _this.lastSensorInfo = i;
                     _this.lastID = _this.data.ID;
@@ -123,7 +123,7 @@ var SingleValueCanvasController = (function (_super) {
         this.data = d;
         if (this.data) {
             var curID = this.data.ID;
-            if (curID != this.lastID) {
+            if (curID !== this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, function (i) {
                     _this.lastSensorInfo = i;
                     _this.lastID = _this.data.ID;
