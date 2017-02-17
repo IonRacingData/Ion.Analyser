@@ -141,7 +141,7 @@ var GPSPlotTester = (function () {
     };
     GPSPlotTester.prototype.draw = function () {
         this.plot.setData(this.testData);
-        this.plot.setSize(this.window.width, this.window.height);
+        //this.plot.setSize(this.window.width, this.window.height);
     };
     return GPSPlotTester;
 }());

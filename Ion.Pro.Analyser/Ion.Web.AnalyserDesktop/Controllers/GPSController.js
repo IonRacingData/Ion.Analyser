@@ -12,6 +12,9 @@ var GPSController = (function (_super) {
         _this.scalePoint = new Point(1, 1);
         _this.width = width;
         _this.height = height;
+        _this.padding = _this.width * 0.05;
+        _this.plotWidth = _this.width - (_this.padding * 2);
+        _this.plotHeight = _this.height - (_this.padding * 2);
         return _this;
     }
     GPSController.prototype.generate = function () {
@@ -20,19 +23,15 @@ var GPSController = (function (_super) {
         this.wrapper.className = "plot-wrapper";
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.width = this.canvas.getWidth();
-        this.height = this.canvas.getHeight();
-        this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
+        this.canvas.setSize(this.width, this.height);
         this.relSize = null;
         return this.wrapper;
     };
     GPSController.prototype.onSizeChange = function () {
         this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
+        this.plotWidth = this.width - (this.padding * 2);
+        this.plotHeight = this.height - (this.padding * 2);
         this.draw();
     };
     GPSController.prototype.draw = function () {
@@ -44,17 +43,16 @@ var GPSController = (function (_super) {
             this.ctxMain.strokeStyle = this.color;
             this.findMinMax();
             this.rescale();
-            this.rescale();
+            offsetX = (this.width - this.plotWidth) / 2;
+            offsetY = (this.height - this.plotHeight) / 2;
+            console.log(offsetX, offsetY);
+            this.padding = 0;
             if (this.posData.points.length > 0) {
                 var firstPoint = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
-                this.ctxMain.moveTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
             }
             for (var i = 0; i < this.posData.points.length; i++) {
                 var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
                 var absPoint = this.getAbsolute(relPoint);
                 this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
             }
@@ -76,12 +74,10 @@ var GPSController = (function (_super) {
         }
     };
     GPSController.prototype.rescale = function () {
-        var newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        var newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
-        this.absWidth = newWidth;
-        this.absHeight = newHeight;
-        var xRatio = this.width / newWidth;
-        var yRatio = this.height / newHeight;
+        var oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        var oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        var xRatio = this.plotWidth / oldWidth;
+        var yRatio = this.plotHeight / oldHeight;
         var ratio = Math.min(xRatio, yRatio);
         var first = new Point(this.relSize.min.x, this.relSize.min.y);
         this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
@@ -89,10 +85,12 @@ var GPSController = (function (_super) {
         var sec = this.getAbsolute(first);
         sec.y = this.height - sec.y;
         this.movePoint = this.movePoint.sub(sec);
+        this.plotWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        this.plotHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        console.log(this.plotWidth, this.plotHeight);
     };
     GPSController.prototype.setData = function (d) {
         this.posData = d;
-        console.log(d);
         this.onDataChange();
     };
     GPSController.prototype.onDataChange = function () {

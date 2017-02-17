@@ -170,7 +170,7 @@ class GPSPlotTester implements IApplication {
 
     draw(): void {
         this.plot.setData(this.testData);
-        this.plot.setSize(this.window.width, this.window.height);
+        //this.plot.setSize(this.window.width, this.window.height);
     }
 
         
