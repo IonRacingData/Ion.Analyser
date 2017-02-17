@@ -8,9 +8,10 @@
     private selectedPoint: Point = null;
     private isMarking = false;
     private marking: IMarking;
-    private displayGrid = true;
-    private stickyAxes = true;
-    private autoScroll = false;
+    private displayGrid: boolean = true;
+    private stickyAxes: boolean = true;
+    private autoScroll: boolean = false;
+    private autoScroll_plotMoved: boolean = false;
     private gridColor = "rgba(100,100,100,0.3)";
     private axisColor = "white";// "black"; // "black";
     private mainColor = "white";
@@ -37,130 +38,17 @@
         this.wrapper.addEventListener("mousedown", (e: MouseEvent) => this.wrapper_mouseDown(e));
         this.wrapper.addEventListener("mousemove", (e: MouseEvent) => this.wrapper_mouseMove(e));
         this.wrapper.addEventListener("mouseup", (e: MouseEvent) => this.wrapper_mouseUp(e));
+        this.wrapper.addEventListener("mouseleave", (e: MouseEvent) => this.wrapper_mouseLeave(e));
 
         this.wrapper.addEventListener("touchstart", (e: TouchEvent) => this.wrapper_touchStart(e));
         this.wrapper.addEventListener("touchmove", (e: TouchEvent) => this.wrapper_touchMove(e));
         this.wrapper.addEventListener("touchend", (e: TouchEvent) => this.wrapper_touchEnd(e));
 
-        this.wrapper.addEventListener("mouseleave", () => {
-            this.mouseDown = false;
-            this.isMarking = false;
-            this.ctxMarking.clear();
-        });
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
 
         this.draw();
         return this.wrapper;
-    }
-
-    private wrapper_keyDown(e: KeyboardEvent) {
-        switch (e.key) {
-            case "g":
-                this.displayGrid = this.displayGrid === true ? false : true;
-                break;
-            case "r":
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
-                break;
-            case "a":
-                this.stickyAxes = this.stickyAxes === true ? false : true;
-                break;
-            case "k":
-                this.autoScroll = this.autoScroll === true ? false : true;
-                break;
-        }
-        this.draw();
-    }
-
-    private wrapper_mouseDown(e: MouseEvent): void {
-        e.preventDefault();
-        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
-        this.mouseDown = true;
-        if (e.altKey) {
-            this.isMarking = true;
-            var mousePoint: Point = this.getMousePoint(e);
-            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-            console.log(this.marking.firstPoint);
-        }
-    }
-
-    private wrapper_mouseMove(e: MouseEvent): void {
-        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
-            if (this.isMarking) {
-                this.marking.secondPoint = this.getMousePoint(e);
-                this.drawMarking();
-            }
-            else {
-                this.isDragging = true;
-                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
-                this.draw();
-            }
-
-        }
-    }
-
-    private wrapper_mouseUp(e: MouseEvent): void {
-        this.wrapper.focus();
-        this.mouseDown = false;
-        if (this.isDragging) {
-            this.isDragging = false;
-        }
-        else if (this.isMarking) {
-            this.isMarking = false;
-            if (this.marking.width !== 0 && this.marking.height !== 0) {
-                this.zoomByMarking();
-            }
-        }
-        else {
-            this.selectPoint(this.getMousePoint(e));
-        }
-    }
-
-    private wrapper_touchStart(e: TouchEvent): void {
-        e.preventDefault();
-        console.log(e);
-        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
-        this.mouseDown = true;
-        if (e.altKey) {
-            this.isMarking = true;
-            var mousePoint: Point = this.getTouchPoint(e);
-            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
-            console.log(this.marking.firstPoint);
-        }
-    }
-
-    private wrapper_touchMove(e: TouchEvent): void {
-        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
-            if (this.isMarking) {
-                this.marking.secondPoint = this.getTouchPoint(e);
-                this.drawMarking();
-            }
-            else {
-                this.isDragging = true;
-                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
-                this.draw();
-            }
-
-        }
-    }
-
-    private wrapper_touchEnd(e: TouchEvent): void {
-        console.log(e);
-        this.wrapper.focus();
-        this.mouseDown = false;
-        if (this.isDragging) {
-            this.isDragging = false;
-        }
-        else if (this.isMarking) {
-            this.isMarking = false;
-            if (this.marking.width !== 0 && this.marking.height !== 0) {
-                this.zoomByMarking();
-            }
-        }
-        else {
-            this.selectPoint(this.getTouchPoint(e));
-        }
     }
 
     private drawMarking(): void {
@@ -179,12 +67,23 @@
     }
 
     protected onDataChange(): void {
-        if (this.autoScroll) {
+        if (this.autoScroll && !this.mouseDown) {
             this.moveToLastPoint();
+            if (this.autoScroll_plotMoved) {
+                this.autoScroll_plotMoved = false;
+                this.autoScaleY();                
+            }
         }
+
         this.draw();
     }
 
+    protected onSensorChange(): void {
+        if (this.data.length > 0) {
+            this.autoScaleY();            
+        }
+    }
+    
     private moveToLastPoint(): void {
         if (this.data[0]) {
             let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
@@ -253,15 +152,6 @@
         var move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
         this.movePoint = this.movePoint.add(move);
         this.draw();
-    }
-
-    getTouchPoint(e: TouchEvent): Point {
-        if (e.touches.length > 0) {
-            return new Point(e.touches[0].clientX, e.touches[0].clientY);
-        }
-        else {
-            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-        }
     }
 
     protected draw(): void {
@@ -342,7 +232,7 @@
         this.ctxMain.lineTo(this.width, y);
         this.ctxMain.stroke();
 
-        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.x);
+        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.x * 1000);
         var steps: number = stepping.steps;
         var decimalPlaces: number = stepping.decimalPlaces;
         var scale: number = stepping.scale;
@@ -351,23 +241,25 @@
             this.ctxMain.beginPath();
             var absX: number = i + this.movePoint.x % steps;
             var transformer: Point = this.getRelative(new Point(absX, y));
-            var number: string;
+            var num: string;
             var numWidth: number;
             var numOffset: number;
 
-            if (Math.abs(transformer.x).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
-                number = "     0";
+            let val = transformer.x / 1000;
+
+            if (Math.abs(val).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
+                num = "     0";
             }
-            else if (Math.abs(scale) > 5) {
-                number = transformer.x.toExponential(2);
+            else if (Math.abs(scale) > 5) {                
+                num = val.toExponential(2);
             }
             else {
-                number = transformer.x.toFixed(decimalPlaces);
+                num = val.toFixed(decimalPlaces);
             }
 
-            numWidth = this.ctxMain.measureText(number);
+            numWidth = this.ctxMain.measureText(num);
             numOffset = y === this.height ? y - 15 : y + 15;
-            this.ctxMain.fillText(number, absX - (numWidth / 2), numOffset);
+            this.ctxMain.fillText(num, absX - (numWidth / 2), numOffset);
 
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
@@ -500,6 +392,153 @@
         this.movePoint = this.movePoint.sub(sec);
 
         this.draw();
+    }
+
+    private autoScaleY(): void {
+        let min: number = 0;
+        let max: number = 0;
+
+        for (let i = 0; i < this.data.length; i++) {
+            let info = this.sensorInfos[this.data[i].ID.toString()];
+            let dmin: number = SensorInfoHelper.minValue(info);
+            let dmax: number = SensorInfoHelper.maxValue(info);            
+            min = dmin < min ? dmin : min;
+            max = dmax > max ? dmax : max;
+        }
+
+        if (min !== max) {
+            let padding: number = (max - min) * 0.2;
+            min -= padding / 2;
+            max += padding / 2;
+            let minAbs: number = this.getAbsolute(new Point(0, min)).y;
+            let maxAbs: number = this.getAbsolute(new Point(0, max)).y;
+            let plotHeight = Math.abs(maxAbs - minAbs);
+
+            let ratio: number = this.height / plotHeight;
+            let first = min;
+            this.scalePoint.y *= ratio;
+            let sec = this.getAbsolute(new Point(0, first)).y;
+            sec = this.height - sec;
+            this.movePoint.y -= sec;
+
+            this.draw();            
+        }
+
+    }
+
+    private wrapper_keyDown(e: KeyboardEvent) {
+        switch (e.key) {
+            case "g":
+                this.displayGrid = this.displayGrid === true ? false : true;
+                break;
+            case "r":
+                this.scalePoint = new Point(1, 1);
+                this.movePoint = new Point(50, 50);
+                break;
+            case "a":
+                this.stickyAxes = this.stickyAxes === true ? false : true;
+                break;
+            case "k":
+                this.autoScroll = this.autoScroll === true ? false : true;
+                break;
+        }
+        this.draw();
+    }
+
+    private wrapper_mouseLeave(e: MouseEvent) {
+        this.mouseDown = false;
+        this.isMarking = false;
+        this.ctxMarking.clear();
+    }
+
+    private wrapper_mouseDown(e: MouseEvent): void {
+        e.preventDefault();
+        this.mouseMod = new Point(this.movePoint.x - e.layerX, this.movePoint.y - (this.height - e.layerY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint: Point = this.getMousePoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+        }
+    }
+
+    private wrapper_mouseMove(e: MouseEvent): void {
+        if (this.mouseDown && (e.movementX !== 0 || e.movementY !== 0)) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getMousePoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.autoScroll_plotMoved = true;
+                this.isDragging = true;
+                this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
+                this.draw();
+            }
+
+        }
+    }
+
+    private wrapper_mouseUp(e: MouseEvent): void {
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getMousePoint(e));
+        }
+    }
+
+    private wrapper_touchStart(e: TouchEvent): void {
+        e.preventDefault();
+        console.log(e);
+        this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
+        this.mouseDown = true;
+        if (e.altKey) {
+            this.isMarking = true;
+            var mousePoint: Point = this.getTouchPoint(e);
+            this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
+            console.log(this.marking.firstPoint);
+        }
+    }
+
+    private wrapper_touchMove(e: TouchEvent): void {
+        if (this.mouseDown /*&& (e.movementX !== 0 || e.movementY !== 0)*/) {
+            if (this.isMarking) {
+                this.marking.secondPoint = this.getTouchPoint(e);
+                this.drawMarking();
+            }
+            else {
+                this.isDragging = true;
+                this.movePoint = new Point(e.touches[0].clientX + this.mouseMod.x, (this.height - e.touches[0].clientY) + this.mouseMod.y);
+                this.draw();
+            }
+
+        }
+    }
+
+    private wrapper_touchEnd(e: TouchEvent): void {
+        console.log(e);
+        this.wrapper.focus();
+        this.mouseDown = false;
+        if (this.isDragging) {
+            this.isDragging = false;
+        }
+        else if (this.isMarking) {
+            this.isMarking = false;
+            if (this.marking.width !== 0 && this.marking.height !== 0) {
+                this.zoomByMarking();
+            }
+        }
+        else {
+            this.selectPoint(this.getTouchPoint(e));
+        }
     }
 }
 

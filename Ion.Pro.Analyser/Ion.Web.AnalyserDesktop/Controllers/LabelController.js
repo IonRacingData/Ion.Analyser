@@ -27,6 +27,11 @@ var LabelController = (function (_super) {
         this.wrapper.style.height = this.height * 0.87 + "px";
         this.adjustFontSize();
     };
+    LabelController.prototype.onDataChange = function () {
+        var val = this.percent * 100;
+        this.textWrapper.innerHTML = val.toFixed(2);
+        this.adjustFontSize();
+    };
     LabelController.prototype.adjustFontSize = function () {
         if (this.textWrapper.offsetWidth > 0) {
             var height = this.height;

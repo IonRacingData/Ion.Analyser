@@ -36,30 +36,22 @@
 
         if (this.horizontal) {
             this.wrapper.style.flexDirection = "row";
-            this.bar1.style.height = 100 + "%";
+            this.bar1.style.height = "100%";
             if (this.double) {
-                this.bar2.style.height = 100 + "%";
+                this.bar2.style.height = "100%";
                 this.barWrapper1.style.justifyContent = "flex-end";
             }
         }
         else {
             this.wrapper.style.flexDirection = "column";
-            this.bar1.style.width = 100 + "%";
+            this.bar1.style.width = "100%";
             if (this.double) {
-                this.bar2.style.width = 100 + "%";
+                this.bar2.style.width = "100%";
             }
         }
 
         return this.wrapper;
-    }
-
-    // temp
-    setValue(percent: number): void {
-        percent = percent < -1 ? -1 : percent;
-        percent = percent > 1 ? 1 : percent;
-        this.value = percent;
-        this.onDataChange();
-    }
+    }    
 
     protected onSizeChange(): void {
         this.wrapper.style.width = this.width + "px";
@@ -67,24 +59,28 @@
     }
 
     protected onDataChange(): void {
-        let val = this.value * 100;
+        
+        let val = this.percent * 100;
+        if (this.double) {
+            val = (val - 50) * 2;
+        }
 
         if (this.horizontal) {
             if (this.double) {
-                this.bar2.style.width = val < 0 ? 0 + "%" : val + "%";
-                this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : 0 + "%";
+                this.bar2.style.width = val < 0 ? "0%" : val + "%";
+                this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : "0%";
             }
             else {
-                this.bar1.style.width = val < 0 ? 0 + "%" : val + "%";
+                this.bar1.style.width = val < 0 ? "0%" : val + "%";
             }
         }
         else {
             if (this.double) {
-                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
-                this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : 0 + "%";
+                this.bar1.style.height = val < 0 ? "0%" : val + "%";
+                this.bar2.style.height = val < 0 ? Math.abs(val) + "%" : "0%";
             }
             else {
-                this.bar1.style.height = val < 0 ? 0 + "%" : val + "%";
+                this.bar1.style.height = val < 0 ? "0%" : val + "%";
             }
         }
     }

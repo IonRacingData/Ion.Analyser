@@ -55,7 +55,7 @@
         return this.wrapper;
     }
 
-    draw(): void {
+    protected draw(): void {
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         let radius = this.size / 2;
@@ -97,12 +97,15 @@
 
     private drawNeedle(): void {
 
+        let val = this.percent * 100;
+
+
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         let radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-
-        let ang = (this.value / 100) * this.totalAngle;
+    
+        let ang = (val / 100) * this.totalAngle;
 
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
@@ -111,14 +114,7 @@
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
-    }
-
-    setValue(percent: number): void {
-        percent = percent > 100 ? 100 : percent;
-        percent = percent < 0 ? 0 : percent;
-        this.value = percent;
-        this.drawNeedle();
-    }
+    }    
 
     protected onSizeChange(): void {
         this.size = Math.min(this.width, this.height);
@@ -126,5 +122,9 @@
         this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
         this.canvas.setSize(this.width, this.height);
         this.draw();
+    }
+
+    protected onDataChange(): void {        
+        this.drawNeedle();
     }
 }

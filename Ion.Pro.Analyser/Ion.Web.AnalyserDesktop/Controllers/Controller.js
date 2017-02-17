@@ -12,18 +12,39 @@ var Controller = (function () {
         this.height = height;
         this.onSizeChange();
     };
-    Controller.prototype.onDataChange = function () { };
-    ; // to be abstract
     return Controller;
 }());
 var SingleValueController = (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.percent = 0;
+        _this.value = 0;
+        _this.lastID = -1;
+        return _this;
     }
     SingleValueController.prototype.setData = function (d) {
+        var _this = this;
         this.data = d;
+        if (this.data) {
+            var curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, function (i) {
+                    _this.lastSensorInfo = i;
+                    _this.lastID = _this.data.ID;
+                    _this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                }
+                this.onDataChange();
+            }
+        }
     };
+    SingleValueController.prototype.setValue = function (value) { };
     return SingleValueController;
 }(Controller));
 var CanvasController = (function (_super) {
@@ -44,24 +65,80 @@ var CanvasController = (function (_super) {
     CanvasController.prototype.getMousePoint = function (e) {
         return new Point(e.layerX, e.layerY);
     };
+    CanvasController.prototype.getTouchPoint = function (e) {
+        if (e.touches.length > 0)
+            return new Point(e.touches[0].clientX, e.touches[0].clientY);
+        else
+            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    };
     return CanvasController;
 }(Controller));
 var MultiValueCanvasController = (function (_super) {
     __extends(MultiValueCanvasController, _super);
     function MultiValueCanvasController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.sensorInfos = {};
+        _this.lastDataLength = 0;
+        return _this;
     }
     MultiValueCanvasController.prototype.setData = function (d) {
+        var _this = this;
         this.data = d;
+        if (this.lastDataLength !== this.data.length) {
+            this.lastDataLength = this.data.length;
+            kernel.senMan.getInfos(function (infos) {
+                _this.updateSensorInfos(infos);
+            });
+        }
         this.onDataChange();
     };
+    MultiValueCanvasController.prototype.updateSensorInfos = function (infos) {
+        this.sensorInfos = {};
+        for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
+            var i = infos_1[_i];
+            for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
+                var d = _b[_a];
+                if (d.ID === i.ID) {
+                    this.sensorInfos[i.ID.toString()] = i;
+                }
+            }
+        }
+        console.log(this.sensorInfos);
+        this.onSensorChange();
+    };
+    MultiValueCanvasController.prototype.onSensorChange = function () { };
     return MultiValueCanvasController;
 }(CanvasController));
 var SingleValueCanvasController = (function (_super) {
     __extends(SingleValueCanvasController, _super);
     function SingleValueCanvasController() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.percent = 0;
+        _this.value = 0;
+        _this.lastID = -1;
+        return _this;
     }
+    SingleValueCanvasController.prototype.setData = function (d) {
+        var _this = this;
+        this.data = d;
+        if (this.data) {
+            var curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, function (i) {
+                    _this.lastSensorInfo = i;
+                    _this.lastID = _this.data.ID;
+                    _this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                }
+                this.onDataChange();
+            }
+        }
+    };
     return SingleValueCanvasController;
 }(CanvasController));
 //# sourceMappingURL=Controller.js.map

@@ -27,6 +27,12 @@
         this.adjustFontSize();
     }
 
+    protected onDataChange(): void {
+        let val = this.percent * 100;
+        this.textWrapper.innerHTML = val.toFixed(2);
+        this.adjustFontSize();
+    }
+
     private adjustFontSize() {
         if (this.textWrapper.offsetWidth > 0) {
             let height: number = this.height;

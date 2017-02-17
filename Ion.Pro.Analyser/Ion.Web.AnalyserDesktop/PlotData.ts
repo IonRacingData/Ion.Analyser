@@ -272,4 +272,8 @@ class PlotDataViewer implements IPlotData1 {
     public getValue(index: number): Point {
         return this.realData.points[index];
     }
+
+    public getLastValue(): Point {
+        return this.realData.points[this.realData.points.length - 1];
+    }
 }

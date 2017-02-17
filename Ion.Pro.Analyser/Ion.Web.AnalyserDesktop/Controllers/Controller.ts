@@ -10,17 +10,40 @@
         this.onSizeChange();
     }
     protected abstract onSizeChange(): void;
-    protected onDataChange(): void { }; // to be abstract
+    protected abstract onDataChange(): void;
     public abstract generate(): HTMLElement;
 }
 
 abstract class SingleValueController extends Controller {
-    protected value: number;
+    protected percent: number = 0;
+    protected value: number = 0;
     protected data: IPlotData1;
+    protected lastID: number = -1;
+    protected lastSensorInfo: SensorInformation;
+
     public setData(d: IPlotData1) {
         this.data = d;
+
+        if (this.data) {
+            let curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
+                    this.lastSensorInfo = i;
+                    this.lastID = this.data.ID;
+                    this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                }
+                this.onDataChange();
+            }
+        }
     }
-    public abstract setValue(value: number): void;
+
+    public setValue(value: number): void { }    
 }
 
 abstract class CanvasController extends Controller {
@@ -44,18 +67,75 @@ abstract class CanvasController extends Controller {
         return new Point(e.layerX, e.layerY);
     }
 
+    protected getTouchPoint(e: TouchEvent): Point {
+        if (e.touches.length > 0)
+            return new Point(e.touches[0].clientX, e.touches[0].clientY);
+        else
+            return new Point(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }
+
     protected abstract draw(): void;
 }
 
 abstract class MultiValueCanvasController extends CanvasController {
     protected data: IPlotData1[];
+    protected sensorInfos: { [id: string]: SensorInformation } = {};
+    private lastDataLength: number = 0;
+
     public setData(d: IPlotData1[]): void {
         this.data = d;
+        if (this.lastDataLength !== this.data.length) {
+            this.lastDataLength = this.data.length;
+            kernel.senMan.getInfos((infos: SensorInformation[]) => {                
+                this.updateSensorInfos(infos);
+            });
+        }
         this.onDataChange();
     }
+
+    private updateSensorInfos(infos: SensorInformation[]) {
+        this.sensorInfos = {};
+
+        for (let i of infos) {
+            for (let d of this.data) {
+                if (d.ID === i.ID) {
+                    this.sensorInfos[i.ID.toString()] = i;
+                }
+            }
+        }
+        console.log(this.sensorInfos);
+        this.onSensorChange();
+    }
+
+    protected onSensorChange(): void { }
 }
 
 abstract class SingleValueCanvasController extends CanvasController {
-    protected value: number;
-    public abstract setValue(value: number): void;
+    protected percent: number = 0;
+    protected value: number = 0;
+    protected data: IPlotData1;
+    protected lastID: number = -1;
+    protected lastSensorInfo: SensorInformation;    
+    
+    public setData(d: IPlotData1) {
+        this.data = d;
+
+        if (this.data) {
+            let curID = this.data.ID;
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
+                    this.lastSensorInfo = i;
+                    this.lastID = this.data.ID;
+                    this.onDataChange();
+                });
+            }
+            else {
+                if (this.lastSensorInfo) {
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
+                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                }
+                this.onDataChange();
+            }
+        }
+    }
 }

@@ -81,11 +81,12 @@ var GaugeController = (function (_super) {
         this.drawNeedle();
     };
     GaugeController.prototype.drawNeedle = function () {
+        var val = this.percent * 100;
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         var radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-        var ang = (this.value / 100) * this.totalAngle;
+        var ang = (val / 100) * this.totalAngle;
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
         this.ctxNeedle.beginPath();
@@ -94,18 +95,15 @@ var GaugeController = (function (_super) {
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
     };
-    GaugeController.prototype.setValue = function (percent) {
-        percent = percent > 100 ? 100 : percent;
-        percent = percent < 0 ? 0 : percent;
-        this.value = percent;
-        this.drawNeedle();
-    };
     GaugeController.prototype.onSizeChange = function () {
         this.size = Math.min(this.width, this.height);
         this.offsetX = (this.width - this.size) / 2;
         this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
         this.canvas.setSize(this.width, this.height);
         this.draw();
+    };
+    GaugeController.prototype.onDataChange = function () {
+        this.drawNeedle();
     };
     return GaugeController;
 }(SingleValueCanvasController));

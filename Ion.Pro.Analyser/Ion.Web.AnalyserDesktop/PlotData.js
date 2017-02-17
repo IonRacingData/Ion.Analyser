@@ -187,6 +187,9 @@ var PlotDataViewer = (function () {
     PlotDataViewer.prototype.getValue = function (index) {
         return this.realData.points[index];
     };
+    PlotDataViewer.prototype.getLastValue = function () {
+        return this.realData.points[this.realData.points.length - 1];
+    };
     return PlotDataViewer;
 }());
 //# sourceMappingURL=PlotData.js.map
