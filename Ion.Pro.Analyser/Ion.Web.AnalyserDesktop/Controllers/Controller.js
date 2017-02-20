@@ -27,11 +27,11 @@ var SingleValueController = (function (_super) {
         var _this = this;
         this.data = d;
         if (this.data) {
-            var curID = this.data.ID;
+            var curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, function (i) {
                     _this.lastSensorInfo = i;
-                    _this.lastID = _this.data.ID;
+                    _this.lastID = _this.data.infos.IDs[0];
                     _this.onDataChange();
                 });
             }
@@ -98,7 +98,7 @@ var MultiValueCanvasController = (function (_super) {
             var i = infos_1[_i];
             for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
                 var d = _b[_a];
-                if (d.ID === i.ID) {
+                if (d.infos.IDs[0] === i.ID) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -122,11 +122,11 @@ var SingleValueCanvasController = (function (_super) {
         var _this = this;
         this.data = d;
         if (this.data) {
-            var curID = this.data.ID;
+            var curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, function (i) {
                     _this.lastSensorInfo = i;
-                    _this.lastID = _this.data.ID;
+                    _this.lastID = _this.data.infos.IDs[0];
                     _this.onDataChange();
                 });
             }

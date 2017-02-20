@@ -1,8 +1,6 @@
-﻿/*jshint bitwise: false*/
-
-class SensorManager implements IEventManager {
+﻿class SensorManager implements IEventManager {
     private dataCache: ISensorPackage[][] = [];
-    private plotCache: PlotData[] = [];
+    private plotCache: SensorDataContainer[] = [];
 
     plotter: IPlot[] = [];
 
@@ -29,7 +27,7 @@ class SensorManager implements IEventManager {
             this.dataCache[sensId].push(realData);
 
             if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new PlotData([]);
+                this.plotCache[sensId] = new SensorDataContainer([]);
                 this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
@@ -88,7 +86,7 @@ class SensorManager implements IEventManager {
         }
     }
 
-    getPlotData(id: number, callback: (data: PlotData) => void): void {
+    getPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
         if (!this.plotCache[id]) {
             this.loadPlotData(id, callback);
         }
@@ -97,7 +95,7 @@ class SensorManager implements IEventManager {
         }
     }
 
-    private loadPlotData(id: number, callback: (data: PlotData) => void): void {
+    private loadPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
         this.loadData(id, (data: ISensorPackage[]): void => {
             let plot = this.convertData(data);
             this.plotCache[id] = plot;
@@ -105,7 +103,7 @@ class SensorManager implements IEventManager {
         });
     }
 
-    private convertData(data: ISensorPackage[]): PlotData {
+    private convertData(data: ISensorPackage[]): SensorDataContainer {
         if (data.length < 1) {
             return null;
         }
@@ -114,7 +112,7 @@ class SensorManager implements IEventManager {
         for (let i = 0; i < data.length; i++) {
             p.push(new Point(data[i].TimeStamp, data[i].Value));
         }
-        let plot = new PlotData(p);
+        let plot = new SensorDataContainer(p);
         plot.ID = id;
         return plot;
 
@@ -203,7 +201,7 @@ class SensorManager implements IEventManager {
     public getSensorInfo(data: IPlotData, callback: (data: SensorInformation) => void) {
         this.getLoadedInfos((all: SensorInformation[]) => {
             for (let i = 0; i < all.length; i++) {
-                if (all[i].ID === data.ID) {
+                if (all[i].ID === data.infos.IDs[0]) {
                     callback(all[i]);
                     break;
                 }
@@ -269,6 +267,10 @@ class Multicallback {
             this.callback.apply(null, this.responses);
         }
     }
+}
+
+class SensorPlotInfo {
+    IDs: number[] = [];
 }
 
 class SensorInformation {

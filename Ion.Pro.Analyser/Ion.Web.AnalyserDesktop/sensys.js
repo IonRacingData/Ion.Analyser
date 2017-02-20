@@ -1,4 +1,3 @@
-/*jshint bitwise: false*/
 var SensorManager = (function () {
     function SensorManager() {
         var _this = this;
@@ -18,7 +17,7 @@ var SensorManager = (function () {
             }
             this.dataCache[sensId].push(realData);
             if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new PlotData([]);
+                this.plotCache[sensId] = new SensorDataContainer([]);
                 this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
@@ -94,7 +93,7 @@ var SensorManager = (function () {
         for (var i = 0; i < data.length; i++) {
             p.push(new Point(data[i].TimeStamp, data[i].Value));
         }
-        var plot = new PlotData(p);
+        var plot = new SensorDataContainer(p);
         plot.ID = id;
         return plot;
     };
@@ -175,7 +174,7 @@ var SensorManager = (function () {
     SensorManager.prototype.getSensorInfo = function (data, callback) {
         this.getLoadedInfos(function (all) {
             for (var i = 0; i < all.length; i++) {
-                if (all[i].ID === data.ID) {
+                if (all[i].ID === data.infos.IDs[0]) {
                     callback(all[i]);
                     break;
                 }
@@ -235,6 +234,12 @@ var Multicallback = (function () {
         }
     };
     return Multicallback;
+}());
+var SensorPlotInfo = (function () {
+    function SensorPlotInfo() {
+        this.IDs = [];
+    }
+    return SensorPlotInfo;
 }());
 var SensorInformation = (function () {
     function SensorInformation() {

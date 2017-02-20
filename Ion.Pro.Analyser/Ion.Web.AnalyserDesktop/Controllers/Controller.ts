@@ -25,11 +25,11 @@ abstract class SingleValueController extends Controller {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.ID;
+            let curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
                     this.lastSensorInfo = i;
-                    this.lastID = this.data.ID;
+                    this.lastID = this.data.infos.IDs[0];
                     this.onDataChange();
                 });
             }
@@ -98,7 +98,7 @@ abstract class MultiValueCanvasController extends CanvasController {
 
         for (let i of infos) {
             for (let d of this.data) {
-                if (d.ID === i.ID) {
+                if (d.infos.IDs[0] === i.ID) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -121,11 +121,11 @@ abstract class SingleValueCanvasController extends CanvasController {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.ID;
+            let curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
                 kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
                     this.lastSensorInfo = i;
-                    this.lastID = this.data.ID;
+                    this.lastID = this.data.infos.IDs[0];
                     this.onDataChange();
                 });
             }

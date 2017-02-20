@@ -29,16 +29,16 @@ var Color = (function () {
     };
     return Color;
 }());
-var PlotData = (function () {
-    function PlotData(p) {
+var SensorDataContainer = (function () {
+    function SensorDataContainer(p) {
         this.points = p;
         this.color = Color.randomColor(0, 255 + 128);
     }
-    PlotData.prototype.getClosest = function (p) {
+    SensorDataContainer.prototype.getClosest = function (p) {
         return this.points[this.getIndexOf(p)];
     };
     // returns index of closest point to 'p' on x-axis
-    PlotData.prototype.getIndexOf = function (p) {
+    SensorDataContainer.prototype.getIndexOf = function (p) {
         var min = 0;
         var max = this.points.length - 1;
         var half;
@@ -65,7 +65,7 @@ var PlotData = (function () {
             }
         }
     };
-    return PlotData;
+    return SensorDataContainer;
 }());
 var PlotDataHelper = (function () {
     function PlotDataHelper() {
@@ -177,8 +177,9 @@ var Point4D = (function () {
 var PlotDataViewer = (function () {
     function PlotDataViewer(realData) {
         this.__isPlotData1 = {};
+        this.infos = new SensorPlotInfo();
         this.realData = realData;
-        this.ID = realData.ID;
+        this.infos.IDs.push(realData.ID);
         this.color = realData.color;
     }
     PlotDataViewer.prototype.getLength = function () {

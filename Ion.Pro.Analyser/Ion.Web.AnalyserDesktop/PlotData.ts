@@ -14,7 +14,7 @@
         }
     }
 
-    public toString() {
+    public toString(): string {
         if (this.a) {
             return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
         }
@@ -40,7 +40,7 @@
     }
 }
 
-class PlotData {
+class SensorDataContainer {
     ID: number;
     color: Color;
     points: Point[];
@@ -229,7 +229,7 @@ class Point4D implements IPoint<Point4D> {
 }
 
 interface IPlotData {
-    ID: number;
+    infos: SensorPlotInfo;
     color: Color;
 
     getLength(): number;
@@ -253,15 +253,14 @@ interface IPlotData3 extends IPlotDataBase<Point4D> {
 
 class PlotDataViewer implements IPlotData1 {
     public __isPlotData1: any = {};
-
-    public ID: number;
+    infos: SensorPlotInfo = new SensorPlotInfo();
     public color: Color;
-    private realData: PlotData;
+    private realData: SensorDataContainer;
 
 
-    constructor(realData: PlotData) {
+    constructor(realData: SensorDataContainer) {
         this.realData = realData;
-        this.ID = realData.ID;
+        this.infos.IDs.push(realData.ID);
         this.color = realData.color;
     }
 

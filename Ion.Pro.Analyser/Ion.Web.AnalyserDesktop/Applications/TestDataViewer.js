@@ -104,7 +104,7 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID === sensor.ID) {
+        if (plot.plotData && plot.plotData.infos.IDs[0] === sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", function (e) {
@@ -122,7 +122,7 @@ var DataAssigner = (function () {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
         for (var i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID === sensor.ID) {
+            if (plot.plotData[i].infos.IDs[0] === sensor.ID) {
                 checkBox.checked = true;
                 break;
             }
@@ -139,7 +139,7 @@ var DataAssigner = (function () {
             }
             else {
                 for (var i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID === sensor.ID) {
+                    if (plot.plotData[i].infos.IDs[0] === sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;

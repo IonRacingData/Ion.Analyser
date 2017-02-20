@@ -116,13 +116,13 @@
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID === sensor.ID) {
+        if (plot.plotData && plot.plotData.infos.IDs[0] === sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", (e: Event) => {
             radio.disabled = true;
             console.log("Single checkbox click");
-            kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
+            kernel.senMan.getPlotData(sensor.ID, (data: SensorDataContainer) => {
                 plot.plotData = new PlotDataViewer(data);
                 plot.dataUpdate();
                 radio.disabled = false;
@@ -135,7 +135,7 @@
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
         for (let i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID === sensor.ID) {
+            if (plot.plotData[i].infos.IDs[0] === sensor.ID) {
                 checkBox.checked = true;
                 break;
             }
@@ -145,7 +145,7 @@
             checkBox.disabled = true;
             console.log("Multi checkbox click");
             if (checkBox.checked) {
-                kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
+                kernel.senMan.getPlotData(sensor.ID, (data: SensorDataContainer) => {
                     plot.plotData.push(new PlotDataViewer(data));
                     plot.dataUpdate();
                     checkBox.disabled = false;
@@ -153,7 +153,7 @@
             }
             else {
                 for (let i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID === sensor.ID) {
+                    if (plot.plotData[i].infos.IDs[0] === sensor.ID) {
                         plot.plotData.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;
