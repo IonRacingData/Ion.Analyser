@@ -174,23 +174,4 @@ var Point4D = (function () {
     };
     return Point4D;
 }());
-var PlotDataViewer = (function () {
-    function PlotDataViewer(realData) {
-        this.__isPlotData1 = {};
-        this.infos = new SensorPlotInfo();
-        this.realData = realData;
-        this.infos.IDs.push(realData.ID);
-        this.color = realData.color;
-    }
-    PlotDataViewer.prototype.getLength = function () {
-        return this.realData.points.length;
-    };
-    PlotDataViewer.prototype.getValue = function (index) {
-        return this.realData.points[index];
-    };
-    PlotDataViewer.prototype.getLastValue = function () {
-        return this.realData.points[this.realData.points.length - 1];
-    };
-    return PlotDataViewer;
-}());
 //# sourceMappingURL=PlotData.js.map
