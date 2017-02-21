@@ -32,7 +32,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(BarTester, "Bar Test"));
-    kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
+    //kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
