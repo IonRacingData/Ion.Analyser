@@ -26,9 +26,6 @@ window.addEventListener("load", function () {
     function isViewer(test) {
         return test.dataSource !== undefined;
     }
-    function isTypeDef(value) {
-        return value.type !== undefined;
-    }
     if (isViewer(g)) {
     }
 });

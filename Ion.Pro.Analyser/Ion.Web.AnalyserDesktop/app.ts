@@ -2,6 +2,7 @@
 
     let a: IDataSource<Point>;
 
+    
 
     a = new PointSensorGroup();
 
@@ -12,7 +13,7 @@
     let testArray: IDataSource<any>[] = [];
     testArray.push(a);
 
-    function getFrom<T>(type: IClassType<T>): IDataSource<T> {
+    function getFrom<T>(type: IClassType<any>): IDataSource<T> {
         for (let val of testArray) {
             if (val.type === type) {
                 return val;
@@ -21,7 +22,7 @@
         return null;
     }
 
-    let b = <ITypeDef<Point>>getFrom(Point);
+    let b = <ITypeDef>getFrom(Point);
     
     alert((<any>b.type).name);
 
@@ -34,10 +35,6 @@
     //startUp();
     function isViewer<T>(test: IViewerBase): test is IViewer<T> {
         return (<IViewer<T>>test).dataSource !== undefined;
-    }
-
-    function isTypeDef(value: any): value is ITypeDef<any> {
-        return (<ITypeDef<any>>value).type !== undefined;
     }
 
 
@@ -53,12 +50,12 @@ interface IClassType<T> {
     new (...param: any[]): T;
 }
 
-interface ITypeDef<T> {
-    type: IClassType<T>;
+interface ITypeDef {
+    type: IClassType<any>;
 }
 
 
-interface IDataSource<T> extends ITypeDef<T> {
+interface IDataSource<T> extends ITypeDef {
     getValue(index: number): T;
     length(): number;
 }
@@ -85,21 +82,21 @@ class PointSensorGroup extends SensorGroup<Point>{
     }
 }
 
-interface IViewerBase {
+interface IViewerBase extends ITypeDef {
     dataUpdate(): void;
     plotType: string;
     plotWindow: AppWindow;
 }
 
-interface IViewer<T> extends IViewerBase, ITypeDef<T> {
+interface IViewer<T> extends IViewerBase, ITypeDef {
     dataSource: IDataSource<T>;
 }
 
-interface ICollectionViewer<T> extends IViewerBase, ITypeDef<T> {
+interface ICollectionViewer<T> extends IViewerBase, ITypeDef {
     dataCollectionSource: IDataSource<T>[];
 }
 
-class TestClass implements IViewer<Point>{
+class TestClass implements IViewer<Point> {
     plotType: string;
     plotWindow: AppWindow;
     dataSource: IDataSource<Point>;
