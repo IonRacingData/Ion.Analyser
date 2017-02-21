@@ -86,13 +86,13 @@ class SensorDataContainer {
 }
 
 class PlotDataHelper {
-    public static getClosest(plotData: IPlotData1, p: Point): Point {
+    public static getClosest(plotData: IDataSource<Point>, p: Point): Point {
         return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
     }
 
-    public static getIndexOf(plotData: IPlotData1, p: Point): number {
+    public static getIndexOf(plotData: IDataSource<Point>, p: Point): number {
         var min: number = 0;
-        var max: number = plotData.getLength() - 1;
+        var max: number = plotData.length() - 1;
         var half: number;
         while (true) {
             half = Math.floor((min + max) / 2);

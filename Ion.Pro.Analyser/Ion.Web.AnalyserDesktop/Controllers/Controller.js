@@ -29,7 +29,7 @@ var SingleValueController = (function (_super) {
         if (this.data) {
             var curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, function (i) {
+                kernel.senMan.getSensorInfoNew(this.data, function (i) {
                     _this.lastSensorInfo = i;
                     _this.lastID = _this.data.infos.IDs[0];
                     _this.onDataChange();
@@ -37,8 +37,8 @@ var SingleValueController = (function (_super) {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
-                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
+                    this.value = this.data.getValue(this.data.length() - 1).y;
                 }
                 this.onDataChange();
             }
@@ -124,7 +124,7 @@ var SingleValueCanvasController = (function (_super) {
         if (this.data) {
             var curID = this.data.infos.IDs[0];
             if (curID != this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, function (i) {
+                kernel.senMan.getSensorInfoNew(this.data, function (i) {
                     _this.lastSensorInfo = i;
                     _this.lastID = _this.data.infos.IDs[0];
                     _this.onDataChange();
@@ -132,8 +132,8 @@ var SingleValueCanvasController = (function (_super) {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
-                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
+                    this.value = this.data.getValue(this.data.length() - 1).y;
                 }
                 this.onDataChange();
             }

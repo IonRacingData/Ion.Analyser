@@ -4,12 +4,10 @@
 
     plotter: IPlot[] = [];
 
+    viewers: IViewerBase<any>[] = [];
 
-    private globalPlot: ISensorPackage[];
-    private globalId: number;
-
-    static readonly event_globalPlot = "globalPlot";
     static readonly event_registerIPlot = "registerIPlot";
+    static readonly event_registerViewer = "registerViewer";
 
     constructor() {
         kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
@@ -209,18 +207,18 @@
         });
     }
 
-    setGlobal(id: number) {
-        this.globalId = id;
-        this.getData(id, (data: ISensorPackage[]) => {
-            this.globalPlot = data;
-            this.eventManager.raiseEvent(SensorManager.event_globalPlot, this.globalPlot);
+    public getSensorInfoNew(data: IDataSource<any>, callback: (data: SensorInformation) => void) {
+        this.getLoadedInfos((all: SensorInformation[]) => {
+            for (let i = 0; i < all.length; i++) {
+                if (all[i].ID === data.infos.IDs[0]) {
+                    callback(all[i]);
+                    break;
+                }
+            }
         });
     }
 
     addEventListener(type: string, listener: any) {
-        if (type === SensorManager.event_globalPlot && this.globalPlot != null) {
-            listener(this.globalPlot);
-        }
         this.eventManager.addEventListener(type, listener);
     }
 
@@ -230,7 +228,7 @@
 
     private plotLinker: IPlot[][] = [];
 
-    register(plotter: IPlot): void {
+    public registerDeprecated(plotter: IPlot): void {
         this.plotter.push(plotter);
         if (!this.plotLinker[plotter.plotDataType]) {
             this.plotLinker[plotter.plotDataType] = [];
@@ -239,6 +237,13 @@
 
         this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     }
+
+    public register<T>(viewer: IViewerBase<T>): void {
+        this.viewers.push(viewer);
+        this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+    }
+
+
 }
 
 class Multicallback {

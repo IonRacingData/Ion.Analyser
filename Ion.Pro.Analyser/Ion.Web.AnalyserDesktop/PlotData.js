@@ -75,7 +75,7 @@ var PlotDataHelper = (function () {
     };
     PlotDataHelper.getIndexOf = function (plotData, p) {
         var min = 0;
-        var max = plotData.getLength() - 1;
+        var max = plotData.length() - 1;
         var half;
         while (true) {
             half = Math.floor((min + max) / 2);

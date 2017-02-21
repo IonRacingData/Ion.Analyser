@@ -1,3 +1,21 @@
+var TestViewer = (function () {
+    function TestViewer() {
+    }
+    TestViewer.prototype.main = function () {
+        var _this = this;
+        this.mk = new HtmlHelper();
+        this.window = kernel.winMan.createWindow(this.application, "Test Window");
+        requestAction("hello", function (data) {
+            _this.helloData = data;
+            _this.draw();
+        });
+    };
+    TestViewer.prototype.draw = function () {
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(this.mk.tag("h1", "", null, this.helloData.Text));
+    };
+    return TestViewer;
+}());
 var DataViewer = (function () {
     function DataViewer() {
     }
@@ -7,28 +25,23 @@ var DataViewer = (function () {
         kernel.senMan.getLoadedInfos(function (ids) { return _this.draw(ids); });
     };
     DataViewer.prototype.draw = function (data) {
-        var _this = this;
         var mk = new HtmlHelper();
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
-        var _loop_1 = function () {
+        for (var i = 0; i < data.length; i++) {
             var curValue = data[i];
             table.addRow([
                 {
                     event: "click", func: function () {
-                        kernel.senMan.setGlobal(curValue.ID);
                     }
                 },
                 (!curValue.Key ? { field: "className", data: "error" } : {})
             ], curValue.ID, curValue.Name, curValue.Unit ? curValue.Unit : "");
-        };
-        for (var i = 0; i < data.length; i++) {
-            _loop_1();
         }
         this.window.content.appendChild(table.generate());
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
-        kernel.senMan.addEventListener(SensorManager.event_globalPlot, function (data) { return _this.drawInner(data); });
+        //kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
     };
     DataViewer.prototype.drawInner = function (data) {
         this.innerTable.innerHTML = "";
@@ -116,10 +129,10 @@ var CsvGenerator = (function () {
 }());
 var LineChartTester = (function () {
     function LineChartTester() {
+        this.plotType = "Line Chart";
+        this.type = Point;
+        this.dataCollectionSource = [];
         this.eh = new EventHandler();
-        this.plotData = [];
-        this.plotType = "Plot";
-        this.plotDataType = PlotType.I1D;
     }
     LineChartTester.prototype.main = function () {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
@@ -131,7 +144,7 @@ var LineChartTester = (function () {
         this.lineChart.setSize(this.window.width, this.window.height);
     };
     LineChartTester.prototype.dataUpdate = function () {
-        this.lineChart.setData(this.plotData);
+        this.lineChart.setData(this.dataCollectionSource);
     };
     LineChartTester.prototype.createEvents = function (eh) {
         var _this = this;
@@ -147,29 +160,11 @@ var LineChartTester = (function () {
     };
     return LineChartTester;
 }());
-var TestViewer = (function () {
-    function TestViewer() {
-    }
-    TestViewer.prototype.main = function () {
-        var _this = this;
-        this.mk = new HtmlHelper();
-        this.window = kernel.winMan.createWindow(this.application, "Test Window");
-        requestAction("hello", function (data) {
-            _this.helloData = data;
-            _this.draw();
-        });
-    };
-    TestViewer.prototype.draw = function () {
-        this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, this.helloData.Text));
-    };
-    return TestViewer;
-}());
 var GaugeTester = (function () {
     function GaugeTester() {
+        this.plotType = "Gauge Chart";
+        this.type = Point;
         this.val = 0;
-        this.plotType = "Gauge";
-        this.plotDataType = PlotType.I1D;
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
@@ -188,12 +183,14 @@ var GaugeTester = (function () {
         this.window.content.appendChild(gaugeWrapper);
     };
     GaugeTester.prototype.dataUpdate = function () {
-        this.gauge.setData(this.plotData);
+        this.gauge.setData(this.dataSource);
     };
     return GaugeTester;
 }());
 var GPSPlotTester = (function () {
     function GPSPlotTester() {
+        this.plotType = "GPS Chart";
+        this.type = Point3D;
         this.points = [];
     }
     GPSPlotTester.prototype.main = function () {
@@ -202,6 +199,7 @@ var GPSPlotTester = (function () {
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
+        kernel.senMan.register(this);
         kernel.senMan.getData(252, function (d) {
             for (var i = 0; i < d.length; i++) {
                 _this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -217,13 +215,15 @@ var GPSPlotTester = (function () {
         this.plot.setData(this.testData);
         this.plot.setSize(this.window.width, this.window.height);
     };
+    GPSPlotTester.prototype.dataUpdate = function () {
+    };
     return GPSPlotTester;
 }());
 var LabelTester = (function () {
     function LabelTester() {
-        this.val = 0;
         this.plotType = "Label";
-        this.plotDataType = PlotType.I1D;
+        this.type = Point;
+        this.val = 0;
     }
     LabelTester.prototype.main = function () {
         var _this = this;
@@ -244,15 +244,15 @@ var LabelTester = (function () {
         });
     };
     LabelTester.prototype.dataUpdate = function () {
-        this.label.setData(this.plotData);
+        this.label.setData(this.dataSource);
     };
     return LabelTester;
 }());
 var BarTester = (function () {
     function BarTester() {
+        this.plotType = "Bar Chart";
+        this.type = Point;
         this.val = 0;
-        this.plotType = "Bar";
-        this.plotDataType = PlotType.I1D;
     }
     BarTester.prototype.main = function () {
         var _this = this;
@@ -268,7 +268,7 @@ var BarTester = (function () {
         });
     };
     BarTester.prototype.dataUpdate = function () {
-        this.bar.setData(this.plotData);
+        this.bar.setData(this.dataSource);
     };
     return BarTester;
 }());

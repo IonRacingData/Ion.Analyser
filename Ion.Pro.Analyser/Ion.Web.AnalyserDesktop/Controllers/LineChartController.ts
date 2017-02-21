@@ -86,7 +86,7 @@
     
     private moveToLastPoint(): void {
         if (this.data[0]) {
-            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
+            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
             if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
                 this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
             }
@@ -161,16 +161,15 @@
         this.drawYAxis();
 
         if (this.data) {
-
+            console.log(this.data);
             for (var d: number = 0; d < this.data.length; d++) {
                 // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
-
                 var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-                var totalLength: number = this.data[d].getLength();
+                var totalLength: number = this.data[d].length();
                 var drawPoint: number = 0;
                 var checkPoint: Point = lastPoint;
 

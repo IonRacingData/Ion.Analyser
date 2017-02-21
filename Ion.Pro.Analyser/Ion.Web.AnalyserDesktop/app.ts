@@ -1,67 +1,28 @@
 ﻿window.addEventListener("load", () => {
-
-    let a: IDataSource<Point>;
-
-    
-
-    a = new PointSensorGroup();
-
-    console.log(a.type == Point); 
-
-    console.log(new a.type(5, 6));
-
-    let testArray: IDataSource<any>[] = [];
-    testArray.push(a);
-
-    function getFrom<T>(type: IClassType<any>): IDataSource<T> {
-        for (let val of testArray) {
-            if (val.type === type) {
-                return val;
-            }
-        }
-        return null;
-    }
-
-    let b = <ITypeDef>getFrom(Point);
-    
-    alert((<any>b.type).name);
-
-
-
-    let g: IViewerBase = new TestClass();
-
-    
-
-    //startUp();
-    function isViewer<T>(test: IViewerBase): test is IViewer<T> {
-        return (<IViewer<T>>test).dataSource !== undefined;
-    }
-
-
-    if (isViewer<Point>(g)) {
-    }
-    
-     
+    startUp();
 });
-
 
 
 interface IClassType<T> {
     new (...param: any[]): T;
 }
 
-interface ITypeDef {
-    type: IClassType<any>;
+interface ITypeDef<T> {
+    type: IClassType<T>;
 }
 
-
-interface IDataSource<T> extends ITypeDef {
+interface IDataSource<T> extends ITypeDef<T> {
+    infos: SensorPlotInfo;
     getValue(index: number): T;
     length(): number;
+    color: Color;
 }
 
 class SensorGroup<T> implements IDataSource<T> {
     type: IClassType<T>;
+
+    infos: SensorPlotInfo = new SensorPlotInfo();
+    color: Color;
 
     public constructor(type: IClassType<T>) {
         this.type = type;
@@ -77,32 +38,39 @@ class SensorGroup<T> implements IDataSource<T> {
 }
 
 class PointSensorGroup extends SensorGroup<Point>{
-    constructor() {
+    private data: SensorDataContainer;
+
+    constructor(data: SensorDataContainer) {
         super(Point);
+        this.data = data;
+
+        this.infos.IDs[0] = data.ID;
+        this.color = data.color;
+    }
+
+    public getValue(index: number): Point {
+        return this.data.points[index];
+    }
+
+    public length(): number {
+        return this.data.points.length;
     }
 }
 
-interface IViewerBase extends ITypeDef {
+class DataSourceInfo<T> {
+    
+}
+
+interface IViewerBase<T> extends ITypeDef<T> {
     dataUpdate(): void;
     plotType: string;
     plotWindow: AppWindow;
 }
 
-interface IViewer<T> extends IViewerBase, ITypeDef {
+interface IViewer<T> extends IViewerBase<T> {
     dataSource: IDataSource<T>;
 }
 
-interface ICollectionViewer<T> extends IViewerBase, ITypeDef {
+interface ICollectionViewer<T> extends IViewerBase<T>{
     dataCollectionSource: IDataSource<T>[];
-}
-
-class TestClass implements IViewer<Point> {
-    plotType: string;
-    plotWindow: AppWindow;
-    dataSource: IDataSource<Point>;
-    type: IClassType<Point> = Point;
-
-    public dataUpdate(): void {
-    }
-
 }

@@ -1,4 +1,27 @@
-﻿class DataViewer implements IApplication {
+﻿class TestViewer implements IApplication {
+    application: Application;
+    window: AppWindow;
+    window2: AppWindow;
+    helloData: IHelloPackage;
+    mk: HtmlHelper;
+
+    main(): void {
+        this.mk = new HtmlHelper();
+        this.window = kernel.winMan.createWindow(this.application, "Test Window");
+
+        requestAction("hello", (data: IHelloPackage) => {
+            this.helloData = data;
+            this.draw();
+        });
+    }
+
+    draw(): void {
+        this.window.content.innerHTML = "";
+        this.window.content.appendChild(this.mk.tag("h1", "", null, this.helloData.Text));
+    }
+}
+
+class DataViewer implements IApplication {
     application: Application;
     window: AppWindow;
     data: ISensorPackage[];
@@ -20,7 +43,6 @@
             table.addRow([
                 {
                     event: "click", func: () => {
-                        kernel.senMan.setGlobal(curValue.ID);
                     }
                 },
                 (!curValue.Key ? { field: "className", data: "error" } : {})
@@ -32,7 +54,7 @@
 
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
-        kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
+        //kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
     }
 
     drawInner(data: ISensorPackage[]): void {
@@ -148,17 +170,19 @@ class CsvGenerator implements IApplication {
     }
 }
 
-class LineChartTester implements IApplication, IMultiPlot {
+class LineChartTester implements IApplication, ICollectionViewer<Point> {
+    plotType: string = "Line Chart";
+    plotWindow: AppWindow;
+    type: IClassType<Point> = Point;
+    dataCollectionSource: IDataSource<Point>[] = [];
+    
+
     application: Application;
     window: AppWindow;
     lineChart: LineChartController;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
-    plotData: IPlotData1[] = [];
-    plotType: string = "Plot";
-    plotWindow: AppWindow;
-    plotDataType = PlotType.I1D;
-
+    
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
         this.window.content.style.overflow = "hidden";
@@ -170,7 +194,7 @@ class LineChartTester implements IApplication, IMultiPlot {
     }
 
     dataUpdate() {
-        this.lineChart.setData(this.plotData);
+        this.lineChart.setData(this.dataCollectionSource);
     }
 
     createEvents(eh: EventHandler) {
@@ -187,38 +211,18 @@ class LineChartTester implements IApplication, IMultiPlot {
     }
 }
 
-class TestViewer implements IApplication {
-    application: Application;
-    window: AppWindow;
-    window2: AppWindow;
-    helloData: IHelloPackage;
-    mk: HtmlHelper;
 
-    main(): void {
-        this.mk = new HtmlHelper();
-        this.window = kernel.winMan.createWindow(this.application, "Test Window");
 
-        requestAction("hello", (data: IHelloPackage) => {
-            this.helloData = data;
-            this.draw();
-        });
-    }
+class GaugeTester implements IApplication, IViewer<Point> {
+    plotType: string = "Gauge Chart";
+    plotWindow: AppWindow;
+    type: IClassType<Point> = Point;
+    dataSource: IDataSource<Point>;
 
-    draw(): void {
-        this.window.content.innerHTML = "";
-        this.window.content.appendChild(this.mk.tag("h1", "", null, this.helloData.Text));
-    }
-}
-
-class GaugeTester implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
     gauge: GaugeController;
     val: number = 0;
-    plotType: string = "Gauge";
-    plotWindow: AppWindow;
-    plotData: IPlotData1;
-    plotDataType = PlotType.I1D;
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
@@ -240,11 +244,16 @@ class GaugeTester implements IApplication, ISinglePlot {
     }
 
     dataUpdate() {
-        this.gauge.setData(this.plotData);
+        this.gauge.setData(this.dataSource);
     }
 }
 
-class GPSPlotTester implements IApplication {
+class GPSPlotTester implements IApplication, IViewer<Point3D> {
+    plotType: string = "GPS Chart";
+    plotWindow: AppWindow;
+    type: IClassType<Point3D> = Point3D;
+    dataSource: IDataSource<Point3D>;
+
     application: Application;
     window: AppWindow;
     points: Point3D[] = [];
@@ -256,7 +265,7 @@ class GPSPlotTester implements IApplication {
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
-        
+        kernel.senMan.register(this);
         kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -273,17 +282,22 @@ class GPSPlotTester implements IApplication {
         this.plot.setData(this.testData);
         this.plot.setSize(this.window.width, this.window.height);
     }
+
+    dataUpdate() {
+
+    }
 }
 
-class LabelTester implements ISinglePlot {
+class LabelTester implements IApplication, IViewer<Point> {
+    plotType: string = "Label";
+    plotWindow: AppWindow;
+    type: IClassType<Point> = Point;
+    dataSource: IDataSource<Point>;
+
     application: Application;
     window: AppWindow;
     label: LabelController;
     val: number = 0;
-    plotData: IPlotData1;
-    plotType: string = "Label";
-    plotWindow: AppWindow;
-    plotDataType: PlotType = PlotType.I1D;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "LabelTester");
@@ -307,19 +321,20 @@ class LabelTester implements ISinglePlot {
     }
 
     dataUpdate() {
-        this.label.setData(this.plotData);
+        this.label.setData(this.dataSource);
     }
 }
 
-class BarTester implements ISinglePlot {
+class BarTester implements IApplication, IViewer<Point> {
+    plotType: string = "Bar Chart";
+    plotWindow: AppWindow;
+    type: IClassType<Point> = Point;
+    dataSource: IDataSource<Point>;
+
     application: Application;
     window: AppWindow;
     bar: BarController;
     val: number = 0;
-    plotData: IPlotData1;
-    plotType: string = "Bar";
-    plotWindow: AppWindow;
-    plotDataType: PlotType = PlotType.I1D;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "BarTester");
@@ -336,7 +351,7 @@ class BarTester implements ISinglePlot {
     }
 
     dataUpdate(): void {
-        this.bar.setData(this.plotData);
+        this.bar.setData(this.dataSource);
     }
 
 }

@@ -4,6 +4,7 @@ var SensorManager = (function () {
         this.dataCache = [];
         this.plotCache = [];
         this.plotter = [];
+        this.viewers = [];
         this.eventManager = new EventManager();
         this.plotLinker = [];
         kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
@@ -181,24 +182,23 @@ var SensorManager = (function () {
             }
         });
     };
-    SensorManager.prototype.setGlobal = function (id) {
-        var _this = this;
-        this.globalId = id;
-        this.getData(id, function (data) {
-            _this.globalPlot = data;
-            _this.eventManager.raiseEvent(SensorManager.event_globalPlot, _this.globalPlot);
+    SensorManager.prototype.getSensorInfoNew = function (data, callback) {
+        this.getLoadedInfos(function (all) {
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].ID === data.infos.IDs[0]) {
+                    callback(all[i]);
+                    break;
+                }
+            }
         });
     };
     SensorManager.prototype.addEventListener = function (type, listener) {
-        if (type === SensorManager.event_globalPlot && this.globalPlot != null) {
-            listener(this.globalPlot);
-        }
         this.eventManager.addEventListener(type, listener);
     };
     SensorManager.prototype.removeEventListener = function (type, listener) {
         this.eventManager.removeEventListener(type, listener);
     };
-    SensorManager.prototype.register = function (plotter) {
+    SensorManager.prototype.registerDeprecated = function (plotter) {
         this.plotter.push(plotter);
         if (!this.plotLinker[plotter.plotDataType]) {
             this.plotLinker[plotter.plotDataType] = [];
@@ -206,10 +206,14 @@ var SensorManager = (function () {
         this.plotLinker[plotter.plotDataType].push(plotter);
         this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
     };
+    SensorManager.prototype.register = function (viewer) {
+        this.viewers.push(viewer);
+        this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+    };
     return SensorManager;
 }());
-SensorManager.event_globalPlot = "globalPlot";
 SensorManager.event_registerIPlot = "registerIPlot";
+SensorManager.event_registerViewer = "registerViewer";
 var Multicallback = (function () {
     function Multicallback(count, callback) {
         this.responses = [];

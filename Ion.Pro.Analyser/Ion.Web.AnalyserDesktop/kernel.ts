@@ -17,9 +17,9 @@ function startUp() {
         senMan: null
     };
 
-    kernel.senMan = new SensorManager();
+    kernel.senMan = new SensorManager();  // Late init because it needs netMan
 
-    kernel.senMan.setGlobal(841);
+    // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
 
@@ -47,6 +47,7 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
+    // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));

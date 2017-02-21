@@ -4,33 +4,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 window.addEventListener("load", function () {
-    var a;
-    a = new PointSensorGroup();
-    console.log(a.type == Point);
-    console.log(new a.type(5, 6));
-    var testArray = [];
-    testArray.push(a);
-    function getFrom(type) {
-        for (var _i = 0, testArray_1 = testArray; _i < testArray_1.length; _i++) {
-            var val = testArray_1[_i];
-            if (val.type === type) {
-                return val;
-            }
-        }
-        return null;
-    }
-    var b = getFrom(Point);
-    alert(b.type.name);
-    var g = new TestClass();
-    //startUp();
-    function isViewer(test) {
-        return test.dataSource !== undefined;
-    }
-    if (isViewer(g)) {
-    }
+    startUp();
 });
 var SensorGroup = (function () {
     function SensorGroup(type) {
+        this.infos = new SensorPlotInfo();
         this.type = type;
     }
     SensorGroup.prototype.getValue = function (index) {
@@ -43,17 +21,24 @@ var SensorGroup = (function () {
 }());
 var PointSensorGroup = (function (_super) {
     __extends(PointSensorGroup, _super);
-    function PointSensorGroup() {
-        return _super.call(this, Point) || this;
+    function PointSensorGroup(data) {
+        var _this = _super.call(this, Point) || this;
+        _this.data = data;
+        _this.infos.IDs[0] = data.ID;
+        _this.color = data.color;
+        return _this;
     }
+    PointSensorGroup.prototype.getValue = function (index) {
+        return this.data.points[index];
+    };
+    PointSensorGroup.prototype.length = function () {
+        return this.data.points.length;
+    };
     return PointSensorGroup;
 }(SensorGroup));
-var TestClass = (function () {
-    function TestClass() {
-        this.type = Point;
+var DataSourceInfo = (function () {
+    function DataSourceInfo() {
     }
-    TestClass.prototype.dataUpdate = function () {
-    };
-    return TestClass;
+    return DataSourceInfo;
 }());
 //# sourceMappingURL=app.js.map
