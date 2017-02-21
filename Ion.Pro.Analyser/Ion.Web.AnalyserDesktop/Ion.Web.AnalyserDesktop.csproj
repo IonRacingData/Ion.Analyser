@@ -29,6 +29,7 @@
     <Content Include="Grid\index.html" />
     <Content Include="Grid\grid-style.css" />
     <Content Include="Grid\grid.css" />
+    <Content Include="steeringWheel.png" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
     <Content Include="web.config" />
@@ -50,6 +51,7 @@
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="Controllers\BarController.ts" />
     <TypeScriptCompile Include="Controllers\Controller.ts" />
+    <TypeScriptCompile Include="Controllers\SteeringWheelController.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="Controllers\GPSController.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />

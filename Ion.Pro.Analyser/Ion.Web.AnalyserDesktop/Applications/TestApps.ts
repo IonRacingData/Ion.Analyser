@@ -239,3 +239,40 @@ class BarTester implements ISinglePlot {
     }
 
 }
+
+class SteeringWheelTester implements ISinglePlot {
+    application: Application;
+    window: AppWindow;
+    wheel: SteeringWheelController;
+    val: number = 0.5;
+    plotData: IPlotData;
+    plotType: string = "Bar";
+    plotWindow: AppWindow;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.wheel = new SteeringWheelController(this.window.width, this.window.height);
+        let wheelWrapper = this.wheel.generate();
+        this.window.content.appendChild(wheelWrapper);
+        this.wheel.setPer(this.val);
+
+        wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 100;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.wheel.setPer(this.val);
+        });
+
+        this.window.addEventListener(AppWindow.event_resize, () => {
+            this.wheel.setSize(this.window.width, this.window.height);
+        });
+    }
+
+    dataUpdate(): void {
+        this.wheel.setData(this.plotData);
+    }
+
+}

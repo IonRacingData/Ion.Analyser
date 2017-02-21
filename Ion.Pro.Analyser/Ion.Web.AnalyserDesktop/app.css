@@ -264,4 +264,9 @@ span.table-resize{
     background-color: red;    
 }
 
+.steeringWheel-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 

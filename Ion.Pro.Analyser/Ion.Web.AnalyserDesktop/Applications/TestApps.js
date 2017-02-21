@@ -196,4 +196,34 @@ var BarTester = (function () {
     };
     return BarTester;
 }());
+var SteeringWheelTester = (function () {
+    function SteeringWheelTester() {
+        this.val = 0.5;
+        this.plotType = "Bar";
+    }
+    SteeringWheelTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.wheel = new SteeringWheelController(this.window.width, this.window.height);
+        var wheelWrapper = this.wheel.generate();
+        this.window.content.appendChild(wheelWrapper);
+        this.wheel.setPer(this.val);
+        wheelWrapper.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY / 100;
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.val = _this.val > 1 ? 1 : _this.val;
+            _this.wheel.setPer(_this.val);
+        });
+        this.window.addEventListener(AppWindow.event_resize, function () {
+            _this.wheel.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    SteeringWheelTester.prototype.dataUpdate = function () {
+        this.wheel.setData(this.plotData);
+    };
+    return SteeringWheelTester;
+}());
 //# sourceMappingURL=TestApps.js.map
