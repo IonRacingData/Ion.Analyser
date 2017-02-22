@@ -452,5 +452,23 @@
     "Key": "GPS_HIGHRES",
     "Name": "GPS High resolution part of GPS",
     "Unit": "&deg;"
+  },
+  {
+    "ID": 42,
+    "Key": "SIN1",
+    "Name": "Sinus 1",
+    "Unit": "%"
+  },
+  {
+    "ID": 43,
+    "Key": "SIN2",
+    "Name": "Sinus 2",
+    "Unit": "%"
+  },
+  {
+    "ID": 44,
+    "Key": "COS1",
+    "Name": "Cos 1",
+    "Unit": "%"
   }
 ]

@@ -12,25 +12,33 @@
     static readonly event_registerIPlot = "registerIPlot";
 
     constructor() {
-        kernel.netMan.registerService(10, (data: any) => {
-            let dataArray = <ISensorPackage[]>this.convertToSensorPackage(data.Sensors);
-            for (let j = 0; j < dataArray.length; j++){
-                let realData = dataArray[j];
-                if (!this.dataCache[realData.ID]) {
-                    this.dataCache[realData.ID] = [];
-                }
-                this.dataCache[realData.ID].push(realData);
-                if (!this.plotCache[realData.ID]) {
-                    this.plotCache[realData.ID] = new PlotData([]);
-                }
-                this.plotCache[realData.ID].points.push(new Point(realData.TimeStamp, realData.Value));   
+        kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
+    }
+
+    private handleService(data: ISensorPackage[]) {
+
+        for (let j = 0; j < data.length; j++) {
+            let realData = data[j];
+            let sensId = realData.ID;
+
+            if (!this.dataCache[sensId]) {
+                this.dataCache[sensId] = [];
             }
-            for (let i = 0; i < this.plotter.length; i++) {
-                this.plotter[i].dataUpdate();
+            this.dataCache[sensId].push(realData);
+
+            if (!this.plotCache[sensId]) {
+                this.plotCache[sensId] = new PlotData([]);
+                this.plotCache[sensId].ID = sensId;
             }
-            
-            //if ()
-        });
+            this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
+        }
+        this.updateAllPlotters();
+    }
+
+    private updateAllPlotters() {
+        for (let i = 0; i < this.plotter.length; i++) {
+            this.plotter[i].dataUpdate();
+        }
     }
 
     private eventManager: EventManager = new EventManager();
@@ -185,6 +193,17 @@
                 (<ISinglePlot>a).dataUpdate();
             }
         }
+    }
+
+    public getSensorInfo(data: IPlotData, callback: (data: SensorInformation) => void) {
+        this.getLoadedInfos((all: SensorInformation[]) => {
+            for (let i = 0; i < all.length; i++) {
+                if (all[i].ID == data.ID) {
+                    callback(all[i]);
+                    break;
+                }
+            }
+        });
     }
 
     setGlobal(id: number) {

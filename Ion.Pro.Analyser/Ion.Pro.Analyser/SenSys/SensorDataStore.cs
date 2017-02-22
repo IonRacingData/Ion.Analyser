@@ -184,7 +184,7 @@ namespace Ion.Pro.Analyser.SenSys
                 SensorInformation info = sensorIdMapping[data.ID];
                 if (info.ValueInfo == null)
                     throw new Exception("Missing ValueInfo for package: " + info.ID.ToString() + ", " + info.Key + ", " + info.Name);
-                temp.Value = info.ValueInfo.ConvertValue((int)temp.Value);
+                temp.Value = info.ValueInfo.ConvertValue((long)temp.Value);
             }
             indexedPackages[data.ID].Add(temp);
             return temp;

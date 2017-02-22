@@ -418,5 +418,34 @@
   {
     "Key": "GPS_HIGHRES",
     "Unit": "&deg;"
+  },
+
+
+
+
+
+
+  // #####--Sinus test curves--#####
+  {
+    "Key": "SIN1",
+    "Unit": "%",
+    "Signed": false,
+    "MaxValue": 100,
+    "Resolution": 8
+  },
+  {
+    "Key": "SIN2",
+    "Unit": "%",
+    "Signed": true,
+    "MaxValue": 100,
+    "Resolution": 8
+  },
+  {
+    "Key": "COS1",
+    "Unit": "%",
+    "Signed": false,
+    "MaxValue": 100,
+    "Resolution": 8
+
   }
 ]

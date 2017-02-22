@@ -26,6 +26,7 @@
     static event_windowSelect = "windowSelect";
     static event_windowClose = "windowClose";
 
+
     constructor(container: HTMLElement) {
         this.body = container;
 
@@ -79,20 +80,55 @@
             }
 
             this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
+            let appWindow = this.getWindowAt(x, y, true);
+            if (appWindow) {
+                appWindow.handleGlobalDrag(x, y, this.activeWindow);
+            }
         }
         else if (this.resizing) {
             this.activeWindow.__setRelativeSize(x, y);
         }
     }
 
+    private getWindowAt(x: number, y: number, ignoreActive: boolean): AppWindow {
+        for (let i = this.order.length - 1; i >= 0 ; i--) {
+            let curWindow = this.windows[i];
+            if (ignoreActive && curWindow === this.activeWindow)
+                continue;
+            if (this.intersects(x, y, curWindow)) {
+                return curWindow;
+            }
+        }
+        return null;
+    }
+
+    private intersects(x: number, y: number, window: AppWindow): boolean {
+        return x > window.x
+            && x < window.x + window.totalWidth
+            && y > window.y
+            && y < window.y + window.totalHeight;
+    }
+
     private mouseUp(e: MouseEvent): void {
         //console.log(e);
+        let x = e.layerX;
+        let y = e.layerY;
+        let appWindow = this.getWindowAt(x, y, true);
+        if (appWindow) {
+            appWindow.handleGlobalRelease(x, y, this.activeWindow);
+        }
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
     private touchEnd(e: TouchEvent): void {
+        let x = e.touches[0].pageX;
+        let y = e.touches[0].pageY;
+        let appWindow = this.getWindowAt(x, y, true);
+        if (appWindow) {
+            appWindow.handleGlobalRelease(x, y, this.activeWindow);
+        }
         this.dragging = false;
         this.resizing = false;
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });

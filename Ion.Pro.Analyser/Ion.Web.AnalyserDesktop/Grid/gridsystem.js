@@ -232,6 +232,7 @@ var GridContainer = (function () {
         this.mouse = "clientX";
         this.dir2 = "width";
         this.pos = "x";
+        this.correction = 0;
         this.baseNode = this.create("");
         this.appWindow = appWindow;
         this.baseNode.addEventListener("mousemove", function (e) {
@@ -283,7 +284,7 @@ var GridContainer = (function () {
         //this.baseNode.appendChild(seperator);
         //this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", function (e) {
-            var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos]);
+            var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos], _this.correction);
             seperator.parentElement.onmousemove = function (e) {
                 _this.appWindow.handleResize();
                 container.adjustSize(e);
@@ -309,7 +310,7 @@ var GridContainer = (function () {
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", function (e) {
-            var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos]);
+            var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos], _this.correction);
             seperator.parentElement.onmousemove = function (e) {
                 _this.appWindow.handleResize();
                 container.adjustSize(e);
@@ -378,13 +379,14 @@ var GridBox = (function () {
     return GridBox;
 }());
 var ResizeContainer = (function () {
-    function ResizeContainer(seperator, dir, offset, style, mouse, windowPos) {
+    function ResizeContainer(seperator, dir, offset, style, mouse, windowPos, correction) {
         this.cur = seperator;
         this.offset = offset;
         this.style = style;
         this.dir = dir;
         this.mouse = mouse;
         this.windowPos = windowPos;
+        this.curCor = correction;
         this.initialize();
     }
     ResizeContainer.prototype.initialize = function () {
@@ -397,7 +399,7 @@ var ResizeContainer = (function () {
         this.startPercent = (this.start - this.correction) / this.total;
     };
     ResizeContainer.prototype.adjustSize = function (e) {
-        var curMovement = e[this.mouse] - this.start;
+        var curMovement = e[this.mouse] - this.start - this.curCor;
         var curPercentMove = curMovement / this.total;
         var prevWidth = this.startPercent + curPercentMove;
         var nextWidth = (this.part / this.total) - prevWidth;
@@ -416,6 +418,7 @@ var GridHContainer = (function (_super) {
         _this.mouse = "clientX";
         _this.dir2 = "width";
         _this.pos = "x";
+        _this.correction = -4;
         return _this;
     }
     GridHContainer.prototype.create = function () {
@@ -441,6 +444,7 @@ var GridVContainer = (function (_super) {
         _this.mouse = "clientY";
         _this.dir2 = "height";
         _this.pos = "y";
+        _this.correction = 25;
         return _this;
     }
     GridVContainer.prototype.create = function () {

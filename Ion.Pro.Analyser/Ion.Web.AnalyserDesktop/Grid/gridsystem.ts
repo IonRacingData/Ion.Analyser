@@ -261,6 +261,7 @@ class GridContainer {
     mouse: string = "clientX";
     dir2: string = "width";
     pos: string = "x";
+    correction: number = 0;
     //last: HTMLElement;
 
     constructor(appWindow: GridViewer) {
@@ -322,7 +323,7 @@ class GridContainer {
         //this.baseNode.appendChild(seperator);
         //this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
-            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos]);
+            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos], this.correction);
 
             seperator.parentElement.onmousemove = (e: MouseEvent) => {
                 this.appWindow.handleResize();
@@ -350,7 +351,7 @@ class GridContainer {
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
-            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos]);
+            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos], this.correction);
 
             seperator.parentElement.onmousemove = (e: MouseEvent) => {
                 this.appWindow.handleResize();
@@ -450,14 +451,16 @@ class ResizeContainer {
     style: string;
     mouse: string;
     windowPos: number;
+    curCor: number;
 
-    constructor(seperator: HTMLElement, dir: string, offset: string, style: string, mouse: string, windowPos: number) {
+    constructor(seperator: HTMLElement, dir: string, offset: string, style: string, mouse: string, windowPos: number, correction: number) {
         this.cur = seperator;
         this.offset = offset;
         this.style = style;
         this.dir = dir;
         this.mouse = mouse;
         this.windowPos = windowPos;
+        this.curCor = correction;
         this.initialize();
     }
 
@@ -473,7 +476,7 @@ class ResizeContainer {
     }
 
     adjustSize(e: MouseEvent) {
-        let curMovement = e[this.mouse] - this.start;
+        let curMovement = e[this.mouse] - this.start - this.curCor;
 
         let curPercentMove = curMovement / this.total;
 
@@ -495,6 +498,7 @@ class GridHContainer extends GridContainer {
     mouse: string = "clientX";
     dir2: string = "width";
     pos: string = "x";
+    correction: number = -4;
 
     constructor(appWindow: GridViewer) {
         super(appWindow);
@@ -523,6 +527,7 @@ class GridVContainer extends GridContainer {
     mouse: string = "clientY";
     dir2: string = "height";
     pos: string = "y";
+    correction: number = 25;
 
     constructor(appWindow: GridViewer) {
         super(appWindow);

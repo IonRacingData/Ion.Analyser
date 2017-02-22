@@ -16,22 +16,42 @@ namespace Ion.Pro.Analyser
     {
         OffLine,
         LiveTest,
+        LiveTestSin,
         SmallTest
     }
+
+    
 
     class Program
     {
         static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
-        static RunMode runMode = RunMode.LiveTest;
+        static RunMode runMode = RunMode.OffLine;
         static string DefaultAction = "index";
         static string DefaultPath = "/home/index";
         //public static string ContentPath = "../../Content/";
         public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
         //public static string ContentPath = "html/";
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
+        static byte[] GetLegacyFormat(SensorPackage pack)
+        {
+            return new byte[]
+            {
+                (byte)(pack.ID >> 0),
+                (byte)(pack.ID >> 8),
+                (byte)(pack.Value >> 0),
+                (byte)(pack.Value >> 8),
+                (byte)(pack.Value >> 16),
+                (byte)(pack.Value >> 24),
+                (byte)(pack.TimeStamp >> 0),
+                (byte)(pack.TimeStamp >> 8),
+                (byte)(pack.TimeStamp >> 16),
+                (byte)(pack.TimeStamp >> 24),
+            };
+        }
 
         static string[] files = new string[]
         {
+            "../../Data/sinus.log16",
             "../../Data/Sets/126_usart_data.log16",
             "../../Data/freq.log16",
             "../../Data/stiangps.gpx",
@@ -40,7 +60,30 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
-            
+            SensorPackage pack = new SensorPackage();
+            BinaryWriter bw = new BinaryWriter(new FileStream("../../Data/sinus.log16", FileMode.Create));
+            for (int i = 0; i < 100000; i++)
+            {
+                pack = new SensorPackage() { ID = 42, TimeStamp = i * 10, Value = (byte)((Math.Sin(i / 20.0) + 1) * 127) };
+                bw.Write(GetLegacyFormat(pack));
+                pack = new SensorPackage() { ID = 43, TimeStamp = i * 10, Value = (sbyte)(Math.Sin(i / 20.0) * 127) };
+                bw.Write(GetLegacyFormat(pack));
+                pack = new SensorPackage() { ID = 44, TimeStamp = i * 10, Value = (byte)((Math.Cos(i / 20.0) + 1) * 127) };
+                bw.Write(GetLegacyFormat(pack));
+
+
+                /*
+                pack = new SensorPackage() { ID = 42, TimeStamp = i * 10, Value = (byte)((Math.Sin(i / 20.0) + 1) * 127) };
+                bw.Write(GetLegacyFormat(pack));
+                pack = new SensorPackage() { ID = 43, TimeStamp = i * 10, Value = (byte)((Math.Sin((i / 20.0) + (Math.PI * 2 / 3)) + 1) * 127) };
+                bw.Write(GetLegacyFormat(pack));
+                pack = new SensorPackage() { ID = 44, TimeStamp = i * 10, Value = (byte)((Math.Sin((i / 20.0) + (Math.PI * 4 / 3)) + 1) * 127) };
+                bw.Write(GetLegacyFormat(pack));*/
+
+            }
+            bw.Close();
+
+
             Console.WriteLine("Ion Analyser Server");
             try
             {
@@ -94,7 +137,10 @@ namespace Ion.Pro.Analyser
                     }
                     break;
                 case RunMode.LiveTest:
-                    Task.Run(() => DataInserter());
+                    Task.Run(() => DataInserter("../../Data/Sets/126_usart_data.log16"));
+                    break;
+                case RunMode.LiveTestSin:
+                    Task.Run(() => DataInserter("../../Data/sinus.log16"));
                     break;
                 case RunMode.SmallTest:
                     store.Add(new SensorPackage() { ID = 1, Value = 1, TimeStamp = 1 });
@@ -112,10 +158,10 @@ namespace Ion.Pro.Analyser
 
 
 
-        static void DataInserter()
+        static void DataInserter(string file)
         {
             DateTime begin = DateTime.Now;
-            ISensorReader reader = Store.GetSensorReader("../../Data/Sets/126_usart_data.log16");
+            ISensorReader reader = Store.GetSensorReader(file);
             //ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
             SensorPackage[] all = reader.ReadPackages();
             int i = 0;

@@ -1,4 +1,4 @@
-﻿class LabelController extends SingleValueController{
+﻿class LabelController extends SingleValueController {
     private textWrapper: HTMLElement;    
     private fontSize: number = 10;
 
@@ -27,13 +27,19 @@
         this.adjustFontSize();
     }
 
+    protected onDataChange(): void {
+        let val = this.percent * 100;
+        this.textWrapper.innerHTML = val.toFixed(2);
+        this.adjustFontSize();
+    }
+
     private adjustFontSize() {
         if (this.textWrapper.offsetWidth > 0) {
             let height: number = this.height;
             let width: number = this.width;
             let textwidth: number = this.textWrapper.offsetWidth;
             let ratio = width / textwidth;
-            this.fontSize *= ratio;     
+            this.fontSize *= ratio;
 
             this.fontSize = this.fontSize > height ? height : this.fontSize;
             this.textWrapper.style.fontSize = this.fontSize + "px";            

@@ -5,25 +5,29 @@ var SensorManager = (function () {
         this.plotCache = [];
         this.plotter = [];
         this.eventManager = new EventManager();
-        kernel.netMan.registerService(10, function (data) {
-            var dataArray = _this.convertToSensorPackage(data.Sensors);
-            for (var j = 0; j < dataArray.length; j++) {
-                var realData = dataArray[j];
-                if (!_this.dataCache[realData.ID]) {
-                    _this.dataCache[realData.ID] = [];
-                }
-                _this.dataCache[realData.ID].push(realData);
-                if (!_this.plotCache[realData.ID]) {
-                    _this.plotCache[realData.ID] = new PlotData([]);
-                }
-                _this.plotCache[realData.ID].points.push(new Point(realData.TimeStamp, realData.Value));
-            }
-            for (var i = 0; i < _this.plotter.length; i++) {
-                _this.plotter[i].dataUpdate();
-            }
-            //if ()
-        });
+        kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
     }
+    SensorManager.prototype.handleService = function (data) {
+        for (var j = 0; j < data.length; j++) {
+            var realData = data[j];
+            var sensId = realData.ID;
+            if (!this.dataCache[sensId]) {
+                this.dataCache[sensId] = [];
+            }
+            this.dataCache[sensId].push(realData);
+            if (!this.plotCache[sensId]) {
+                this.plotCache[sensId] = new PlotData([]);
+                this.plotCache[sensId].ID = sensId;
+            }
+            this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
+        }
+        this.updateAllPlotters();
+    };
+    SensorManager.prototype.updateAllPlotters = function () {
+        for (var i = 0; i < this.plotter.length; i++) {
+            this.plotter[i].dataUpdate();
+        }
+    };
     SensorManager.prototype.getInfos = function (callback) {
         requestAction("GetIds", callback);
     };
@@ -163,6 +167,16 @@ var SensorManager = (function () {
                 a.dataUpdate();
             }
         }
+    };
+    SensorManager.prototype.getSensorInfo = function (data, callback) {
+        this.getLoadedInfos(function (all) {
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].ID == data.ID) {
+                    callback(all[i]);
+                    break;
+                }
+            }
+        });
     };
     SensorManager.prototype.setGlobal = function (id) {
         var _this = this;
