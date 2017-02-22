@@ -8,7 +8,7 @@ var Application = (function () {
         this.application.main();
     };
     Application.prototype.onClose = function () {
-        if (this.windows.length == 1) {
+        if (this.windows.length === 1) {
             kernel.appMan.closeApplication(this);
         }
     };

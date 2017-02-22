@@ -14,7 +14,7 @@
         }
     }
 
-    public toString() {
+    public toString(): string {
         if (this.a) {
             return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
         }
@@ -24,7 +24,7 @@
     }
 
     public static randomColor(lowLimit: number, highLimit: number): Color {
-        
+
         let r = 0;
         let g = 0;
         let b = 0;
@@ -40,7 +40,7 @@
     }
 }
 
-class PlotData {
+class SensorDataContainer {
     ID: number;
     color: Color;
     points: Point[];
@@ -86,13 +86,13 @@ class PlotData {
 }
 
 class PlotDataHelper {
-    public static getClosest(plotData: IPlotData, p: Point): Point {
+    public static getClosest(plotData: IDataSource<Point>, p: Point): Point {
         return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
     }
 
-    public static getIndexOf(plotData: IPlotData, p: Point): number {
+    public static getIndexOf(plotData: IDataSource<Point>, p: Point): number {
         var min: number = 0;
-        var max: number = plotData.getLength() - 1;
+        var max: number = plotData.length() - 1;
         var half: number;
         while (true) {
             half = Math.floor((min + max) / 2);
@@ -128,7 +128,14 @@ class GPSPlotData {
     }
 }
 
-class Point {
+interface IPoint<T> {
+    add(p: T): T;
+    sub(p: T): T;
+    multiply(p: T): T;
+    divide(p: T): T;
+}
+
+class Point implements IPoint<Point> {
 
     x: number;
     y: number;
@@ -159,12 +166,12 @@ class Point {
     }
 
     toString(): string {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();        
+        return "x: " + this.x.toString() + "  y: " + this.y.toString();
     }
 }
 
-class Point3D {
-    x: number; 
+class Point3D implements IPoint<Point3D> {
+    x: number;
     y: number;
     z: number;
 
@@ -195,36 +202,32 @@ class Point3D {
     }
 }
 
-interface IPlotData {
-    ID: number;
-    color: Color;
+class Point4D implements IPoint<Point4D> {
+    public x: number;
+    public y: number;
+    public z: number;
+    public i: number;
 
-    getLength(): number;
-    getValue(index: number): Point;
-    getLastValue(): Point;
-}
-
-class PlotDataViewer implements IPlotData {
-    public ID: number;
-    public color: Color;
-    private realData: PlotData;
-
-
-    constructor(realData: PlotData) {
-        this.realData = realData;
-        this.ID = realData.ID;
-        this.color = realData.color;
+    constructor(x: number, y: number, z: number, i: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.i = i;
     }
 
-    public getLength(): number {
-        return this.realData.points.length;
+    add(p: Point4D): Point4D {
+        return new Point4D(this.x + p.x, this.y + p.y, this.z + p.z, this.i + p.i);
     }
 
-    public getValue(index: number): Point {
-        return this.realData.points[index];
+    sub(p: Point4D): Point4D {
+        return new Point4D(this.x - p.x, this.y - p.y, this.z - p.z, this.i - p.i);
     }
 
-    public getLastValue(): Point {
-        return this.realData.points[this.realData.points.length - 1];
+    multiply(p: Point4D): Point4D {
+        return new Point4D(this.x * p.x, this.y * p.y, this.z * p.z, this.i * p.i);
+    }
+
+    divide(p: Point4D): Point4D {
+        return new Point4D(this.x / p.x, this.y / p.y, this.z / p.z, this.i / p.i);
     }
 }

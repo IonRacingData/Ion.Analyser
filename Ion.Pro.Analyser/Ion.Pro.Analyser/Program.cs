@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ion.Pro.Analyser.Data;
 using Ion.Pro.Analyser.SenSys;
+using System.Net.Sockets;
 
 namespace Ion.Pro.Analyser
 {
@@ -17,6 +18,7 @@ namespace Ion.Pro.Analyser
         OffLine,
         LiveTest,
         LiveTestSin,
+        LiveTestLegacy,
         SmallTest
     }
 
@@ -153,10 +155,31 @@ namespace Ion.Pro.Analyser
                     store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
                     store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
                     break;
+                case RunMode.LiveTestLegacy:
+                    Task.Run(() => ReadLegacyTelemetry());
+                    break;
             }
         }
 
+        private static void ReadLegacyTelemetry()
+        {
+            UdpClient client = new UdpClient(16300);
+            DateTime startTime = DateTime.Now;
+            while (true)
+            {
+                Net.IPEndPoint endPoint = new Net.IPEndPoint(Net.IPAddress.Any, 0);
+                byte[] bytes = client.Receive(ref endPoint);
 
+                for (int i = 0; i < bytes.Length; i += 6)
+                {
+                    SensorPackage package = new SensorPackage();
+                    package.ID = BitConverter.ToUInt16(bytes, i);
+                    package.Value = BitConverter.ToInt32(bytes, i + 2);
+                    package.TimeStamp = (long)(DateTime.Now - startTime).TotalMilliseconds;
+                    SensorDataStore.GetDefault().AddLive(package);
+                }
+            }
+        }
 
         static void DataInserter(string file)
         {
@@ -184,7 +207,7 @@ namespace Ion.Pro.Analyser
             }
         }
 
-        static HttpAction testAction = null;
+        //static HttpAction testAction = null;
         static SessionService service = new SessionService();
 
         public static async Task WebHandlerAsync(HttpWrapper wrapper)

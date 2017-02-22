@@ -9,9 +9,9 @@
     private startAngle: number = -(3 * Math.PI) / 4;
     private needle: ImageData;
     private offsetX: number;
-    private offsetY: number;   
+    private offsetY: number;
     private color: string = "black";
-    private needleColor: string = "black";    
+    private needleColor: string = "black";
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         super();
@@ -32,7 +32,7 @@
                 let rules = ss.cssRules;
 
                 for (let j = 0; j < rules.length; j++) {
-                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];                    
+                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];
                     if (rule.selectorText === ".gauge-plot") {
                         this.color = rule.style.color;
                         this.needleColor = rule.style.borderColor;
@@ -41,9 +41,7 @@
                 }
                 break;
             }
-        }            
-
-        
+        }
     }
 
     generate(): HTMLElement {
@@ -56,19 +54,18 @@
         this.setSize(this.size, this.size);
         return this.wrapper;
     }
-        
-    protected draw(): void {
 
+    protected draw(): void {
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         let radius = this.size / 2;
 
         // center dot
-        this.ctxCenter.fillStyle = this.color;        
+        this.ctxCenter.fillStyle = this.color;
         this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
-        //this.ctxCenter.beginPath();
+        // this.ctxCenter.beginPath();
         this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
-        this.ctxCenter.fill();        
+        this.ctxCenter.fill();
 
         // ring
         this.ctxMain.beginPath();
@@ -80,7 +77,7 @@
         // labels
         this.ctxMain.textBaseline = "middle";
         this.ctxMain.textAlign = "center";
-        this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";        
+        this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";
 
         for (let i = 0; i < this.labels.length; i++) {
             let increment = this.totalAngle / (this.labels.length - 1);
@@ -93,14 +90,15 @@
             this.ctxMain.rotate(ang);
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
-        }        
+        }
 
-        this.drawNeedle();     
-        
-    }                  
+        this.drawNeedle();
+    }
 
     private drawNeedle(): void {
+
         let val = this.percent * 100;
+
 
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();

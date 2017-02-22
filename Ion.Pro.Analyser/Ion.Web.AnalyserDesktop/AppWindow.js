@@ -31,7 +31,7 @@ var AppWindow = (function () {
         this.setPos(300, 50);
         this.setSize(500, 400);
         this.windowElement = handle.getElementsByClassName("window")[0];
-        this.content = this.sizeHandle; //<HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content = this.sizeHandle; // <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
         this.content.addEventListener("mousemove", function (e) { return _this.content_mouseMove(e); });
     }
     Object.defineProperty(AppWindow.prototype, "title", {
@@ -74,7 +74,7 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.header_mouseDown = function (e) {
         e.stopPropagation();
-        //console.log("headerDown");
+        // console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.pageY + this.outerBoxMargin;
         this.winMan.dragging = true;
@@ -82,7 +82,7 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.header_touchStart = function (e) {
         e.stopPropagation();
-        //e.preventDefault();
+        // e.preventDefault();
         console.log(e);
         this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY + this.outerBoxMargin;
@@ -155,8 +155,9 @@ var AppWindow = (function () {
         for (var i = 0; i < 4; i++) {
             curHandle.style.width = "100%";
             curHandle.style.height = "100%";
-            if (i == 3)
+            if (i === 3) {
                 break;
+            }
             curHandle = curHandle.parentElement;
         }
         curHandle.style.padding = "0";
@@ -334,10 +335,12 @@ var AppWindow = (function () {
         if (storeSize === void 0) { storeSize = true; }
         var newWidth = width + this.deltaX;
         var newHeight = height + this.deltaY;
-        if (newWidth < 230)
+        if (newWidth < 230) {
             newWidth = 230;
-        if (newHeight < 150)
+        }
+        if (newHeight < 150) {
             newHeight = 150;
+        }
         this.sizeHandle.style.width = (newWidth).toString() + "px";
         this.sizeHandle.style.height = (newHeight).toString() + "px";
         this.width = newWidth;

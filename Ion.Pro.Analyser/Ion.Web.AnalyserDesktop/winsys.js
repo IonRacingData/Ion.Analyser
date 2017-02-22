@@ -13,9 +13,9 @@ var WindowManager = (function () {
         window.addEventListener("touchmove", function (e) { return _this.touchMove(e); });
         window.addEventListener("touchend", function (e) { return _this.touchEnd(e); });
         this.eventManager = new EventManager();
-        //this.addEventListener = this.eventManager.addEventListener;
-        //this.addEventListener2 = this.eventManager.addEventListener;
-        //addEventListener
+        // this.addEventListener = this.eventManager.addEventListener;
+        // this.addEventListener2 = this.eventManager.addEventListener;
+        // addEventListener
     }
     WindowManager.prototype.mouseMove = function (e) {
         this.handleMouseMoving(e.pageX, e.pageY, e);
@@ -63,8 +63,9 @@ var WindowManager = (function () {
     WindowManager.prototype.getWindowAt = function (x, y, ignoreActive) {
         for (var i = this.order.length - 1; i >= 0; i--) {
             var curWindow = this.windows[i];
-            if (ignoreActive && curWindow === this.activeWindow)
+            if (ignoreActive && curWindow === this.activeWindow) {
                 continue;
+            }
             if (this.intersects(x, y, curWindow)) {
                 return curWindow;
             }
@@ -78,7 +79,7 @@ var WindowManager = (function () {
             && y < window.y + window.totalHeight;
     };
     WindowManager.prototype.mouseUp = function (e) {
-        //console.log(e);
+        // console.log(e);
         var x = e.layerX;
         var y = e.layerY;
         var appWindow = this.getWindowAt(x, y, true);
@@ -102,7 +103,7 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
-        //window.setTitle(title);
+        // window.setTitle(title);
         window.title = title;
         app.windows.push(window);
         this.registerWindow(window);

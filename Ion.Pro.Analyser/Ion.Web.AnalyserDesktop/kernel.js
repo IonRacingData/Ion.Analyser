@@ -6,8 +6,8 @@ function startUp() {
         netMan: new NetworkManager(),
         senMan: null
     };
-    kernel.senMan = new SensorManager();
-    kernel.senMan.setGlobal(841);
+    kernel.senMan = new SensorManager(); // Late init because it needs netMan
+    // kernel.senMan.setGlobal(841);
     registerLaunchers();
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
@@ -23,19 +23,22 @@ function startUp() {
 }
 function registerLaunchers() {
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(BarTester, "Bar Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(SteeringWheelTester, "Steering Wheel Test"));
-    kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
+    //kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
 }
+/* tslint:enable:interface-name */
 var Launcher = (function () {
     function Launcher(mainFunction, name) {
         this.mainFunction = mainFunction;

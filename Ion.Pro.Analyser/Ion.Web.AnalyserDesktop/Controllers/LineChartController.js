@@ -80,7 +80,7 @@ var LineChartController = (function (_super) {
     };
     LineChartController.prototype.moveToLastPoint = function () {
         if (this.data[0]) {
-            var lastPointAbs = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
+            var lastPointAbs = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
             if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
                 this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
             }
@@ -88,11 +88,11 @@ var LineChartController = (function (_super) {
     };
     LineChartController.prototype.selectPoint = function (e) {
         if (this.data) {
-            //var mp: Point = this.getMousePoint(e);
+            // var mp: Point = this.getMousePoint(e);
             var mp = e;
             var p = null;
             for (var i = 0; i < this.data.length; i++) {
-                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
@@ -145,14 +145,15 @@ var LineChartController = (function (_super) {
         this.drawXAxis();
         this.drawYAxis();
         if (this.data) {
+            console.log(this.data);
             for (var d = 0; d < this.data.length; d++) {
-                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
                 var lastPoint = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-                var totalLength = this.data[d].getLength();
+                var totalLength = this.data[d].length();
                 var drawPoint = 0;
                 var checkPoint = lastPoint;
                 this.ctxMain.beginPath();
@@ -331,7 +332,7 @@ var LineChartController = (function (_super) {
         var min = 0;
         var max = 0;
         for (var i = 0; i < this.data.length; i++) {
-            var info = this.sensorInfos[this.data[i].ID.toString()];
+            var info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
             var dmin = SensorInfoHelper.minValue(info);
             var dmax = SensorInfoHelper.maxValue(info);
             min = dmin < min ? dmin : min;

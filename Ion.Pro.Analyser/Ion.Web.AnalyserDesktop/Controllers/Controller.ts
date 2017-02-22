@@ -17,26 +17,26 @@
 abstract class SingleValueController extends Controller {
     protected percent: number = 0;
     protected value: number = 0;
-    protected data: IPlotData;
+    protected data: IDataSource<Point>;
     protected lastID: number = -1;
     protected lastSensorInfo: SensorInformation;
 
-    public setData(d: IPlotData) {
+    public setData(d: IDataSource<Point>) {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.ID;
-            if (curID !== this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
+            let curID = this.data.infos.IDs[0];
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfoNew(this.data, (i: SensorInformation) => {
                     this.lastSensorInfo = i;
-                    this.lastID = this.data.ID;
+                    this.lastID = this.data.infos.IDs[0];
                     this.onDataChange();
                 });
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
-                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
+                    this.value = this.data.getValue(this.data.length() - 1).y;
                 }
                 this.onDataChange();
             }
@@ -78,11 +78,11 @@ abstract class CanvasController extends Controller {
 }
 
 abstract class MultiValueCanvasController extends CanvasController {
-    protected data: IPlotData[];
+    protected data: IDataSource<Point>[];
     protected sensorInfos: { [id: string]: SensorInformation } = {};
     private lastDataLength: number = 0;
 
-    public setData(d: IPlotData[]): void {
+    public setData(d: IDataSource<Point>[]): void {
         this.data = d;
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
@@ -98,7 +98,7 @@ abstract class MultiValueCanvasController extends CanvasController {
 
         for (let i of infos) {
             for (let d of this.data) {
-                if (d.ID === i.ID) {
+                if (d.infos.IDs[0] === i.ID) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -113,26 +113,26 @@ abstract class MultiValueCanvasController extends CanvasController {
 abstract class SingleValueCanvasController extends CanvasController {
     protected percent: number = 0;
     protected value: number = 0;
-    protected data: IPlotData;
+    protected data: IDataSource<Point>;
     protected lastID: number = -1;
     protected lastSensorInfo: SensorInformation;    
     
-    public setData(d: IPlotData) {
+    public setData(d: IDataSource<Point>) {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.ID;
-            if (curID !== this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, (i: SensorInformation) => {
+            let curID = this.data.infos.IDs[0];
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfoNew(this.data, (i: SensorInformation) => {
                     this.lastSensorInfo = i;
-                    this.lastID = this.data.ID;
+                    this.lastID = this.data.infos.IDs[0];
                     this.onDataChange();
                 });
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.getLength() - 1)).y;
-                    this.value = this.data.getValue(this.data.getLength() - 1).y;
+                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
+                    this.value = this.data.getValue(this.data.length() - 1).y;
                 }
                 this.onDataChange();
             }

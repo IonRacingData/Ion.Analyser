@@ -1,22 +1,19 @@
 ﻿class SensorManager implements IEventManager {
     private dataCache: ISensorPackage[][] = [];
-    private plotCache: PlotData[] = [];
+    private plotCache: SensorDataContainer[] = [];
+    private eventManager: EventManager = new EventManager();
 
-    plotter: IPlot[] = [];
 
+    public viewers: IViewerBase<any>[] = [];
 
-    private globalPlot: ISensorPackage[];
-    private globalId: number;
-
-    static readonly event_globalPlot = "globalPlot";
     static readonly event_registerIPlot = "registerIPlot";
+    static readonly event_registerViewer = "registerViewer";
 
     constructor() {
         kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
     }
 
     private handleService(data: ISensorPackage[]) {
-
         for (let j = 0; j < data.length; j++) {
             let realData = data[j];
             let sensId = realData.ID;
@@ -27,7 +24,7 @@
             this.dataCache[sensId].push(realData);
 
             if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new PlotData([]);
+                this.plotCache[sensId] = new SensorDataContainer([]);
                 this.plotCache[sensId].ID = sensId;
             }
             this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
@@ -35,23 +32,109 @@
         this.updateAllPlotters();
     }
 
-    private updateAllPlotters() {
-        for (let i = 0; i < this.plotter.length; i++) {
-            this.plotter[i].dataUpdate();
+    private convertData(data: ISensorPackage[]): SensorDataContainer {
+        if (data.length < 1) {
+            return null;
         }
+        let id = data[0].ID;
+        let p: Point[] = [];
+        for (let i = 0; i < data.length; i++) {
+            p.push(new Point(data[i].TimeStamp, data[i].Value));
+        }
+        let plot = new SensorDataContainer(p);
+        plot.ID = id;
+        return plot;
     }
 
-    private eventManager: EventManager = new EventManager();
+    private convertToSensorPackage(str: string): ISensorPackage[] {
+        let raw = atob(str);
+        let ret: ISensorPackage[] = [];
+        for (let i = 0; i < raw.length / 28; i++) {
+            /*console.log(raw.charCodeAt(i * 28));
+            console.log(raw.charCodeAt(i * 28 + 1));
+            console.log(raw.charCodeAt(i * 28 + 2));
+            console.log(raw.charCodeAt(i * 28 + 3));*/
+            let buf = new ArrayBuffer(8);
+            let insert = new Uint8Array(buf);
+            insert[0] = raw.charCodeAt(i * 28 + 4);
+            insert[1] = raw.charCodeAt(i * 28 + 5);
+            insert[2] = raw.charCodeAt(i * 28 + 6);
+            insert[3] = raw.charCodeAt(i * 28 + 7);
+            insert[4] = raw.charCodeAt(i * 28 + 8);
+            insert[5] = raw.charCodeAt(i * 28 + 9);
+            insert[6] = raw.charCodeAt(i * 28 + 10);
+            insert[7] = raw.charCodeAt(i * 28 + 11);
+            let output = new Float64Array(buf);
+            /* tslint:disable:no-bitwise */
+            ret[i] = {
+                ID: raw.charCodeAt(i * 28)
+                | raw.charCodeAt(i * 28 + 1) << 8
+                | raw.charCodeAt(i * 28 + 2) << 16
+                | raw.charCodeAt(i * 28 + 3) << 24,
+                Value: output[0],
+                /*Value: raw.charCodeAt(i * 28 + 4)
+                | raw.charCodeAt(i * 28 + 5) << 8
+                | raw.charCodeAt(i * 28 + 6) << 16
+                | raw.charCodeAt(i * 28 + 7) << 24
+                | raw.charCodeAt(i * 28 + 8) << 32
+                | raw.charCodeAt(i * 28 + 9) << 40
+                | raw.charCodeAt(i * 28 + 10) << 48
+                | raw.charCodeAt(i * 28 + 11) << 56,*/
 
-    getInfos(callback: (ids: SensorInformation[]) => void): void {
+                TimeStamp:
+                raw.charCodeAt(i * 28 + 12)
+                | raw.charCodeAt(i * 28 + 13) << 8
+                | raw.charCodeAt(i * 28 + 14) << 16
+                | raw.charCodeAt(i * 28 + 15) << 24
+                | raw.charCodeAt(i * 28 + 16) << 32
+                | raw.charCodeAt(i * 28 + 17) << 40
+                | raw.charCodeAt(i * 28 + 18) << 48
+                | raw.charCodeAt(i * 28 + 19) << 56,
+
+            };
+
+            /* tslint:enable:no-bitwise */
+        }
+        return ret;
+    }
+
+    private loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
+        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
+            let realData = this.convertToSensorPackage(data.Sensors);
+            console.log(realData);
+            this.dataCache[id] = realData;
+            callback(realData);
+        });
+        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
+            this.dataCache[id] = data;
+            callback(data);
+        });*/
+    }
+
+    private loadPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
+        this.loadData(id, (data: ISensorPackage[]): void => {
+            let plot = this.convertData(data);
+            this.plotCache[id] = plot;
+            callback(plot);
+        });
+    }
+
+    private updateAllPlotters() {
+        for (let i = 0; i < this.viewers.length; i++) {
+            this.viewers[i].dataUpdate();
+        }
+    }
+    
+    
+    public getInfos(callback: (ids: SensorInformation[]) => void): void {
         requestAction("GetIds", callback);
     }
 
-    getLoadedIds(callback: (ids: number[]) => void): void {
+    public getLoadedIds(callback: (ids: number[]) => void): void {
         requestAction("GetLoadedIds", callback);
     }
 
-    getLoadedInfos(callback: (ids: SensorInformation[]) => void): void {
+    public getLoadedInfos(callback: (ids: SensorInformation[]) => void): void {
         let multiBack = new Multicallback(2, (ids: SensorInformation[], loaded: number[]) => {
             let newLoaded: SensorInformation[] = [];
             let allIds: SensorInformation[] = [];
@@ -77,7 +160,7 @@
         this.getLoadedIds(multiBack.createCallback());
     }
 
-    getData(id: number, callback: (data: ISensorPackage[]) => void): void{
+    public getData(id: number, callback: (data: ISensorPackage[]) => void): void {
         if (!this.dataCache[id]) {
             this.loadData(id, callback);
         }
@@ -86,7 +169,7 @@
         }
     }
 
-    getPlotData(id: number, callback: (data: PlotData) => void): void {
+    public getPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
         if (!this.plotCache[id]) {
             this.loadPlotData(id, callback);
         }
@@ -95,110 +178,29 @@
         }
     }
 
-    private loadPlotData(id: number, callback: (data: PlotData) => void): void {
-        this.loadData(id, (data: ISensorPackage[]): void => {
-            let plot = this.convertData(data);
-            this.plotCache[id] = plot;
-            callback(plot);
-        });
-    }
-
-    private convertData(data: ISensorPackage[]): PlotData {
-        if (data.length < 1)
-            return null;
-        let id = data[0].ID;
-        let p: Point[] = [];
-        for (let i = 0; i < data.length; i++) {
-            p.push(new Point(data[i].TimeStamp, data[i].Value));
-        }
-        let plot = new PlotData(p);
-        plot.ID = id;
-        return plot;
-
-    }
-
-    private loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
-        kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
-            let realData = this.convertToSensorPackage(data.Sensors);
-            console.log(realData);
-            this.dataCache[id] = realData;
-            callback(realData);
-        });
-        /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
-            this.dataCache[id] = data;
-            callback(data);
-        });*/
-    }
-
-    private convertToSensorPackage(str: string): ISensorPackage[] {
-        let raw = atob(str);
-        let ret: ISensorPackage[] = [];
-        for (let i = 0; i < raw.length / 28; i++) {
-            /*console.log(raw.charCodeAt(i * 28));
-            console.log(raw.charCodeAt(i * 28 + 1));
-            console.log(raw.charCodeAt(i * 28 + 2));
-            console.log(raw.charCodeAt(i * 28 + 3));*/
-            let buf = new ArrayBuffer(8);
-            let insert = new Uint8Array(buf);
-            insert[0] = raw.charCodeAt(i * 28 + 4);
-            insert[1] = raw.charCodeAt(i * 28 + 5);
-            insert[2] = raw.charCodeAt(i * 28 + 6);
-            insert[3] = raw.charCodeAt(i * 28 + 7);
-            insert[4] = raw.charCodeAt(i * 28 + 8);
-            insert[5] = raw.charCodeAt(i * 28 + 9);
-            insert[6] = raw.charCodeAt(i * 28 + 10);
-            insert[7] = raw.charCodeAt(i * 28 + 11);
-            let output = new Float64Array(buf);
-
-            ret[i] = {
-                ID: raw.charCodeAt(i * 28)
-                | raw.charCodeAt(i * 28 + 1) << 8
-                | raw.charCodeAt(i * 28 + 2) << 16
-                | raw.charCodeAt(i * 28 + 3) << 24,
-                Value: output[0],
-                /*Value: raw.charCodeAt(i * 28 + 4)
-                | raw.charCodeAt(i * 28 + 5) << 8
-                | raw.charCodeAt(i * 28 + 6) << 16
-                | raw.charCodeAt(i * 28 + 7) << 24
-                | raw.charCodeAt(i * 28 + 8) << 32
-                | raw.charCodeAt(i * 28 + 9) << 40
-                | raw.charCodeAt(i * 28 + 10) << 48
-                | raw.charCodeAt(i * 28 + 11) << 56,*/
-
-                TimeStamp:
-                  raw.charCodeAt(i * 28 + 12)
-                | raw.charCodeAt(i * 28 + 13) << 8
-                | raw.charCodeAt(i * 28 + 14) << 16
-                | raw.charCodeAt(i * 28 + 15) << 24
-                | raw.charCodeAt(i * 28 + 16) << 32
-                | raw.charCodeAt(i * 28 + 17) << 40
-                | raw.charCodeAt(i * 28 + 18) << 48
-                | raw.charCodeAt(i * 28 + 19) << 56,
-                
-            } 
-        }
-        return ret;
-    }
 
     public clearCache(): void {
         this.dataCache = [];
         this.plotCache = [];
-        for (let a of this.plotter) {
-            if (Array.isArray((<any>a).plotData)) {
-                (<IMultiPlot>a).plotData.splice(0);
-                (<IMultiPlot>a).dataUpdate();
+        for (let a of this.viewers) {
+            if (SensorManager.isCollectionViewer(a)) {
+                a.dataCollectionSource.splice(0);
+
+            }
+            else if (SensorManager.isViewer(a)) {
+                a.dataSource = null;
             }
             else {
-                (<ISinglePlot>a).plotData = null;
-                (<ISinglePlot>a).dataUpdate();
+                console.log("Here is something wrong ...");
             }
+            a.dataUpdate();
         }
     }
 
-    public getSensorInfo(data: IPlotData, callback: (data: SensorInformation) => void) {
+    public getSensorInfoNew(data: IDataSource<any>, callback: (data: SensorInformation) => void) {
         this.getLoadedInfos((all: SensorInformation[]) => {
             for (let i = 0; i < all.length; i++) {
-                if (all[i].ID == data.ID) {
+                if (all[i].ID === data.infos.IDs[0]) {
                     callback(all[i]);
                     break;
                 }
@@ -206,32 +208,31 @@
         });
     }
 
-    setGlobal(id: number) {
-        this.globalId = id;
-        this.getData(id, (data: ISensorPackage[]) => {
-            this.globalPlot = data;
-            this.eventManager.raiseEvent(SensorManager.event_globalPlot, this.globalPlot);
-        });
-    }
-
-    addEventListener(type: string, listener: any) {
-        if (type == SensorManager.event_globalPlot && this.globalPlot != null) {
-            listener(this.globalPlot);
-        }
+    public addEventListener(type: string, listener: any) {
         this.eventManager.addEventListener(type, listener);
     }
 
-    removeEventListener(type: string, listener: any) {
+    public removeEventListener(type: string, listener: any) {
         this.eventManager.removeEventListener(type, listener);
     }
 
-    
-    
-    register(plotter: IPlot): void {
-        this.plotter.push(plotter);
-        this.eventManager.raiseEvent(SensorManager.event_registerIPlot, null);
+    public register<T>(viewer: IViewerBase<T>): void {
+        this.viewers.push(viewer);
+        this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+    }
+
+
+
+    public static isViewer(value: IViewerBase<any>): value is IViewer<any> {
+        return (<IViewer<any>>value).dataSource !== undefined;
+    }
+
+    public static isCollectionViewer(value: IViewerBase<any>): value is ICollectionViewer<any> {
+        return (<ICollectionViewer<any>>value).dataCollectionSource !== undefined;
     }
 }
+
+
 
 class Multicallback {
     callback: (...param: any[]) => void;
@@ -255,10 +256,14 @@ class Multicallback {
     }
 
     checkReturn() {
-        if (this.count == this.returned) {
+        if (this.count === this.returned) {
             this.callback.apply(null, this.responses);
         }
     }
+}
+
+class SensorPlotInfo {
+    IDs: number[] = [];
 }
 
 class SensorInformation {
@@ -292,7 +297,9 @@ class SensorInfoHelper {
             val = temp.MaxValue;
         }
         else {
+            /* tslint:disable:no-bitwise */
             val = (1 << temp.Resolution) - 1;
+            /* tslint:enable:no-bitwise */
         }
         return val;
     }
@@ -319,18 +326,4 @@ class SensorInfoHelper {
         let newVal = (p.y - min) / (max - min);
         return new Point(p.x, newVal);
     }
-}
-
-interface IPlot {
-    dataUpdate();
-    plotType: string;
-    plotWindow: AppWindow;
-}
-
-interface ISinglePlot extends IPlot {
-    plotData: IPlotData;
-}
-
-interface IMultiPlot extends IPlot {
-    plotData: IPlotData[];
 }

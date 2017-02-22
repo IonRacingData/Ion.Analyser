@@ -1,4 +1,4 @@
-﻿class LineChartController extends MultiValueCanvasController{
+﻿class LineChartController extends MultiValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
     private mouseMod: Point;
@@ -91,7 +91,7 @@
     
     private moveToLastPoint(): void {
         if (this.data[0]) {
-            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
+            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
             if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
                 this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
             }
@@ -100,11 +100,11 @@
 
     private selectPoint(e: Point): void {
         if (this.data) {
-            //var mp: Point = this.getMousePoint(e);
+            // var mp: Point = this.getMousePoint(e);
             var mp = e;
             var p: Point = null;
             for (let i: number = 0; i < this.data.length; i++) {
-                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
@@ -160,22 +160,21 @@
     }
 
     protected draw(): void {
-        this.ctxMain.clear();        
+        this.ctxMain.clear();
 
         this.drawXAxis();
         this.drawYAxis();
 
         if (this.data) {
-
+            console.log(this.data);
             for (var d: number = 0; d < this.data.length; d++) {
-                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
+                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
-
                 var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-                var totalLength: number = this.data[d].getLength();
+                var totalLength: number = this.data[d].length();
                 var drawPoint: number = 0;
                 var checkPoint: Point = lastPoint;
 
@@ -212,7 +211,7 @@
                 this.ctxMain.stroke();
                 this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
             }
-        }        
+        }
     }
 
     private drawXAxis(): void {
@@ -404,7 +403,7 @@
         let max: number = 0;
 
         for (let i = 0; i < this.data.length; i++) {
-            let info = this.sensorInfos[this.data[i].ID.toString()];
+            let info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
             let dmin: number = SensorInfoHelper.minValue(info);
             let dmax: number = SensorInfoHelper.maxValue(info);            
             min = dmin < min ? dmin : min;
@@ -629,7 +628,7 @@ class ContextFixer {
         let newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {        
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     }
@@ -654,7 +653,7 @@ class LayeredCanvas {
     }
 
     addCanvas(): HTMLCanvasElement {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");
         this.wrapper.appendChild(canvas);
         this.canvases.push(canvas);
         return canvas;

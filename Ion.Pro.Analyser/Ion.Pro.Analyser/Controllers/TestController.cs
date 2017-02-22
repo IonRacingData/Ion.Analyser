@@ -51,5 +51,12 @@ namespace Ion.Pro.Analyser.Controllers
             SensorDataStore.GetDefault().LoadNewData(file);
             return String("OK");
         }
+
+        public IActionResult Csv(string encoding, string values, string title)
+        {
+            string result = SensorDataStore.GetDefault().CreateCsv(encoding == "nor", title == "checked");
+
+            return File(Encoding.Default.GetBytes(result), "data_" + values + ".csv", true);
+        }
     }
 }

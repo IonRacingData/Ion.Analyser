@@ -1,4 +1,5 @@
 var selectedSpan = null;
+/* tslint:enable:interface-name */
 var HtmlHelper = (function () {
     function HtmlHelper() {
     }

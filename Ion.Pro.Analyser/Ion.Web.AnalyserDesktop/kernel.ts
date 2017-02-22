@@ -1,6 +1,6 @@
-﻿var kernel: Kernel;
+﻿var kernel: IKernel;
 
-interface Kernel {
+interface IKernel {
     winMan: WindowManager;
     appMan: ApplicationManager;
     netMan: NetworkManager;
@@ -8,7 +8,7 @@ interface Kernel {
 }
 
 function startUp() {
-    
+
 
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
@@ -17,9 +17,9 @@ function startUp() {
         senMan: null
     };
 
-    kernel.senMan = new SensorManager();
+    kernel.senMan = new SensorManager();  // Late init because it needs netMan
 
-    kernel.senMan.setGlobal(841);
+    // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
 
@@ -44,11 +44,13 @@ function startUp() {
 
 function registerLaunchers() {
 
-    
+
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
+    // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
 
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
@@ -56,7 +58,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(BarTester, "Bar Test"));
     kernel.appMan.registerApplication("Plot", new Launcher(SteeringWheelTester, "Steering Wheel Test"));
-    kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
+    //kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
 
 
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
@@ -64,14 +66,15 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
 }
 
-interface EventTarget extends IEventManager
-{
+/* tslint:disable:interface-name */
+interface EventTarget extends IEventManager {
 
 }
 
 interface HTMLElement {
     window: AppWindow;
 }
+/* tslint:enable:interface-name */
 
 class Launcher {
     mainFunction: new () => IApplication;

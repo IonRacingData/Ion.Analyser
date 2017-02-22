@@ -9,10 +9,9 @@ var DataAssigner = (function () {
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
         this.draw();
-        this.eh.on(kernel.senMan, SensorManager.event_registerIPlot, function () { return _this.draw(); });
+        this.eh.on(kernel.senMan, SensorManager.event_registerViewer, function () { return _this.draw(); });
     };
     DataAssigner.prototype.draw = function () {
-        var _this = this;
         this.window.content.innerHTML = "";
         var mk = this.mk;
         var divLeft = mk.tag("div");
@@ -20,62 +19,12 @@ var DataAssigner = (function () {
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
         var last = null;
-        //let selectedPlot: IPlot = null;
+        // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
-        var _loop_1 = function (i) {
-            var curPlot = senMan.plotter[i];
-            var isMulti = Array.isArray(curPlot.plotData);
-            if (isMulti) {
-                tableGen.addRow([
-                    {
-                        event: "click", func: function (e) {
-                            if (last !== null) {
-                                last.classList.remove("selectedrow");
-                            }
-                            last = _this.findTableRow(e.target);
-                            last.classList.add("selectedrow");
-                            kernel.senMan.getLoadedInfos(function (x) { return _this.drawMultiSensors(curPlot, x); });
-                        }
-                    },
-                    {
-                        event: "mouseenter", func: function (e) {
-                            curPlot.plotWindow.highlight(true);
-                        }
-                    },
-                    {
-                        event: "mouseleave", func: function (e) {
-                            curPlot.plotWindow.highlight(false);
-                        }
-                    },
-                ], curPlot.plotType, "Multi Plot");
-            }
-            else {
-                tableGen.addRow([
-                    {
-                        event: "click", func: function (e) {
-                            if (last !== null) {
-                                last.classList.remove("selectedrow");
-                            }
-                            last = _this.findTableRow(e.target);
-                            last.classList.add("selectedrow");
-                            kernel.senMan.getLoadedInfos(function (x) { return _this.drawSingleSensors(curPlot, x); });
-                        },
-                    },
-                    {
-                        event: "mouseenter", func: function (e) {
-                            curPlot.plotWindow.highlight(true);
-                        }
-                    },
-                    {
-                        event: "mouseleave", func: function (e) {
-                            curPlot.plotWindow.highlight(false);
-                        }
-                    }
-                ], curPlot.plotType, "Single Plot");
-            }
-        };
-        for (var i = 0; i < senMan.plotter.length; i++) {
-            _loop_1(i);
+        for (var i = 0; i < senMan.viewers.length; i++) {
+            var curPlot = senMan.viewers[i];
+            var isMulti = curPlot.dataCollectionSource !== undefined;
+            this.drawRow(curPlot, isMulti, tableGen, last);
         }
         divLeft.appendChild(tableGen.generate());
         divLeft.style.minWidth = "250px";
@@ -86,6 +35,40 @@ var DataAssigner = (function () {
         divRight.style.overflowY = "auto";
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);
+    };
+    DataAssigner.prototype.drawRow = function (curPlot, isMulti, tableGen, last) {
+        var _this = this;
+        var name = "Single Plot";
+        if (isMulti) {
+            name = "Multi Plot";
+        }
+        tableGen.addRow([
+            {
+                event: "click", func: function (e) {
+                    if (last !== null) {
+                        last.classList.remove("selectedrow");
+                    }
+                    last = _this.findTableRow(e.target);
+                    last.classList.add("selectedrow");
+                    if (isMulti) {
+                        kernel.senMan.getLoadedInfos(function (x) { return _this.drawMultiSensors(curPlot, x); });
+                    }
+                    else {
+                        kernel.senMan.getLoadedInfos(function (x) { return _this.drawSingleSensors(curPlot, x); });
+                    }
+                }
+            },
+            {
+                event: "mouseenter", func: function (e) {
+                    curPlot.plotWindow.highlight(true);
+                }
+            },
+            {
+                event: "mouseleave", func: function (e) {
+                    curPlot.plotWindow.highlight(false);
+                }
+            },
+        ], curPlot.plotType, name);
     };
     DataAssigner.prototype.findTableRow = function (element) {
         var curElement = element;
@@ -104,14 +87,14 @@ var DataAssigner = (function () {
         var radio = this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID == sensor.ID) {
+        if (plot.dataSource && plot.dataSource.infos.IDs[0] === sensor.ID) {
             radio.checked = true;
         }
         radio.addEventListener("change", function (e) {
             radio.disabled = true;
             console.log("Single checkbox click");
             kernel.senMan.getPlotData(sensor.ID, function (data) {
-                plot.plotData = new PlotDataViewer(data);
+                plot.dataSource = new PointSensorGroup(data);
                 plot.dataUpdate();
                 radio.disabled = false;
             });
@@ -121,8 +104,8 @@ var DataAssigner = (function () {
     DataAssigner.prototype.createMultiSensor = function (plot, sensor) {
         var checkBox = this.mk.tag("input");
         checkBox.type = "checkbox";
-        for (var i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID == sensor.ID) {
+        for (var i = 0; i < plot.dataCollectionSource.length; i++) {
+            if (plot.dataCollectionSource[i].infos.IDs[0] === sensor.ID) {
                 checkBox.checked = true;
                 break;
             }
@@ -132,15 +115,15 @@ var DataAssigner = (function () {
             console.log("Multi checkbox click");
             if (checkBox.checked) {
                 kernel.senMan.getPlotData(sensor.ID, function (data) {
-                    plot.plotData.push(new PlotDataViewer(data));
+                    plot.dataCollectionSource.push(new PointSensorGroup(data));
                     plot.dataUpdate();
                     checkBox.disabled = false;
                 });
             }
             else {
-                for (var i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID == sensor.ID) {
-                        plot.plotData.splice(i, 1);
+                for (var i = 0; i < plot.dataCollectionSource.length; i++) {
+                    if (plot.dataCollectionSource[i].infos.IDs[0] === sensor.ID) {
+                        plot.dataCollectionSource.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;
                         break;
@@ -168,28 +151,37 @@ var DataAssigner = (function () {
     };
     return DataAssigner;
 }());
-var TestDataViewer = (function () {
-    function TestDataViewer() {
-        this.plotType = "Test Data Viewer";
-    }
-    TestDataViewer.prototype.main = function () {
+/*class TestDataViewer implements IApplication, ISinglePlot {
+    application: Application;
+    window: AppWindow;
+    plotData: IPlotData1;
+    plotType: string = "Test Data Viewer";
+    plotWindow: AppWindow;
+    plotDataType = PlotType.I1D;
+
+    main(): void {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
-    };
-    TestDataViewer.prototype.draw = function () {
-        var gen = new HtmlTableGen("table");
+        kernel.senMan.registerDeprecated(this);
+    }
+
+    draw(): void {
+        let gen = new HtmlTableGen("table");
         gen.addHeader("Value", "Timestamp");
-        for (var i = 0; i < this.plotData.getLength() && i < 10; i++) {
+
+        for (let i = 0; i < this.plotData.getLength() && i < 10; i++) {
             gen.addRow(this.plotData.getValue(i).x, this.plotData.getValue(i).y);
         }
+
         this.window.content.appendChild(gen.generate());
-        //console.log("Here we should draw something, but you know, we are lazy");
-    };
-    TestDataViewer.prototype.dataUpdate = function () {
+
+        // console.log("Here we should draw something, but you know, we are lazy");
+    }
+
+    dataUpdate(): void {
         this.draw();
-    };
-    return TestDataViewer;
-}());
+    }
+}
+*/
 var SensorSetSelector = (function () {
     function SensorSetSelector() {
         this.mk = new HtmlHelper();
@@ -205,12 +197,12 @@ var SensorSetSelector = (function () {
         this.wrapper.innerHTML = "";
         var table = new HtmlTableGen("table selectable");
         table.addHeader("File name", "File size", "Sensor reader");
-        var _loop_2 = function (a) {
+        var _loop_1 = function (a) {
             table.addRow([
                 {
                     "event": "click",
                     "func": function (event) {
-                        //console.log("you clicked on: " + a.FileName);
+                        // console.log("you clicked on: " + a.FileName);
                         requestAction("LoadDataset?file=" + a.FullFileName, function (data) { });
                         kernel.senMan.clearCache();
                     }
@@ -219,7 +211,7 @@ var SensorSetSelector = (function () {
         };
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var a = data_1[_i];
-            _loop_2(a);
+            _loop_1(a);
         }
         this.wrapper.appendChild(table.generate());
     };

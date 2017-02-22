@@ -29,16 +29,16 @@ var Color = (function () {
     };
     return Color;
 }());
-var PlotData = (function () {
-    function PlotData(p) {
+var SensorDataContainer = (function () {
+    function SensorDataContainer(p) {
         this.points = p;
         this.color = Color.randomColor(0, 255 + 128);
     }
-    PlotData.prototype.getClosest = function (p) {
+    SensorDataContainer.prototype.getClosest = function (p) {
         return this.points[this.getIndexOf(p)];
     };
     // returns index of closest point to 'p' on x-axis
-    PlotData.prototype.getIndexOf = function (p) {
+    SensorDataContainer.prototype.getIndexOf = function (p) {
         var min = 0;
         var max = this.points.length - 1;
         var half;
@@ -65,7 +65,7 @@ var PlotData = (function () {
             }
         }
     };
-    return PlotData;
+    return SensorDataContainer;
 }());
 var PlotDataHelper = (function () {
     function PlotDataHelper() {
@@ -75,7 +75,7 @@ var PlotDataHelper = (function () {
     };
     PlotDataHelper.getIndexOf = function (plotData, p) {
         var min = 0;
-        var max = plotData.getLength() - 1;
+        var max = plotData.length() - 1;
         var half;
         while (true) {
             half = Math.floor((min + max) / 2);
@@ -156,21 +156,25 @@ var Point3D = (function () {
     };
     return Point3D;
 }());
-var PlotDataViewer = (function () {
-    function PlotDataViewer(realData) {
-        this.realData = realData;
-        this.ID = realData.ID;
-        this.color = realData.color;
+var Point4D = (function () {
+    function Point4D(x, y, z, i) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.i = i;
     }
-    PlotDataViewer.prototype.getLength = function () {
-        return this.realData.points.length;
+    Point4D.prototype.add = function (p) {
+        return new Point4D(this.x + p.x, this.y + p.y, this.z + p.z, this.i + p.i);
     };
-    PlotDataViewer.prototype.getValue = function (index) {
-        return this.realData.points[index];
+    Point4D.prototype.sub = function (p) {
+        return new Point4D(this.x - p.x, this.y - p.y, this.z - p.z, this.i - p.i);
     };
-    PlotDataViewer.prototype.getLastValue = function () {
-        return this.realData.points[this.realData.points.length - 1];
+    Point4D.prototype.multiply = function (p) {
+        return new Point4D(this.x * p.x, this.y * p.y, this.z * p.z, this.i * p.i);
     };
-    return PlotDataViewer;
+    Point4D.prototype.divide = function (p) {
+        return new Point4D(this.x / p.x, this.y / p.y, this.z / p.z, this.i / p.i);
+    };
+    return Point4D;
 }());
 //# sourceMappingURL=PlotData.js.map

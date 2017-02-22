@@ -133,3 +133,7 @@ span.table-resize{
 .bar-controller {
     background-color: green;
 }
+
+.disabled {
+    color: darkgray;
+}

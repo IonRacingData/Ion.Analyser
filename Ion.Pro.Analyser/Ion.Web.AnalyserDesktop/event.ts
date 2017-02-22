@@ -29,8 +29,8 @@ class EventHandler {
     }
 
     close() {
-        for (var i in this.localEvents) {
-            var cur = this.localEvents[i];
+        for (var cur of this.localEvents) {
+            // var cur = this.localEvents[i];
             cur.manager.removeEventListener(cur.type, cur.handler);
         }
     }
@@ -60,7 +60,7 @@ class EventManager implements IEventManager {
             }
             return true;
         }
-        //console.error("event of type: " + type + " does not exist!");
+        // console.error("event of type: " + type + " does not exist!");
         return false;
     }
 }

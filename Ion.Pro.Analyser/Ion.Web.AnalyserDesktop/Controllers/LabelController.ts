@@ -1,5 +1,5 @@
 ﻿class LabelController extends SingleValueController {
-    private textWrapper: HTMLElement;    
+    private textWrapper: HTMLElement;
     private fontSize: number = 10;
 
     constructor(width: number, height: number) {
@@ -42,8 +42,7 @@
             this.fontSize *= ratio;
 
             this.fontSize = this.fontSize > height ? height : this.fontSize;
-            this.textWrapper.style.fontSize = this.fontSize + "px";            
+            this.textWrapper.style.fontSize = this.fontSize + "px";
         }
     }
-    
 }

@@ -92,7 +92,7 @@
         this.setPos(300, 50);
         this.setSize(500, 400);
         this.windowElement = <HTMLElement>handle.getElementsByClassName("window")[0];
-        this.content = this.sizeHandle;//<HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content = this.sizeHandle;// <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
 
         this.content.addEventListener("mousemove", (e: MouseEvent) => this.content_mouseMove(e));
     }
@@ -116,7 +116,7 @@
 
     private header_mouseDown(e: MouseEvent): void {
         e.stopPropagation();
-        //console.log("headerDown");
+        // console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.pageY + this.outerBoxMargin;
 
@@ -126,7 +126,7 @@
 
     private header_touchStart(e: TouchEvent): void {
         e.stopPropagation();
-        //e.preventDefault();
+        // e.preventDefault();
         console.log(e);
         this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY + this.outerBoxMargin;
@@ -196,7 +196,7 @@
         this.setSize(this.width, this.height, false);
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
-        let curHandle = this.sizeHandle.parentElement
+        let curHandle = this.sizeHandle.parentElement;
         for (let i = 0; i < 3; i++) {
             curHandle.style.width = null;
             curHandle.style.height = null;
@@ -214,8 +214,9 @@
         for (let i = 0; i < 4; i++) {
             curHandle.style.width = "100%";
             curHandle.style.height = "100%";
-            if (i == 3)
+            if (i === 3) {
                 break;
+            }
             curHandle = curHandle.parentElement;
         }
         curHandle.style.padding = "0";
@@ -398,7 +399,7 @@
 
 
     __setRelativePos(x: number, y: number, storePos: boolean = true): void {
-        
+
         if (this.state === WindowState.MAXIMIZED || this.state === WindowState.TILED) {
             this.restore();
             this.deltaX = -this.width / 2;
@@ -413,15 +414,17 @@
         }
         this.onMove();
     }
-    
+
     __setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
         let newWidth = width + this.deltaX;
         let newHeight = height + this.deltaY;
 
-        if (newWidth < 230)
+        if (newWidth < 230) {
             newWidth = 230;
-        if (newHeight < 150)
+        }
+        if (newHeight < 150) {
             newHeight = 150;
+        }
         this.sizeHandle.style.width = (newWidth).toString() + "px";
         this.sizeHandle.style.height = (newHeight).toString() + "px";
         this.width = newWidth;
@@ -431,7 +434,7 @@
             this.storeHeight = newHeight;
         }
         this.onResize();
-    }    
+    }
 }
 
 class AppMouseEvent implements EventData {

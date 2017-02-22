@@ -20,7 +20,7 @@
     addEventListener2: (type: string, listner: any) => void;
 
     static event_globalDrag = "globalDrag";
-    static event_globalUp = "globalUp;"
+    static event_globalUp = "globalUp;";
 
     static event_windowOpen = "windowOpen";
     static event_windowSelect = "windowSelect";
@@ -37,9 +37,9 @@
         window.addEventListener("touchmove", (e: TouchEvent) => this.touchMove(e));
         window.addEventListener("touchend", (e: TouchEvent) => this.touchEnd(e));
         this.eventManager = new EventManager();
-        //this.addEventListener = this.eventManager.addEventListener;
-        //this.addEventListener2 = this.eventManager.addEventListener;
-        //addEventListener
+        // this.addEventListener = this.eventManager.addEventListener;
+        // this.addEventListener2 = this.eventManager.addEventListener;
+        // addEventListener
     }
 
     mouseMove(e: MouseEvent): void {
@@ -93,8 +93,9 @@
     private getWindowAt(x: number, y: number, ignoreActive: boolean): AppWindow {
         for (let i = this.order.length - 1; i >= 0 ; i--) {
             let curWindow = this.windows[i];
-            if (ignoreActive && curWindow === this.activeWindow)
+            if (ignoreActive && curWindow === this.activeWindow) {
                 continue;
+            }
             if (this.intersects(x, y, curWindow)) {
                 return curWindow;
             }
@@ -110,7 +111,7 @@
     }
 
     private mouseUp(e: MouseEvent): void {
-        //console.log(e);
+        // console.log(e);
         let x = e.layerX;
         let y = e.layerY;
         let appWindow = this.getWindowAt(x, y, true);
@@ -136,7 +137,7 @@
 
     createWindow(app: Application, title: string): AppWindow {
         var window: AppWindow = this.makeWindow(app);
-        //window.setTitle(title);
+        // window.setTitle(title);
         window.title = title;
         app.windows.push(window);
         this.registerWindow(window);

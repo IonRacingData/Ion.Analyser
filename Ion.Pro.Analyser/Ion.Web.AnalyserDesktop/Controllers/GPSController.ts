@@ -28,7 +28,6 @@
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.canvas.setSize(this.width, this.height);
         this.relSize = null;
-        
         return this.wrapper;
     }
 
@@ -43,7 +42,6 @@
 
     protected draw(): void {
         if (this.posData) {
-
             let offsetX: number;
             let offsetY: number;
 
@@ -77,7 +75,7 @@
         if (this.relSize === null && this.posData.points.length > 0) {
             this.relSize = { min: null, max: null };
             this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
-            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);            
+            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);
         }
         for (let i = 0; i < this.posData.points.length; i++) {
             let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);
