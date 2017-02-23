@@ -1,8 +1,7 @@
 ﻿class SensorManager implements IEventManager {
-    private dataCache: ISensorPackage[][] = [];
     private plotCache: SensorDataContainer[] = [];
     private eventManager: EventManager = new EventManager();
-
+    private sensorInformations: SensorInformation[];
 
     public viewers: IViewerBase<any>[] = [];
 
@@ -17,17 +16,10 @@
         for (let j = 0; j < data.length; j++) {
             let realData = data[j];
             let sensId = realData.ID;
-
-            if (!this.dataCache[sensId]) {
-                this.dataCache[sensId] = [];
-            }
-            this.dataCache[sensId].push(realData);
-
             if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new SensorDataContainer([]);
-                this.plotCache[sensId].ID = sensId;
+                this.plotCache[sensId] = new SensorDataContainer(sensId);
             }
-            this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
+            this.plotCache[sensId].insertSensorPackage([realData]);
         }
         this.updateAllPlotters();
     }
@@ -36,13 +28,10 @@
         if (data.length < 1) {
             return null;
         }
-        let id = data[0].ID;
-        let p: Point[] = [];
-        for (let i = 0; i < data.length; i++) {
-            p.push(new Point(data[i].TimeStamp, data[i].Value));
-        }
-        let plot = new SensorDataContainer(p);
-        plot.ID = id;
+
+        let plot = new SensorDataContainer(data[0].ID);
+        plot.insertSensorPackage(data);
+
         return plot;
     }
 
@@ -98,25 +87,21 @@
         return ret;
     }
 
-    private loadData(id: number, callback: (data: ISensorPackage[]) => void): void {
+    private loadData(id: number, callback: (data: SensorDataContainer) => void): void {
+
         kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
-            let realData = this.convertToSensorPackage(data.Sensors);
-            console.log(realData);
-            this.dataCache[id] = realData;
-            callback(realData);
+            let realData: ISensorPackage[] = this.convertToSensorPackage(data.Sensors);
+            let dataContainer = this.convertData(realData);
+            this.plotCache.push(dataContainer);
+            console.log(dataContainer);
+            callback(dataContainer);
         });
+
+
         /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
         });*/
-    }
-
-    private loadPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
-        this.loadData(id, (data: ISensorPackage[]): void => {
-            let plot = this.convertData(data);
-            this.plotCache[id] = plot;
-            callback(plot);
-        });
     }
 
     private updateAllPlotters() {
@@ -127,7 +112,13 @@
     
     
     public getInfos(callback: (ids: SensorInformation[]) => void): void {
-        requestAction("GetIds", callback);
+        if (this.sensorInformations !== undefined && this.sensorInformations !== null && this.sensorInformations.length > 0) {
+            callback(this.sensorInformations);
+        }
+        requestAction("GetIds", (ids: SensorInformation[]) => {
+            this.sensorInformations = ids;
+            callback(this.sensorInformations);
+        });
     }
 
     public getLoadedIds(callback: (ids: number[]) => void): void {
@@ -160,18 +151,9 @@
         this.getLoadedIds(multiBack.createCallback());
     }
 
-    public getData(id: number, callback: (data: ISensorPackage[]) => void): void {
-        if (!this.dataCache[id]) {
-            this.loadData(id, callback);
-        }
-        else {
-            callback(this.dataCache[id]);
-        }
-    }
-
-    public getPlotData(id: number, callback: (data: SensorDataContainer) => void): void {
+    public getSensorData(id: number, callback: (data: SensorDataContainer) => void): void {
         if (!this.plotCache[id]) {
-            this.loadPlotData(id, callback);
+            this.loadData(id, callback);
         }
         else {
             callback(this.plotCache[id]);
@@ -180,8 +162,8 @@
 
 
     public clearCache(): void {
-        this.dataCache = [];
         this.plotCache = [];
+        this.sensorInformations = null;
         for (let a of this.viewers) {
             if (SensorManager.isCollectionViewer(a)) {
                 a.dataCollectionSource.splice(0);
@@ -191,13 +173,13 @@
                 a.dataSource = null;
             }
             else {
-                console.log("Here is something wrong ...");
+                console.log("[SensorManager.clearChache()] Here is something wrong ...");
             }
             a.dataUpdate();
         }
     }
 
-    public getSensorInfoNew(data: IDataSource<any>, callback: (data: SensorInformation) => void) {
+    public getSensorInfo(data: IDataSource<any>, callback: (data: SensorInformation) => void): void {
         this.getLoadedInfos((all: SensorInformation[]) => {
             for (let i = 0; i < all.length; i++) {
                 if (all[i].ID === data.infos.IDs[0]) {
@@ -208,11 +190,11 @@
         });
     }
 
-    public addEventListener(type: string, listener: any) {
+    public addEventListener(type: string, listener: any): void {
         this.eventManager.addEventListener(type, listener);
     }
 
-    public removeEventListener(type: string, listener: any) {
+    public removeEventListener(type: string, listener: any): void {
         this.eventManager.removeEventListener(type, listener);
     }
 

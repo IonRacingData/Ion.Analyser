@@ -49,7 +49,7 @@ class PointSensorGroup extends SensorGroup<Point>{
     }
 
     public getValue(index: number): Point {
-        return this.data.points[index];
+        return this.data.points[index].getPoint();
     }
 
     public length(): number {

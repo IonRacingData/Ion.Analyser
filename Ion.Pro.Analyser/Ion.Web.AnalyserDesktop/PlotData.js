@@ -30,23 +30,54 @@ var Color = (function () {
     return Color;
 }());
 var SensorDataContainer = (function () {
-    function SensorDataContainer(p) {
+    function SensorDataContainer(id, p) {
+        if (p === void 0) { p = []; }
+        this.ID = id;
         this.points = p;
         this.color = Color.randomColor(0, 255 + 128);
     }
+    SensorDataContainer.prototype.insertSensorPackage = function (p) {
+        this.insertData(p.map(function (value, index, array) { return new SensorValue(value.Value, value.TimeStamp); }));
+    };
+    SensorDataContainer.prototype.insertData = function (p) {
+        if (p.length > 0) {
+            if (this.points.length === 0) {
+                (_a = this.points).push.apply(_a, p);
+            }
+            var first = p[0];
+            var last = p[p.length - 1];
+            if (first.timestamp > this.last().timestamp) {
+                (_b = this.points).push.apply(_b, p);
+            }
+            else if (last.timestamp < this.points[0].timestamp) {
+                (_c = this.points).splice.apply(_c, [0, 0].concat(p));
+            }
+            else {
+                var index = this.getClosesIndexOf(first);
+                if (first.timestamp > this.points[index].timestamp) {
+                    index--;
+                }
+                (_d = this.points).splice.apply(_d, [index, 0].concat(p));
+            }
+        }
+        var _a, _b, _c, _d;
+    };
+    SensorDataContainer.prototype.last = function () {
+        return this.points[this.points.length - 1];
+    };
     SensorDataContainer.prototype.getClosest = function (p) {
-        return this.points[this.getIndexOf(p)];
+        return this.points[this.getClosesIndexOf(p)];
     };
     // returns index of closest point to 'p' on x-axis
-    SensorDataContainer.prototype.getIndexOf = function (p) {
+    SensorDataContainer.prototype.getClosesIndexOf = function (p) {
         var min = 0;
         var max = this.points.length - 1;
         var half;
         while (true) {
             half = Math.floor((min + max) / 2);
             if (half === min) {
-                var diffMin = p.x - this.points[min].x;
-                var diffMax = this.points[max].x - p.x;
+                var diffMin = p.timestamp - this.points[min].timestamp;
+                var diffMax = this.points[max].timestamp - p.timestamp;
                 if (diffMin < diffMax) {
                     return min;
                 }
@@ -54,10 +85,10 @@ var SensorDataContainer = (function () {
                     return max;
                 }
             }
-            else if (p.x < this.points[half].x) {
+            else if (p.timestamp < this.points[half].timestamp) {
                 max = half;
             }
-            else if (p.x > this.points[half].x) {
+            else if (p.timestamp > this.points[half].timestamp) {
                 min = half;
             }
             else {
@@ -66,6 +97,18 @@ var SensorDataContainer = (function () {
         }
     };
     return SensorDataContainer;
+}());
+var SensorValue = (function () {
+    function SensorValue(value, timestamp) {
+        this.value = 0;
+        this.timestamp = 0;
+        this.value = value;
+        this.timestamp = timestamp;
+    }
+    SensorValue.prototype.getPoint = function () {
+        return new Point(this.timestamp, this.value);
+    };
+    return SensorValue;
 }());
 var PlotDataHelper = (function () {
     function PlotDataHelper() {

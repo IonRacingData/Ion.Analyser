@@ -1,7 +1,6 @@
 var SensorManager = (function () {
     function SensorManager() {
         var _this = this;
-        this.dataCache = [];
         this.plotCache = [];
         this.eventManager = new EventManager();
         this.viewers = [];
@@ -11,15 +10,10 @@ var SensorManager = (function () {
         for (var j = 0; j < data.length; j++) {
             var realData = data[j];
             var sensId = realData.ID;
-            if (!this.dataCache[sensId]) {
-                this.dataCache[sensId] = [];
-            }
-            this.dataCache[sensId].push(realData);
             if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new SensorDataContainer([]);
-                this.plotCache[sensId].ID = sensId;
+                this.plotCache[sensId] = new SensorDataContainer(sensId);
             }
-            this.plotCache[sensId].points.push(new Point(realData.TimeStamp, realData.Value));
+            this.plotCache[sensId].insertSensorPackage([realData]);
         }
         this.updateAllPlotters();
     };
@@ -27,13 +21,8 @@ var SensorManager = (function () {
         if (data.length < 1) {
             return null;
         }
-        var id = data[0].ID;
-        var p = [];
-        for (var i = 0; i < data.length; i++) {
-            p.push(new Point(data[i].TimeStamp, data[i].Value));
-        }
-        var plot = new SensorDataContainer(p);
-        plot.ID = id;
+        var plot = new SensorDataContainer(data[0].ID);
+        plot.insertSensorPackage(data);
         return plot;
     };
     SensorManager.prototype.convertToSensorPackage = function (str) {
@@ -86,22 +75,15 @@ var SensorManager = (function () {
         var _this = this;
         kernel.netMan.sendMessage("/sensor/getdata", { num: id }, function (data) {
             var realData = _this.convertToSensorPackage(data.Sensors);
-            console.log(realData);
-            _this.dataCache[id] = realData;
-            callback(realData);
+            var dataContainer = _this.convertData(realData);
+            _this.plotCache.push(dataContainer);
+            console.log(dataContainer);
+            callback(dataContainer);
         });
         /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
         });*/
-    };
-    SensorManager.prototype.loadPlotData = function (id, callback) {
-        var _this = this;
-        this.loadData(id, function (data) {
-            var plot = _this.convertData(data);
-            _this.plotCache[id] = plot;
-            callback(plot);
-        });
     };
     SensorManager.prototype.updateAllPlotters = function () {
         for (var i = 0; i < this.viewers.length; i++) {
@@ -109,7 +91,14 @@ var SensorManager = (function () {
         }
     };
     SensorManager.prototype.getInfos = function (callback) {
-        requestAction("GetIds", callback);
+        var _this = this;
+        if (this.sensorInformations !== undefined && this.sensorInformations !== null && this.sensorInformations.length > 0) {
+            callback(this.sensorInformations);
+        }
+        requestAction("GetIds", function (ids) {
+            _this.sensorInformations = ids;
+            callback(_this.sensorInformations);
+        });
     };
     SensorManager.prototype.getLoadedIds = function (callback) {
         requestAction("GetLoadedIds", callback);
@@ -139,25 +128,17 @@ var SensorManager = (function () {
         this.getInfos(multiBack.createCallback());
         this.getLoadedIds(multiBack.createCallback());
     };
-    SensorManager.prototype.getData = function (id, callback) {
-        if (!this.dataCache[id]) {
-            this.loadData(id, callback);
-        }
-        else {
-            callback(this.dataCache[id]);
-        }
-    };
-    SensorManager.prototype.getPlotData = function (id, callback) {
+    SensorManager.prototype.getSensorData = function (id, callback) {
         if (!this.plotCache[id]) {
-            this.loadPlotData(id, callback);
+            this.loadData(id, callback);
         }
         else {
             callback(this.plotCache[id]);
         }
     };
     SensorManager.prototype.clearCache = function () {
-        this.dataCache = [];
         this.plotCache = [];
+        this.sensorInformations = null;
         for (var _i = 0, _a = this.viewers; _i < _a.length; _i++) {
             var a = _a[_i];
             if (SensorManager.isCollectionViewer(a)) {
@@ -167,12 +148,12 @@ var SensorManager = (function () {
                 a.dataSource = null;
             }
             else {
-                console.log("Here is something wrong ...");
+                console.log("[SensorManager.clearChache()] Here is something wrong ...");
             }
             a.dataUpdate();
         }
     };
-    SensorManager.prototype.getSensorInfoNew = function (data, callback) {
+    SensorManager.prototype.getSensorInfo = function (data, callback) {
         this.getLoadedInfos(function (all) {
             for (var i = 0; i < all.length; i++) {
                 if (all[i].ID === data.infos.IDs[0]) {

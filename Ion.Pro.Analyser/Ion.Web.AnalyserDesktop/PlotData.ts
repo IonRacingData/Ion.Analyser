@@ -43,27 +43,61 @@
 class SensorDataContainer {
     ID: number;
     color: Color;
-    points: Point[];
+    points: SensorValue[];
 
-    constructor(p: Point[]) {
+
+    constructor(id: number)
+    constructor(id: number, p: SensorValue[] = []) {
+        this.ID = id;
         this.points = p;
         this.color = Color.randomColor(0, 255 + 128);
     }
 
-    getClosest(p: Point): Point {
-        return this.points[this.getIndexOf(p)];
+    insertSensorPackage(p: ISensorPackage[]) {
+        this.insertData(p.map((value: ISensorPackage, index: number, array: ISensorPackage[]) => { return new SensorValue(value.Value, value.TimeStamp); }));
+    }
+
+    insertData(p: SensorValue[]) {
+        if (p.length > 0) {
+            if (this.points.length === 0) {
+                this.points.push(...p);
+            }
+            let first = p[0];
+            let last = p[p.length - 1];
+            if (first.timestamp > this.last().timestamp) {
+                this.points.push(...p);
+            }
+            else if (last.timestamp < this.points[0].timestamp) {
+                this.points.splice(0, 0, ...p);
+            }
+            else {
+                let index = this.getClosesIndexOf(first);
+                if (first.timestamp > this.points[index].timestamp) {
+                    index--;
+                }
+                this.points.splice(index, 0, ...p);
+            }
+        }
+    }
+
+    last(): SensorValue {
+        return this.points[this.points.length - 1];
+    }
+
+    getClosest(p: SensorValue): SensorValue {
+        return this.points[this.getClosesIndexOf(p)];
     }
 
     // returns index of closest point to 'p' on x-axis
-    getIndexOf(p: Point): number {
+    getClosesIndexOf(p: SensorValue): number {
         var min: number = 0;
         var max: number = this.points.length - 1;
         var half: number;
         while (true) {
             half = Math.floor((min + max) / 2);
             if (half === min) {
-                var diffMin: number = p.x - this.points[min].x;
-                var diffMax: number = this.points[max].x - p.x;
+                var diffMin: number = p.timestamp - this.points[min].timestamp;
+                var diffMax: number = this.points[max].timestamp - p.timestamp;
                 if (diffMin < diffMax) {
                     return min;
                 }
@@ -72,16 +106,31 @@ class SensorDataContainer {
                 }
 
             }
-            else if (p.x < this.points[half].x) {
+            else if (p.timestamp < this.points[half].timestamp) {
                 max = half;
             }
-            else if (p.x > this.points[half].x) {
+            else if (p.timestamp > this.points[half].timestamp) {
                 min = half;
             }
             else {
                 return half;
             }
         }
+    }
+}
+
+class SensorValue
+{
+    public value: number = 0;
+    public timestamp: number = 0;
+
+    constructor(value: number, timestamp: number) {
+        this.value = value;
+        this.timestamp = timestamp;
+    }
+
+    public getPoint(): Point {
+        return new Point(this.timestamp, this.value);
     }
 }
 

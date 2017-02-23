@@ -108,7 +108,7 @@
         radio.addEventListener("change", (e: Event) => {
             radio.disabled = true;
             console.log("Single checkbox click");
-            kernel.senMan.getPlotData(sensor.ID, (data: SensorDataContainer) => {
+            kernel.senMan.getSensorData(sensor.ID, (data: SensorDataContainer) => {
                 plot.dataSource = new PointSensorGroup(data);
                 plot.dataUpdate();
                 radio.disabled = false;
@@ -131,7 +131,7 @@
             checkBox.disabled = true;
             console.log("Multi checkbox click");
             if (checkBox.checked) {
-                kernel.senMan.getPlotData(sensor.ID, (data: SensorDataContainer) => {
+                kernel.senMan.getSensorData(sensor.ID, (data: SensorDataContainer) => {
                     plot.dataCollectionSource.push(new PointSensorGroup(data));
                     plot.dataUpdate();
                     checkBox.disabled = false;

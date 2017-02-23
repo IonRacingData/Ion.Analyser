@@ -29,7 +29,7 @@ var PointSensorGroup = (function (_super) {
         return _this;
     }
     PointSensorGroup.prototype.getValue = function (index) {
-        return this.data.points[index];
+        return this.data.points[index].getPoint();
     };
     PointSensorGroup.prototype.length = function () {
         return this.data.points.length;
