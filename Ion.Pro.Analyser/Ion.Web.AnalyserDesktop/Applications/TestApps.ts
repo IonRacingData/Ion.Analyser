@@ -266,13 +266,13 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        kernel.senMan.getData(252, (d: ISensorPackage[]) => {
+        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
             this.testData = new GPSPlotData(this.points);
             this.draw();
-        });
+        });*/
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.plot.setSize(this.window.width, this.window.height);
         });
@@ -354,4 +354,44 @@ class BarTester implements IApplication, IViewer<Point> {
         this.bar.setData(this.dataSource);
     }
 
+}
+
+class LegacyRPIManager implements IApplication {
+    public application: Application;
+    public window: AppWindow;
+    private mk: HtmlHelper = new HtmlHelper();
+
+    public main() {
+        this.window = kernel.winMan.createWindow(this.application, "Legacy RPI Manager");
+        let wrapper = this.mk.tag("div");
+
+        wrapper.appendChild(this.mk.tag("button", "", [{
+            event: "click",
+            func: (event: Event) => {
+                requestAction("ConnectLegacy", null);
+            }
+        }], "Connect"));
+
+        wrapper.appendChild(this.mk.tag("button", "", [{
+            event: "click",
+            func: (event: Event) => {
+                requestAction("Status", null);
+            }
+        }], "Status"));
+
+        wrapper.appendChild(this.mk.tag("button", "", [{
+            event: "click",
+            func: (event: Event) => {
+                requestAction("StartReceive", null);
+            }
+        }], "StartReceive"));
+
+        wrapper.appendChild(this.mk.tag("button", "", [{
+            event: "click",
+            func: (event: Event) => {
+                requestAction("StopReceive", null);
+            }
+        }], "StopReceive"));
+        this.window.content.appendChild(wrapper);
+    }
 }

@@ -58,5 +58,51 @@ namespace Ion.Pro.Analyser.Controllers
 
             return File(Encoding.Default.GetBytes(result), "data_" + values + ".csv", true);
         }
+
+        public IActionResult ConnectLegacy()
+        {
+            if (Program.rpiManager != null)
+            {
+                Program.rpiManager.Connect();
+                return Json(new { Status = "OK" });
+            }
+            return Json(new { Status = "Not available" });
+        }
+
+        public IActionResult Status()
+        {
+            if (Program.rpiManager == null)
+            {
+                return Json(new { Status = "Not available" });
+            }
+            else if (Program.rpiManager.Connected)
+            {
+                return Json(new { Status = "Connected" });
+            }
+            else// if (!Program.rpiManager.connected)
+            {
+                return Json(new { Status = "Not Connected" });
+            }
+        }
+
+        public IActionResult StartReceive()
+        {
+            if (Program.rpiManager != null)
+            {
+                Program.rpiManager.StartReceive();
+                return Json(new { Status = "OK" });
+            }
+            return Json(new { Status = "Not available" });
+        }
+
+        public IActionResult StopReceive()
+        {
+            if (Program.rpiManager != null)
+            {
+                Program.rpiManager.Stop();
+                return Json(new { Status = "OK" });
+            }
+            return Json(new { Status = "Not available" });
+        }
     }
 }

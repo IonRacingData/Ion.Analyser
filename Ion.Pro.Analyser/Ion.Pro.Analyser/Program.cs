@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Ion.Pro.Analyser.Data;
 using Ion.Pro.Analyser.SenSys;
 using System.Net.Sockets;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Ion.Pro.Analyser
 {
@@ -22,7 +24,113 @@ namespace Ion.Pro.Analyser
         SmallTest
     }
 
-    
+    class LegacySSHManager
+    {
+        public string plinkPath { get; private set; }
+        public string IPAddress { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        List<string> readBuffer = new List<string>();
+        StreamWriter stdIn;
+        StreamReader stdOut;
+        public bool Connected { get; private set; } = false;
+        Task readTask;
+        bool continueRead = true;
+
+        public LegacySSHManager(string plinkPath)
+        {
+            this.plinkPath = plinkPath;
+            IPAddress = "10.0.0.3";
+            username = "pi";
+            password = "raspberry";
+
+        }
+
+        public void Connect()
+        {
+            if (!Connected)
+            {
+                string connectString = $"{username}@{IPAddress}";
+                ProcessStartInfo startInfo = new ProcessStartInfo(plinkPath, connectString);
+                startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.UseShellExecute = false;
+
+                Process p = new Process();
+                p.StartInfo = startInfo;
+                bool success = p.Start();
+                stdIn = p.StandardInput;
+                stdOut = p.StandardOutput;
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                bool timeout = false;
+                readCanceled = new CancellationTokenSource();
+                readTask = ReadInput(stdOut);
+                while (readBuffer.Count < 1)
+                {
+                    if (watch.ElapsedMilliseconds > 5000)
+                    {
+                        timeout = true;
+                        break;
+                    }
+                    System.Threading.Thread.Yield();
+                }
+                watch.Stop();
+                if (!timeout)
+                {
+                    Connected = true;
+                    //readTask = ReadInput();
+                    stdIn.WriteLine(password);
+                }
+                else
+                {
+                    readCanceled.Cancel(true);
+                    Console.WriteLine("Connect to RPI Timed out, please check ip settings");
+                    stdIn.WriteLine((char)3);
+                }
+            }
+        }
+        CancellationTokenSource readCanceled = new CancellationTokenSource();
+
+        private async Task ReadInput(StreamReader stdOut)
+        {
+            while (continueRead)
+            {
+                byte[] readBuffer = new byte[1024];
+                int read = 0;
+                try
+                {
+                    read = await stdOut.BaseStream.ReadAsync(readBuffer, 0, 1024, readCanceled.Token);
+                }
+                catch(Exception e)
+                {
+
+                }
+                if (readCanceled.IsCancellationRequested)
+                    break;
+                List<byte> removedOtherChars = new List<byte>();
+                string s = Encoding.Default.GetString(readBuffer, 0, read);
+                Console.Write(s);
+                this.readBuffer.Add(s);
+            }
+        }
+
+        public void StartReceive()
+        {
+            if (Connected)
+            {
+                stdIn.WriteLine("sudo ./start");
+            }
+        }
+
+        public void Stop()
+        {
+            //System.Threading.Thread.Sleep(5000);
+            stdIn.WriteLine((char)3);
+        }
+
+    }
 
     class Program
     {
@@ -50,6 +158,8 @@ namespace Ion.Pro.Analyser
                 (byte)(pack.TimeStamp >> 24),
             };
         }
+        public static string plinkPath;
+        public static LegacySSHManager rpiManager { get; private set; }
 
         static string[] files = new string[]
         {
@@ -62,6 +172,14 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
+            plinkPath = TryFindPlink();
+            if (plinkPath != null)
+            {
+                rpiManager = new LegacySSHManager(plinkPath);
+                //rpiManager.Connect();
+                //Console.ReadLine();
+
+            }
             SensorPackage pack = new SensorPackage();
             BinaryWriter bw = new BinaryWriter(new FileStream("../../Data/sinus.log16", FileMode.Create));
             for (int i = 0; i < 100000; i++)
@@ -386,7 +504,33 @@ namespace Ion.Pro.Analyser
                 }
             }
         }
+
+        static string TryFindPlink()
+        {
+            string[] searchPaths = new[] {
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
+
+            foreach (string s in searchPaths)
+            {
+                DirectoryInfo di = new DirectoryInfo(s);
+                DirectoryInfo[] dis = di.GetDirectories("putty");
+                if (dis.Length > 0)
+                {
+                    FileInfo fi = dis[0].GetFiles("plink.exe").FirstOrDefault();
+                    if (fi != null)
+                    {
+                        Console.WriteLine("Found plink: " + fi.FullName);
+                        return fi.FullName;
+                    }
+                }
+            }
+            return null;
+        }
     }
+
+
 
     public class SensorNumPackage
     {

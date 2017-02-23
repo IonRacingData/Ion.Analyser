@@ -18,7 +18,6 @@ function startUp() {
     };
 
     kernel.senMan = new SensorManager();  // Late init because it needs netMan
-
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
@@ -63,6 +62,8 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
     kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
+
+    kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
 }
 
 /* tslint:disable:interface-name */

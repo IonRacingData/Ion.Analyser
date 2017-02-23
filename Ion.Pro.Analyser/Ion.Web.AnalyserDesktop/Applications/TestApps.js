@@ -200,13 +200,13 @@ var GPSPlotTester = (function () {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        kernel.senMan.getData(252, function (d) {
-            for (var i = 0; i < d.length; i++) {
-                _this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
+            for (let i = 0; i < d.length; i++) {
+                this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
-            _this.testData = new GPSPlotData(_this.points);
-            _this.draw();
-        });
+            this.testData = new GPSPlotData(this.points);
+            this.draw();
+        });*/
         this.window.addEventListener(AppWindow.event_resize, function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
@@ -271,5 +271,40 @@ var BarTester = (function () {
         this.bar.setData(this.dataSource);
     };
     return BarTester;
+}());
+var LegacyRPIManager = (function () {
+    function LegacyRPIManager() {
+        this.mk = new HtmlHelper();
+    }
+    LegacyRPIManager.prototype.main = function () {
+        this.window = kernel.winMan.createWindow(this.application, "Legacy RPI Manager");
+        var wrapper = this.mk.tag("div");
+        wrapper.appendChild(this.mk.tag("button", "", [{
+                event: "click",
+                func: function (event) {
+                    requestAction("ConnectLegacy", null);
+                }
+            }], "Connect"));
+        wrapper.appendChild(this.mk.tag("button", "", [{
+                event: "click",
+                func: function (event) {
+                    requestAction("Status", null);
+                }
+            }], "Status"));
+        wrapper.appendChild(this.mk.tag("button", "", [{
+                event: "click",
+                func: function (event) {
+                    requestAction("StartReceive", null);
+                }
+            }], "StartReceive"));
+        wrapper.appendChild(this.mk.tag("button", "", [{
+                event: "click",
+                func: function (event) {
+                    requestAction("StopReceive", null);
+                }
+            }], "StopReceive"));
+        this.window.content.appendChild(wrapper);
+    };
+    return LegacyRPIManager;
 }());
 //# sourceMappingURL=TestApps.js.map
