@@ -50,7 +50,9 @@ var DataAssigner = (function () {
                     }
                     last = _this.findTableRow(e.target);
                     last.classList.add("selectedrow");
+                    var sources = kernel.senMan.getDataSources(curPlot.type);
                     if (isMulti) {
+                        //this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
                         kernel.senMan.getLoadedInfos(function (x) { return _this.drawMultiSensors(curPlot, x); });
                     }
                     else {
@@ -93,6 +95,7 @@ var DataAssigner = (function () {
         radio.addEventListener("change", function (e) {
             radio.disabled = true;
             console.log("Single checkbox click");
+            //kernel.senMan.getDataSources(plot.type);
             kernel.senMan.getSensorData(sensor.ID, function (data) {
                 plot.dataSource = new PointSensorGroup(data);
                 plot.dataUpdate();

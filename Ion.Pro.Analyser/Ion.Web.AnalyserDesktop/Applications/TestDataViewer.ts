@@ -58,10 +58,13 @@
                     }
                     last = this.findTableRow(<HTMLElement>e.target);
                     last.classList.add("selectedrow");
+                    let sources = kernel.senMan.getDataSources(curPlot.type);
                     if (isMulti) {
+                        //this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
                         kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<ICollectionViewer<any>>curPlot, x));
                     }
                     else {
+                        
                         kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawSingleSensors(<IViewer<any>>curPlot, x));
                     }
                 }
@@ -108,6 +111,7 @@
         radio.addEventListener("change", (e: Event) => {
             radio.disabled = true;
             console.log("Single checkbox click");
+            //kernel.senMan.getDataSources(plot.type);
             kernel.senMan.getSensorData(sensor.ID, (data: SensorDataContainer) => {
                 plot.dataSource = new PointSensorGroup(data);
                 plot.dataUpdate();

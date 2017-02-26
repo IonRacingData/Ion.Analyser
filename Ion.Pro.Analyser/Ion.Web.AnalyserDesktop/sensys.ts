@@ -1,9 +1,10 @@
 ﻿class SensorManager implements IEventManager {
-    private plotCache: SensorDataContainer[] = [];
+    private dataCache: SensorDataContainer[] = [];
     private eventManager: EventManager = new EventManager();
     private sensorInformations: SensorInformation[];
 
     public viewers: IViewerBase<any>[] = [];
+    private dataSources: IDataSource<any>[] = [];
 
     static readonly event_registerIPlot = "registerIPlot";
     static readonly event_registerViewer = "registerViewer";
@@ -16,10 +17,10 @@
         for (let j = 0; j < data.length; j++) {
             let realData = data[j];
             let sensId = realData.ID;
-            if (!this.plotCache[sensId]) {
-                this.plotCache[sensId] = new SensorDataContainer(sensId);
+            if (!this.dataCache[sensId]) {
+                this.dataCache[sensId] = new SensorDataContainer(sensId);
             }
-            this.plotCache[sensId].insertSensorPackage([realData]);
+            this.dataCache[sensId].insertSensorPackage([realData]);
         }
         this.updateAllPlotters();
     }
@@ -87,17 +88,25 @@
         return ret;
     }
 
+    private pushToCache(data: ISensorPackage[]): SensorDataContainer {
+        if (data.length > 0) {
+            let temp = this.dataCache[data[0].ID];
+
+            temp.insertSensorPackage(data);
+
+            console.log(this.dataSources);
+            return temp;
+        }
+        return null;
+        
+    }
+
     private loadData(id: number, callback: (data: SensorDataContainer) => void): void {
 
         kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
-            let realData: ISensorPackage[] = this.convertToSensorPackage(data.Sensors);
-            let dataContainer = this.convertData(realData);
-            this.plotCache.push(dataContainer);
-            console.log(dataContainer);
+            let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors));
             callback(dataContainer);
         });
-
-
         /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
@@ -122,7 +131,17 @@
     }
 
     public getLoadedIds(callback: (ids: number[]) => void): void {
-        requestAction("GetLoadedIds", callback);
+        requestAction("GetLoadedIds", (ids: number[]) => {
+            ids.forEach((value: number, index: number, array: number[]) => {
+                if (!this.dataCache[value]) {
+                    this.dataCache[value] = new SensorDataContainer(value);
+                    let a = new PointSensorGroup(this.dataCache[value]);
+                    this.dataSources.push(a);
+                }
+            });
+            
+            callback(ids);
+        });
     }
 
     public getLoadedInfos(callback: (ids: SensorInformation[]) => void): void {
@@ -152,17 +171,17 @@
     }
 
     public getSensorData(id: number, callback: (data: SensorDataContainer) => void): void {
-        if (!this.plotCache[id]) {
+        if (!this.dataCache[id]) {
             this.loadData(id, callback);
         }
         else {
-            callback(this.plotCache[id]);
+            callback(this.dataCache[id]);
         }
     }
 
 
     public clearCache(): void {
-        this.plotCache = [];
+        this.dataCache = [];
         this.sensorInformations = null;
         for (let a of this.viewers) {
             if (SensorManager.isCollectionViewer(a)) {
@@ -204,6 +223,20 @@
     }
 
 
+
+    public getDataSources<T>(type: IClassType<T>): IDataSource<T>[] {
+        let returnArray: IDataSource<T>[] = [];
+        for (let cur of this.dataSources) {
+            if (SensorManager.isDatasource(cur, type)) {
+                returnArray.push(cur);
+            }
+        }
+        return returnArray;
+    }
+
+    public static isDatasource<T>(source: IDataSource<T>, type: IClassType<T>): source is IDataSource<T> {
+        return source.type === type;
+    }
 
     public static isViewer(value: IViewerBase<any>): value is IViewer<any> {
         return (<IViewer<any>>value).dataSource !== undefined;
