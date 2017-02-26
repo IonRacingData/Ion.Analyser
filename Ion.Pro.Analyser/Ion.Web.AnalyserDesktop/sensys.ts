@@ -11,6 +11,7 @@
 
     constructor() {
         kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
+        this.getLoadedIds((ids: number[]) => { });
     }
 
     private handleService(data: ISensorPackage[]) {
@@ -222,8 +223,6 @@
         this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
     }
 
-
-
     public getDataSources<T>(type: IClassType<T>): IDataSource<T>[] {
         let returnArray: IDataSource<T>[] = [];
         for (let cur of this.dataSources) {
@@ -233,6 +232,19 @@
         }
         return returnArray;
     }
+
+    public fillDataSource<T>(source: IDataSource<T>, callback: () => void): void {
+        let multiback = new Multicallback(source.infos.IDs.length, (...params: SensorDataContainer[]) => {
+            callback();
+        });
+
+        for (let i = 0; i < source.infos.IDs.length; i++) {
+            this.loadData(source.infos.IDs[i], multiback.createCallback());
+        }
+
+    }
+
+
 
     public static isDatasource<T>(source: IDataSource<T>, type: IClassType<T>): source is IDataSource<T> {
         return source.type === type;

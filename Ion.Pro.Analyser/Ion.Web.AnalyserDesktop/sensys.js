@@ -6,6 +6,7 @@ var SensorManager = (function () {
         this.viewers = [];
         this.dataSources = [];
         kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
+        this.getLoadedIds(function (ids) { });
     }
     SensorManager.prototype.handleService = function (data) {
         for (var j = 0; j < data.length; j++) {
@@ -199,6 +200,18 @@ var SensorManager = (function () {
             }
         }
         return returnArray;
+    };
+    SensorManager.prototype.fillDataSource = function (source, callback) {
+        var multiback = new Multicallback(source.infos.IDs.length, function () {
+            var params = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                params[_i] = arguments[_i];
+            }
+            callback();
+        });
+        for (var i = 0; i < source.infos.IDs.length; i++) {
+            this.loadData(source.infos.IDs[i], multiback.createCallback());
+        }
     };
     SensorManager.isDatasource = function (source, type) {
         return source.type === type;
