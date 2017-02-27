@@ -103,7 +103,6 @@ var MultiValueCanvasController = (function (_super) {
                 }
             }
         }
-        console.log(this.sensorInfos);
         this.onSensorChange();
     };
     MultiValueCanvasController.prototype.onSensorChange = function () { };
@@ -141,4 +140,123 @@ var SingleValueCanvasController = (function (_super) {
     };
     return SingleValueCanvasController;
 }(CanvasController));
+var ScatterChartBase = (function (_super) {
+    __extends(ScatterChartBase, _super);
+    function ScatterChartBase(width, height) {
+        var _this = _super.call(this) || this;
+        _this.lastID = -1;
+        _this.color = "white";
+        _this.movePoint = new Point(0, 0);
+        _this.scalePoint = new Point(1, 1);
+        _this.width = width;
+        _this.height = height;
+        _this.padding = _this.width * 0.05;
+        _this.availablePlotWidth = _this.width - (_this.padding * 2);
+        _this.availablePlotHeight = _this.height - (_this.padding * 2);
+        return _this;
+    }
+    ScatterChartBase.prototype.generate = function () {
+        this.wrapper = document.createElement("div");
+        this.wrapper.setAttribute("tabindex", "0");
+        this.wrapper.className = "plot-wrapper";
+        this.canvas = new LayeredCanvas(this.wrapper);
+        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.canvas.setSize(this.width, this.height);
+        return this.wrapper;
+    };
+    ScatterChartBase.prototype.onSizeChange = function () {
+        this.canvas.setSize(this.width, this.height);
+        this.padding = this.width * 0.05;
+        this.availablePlotWidth = this.width - (this.padding * 2);
+        this.availablePlotHeight = this.height - (this.padding * 2);
+        this.draw();
+    };
+    ScatterChartBase.prototype.draw = function () {
+        if (this.data.length() > 0) {
+            var offsetX = void 0;
+            var offsetY = void 0;
+            var posDataLength = this.data.length();
+            this.ctxMain.clear();
+            this.ctxMain.beginPath();
+            this.ctxMain.strokeStyle = this.color;
+            this.rescale();
+            offsetX = (this.width - this.plotWidth) / 2;
+            offsetY = (this.height - this.plotHeight) / 2;
+            if (posDataLength > 0) {
+                var firstPoint = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
+                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
+            }
+            for (var i = 0; i < posDataLength; i++) {
+                var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+                var absPoint = this.getAbsolute(relPoint);
+                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
+            }
+            this.ctxMain.stroke();
+        }
+    };
+    ScatterChartBase.prototype.findMinMax = function () {
+        var posDataLength = this.data.length();
+        if (posDataLength > 0) {
+            var firstPoint = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+            this.relSize = new Rectangle(firstPoint, firstPoint);
+        }
+        for (var i = 0; i < posDataLength; i++) {
+            var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+            this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
+            this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
+            this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
+            this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
+        }
+    };
+    ScatterChartBase.prototype.rescale = function () {
+        this.findMinMax();
+        var oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        var oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        var xRatio = this.availablePlotWidth / oldWidth;
+        var yRatio = this.availablePlotHeight / oldHeight;
+        var ratio = Math.min(xRatio, yRatio);
+        var first = new Point(this.relSize.min.x, this.relSize.min.y);
+        this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
+        this.scalePoint.y = Math.abs(this.scalePoint.y * ratio);
+        var sec = this.getAbsolute(first);
+        sec.y = this.height - sec.y;
+        this.movePoint = this.movePoint.sub(sec);
+        this.plotWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        this.plotHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+    };
+    ScatterChartBase.prototype.onDataChange = function () {
+        this.draw();
+    };
+    ScatterChartBase.prototype.setData = function (d) {
+        var _this = this;
+        this.data = d;
+        if (this.data) {
+            var curID = this.data.infos.IDs[0];
+            if (curID != this.lastID) {
+                kernel.senMan.getSensorInfoNew(this.data, function (i) {
+                    _this.lastSensorInfo = i;
+                    _this.lastID = _this.data.infos.IDs[0];
+                    _this.onDataChange();
+                });
+            }
+            else {
+                this.onDataChange();
+            }
+        }
+    };
+    return ScatterChartBase;
+}(CanvasController));
+var Rectangle = (function () {
+    function Rectangle(min, max) {
+        this.min = min;
+        this.max = max;
+    }
+    Rectangle.prototype.getHeight = function () {
+        return this.max.y - this.min.y;
+    };
+    Rectangle.prototype.getWidth = function () {
+        return this.max.x - this.min.x;
+    };
+    return Rectangle;
+}());
 //# sourceMappingURL=Controller.js.map

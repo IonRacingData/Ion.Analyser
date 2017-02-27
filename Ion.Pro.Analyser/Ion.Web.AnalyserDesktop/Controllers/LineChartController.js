@@ -145,9 +145,7 @@ var LineChartController = (function (_super) {
         this.drawXAxis();
         this.drawYAxis();
         if (this.data) {
-            console.log(this.data);
             for (var d = 0; d < this.data.length; d++) {
-                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
@@ -333,10 +331,12 @@ var LineChartController = (function (_super) {
         var max = 0;
         for (var i = 0; i < this.data.length; i++) {
             var info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
-            var dmin = SensorInfoHelper.minValue(info);
-            var dmax = SensorInfoHelper.maxValue(info);
-            min = dmin < min ? dmin : min;
-            max = dmax > max ? dmax : max;
+            if (info) {
+                var dmin = SensorInfoHelper.minValue(info);
+                var dmax = SensorInfoHelper.maxValue(info);
+                min = dmin < min ? dmin : min;
+                max = dmax > max ? dmax : max;
+            }
         }
         if (min !== max) {
             var padding = (max - min) * 0.2;

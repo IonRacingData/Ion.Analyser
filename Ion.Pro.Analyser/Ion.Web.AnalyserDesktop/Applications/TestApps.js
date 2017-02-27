@@ -189,7 +189,7 @@ var GaugeTester = (function () {
 }());
 var GPSPlotTester = (function () {
     function GPSPlotTester() {
-        this.plotType = "GPS Chart";
+        this.plotType = "GPS";
         this.type = Point3D;
         this.points = [];
     }
@@ -200,22 +200,20 @@ var GPSPlotTester = (function () {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        kernel.senMan.getData(252, function (d) {
-            for (var i = 0; i < d.length; i++) {
-                _this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
+        this.plotWindow = this.window;
+        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
+            for (let i = 0; i < d.length; i++) {
+                this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
-            _this.testData = new GPSPlotData(_this.points);
-            _this.draw();
-        });
+            this.testData = new GPSPlotData(this.points);
+            this.draw();
+        });*/
         this.window.addEventListener(AppWindow.event_resize, function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
     };
-    GPSPlotTester.prototype.draw = function () {
-        this.plot.setData(this.testData);
-        //this.plot.setSize(this.window.width, this.window.height);
-    };
     GPSPlotTester.prototype.dataUpdate = function () {
+        this.plot.setData(this.dataSource);
     };
     return GPSPlotTester;
 }());

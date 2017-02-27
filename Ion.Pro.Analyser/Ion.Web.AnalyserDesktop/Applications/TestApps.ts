@@ -249,7 +249,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
 }
 
 class GPSPlotTester implements IApplication, IViewer<Point3D> {
-    plotType: string = "GPS Chart";
+    plotType: string = "GPS";
     plotWindow: AppWindow;
     type: IClassType<Point3D> = Point3D;
     dataSource: IDataSource<Point3D>;
@@ -258,7 +258,6 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     window: AppWindow;
     points: Point3D[] = [];
     plot: GPSController;
-    testData: GPSPlotData;
 
     main() {
         this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
@@ -266,25 +265,21 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        kernel.senMan.getData(252, (d: ISensorPackage[]) => {
+        this.plotWindow = this.window;
+        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
             }
             this.testData = new GPSPlotData(this.points);
             this.draw();
-        });
+        });*/
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.plot.setSize(this.window.width, this.window.height);
         });
     }
 
-    draw(): void {
-        this.plot.setData(this.testData);
-        //this.plot.setSize(this.window.width, this.window.height);
-    }
-
     dataUpdate() {
-
+        this.plot.setData(this.dataSource);
     }
 }
 

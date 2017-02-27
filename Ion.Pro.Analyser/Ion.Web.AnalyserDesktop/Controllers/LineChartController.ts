@@ -166,9 +166,7 @@
         this.drawYAxis();
 
         if (this.data) {
-            console.log(this.data);
             for (var d: number = 0; d < this.data.length; d++) {
-                // var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
@@ -404,10 +402,12 @@
 
         for (let i = 0; i < this.data.length; i++) {
             let info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
-            let dmin: number = SensorInfoHelper.minValue(info);
-            let dmax: number = SensorInfoHelper.maxValue(info);            
-            min = dmin < min ? dmin : min;
-            max = dmax > max ? dmax : max;
+            if (info) {
+                let dmin: number = SensorInfoHelper.minValue(info);
+                let dmax: number = SensorInfoHelper.maxValue(info);
+                min = dmin < min ? dmin : min;
+                max = dmax > max ? dmax : max;
+            }            
         }
 
         if (min !== max) {
