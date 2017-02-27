@@ -46,7 +46,7 @@
     }
 
     protected draw(): void {
-        if (this.data.length() > 0) {
+        if (this.data && this.data.length() > 0) {
             let offsetX: number;
             let offsetY: number;
             let posDataLength: number = this.data.length();

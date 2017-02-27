@@ -35,7 +35,7 @@ var GPSController = (function (_super) {
         this.draw();
     };
     GPSController.prototype.draw = function () {
-        if (this.data.length() > 0) {
+        if (this.data && this.data.length() > 0) {
             var offsetX = void 0;
             var offsetY = void 0;
             var posDataLength = this.data.length();
