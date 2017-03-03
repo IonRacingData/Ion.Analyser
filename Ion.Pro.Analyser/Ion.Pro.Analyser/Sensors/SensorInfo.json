@@ -447,5 +447,40 @@
     "MaxValue": 100,
     "Resolution": 8
 
+  },
+
+  // #####--Motor Controller--#####
+  {
+    "Key": "MC_RAW"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_Q"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_D"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_Q"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_D"
+  },
+  {
+    "Key": "MC_MOTOR_POWER"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED_FILTER"
+  },
+  {
+    "Key": "MC_TEMP_MOTOR"
+  },
+  {
+    "Key": "MC_TEMP_IGBT"
+  },
+  {
+    "Key": "MC_TEMP_VSI_AMBIENT"
   }
 ]
