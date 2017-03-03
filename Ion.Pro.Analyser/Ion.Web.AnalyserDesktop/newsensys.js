@@ -62,7 +62,6 @@ var Kernel;
                             | raw.charCodeAt(i * 28 + 18) << 48
                             | raw.charCodeAt(i * 28 + 19) << 56,
                     };
-                    /* tslint:enable:no-bitwise */
                 }
                 return ret;
             };

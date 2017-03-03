@@ -7,7 +7,8 @@ function startUp() {
         senMan: null
     };
     kernel.senMan = new sensys.SensorManager(); // Late init because it needs netMan
-    kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
+    //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     // kernel.senMan.setGlobal(841);
     registerLaunchers();
     var mk = new HtmlHelper();
