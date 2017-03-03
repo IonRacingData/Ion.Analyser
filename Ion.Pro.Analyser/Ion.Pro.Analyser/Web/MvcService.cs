@@ -1,4 +1,5 @@
-﻿using NicroWare.Pro.DmxControl.JSON;
+﻿using Ion.Pro.Analyser.Web;
+using NicroWare.Pro.DmxControl.JSON;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +16,7 @@ namespace Ion.Pro.Analyser
     {
         public Dictionary<string, MethodInfo> AllActions { get; private set; } = new Dictionary<string, MethodInfo>();
         public HttpContext HttpContext { get; set; }
-        public string BasePath = Program.ContentPath;
+        public string BasePath = IonAnalyserWebPage.ContentPath;
 
         public Controller()
         {

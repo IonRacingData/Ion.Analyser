@@ -52,6 +52,23 @@ namespace Ion.Pro.Analyser.Controllers
             return String("OK");
         }
 
+        public IActionResult Available()
+        {
+            return Json(new { });
+        }
+
+        public IActionResult LoadNewDataSet(string file)
+        {
+            return Json(((object)SensorDataSetInformation.FromSensorDataSet(SensorManager.GetDefault().Load(file))) ?? new { Data = "Not available" });
+        }
+
+        public IActionResult GetSensorInformation()
+        {
+            return Json(new { });
+        }
+
+
+
         public IActionResult Csv(string encoding, string values, string title)
         {
             string result = SensorDataStore.GetDefault().CreateCsv(encoding == "nor", title == "checked");
@@ -59,6 +76,9 @@ namespace Ion.Pro.Analyser.Controllers
             return File(Encoding.Default.GetBytes(result), "data_" + values + ".csv", true);
         }
 
+
+
+        #region LegacySSHManager
         public IActionResult ConnectLegacy()
         {
             if (Program.rpiManager != null)
@@ -103,6 +123,28 @@ namespace Ion.Pro.Analyser.Controllers
                 return Json(new { Status = "OK" });
             }
             return Json(new { Status = "Not available" });
+        }
+        #endregion
+
+    }
+
+    public class SensorDataSetInformation
+    {
+        public string Name { get; set; }
+        public List<NewSensorInformation> AllInfos { get; set; } = new List<NewSensorInformation>();
+        public List<string> LoadedKeys { get; set; } = new List<string>();
+
+        public static SensorDataSetInformation FromSensorDataSet(SensorDataSet set)
+        {
+            if (set == null)
+                return null;
+            return new SensorDataSetInformation()
+            {
+                Name = set.Name,
+                AllInfos = set.AllInfos.Values.ToList(),
+                LoadedKeys = set.AllData.Keys.ToList()
+            };
+            
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿window.addEventListener("load", () => {
+﻿import sensys = Kernel.SenSys;
+
+window.addEventListener("load", () => {
     startUp();
 });
 
@@ -13,8 +15,9 @@ interface ITypeDef<T> {
 
 interface IDataSource<T> extends ITypeDef<T> {
     infos: SensorPlotInfo;
-    getValue(index: number): T;
-    length(): number;
+    getValue(index: number, subplot?: number): T;
+    length(subplot?: number): number;
+    subplots(): number;
     color: Color;
 }
 
@@ -28,12 +31,17 @@ class SensorGroup<T> implements IDataSource<T> {
         this.type = type;
     }
 
-    public getValue(index: number): T {
+    public getValue(index: number, subplot: number = 0): T {
         return null;
     }
 
-    public length(): number {
+    public length(subplot: number = 0): number {
         return 0;
+    }
+
+    public subplots(): number
+    {
+        return 1;
     }
 }
 
@@ -45,6 +53,7 @@ class PointSensorGroup extends SensorGroup<Point>{
         this.data = data;
 
         this.infos.IDs[0] = data.ID;
+        this.infos.SensorInfos[0] = data.info;
         this.color = data.color;
     }
 

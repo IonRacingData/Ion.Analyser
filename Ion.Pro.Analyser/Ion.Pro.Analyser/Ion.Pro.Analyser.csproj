@@ -48,10 +48,11 @@
     <Compile Include="Controllers\Socket.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Data\SensorDataReader.cs" />
-    <Compile Include="Http.cs" />
-    <Compile Include="HttpServer.cs" />
-    <Compile Include="JSON.cs" />
-    <Compile Include="MvcService.cs" />
+    <Compile Include="Web\Http.cs" />
+    <Compile Include="Web\HttpServer.cs" />
+    <Compile Include="Web\IonWebPage.cs" />
+    <Compile Include="Web\JSON.cs" />
+    <Compile Include="Web\MvcService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SenSys\Models.cs" />
@@ -63,22 +64,22 @@
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\freq.log16" />
     <None Include="Data\sinus.log16" />
-    <None Include="Sensors\SensorInfo.json">
+    <None Include="Sensors\Data2016\SensorInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\stiangps.gpx" />
     <None Include="Data\Sets\126_usart_data.log16" />
     <None Include="Data\fredrikgps.gpx" />
     <None Include="Data\GPS_DataFile.gpscsv" />
-    <None Include="Sensors\Sensor.json">
+    <None Include="Sensors\Data2016\Sensor.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Sensors\sensorInfoTypeDef.json">
+    <None Include="Sensors\TypeDef\sensorInformationTypeDef.json" />
+    <None Include="Sensors\SensorInformation.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Sensors\sensorTypeDef.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Sensors\TypeDef\sensorInfoTypeDef.json" />
+    <None Include="Sensors\TypeDef\sensorTypeDef.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\image.jpg" />
@@ -86,10 +87,11 @@
     <Content Include="Content\main.css" />
     <Content Include="Content\main.js" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Sensors_4SensorInfo_1json__JSONSchema="sensorInfoTypeDef.json" Sensors_4Sensor_1json__JSONSchema="sensorTypeDef.json" />
+      <UserProperties Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

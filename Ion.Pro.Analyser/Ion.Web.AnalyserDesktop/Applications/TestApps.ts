@@ -29,7 +29,7 @@ class DataViewer implements IApplication {
     innerTable: HTMLElement;
     main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
+        //kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     }
 
     draw(data: SensorInformation[]): void {

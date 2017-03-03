@@ -20,9 +20,8 @@ var DataViewer = (function () {
     function DataViewer() {
     }
     DataViewer.prototype.main = function () {
-        var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
-        kernel.senMan.getLoadedInfos(function (ids) { return _this.draw(ids); });
+        //kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     };
     DataViewer.prototype.draw = function (data) {
         var mk = new HtmlHelper();

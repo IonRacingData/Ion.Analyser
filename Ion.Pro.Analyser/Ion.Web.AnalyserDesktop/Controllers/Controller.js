@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Controller = (function () {
     function Controller() {
         this.mk = new HtmlHelper;
@@ -20,20 +25,18 @@ var SingleValueController = (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.percent = 0;
         _this.value = 0;
-        _this.lastID = -1;
+        _this.lastID = "";
         return _this;
     }
     SingleValueController.prototype.setData = function (d) {
-        var _this = this;
         this.data = d;
         if (this.data) {
             var curID = this.data.infos.IDs[0];
-            if (curID != this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, function (i) {
-                    _this.lastSensorInfo = i;
-                    _this.lastID = _this.data.infos.IDs[0];
-                    _this.onDataChange();
-                });
+            if (curID !== this.lastID) {
+                var i = this.data.infos.SensorInfos[0];
+                this.lastSensorInfo = i;
+                this.lastID = i.Key;
+                this.onDataChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -82,13 +85,13 @@ var MultiValueCanvasController = (function (_super) {
         return _this;
     }
     MultiValueCanvasController.prototype.setData = function (d) {
-        var _this = this;
         this.data = d;
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
-            kernel.senMan.getInfos(function (infos) {
-                _this.updateSensorInfos(infos);
-            });
+            this.updateSensorInfos(kernel.senMan.getInfos());
+            /*kernel.senMan.getInfos((infos: SensorInformation[]) => {
+                this.updateSensorInfos(infos);
+            });*/
         }
         this.onDataChange();
     };
@@ -98,7 +101,7 @@ var MultiValueCanvasController = (function (_super) {
             var i = infos_1[_i];
             for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
                 var d = _b[_a];
-                if (d.infos.IDs[0] === i.ID) {
+                if (d.infos.IDs[0] === i.Key) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -115,20 +118,18 @@ var SingleValueCanvasController = (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.percent = 0;
         _this.value = 0;
-        _this.lastID = -1;
+        _this.lastID = "";
         return _this;
     }
     SingleValueCanvasController.prototype.setData = function (d) {
-        var _this = this;
         this.data = d;
         if (this.data) {
             var curID = this.data.infos.IDs[0];
-            if (curID != this.lastID) {
-                kernel.senMan.getSensorInfo(this.data, function (i) {
-                    _this.lastSensorInfo = i;
-                    _this.lastID = _this.data.infos.IDs[0];
-                    _this.onDataChange();
-                });
+            if (curID !== this.lastID) {
+                var i = this.data.infos.SensorInfos[0];
+                this.lastSensorInfo = i;
+                this.lastID = this.data.infos.IDs[0];
+                this.onDataChange();
             }
             else {
                 if (this.lastSensorInfo) {

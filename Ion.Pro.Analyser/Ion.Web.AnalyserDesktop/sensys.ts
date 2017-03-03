@@ -1,4 +1,4 @@
-﻿class SensorManager implements IEventManager {
+﻿/*class SensorManager implements IEventManager {
     private dataCache: SensorDataContainer[] = [];
     private eventManager: EventManager = new EventManager();
     private sensorInformations: SensorInformation[];
@@ -12,6 +12,7 @@
     constructor() {
         kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
         this.getLoadedIds((ids: number[]) => { });
+
     }
 
     private handleService(data: ISensorPackage[]) {
@@ -44,7 +45,7 @@
             /*console.log(raw.charCodeAt(i * 28));
             console.log(raw.charCodeAt(i * 28 + 1));
             console.log(raw.charCodeAt(i * 28 + 2));
-            console.log(raw.charCodeAt(i * 28 + 3));*/
+            console.log(raw.charCodeAt(i * 28 + 3));
             let buf = new ArrayBuffer(8);
             let insert = new Uint8Array(buf);
             insert[0] = raw.charCodeAt(i * 28 + 4);
@@ -56,7 +57,7 @@
             insert[6] = raw.charCodeAt(i * 28 + 10);
             insert[7] = raw.charCodeAt(i * 28 + 11);
             let output = new Float64Array(buf);
-            /* tslint:disable:no-bitwise */
+            /* tslint:disable:no-bitwise 
             ret[i] = {
                 ID: raw.charCodeAt(i * 28)
                 | raw.charCodeAt(i * 28 + 1) << 8
@@ -70,7 +71,7 @@
                 | raw.charCodeAt(i * 28 + 8) << 32
                 | raw.charCodeAt(i * 28 + 9) << 40
                 | raw.charCodeAt(i * 28 + 10) << 48
-                | raw.charCodeAt(i * 28 + 11) << 56,*/
+                | raw.charCodeAt(i * 28 + 11) << 56,
 
                 TimeStamp:
                 raw.charCodeAt(i * 28 + 12)
@@ -84,7 +85,7 @@
 
             };
 
-            /* tslint:enable:no-bitwise */
+            /* tslint:enable:no-bitwise 
         }
         return ret;
     }
@@ -111,7 +112,14 @@
         /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
             this.dataCache[id] = data;
             callback(data);
-        });*/
+        });
+    }
+
+    private loadSensorInformation(): void {
+        requestAction("GetIds", (ids: SensorInformation[]) => {
+            this.sensorInformations = ids;
+            //callback(this.sensorInformations);
+        });
     }
 
     private updateAllPlotters() {
@@ -202,7 +210,7 @@
     public getSensorInfo(data: IDataSource<any>, callback: (data: SensorInformation) => void): void {
         this.getLoadedInfos((all: SensorInformation[]) => {
             for (let i = 0; i < all.length; i++) {
-                if (all[i].ID === data.infos.IDs[0]) {
+                if (all[i].Key === data.infos.IDs[0]) {
                     callback(all[i]);
                     break;
                 }
@@ -259,7 +267,7 @@
     }
 }
 
-
+*/
 
 class Multicallback {
     callback: (...param: any[]) => void;
@@ -290,7 +298,8 @@ class Multicallback {
 }
 
 class SensorPlotInfo {
-    IDs: number[] = [];
+    IDs: string[] = [];
+    SensorInfos: sensys.ISensorInformation[] = [];
 }
 
 class SensorInformation {
@@ -314,39 +323,37 @@ class SensorValueInformation {
 }
 
 class SensorInfoHelper {
-    public static maxValue(info: SensorInformation): number {
+    public static maxValue(info: sensys.ISensorInformation): number {
         let val = 0;
-        let temp = info.ValueInfo;
-        if (temp.MaxDisplay) {
-            val = temp.MaxDisplay;
+        if (info.MaxDisplay) {
+            val = info.MaxDisplay;
         }
-        else if (temp.MaxValue) {
-            val = temp.MaxValue;
+        else if (info.MaxValue) {
+            val = info.MaxValue;
         }
         else {
             /* tslint:disable:no-bitwise */
-            val = (1 << temp.Resolution) - 1;
+            val = (1 << info.Resolution) - 1;
             /* tslint:enable:no-bitwise */
         }
         return val;
     }
 
-    public static minValue(info: SensorInformation): number {
+    public static minValue(info: sensys.ISensorInformation): number {
         let val = 0;
-        let temp = info.ValueInfo;
-        if (temp.MinDisplay) {
-            val = temp.MinDisplay;
+        if (info.MinDisplay) {
+            val = info.MinDisplay;
         }
-        else if (temp.MinValue) {
-            val = temp.MinValue;
+        else if (info.MinValue) {
+            val = info.MinValue;
         }
-        else if (temp.Signed) {
+        else if (info.Signed) {
             val = -SensorInfoHelper.maxValue(info) - 1;
         }
         return val;
     }
 
-    public static getPercent(info: SensorInformation, p: Point): Point {
+    public static getPercent(info: sensys.ISensorInformation, p: Point): Point {
         let min = SensorInfoHelper.minValue(info);
         let max = SensorInfoHelper.maxValue(info);
 

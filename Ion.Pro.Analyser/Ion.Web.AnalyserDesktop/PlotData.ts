@@ -41,13 +41,14 @@
 }
 
 class SensorDataContainer {
-    ID: number;
-    color: Color;
-    points: SensorValue[];
+    public ID: string;
+    public color: Color;
+    public points: SensorValue[];
+    public info: sensys.ISensorInformation;
 
 
-    constructor(id: number)
-    constructor(id: number, p: SensorValue[] = []) {
+    constructor(id: string)
+    constructor(id: string, p: SensorValue[] = []) {
         this.ID = id;
         this.points = p;
         this.color = Color.randomColor(0, 255 + 128);

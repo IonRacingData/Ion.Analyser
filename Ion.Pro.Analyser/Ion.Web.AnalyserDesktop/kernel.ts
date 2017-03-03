@@ -4,7 +4,7 @@ interface IKernel {
     winMan: WindowManager;
     appMan: ApplicationManager;
     netMan: NetworkManager;
-    senMan: SensorManager;
+    senMan: sensys.SensorManager;
 }
 
 function startUp() {
@@ -17,7 +17,8 @@ function startUp() {
         senMan: null
     };
 
-    kernel.senMan = new SensorManager();  // Late init because it needs netMan
+    kernel.senMan = new sensys.SensorManager();  // Late init because it needs netMan
+    kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
