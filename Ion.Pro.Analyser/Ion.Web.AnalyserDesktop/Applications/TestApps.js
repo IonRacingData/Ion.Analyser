@@ -134,13 +134,20 @@ var LineChartTester = (function () {
         this.eh = new EventHandler();
     }
     LineChartTester.prototype.main = function () {
+        var _this = this;
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+        this.eh.on(this.plotWindow, AppWindow.event_close, function () { return _this.window_close(); });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
+    };
+    LineChartTester.prototype.window_close = function () {
+        console.log("closing");
+        kernel.senMan.unregister(this);
+        this.eh.close();
     };
     LineChartTester.prototype.dataUpdate = function () {
         this.lineChart.setData(this.dataCollectionSource);

@@ -295,7 +295,7 @@ var Multicallback = (function () {
 }());
 var SensorPlotInfo = (function () {
     function SensorPlotInfo() {
-        this.IDs = [];
+        this.Keys = [];
         this.SensorInfos = [];
     }
     return SensorPlotInfo;
@@ -324,6 +324,7 @@ var SensorInfoHelper = (function () {
         else {
             /* tslint:disable:no-bitwise */
             val = (1 << info.Resolution) - 1;
+            /* tslint:enable:no-bitwise */
         }
         return val;
     };

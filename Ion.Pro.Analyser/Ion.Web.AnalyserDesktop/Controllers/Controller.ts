@@ -25,7 +25,7 @@ abstract class SingleValueController extends Controller {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.IDs[0];
+            let curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
                 let i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
@@ -98,7 +98,7 @@ abstract class MultiValueCanvasController extends CanvasController {
 
         for (let i of infos) {
             for (let d of this.data) {
-                if (d.infos.IDs[0] === i.Key) {
+                if (d.infos.Keys[0] === i.Key) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -121,11 +121,11 @@ abstract class SingleValueCanvasController extends CanvasController {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.IDs[0];
+            let curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
                 let i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
-                this.lastID = this.data.infos.IDs[0];
+                this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
             }
             else {

@@ -63,39 +63,69 @@ namespace Ion.Pro.Analyser.SenSys
             }
         }
 
-        public void Load()
+        public RealSensorPackage Add(SensorPackage pack)
         {
-            LoadInformation();
-            ISensorReader reader = Provider.GetSensorReader(Name);
-
-            SensorPackage[] packages = reader.ReadPackages();
-            foreach (SensorPackage pack in packages)
+            string key = pack.ID.ToString();
+            RealSensorPackage realPack;
+            if (IdKeyMap.ContainsKey(pack.ID))
             {
-                string key = pack.ID.ToString();
-                RealSensorPackage realPack;
-                if (IdKeyMap.ContainsKey(pack.ID))
+                key = IdKeyMap[pack.ID];
+                realPack = new RealSensorPackage()
                 {
-                    key = IdKeyMap[pack.ID];
-                    realPack = new RealSensorPackage()
-                    {
-                        ID = pack.ID,
-                        TimeStamp = pack.TimeStamp,
-                        AbsoluteTimeStamp = pack.AbsoluteTimeStamp,
-                        Value = AllInfos[IdKeyMap[pack.ID]].ConvertValue(pack.Value)
-                    };
-                }
-                else
-                {
-                    realPack = RealSensorPackage.Convert(pack);
-                }
-
-                if (!AllData.ContainsKey(key))
-                {
-                    AllData[key] = new List<RealSensorPackage>();
-                }
-                AllData[key].Add(realPack);
+                    ID = pack.ID,
+                    TimeStamp = pack.TimeStamp,
+                    AbsoluteTimeStamp = pack.AbsoluteTimeStamp,
+                    Value = AllInfos[IdKeyMap[pack.ID]].ConvertValue(pack.Value)
+                };
+            }
+            else
+            {
+                realPack = RealSensorPackage.Convert(pack);
             }
 
+            if (!AllData.ContainsKey(key))
+            {
+                AllData[key] = new List<RealSensorPackage>();
+            }
+            AllData[key].Add(realPack);
+            return realPack;
+        }
+
+        public void Load(bool isFile = true)
+        {
+            LoadInformation();
+            if (isFile)
+            {
+                ISensorReader reader = Provider.GetSensorReader(Name);
+
+                SensorPackage[] packages = reader.ReadPackages();
+                foreach (SensorPackage pack in packages)
+                {
+                    this.Add(pack);
+                }
+            }
+        }
+
+        public byte[] GetBinaryData(int id)
+        {
+            if (IdKeyMap.ContainsKey(id))
+            {
+                return GetBinaryData(IdKeyMap[id]);
+            }
+            return new byte[0];
+        }
+
+        public byte[] GetBinaryData(string key)
+        {
+            List<byte> allBytes = new List<byte>();
+            if (AllData.ContainsKey(key))
+            {
+                foreach (RealSensorPackage rsp in AllData[key])
+                {
+                    allBytes.AddRange(rsp.GetBinary());
+                }
+            }
+            return allBytes.ToArray();
         }
     }
 
@@ -127,6 +157,8 @@ namespace Ion.Pro.Analyser.SenSys
 
         public Dictionary<string, SensorDataSet> LoadedDataSets { get; } = new Dictionary<string, SensorDataSet>();
 
+        public event EventHandler<SensorEventArgs> DataReceived;
+
         public SensorManager()
         {
             LoadSensorInformation();
@@ -155,6 +187,22 @@ namespace Ion.Pro.Analyser.SenSys
         public static SensorManager GetDefault()
         {
             return instance.Value;
+        }
+
+        public RealSensorPackage Add(string dataSet, SensorPackage data)
+        {
+            if (!this.LoadedDataSets.ContainsKey(dataSet))
+            {
+                this.LoadedDataSets[dataSet] = new SensorDataSet(dataSet, new LegacySensorProvider());
+                this.LoadedDataSets[dataSet].Load(false);
+            }
+            RealSensorPackage temp = this.LoadedDataSets[dataSet].Add(data);
+            return temp;
+        }
+
+        public void AddLive(string dataSet, SensorPackage package)
+        {
+            OnDataReceived(this.Add(dataSet, package));
         }
 
         public void RegisterProvider(string fileExtension, ISensorProvider provider)
@@ -188,6 +236,56 @@ namespace Ion.Pro.Analyser.SenSys
                 return null;
             }
         }
+
+        public void OnDataReceived(RealSensorPackage package)
+        {
+            DataReceived?.Invoke(this, new SensorEventArgs() { Package = package });
+        }
+
+        public byte[] GetBinaryData(string dataset, int id)
+        {
+            if (LoadedDataSets.ContainsKey(dataset))
+            {
+                return LoadedDataSets[dataset].GetBinaryData(id);
+            }
+            return new byte[0];
+        }
+
+        /*public string CreateCsv(bool norFormat, bool includeTitle)
+        {
+            char seperator = ',';
+            IFormatProvider provider = NumberFormatInfo.InvariantInfo;
+            if (norFormat)
+            {
+                seperator = ';';
+                provider = new CultureInfo("no-NB");
+            }
+            int largestDataSet = 0;
+            StringBuilder sb = new StringBuilder();
+            List<List<RealSensorPackage>> allValues = new List<List<RealSensorPackage>>();
+            foreach (KeyValuePair<int, List<RealSensorPackage>> pair in indexedPackages)
+            {
+                string name = "Unknown (" + pair.Key.ToString() + ")";
+                if (sensorIdMapping.ContainsKey(pair.Key))
+                {
+                    SensorInformation si = sensorIdMapping[pair.Key];
+                    name = si.Name;
+                }
+                if (includeTitle) sb.Append(name + seperator);
+                largestDataSet = Math.Max(largestDataSet, pair.Value.Count);
+                allValues.Add(pair.Value);
+            }
+            if (includeTitle) sb.AppendLine();
+            for (int i = 0; i < largestDataSet; i++)
+            {
+                for (int j = 0; j < allValues.Count; j++)
+                {
+                    sb.Append((allValues[j].Count > i ? allValues[j][i].Value.ToString(provider) : "") + seperator);
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
+        }*/
     }
 
     public class SensorDataStore

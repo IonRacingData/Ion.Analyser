@@ -10,6 +10,11 @@ var DataAssigner = (function () {
         this.window.content.style.flexWrap = "wrap";
         this.draw();
         this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () { return _this.draw(); });
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () { return _this.draw(); });
+        this.eh.on(this.window, AppWindow.event_close, function () { return _this.window_close(); });
+    };
+    DataAssigner.prototype.window_close = function () {
+        this.eh.close();
     };
     DataAssigner.prototype.draw = function () {
         this.window.content.innerHTML = "";
@@ -152,13 +157,14 @@ var DataAssigner = (function () {
             var sensor = info[i];
             var ctrl = drawMethod.call(this, plot, sensor);
             var label = this.mk.tag("label");
-            //label.title = sensor.ID.toString() + " (0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
-            /*if (!sensor) {
+            var firstInfo = sensor.infos.SensorInfos[0];
+            label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
+            if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
-            }*/
+            }
             label.appendChild(ctrl);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
-            label.appendChild(document.createTextNode(sensor.infos.IDs[0].toString()));
+            label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
             this.sensorTable.appendChild(this.mk.tag("br"));
         }

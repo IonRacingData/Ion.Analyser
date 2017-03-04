@@ -62,9 +62,7 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
-            SensorManager manager = SensorManager.GetDefault();
-            manager.RegisterProvider("log16", new LegacySensorProvider());
-            manager.RegisterProvider("log", new LegacySensorProvider());
+            
 
             //manager.Load("../../Data/Sets/126_usart_data.log16");
 
@@ -81,6 +79,7 @@ namespace Ion.Pro.Analyser
             Console.WriteLine("Ion Analyser Server");
             try
             {
+                InitSenSys();
                 //InitSensorStore();
                 //InsertSensorTestData();
                 IonAnalyserWebPage.Run();
@@ -91,6 +90,14 @@ namespace Ion.Pro.Analyser
                 Console.WriteLine(e);
             }
             Console.Read();
+        }
+
+        static void InitSenSys()
+        {
+            SensorManager manager = SensorManager.GetDefault();
+            manager.RegisterProvider("log16", new LegacySensorProvider());
+            manager.RegisterProvider("log", new LegacySensorProvider());
+            ComBus.GetDefault().RegisterClient(new NewSensorComService());
         }
 
         static void CreateSinData()
@@ -358,10 +365,58 @@ namespace Ion.Pro.Analyser
         }
     }
 
+    public class NewSensorComService : ComBusClient
+    {
+        List<RealSensorPackage> SendCache = new List<RealSensorPackage>();
+        DateTime lastSend = new DateTime();
 
+        public NewSensorComService()
+        {
+            SensorManager.GetDefault().DataReceived += SensorManager_DataReceived;
+        }
+
+        private void SensorManager_DataReceived(object sender, SensorEventArgs e)
+        {
+            DateTime current = DateTime.Now;
+            SendCache.Add(e.Package);
+            if ((current - lastSend).TotalMilliseconds > 100)
+            {
+                List<byte> allBytes = new List<byte>();
+                foreach (RealSensorPackage sp in SendCache)
+                {
+                    allBytes.AddRange(sp.GetBinary());
+                }
+                SendCache.Clear();
+                ComBus.SendMessage(new ComMessage()
+                {
+                    MessageId = 10,
+                    Status = (int)ComMessageStatus.Request110,
+                    Path = "/sensor/update",
+                    NodeId = this.Id,
+                    Data = JSONObject.Create(new { Sensors = Convert.ToBase64String(allBytes.ToArray()) }).ToJsonString()
+                });
+
+                lastSend = current;
+            }
+        }
+
+        public override void ReceiveMessage(ComMessage message)
+        {
+            string[] parts = message.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts[0] == "sensor")
+            {
+                if (parts[1] == "getdata")
+                {
+                    SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(SensorManager.GetDefault().GetBinaryData(package.dataset, package.num)) }, message, this);
+                }
+            }
+        }
+    }
 
     public class SensorNumPackage
     {
+        public string dataset { get; set; }
         public int num { get; set; }
     }
 

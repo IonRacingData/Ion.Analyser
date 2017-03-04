@@ -298,7 +298,7 @@ class Multicallback {
 }
 
 class SensorPlotInfo {
-    IDs: string[] = [];
+    Keys: string[] = [];
     SensorInfos: sensys.ISensorInformation[] = [];
 }
 

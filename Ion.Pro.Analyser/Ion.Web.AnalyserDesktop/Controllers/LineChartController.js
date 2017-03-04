@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var LineChartController = (function (_super) {
     __extends(LineChartController, _super);
     function LineChartController() {
@@ -327,7 +332,8 @@ var LineChartController = (function (_super) {
         var min = 0;
         var max = 0;
         for (var i = 0; i < this.data.length; i++) {
-            var info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
+            //let info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
+            var info = this.data[i].infos.SensorInfos[0];
             var dmin = SensorInfoHelper.minValue(info);
             var dmax = SensorInfoHelper.maxValue(info);
             min = dmin < min ? dmin : min;

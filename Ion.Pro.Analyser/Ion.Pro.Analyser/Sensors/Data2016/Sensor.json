@@ -324,5 +324,51 @@
   {
     "ID": 44,
     "Key": "COS1"
+  },
+
+  // #####--MotorController--######
+  {
+    "ID": 384,
+    "Key": "MC_RAW"
+  },
+  {
+    "ID": 61504, //0xF040 -> 0x27
+    "Key": "MC_VSI_CURRENT_Q"
+  },
+  {
+    "ID": 61505, //0xF041 -> 0x28
+    "Key": "MC_VSI_CURRENT_D"
+  },
+  {
+    "ID": 61506, //0xF042 -> 0x29
+    "Key": "MC_VSI_VOLTAGE_Q"
+  },
+  {
+    "ID": 61507, //0xF043 -> 0x2a
+    "Key": "MC_VSI_VOLTAGE_D"
+  },
+  {
+    "ID": 61508, //0xF044 -> 0xf6
+    "Key": "MC_MOTOR_POWER"
+  },
+  {
+    "ID": 61509, //0xF045 -> 0x30
+    "Key": "MC_MOTOR_SPEED"
+  },
+  {
+    "ID": 61510, //0xF046 -> 0xa8
+    "Key": "MC_MOTOR_SPEED_FILTER"
+  },
+  {
+    "ID": 61511, //0xF047 -> 0x49,
+    "Key": "MC_TEMP_MOTOR"
+  },
+  {
+    "ID": 61512, //0xF048 -> 0x4A,
+    "Key": "MC_TEMP_IGBT"
+  },
+  {
+    "ID": 61513, //0xF049 -> 0x4B,
+    "Key": "MC_TEMP_VSI_AMBIENT"
   }
 ]

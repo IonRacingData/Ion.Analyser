@@ -185,12 +185,19 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+        this.eh.on(this.plotWindow, AppWindow.event_close, () => this.window_close());
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.createEvents(this.eh);
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
+    }
+
+    private window_close() {
+        console.log("closing");
+        kernel.senMan.unregister(this);
+        this.eh.close();
     }
 
     dataUpdate() {

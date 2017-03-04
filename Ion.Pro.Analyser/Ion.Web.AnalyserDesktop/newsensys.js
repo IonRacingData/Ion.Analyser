@@ -12,8 +12,10 @@ var Kernel;
                 //this.loadSensorInformation();
             }
             SensorManager.prototype.addEventListener = function (type, handeler) {
+                this.eventManager.addEventListener(type, handeler);
             };
             SensorManager.prototype.removeEventListener = function (type, handeler) {
+                this.eventManager.removeEventListener(type, handeler);
             };
             SensorManager.prototype.loadSensorInformation = function () {
                 requestAction("GetSensorInformation", function (ids) {
@@ -62,6 +64,7 @@ var Kernel;
                             | raw.charCodeAt(i * 28 + 18) << 48
                             | raw.charCodeAt(i * 28 + 19) << 56,
                     };
+                    /* tslint:enable:no-bitwise */
                 }
                 return ret;
             };
@@ -72,7 +75,11 @@ var Kernel;
                 var _this = this;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
-                        _this.loadedDataSet.push(new SensorDataSet(data));
+                        var dataSet = new SensorDataSet(data);
+                        for (var v in dataSet.SensorData) {
+                            _this.dataSources.push(new PointSensorGroup(dataSet.SensorData[v]));
+                        }
+                        _this.loadedDataSet.push(dataSet);
                     }
                     console.log(data);
                     if (callback) {
@@ -83,6 +90,11 @@ var Kernel;
             SensorManager.prototype.register = function (viewer) {
                 this.viewers.push(viewer);
                 this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+            };
+            SensorManager.prototype.unregister = function (viewer) {
+                var index = this.viewers.indexOf(viewer);
+                this.viewers.splice(index, 1);
+                this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
             };
             SensorManager.prototype.getInfos = function () {
                 return this.loadedDataSet[0].AllInfos;
@@ -99,16 +111,17 @@ var Kernel;
             };
             SensorManager.prototype.pushToCache = function (data) {
                 if (data.length > 0) {
-                    var temp = this.loadedDataSet[0].SensorData[data[0].ID];
+                    var key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                    var temp = this.loadedDataSet[0].SensorData[key];
                     temp.insertSensorPackage(data);
                     console.log(this.dataSources);
                     return temp;
                 }
                 return null;
             };
-            SensorManager.prototype.loadData = function (id, callback) {
+            SensorManager.prototype.loadData = function (info, callback) {
                 var _this = this;
-                kernel.netMan.sendMessage("/sensor/getdata", { num: id }, function (data) {
+                kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, function (data) {
                     var dataContainer = _this.pushToCache(_this.convertToSensorPackage(data.Sensors));
                     callback(dataContainer);
                 });
@@ -118,15 +131,15 @@ var Kernel;
                 });*/
             };
             SensorManager.prototype.fillDataSource = function (source, callback) {
-                var multiback = new Multicallback(source.infos.IDs.length, function () {
+                var multiback = new Multicallback(source.infos.Keys.length, function () {
                     var params = [];
                     for (var _i = 0; _i < arguments.length; _i++) {
                         params[_i] = arguments[_i];
                     }
                     callback();
                 });
-                for (var i = 0; i < source.infos.IDs.length; i++) {
-                    this.loadData(source.infos.SensorInfos[i].ID, multiback.createCallback());
+                for (var i = 0; i < source.infos.Keys.length; i++) {
+                    this.loadData(source.infos.SensorInfos[i], multiback.createCallback());
                 }
             };
             SensorManager.isDatasource = function (source, type) {
@@ -141,19 +154,44 @@ var Kernel;
             return SensorManager;
         }());
         SensorManager.event_registerViewer = "registerViewer";
+        SensorManager.event_unregisterViewer = "unregisterViewer";
         SenSys.SensorManager = SensorManager;
         var SensorDataSet = (function () {
             function SensorDataSet(data) {
                 this.AllInfos = [];
+                this.KeyInfoMap = {};
                 this.LoadedKeys = [];
-                this.SensorData = [];
+                this.IdKeyMap = [];
+                this.SensorData = {};
                 this.Name = data.Name;
                 this.LoadedKeys = data.LoadedKeys;
                 this.AllInfos = data.AllInfos;
                 for (var _i = 0, _a = this.AllInfos; _i < _a.length; _i++) {
                     var a = _a[_i];
-                    var temp = new SensorDataContainer(a.Key);
-                    temp.info = a;
+                    this.IdKeyMap[a.ID] = a.Key;
+                    this.KeyInfoMap[a.Key] = a;
+                    a.SensorSet = this;
+                }
+                for (var _b = 0, _c = this.LoadedKeys; _b < _c.length; _b++) {
+                    var a = _c[_b];
+                    var temp = new SensorDataContainer(a);
+                    var sensInfo = this.KeyInfoMap[a];
+                    if (!sensInfo) {
+                        sensInfo = {
+                            ID: parseInt(a),
+                            Key: a,
+                            SensorSet: this,
+                            Name: a,
+                            MaxDisplay: null,
+                            MaxValue: null,
+                            MinDisplay: null,
+                            MinValue: null,
+                            Resolution: 0,
+                            Signed: false,
+                            Unit: null
+                        };
+                    }
+                    temp.info = sensInfo;
                     this.SensorData[temp.ID] = temp;
                 }
             }

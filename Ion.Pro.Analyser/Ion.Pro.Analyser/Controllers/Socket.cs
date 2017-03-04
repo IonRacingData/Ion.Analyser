@@ -81,7 +81,7 @@ namespace Ion.Pro.Analyser.Controllers
                 byte[] data = reader.ReadBytes(2);
                 frame.PayloadLength = data[0] << 8 | data[1];
             }
-            if (frame.PayloadLength == 127)
+            else if (frame.PayloadLength == 127)
             {
                 byte[] data = reader.ReadBytes(8); // We cant make an array bigger then this anyway, if we have data more then 2GB we got problems.
                 frame.PayloadLength = data[4] << 24 | data[5] << 16 | data[6] << 8 | data[7];

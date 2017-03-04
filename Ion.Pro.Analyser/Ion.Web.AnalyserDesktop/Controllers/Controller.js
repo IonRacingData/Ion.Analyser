@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Controller = (function () {
     function Controller() {
         this.mk = new HtmlHelper;
@@ -26,7 +31,7 @@ var SingleValueController = (function (_super) {
     SingleValueController.prototype.setData = function (d) {
         this.data = d;
         if (this.data) {
-            var curID = this.data.infos.IDs[0];
+            var curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
                 var i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
@@ -84,6 +89,9 @@ var MultiValueCanvasController = (function (_super) {
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
             this.updateSensorInfos(kernel.senMan.getInfos());
+            /*kernel.senMan.getInfos((infos: SensorInformation[]) => {
+                this.updateSensorInfos(infos);
+            });*/
         }
         this.onDataChange();
     };
@@ -93,7 +101,7 @@ var MultiValueCanvasController = (function (_super) {
             var i = infos_1[_i];
             for (var _a = 0, _b = this.data; _a < _b.length; _a++) {
                 var d = _b[_a];
-                if (d.infos.IDs[0] === i.Key) {
+                if (d.infos.Keys[0] === i.Key) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
             }
@@ -116,11 +124,11 @@ var SingleValueCanvasController = (function (_super) {
     SingleValueCanvasController.prototype.setData = function (d) {
         this.data = d;
         if (this.data) {
-            var curID = this.data.infos.IDs[0];
+            var curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
                 var i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
-                this.lastID = this.data.infos.IDs[0];
+                this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
             }
             else {

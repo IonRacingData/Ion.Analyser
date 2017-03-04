@@ -398,7 +398,8 @@
         let max: number = 0;
 
         for (let i = 0; i < this.data.length; i++) {
-            let info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
+            //let info = this.sensorInfos[this.data[i].infos.IDs[0].toString()];
+            let info = this.data[i].infos.SensorInfos[0];
             let dmin: number = SensorInfoHelper.minValue(info);
             let dmax: number = SensorInfoHelper.maxValue(info);            
             min = dmin < min ? dmin : min;

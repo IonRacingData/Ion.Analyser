@@ -8,17 +8,18 @@
         private dataSources: IDataSource<any>[] = [];
 
         static readonly event_registerViewer = "registerViewer";
+        static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
             //this.loadSensorInformation();
         }
 
         public addEventListener(type: string, handeler: any): void {
-
+            this.eventManager.addEventListener(type, handeler);
         }
 
         public removeEventListener(type: string, handeler: any): void {
-
+            this.eventManager.removeEventListener(type, handeler);
         }
 
         private loadSensorInformation(): void {
@@ -86,7 +87,11 @@
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
-                    this.loadedDataSet.push(new SensorDataSet(data));
+                    let dataSet = new SensorDataSet(data);
+                    for (let v in dataSet.SensorData) {
+                        this.dataSources.push(new PointSensorGroup(dataSet.SensorData[v]));
+                    }
+                    this.loadedDataSet.push(dataSet);
                 }
                 console.log(data);
                 if (callback) {
@@ -98,6 +103,12 @@
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
             this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+        }
+
+        public unregister<T>(viewer: IViewerBase<T>): void {
+            let index = this.viewers.indexOf(viewer);
+            this.viewers.splice(index, 1);
+            this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
         }
 
         public getInfos(): ISensorInformation[] {
@@ -116,7 +127,8 @@
 
         private pushToCache(data: ISensorPackage[]): SensorDataContainer {
             if (data.length > 0) {
-                let temp = this.loadedDataSet[0].SensorData[data[0].ID];
+                let key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                let temp = this.loadedDataSet[0].SensorData[key];
 
                 temp.insertSensorPackage(data);
 
@@ -127,9 +139,9 @@
 
         }
 
-        private loadData(id: number, callback: (data: SensorDataContainer) => void): void {
+        private loadData(info: ISensorInformation, callback: (data: SensorDataContainer) => void): void {
 
-            kernel.netMan.sendMessage("/sensor/getdata", { num: id }, (data: any) => {
+            kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, (data: any) => {
                 let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors));
                 callback(dataContainer);
             });
@@ -140,12 +152,12 @@
         }
 
         public fillDataSource<T>(source: IDataSource<T>, callback: () => void): void {
-            let multiback = new Multicallback(source.infos.IDs.length, (...params: SensorDataContainer[]) => {
+            let multiback = new Multicallback(source.infos.Keys.length, (...params: SensorDataContainer[]) => {
                 callback();
             });
 
-            for (let i = 0; i < source.infos.IDs.length; i++) {
-                this.loadData(source.infos.SensorInfos[i].ID, multiback.createCallback());
+            for (let i = 0; i < source.infos.Keys.length; i++) {
+                this.loadData(source.infos.SensorInfos[i], multiback.createCallback());
             }
 
         }
@@ -166,16 +178,39 @@
     export class SensorDataSet {
         public Name: string;
         public AllInfos: ISensorInformation[] = [];
+        public KeyInfoMap: { [index: string]: ISensorInformation } = { };
         public LoadedKeys: string[] = [];
-        public SensorData: SensorDataContainer[] = [];
+        public IdKeyMap: string[] = [];
+        public SensorData: { [index: string]: SensorDataContainer } = { };
 
         public constructor(data: ISensorDataSet) {
             this.Name = data.Name;
             this.LoadedKeys = data.LoadedKeys;
             this.AllInfos = data.AllInfos;
             for (let a of this.AllInfos) {
-                let temp = new SensorDataContainer(a.Key);
-                temp.info = a;
+                this.IdKeyMap[a.ID] = a.Key;
+                this.KeyInfoMap[a.Key] = a;
+                a.SensorSet = this;
+            }
+            for (let a of this.LoadedKeys) {
+                let temp = new SensorDataContainer(a);
+                let sensInfo = this.KeyInfoMap[a];
+                if (!sensInfo) {
+                    sensInfo = {
+                        ID: parseInt(a),
+                        Key: a,
+                        SensorSet: this,
+                        Name: a,
+                        MaxDisplay: null,
+                        MaxValue: null,
+                        MinDisplay: null,
+                        MinValue: null,
+                        Resolution: 0,
+                        Signed: false,
+                        Unit: null
+                    }
+                }
+                temp.info = sensInfo;
                 this.SensorData[temp.ID] = temp;
             }
         }

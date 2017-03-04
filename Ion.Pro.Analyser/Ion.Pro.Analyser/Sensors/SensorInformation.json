@@ -397,5 +397,51 @@
     "Key": "COS1",
     "Name": "Cos 1",
     "Unit": "%"
+  },
+
+  // #####--Motor Controller--#####
+  {
+    "Key": "MC_RAW",
+    "Name": "Motor Controller Raw"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_Q",
+    "Name": "MC VSI Current Q Axis"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_D",
+    "Name": "MC VSI Current Q Axis"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_Q",
+    "Name": "MC VSI Voltage Q Axis"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_D",
+    "Name": "MC VSI Voltage Q Axis"
+  },
+  {
+    "Key": "MC_MOTOR_POWER",
+    "Name": "MC Motor Power"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED",
+    "Name": "MC Motor Speed"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED_FILTER",
+    "Name": "MC Filted Motor Speed"
+  },
+  {
+    "Key": "MC_TEMP_MOTOR",
+    "Name": "MC Temperature Motor"
+  },
+  {
+    "Key": "MC_TEMP_IGBT",
+    "Name": "MC Temperature IGBT"
+  },
+  {
+    "Key": "MC_TEMP_VSI_AMBIENT",
+    "Name": "MC Temperature Ambient VSI"
   }
 ]

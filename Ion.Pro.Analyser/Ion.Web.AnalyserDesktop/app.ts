@@ -52,7 +52,7 @@ class PointSensorGroup extends SensorGroup<Point>{
         super(Point);
         this.data = data;
 
-        this.infos.IDs[0] = data.ID;
+        this.infos.Keys[0] = data.ID;
         this.infos.SensorInfos[0] = data.info;
         this.color = data.color;
     }
