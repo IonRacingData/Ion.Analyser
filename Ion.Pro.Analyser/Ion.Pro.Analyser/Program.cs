@@ -54,7 +54,7 @@ namespace Ion.Pro.Analyser
         static string[] files = new string[]
         {
             "../../Data/sinus.log16",
-            "../../Data/Sets/126_usart_data.log16",
+            "../../Data/Sets/167_usart_data.log16",
             "../../Data/freq.log16",
             "../../Data/stiangps.gpx",
             "../../Data/fredrikgps.gpx"
