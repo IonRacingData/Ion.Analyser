@@ -456,22 +456,26 @@
   {
     "Key": "MC_VSI_CURRENT_Q",
     "Resolution": 16,
-    "Signed": true
+    "Signed": true,
+    "MaxValue": 32767
   },
   {
     "Key": "MC_VSI_CURRENT_D",
     "Resolution": 16,
-    "Signed": true
+    "Signed": true,
+    "MaxValue": 32767
   },
   {
     "Key": "MC_VSI_VOLTAGE_Q",
     "Resolution": 16,
-    "Signed": true
+    "Signed": true,
+    "MaxValue": 32767
   },
   {
     "Key": "MC_VSI_VOLTAGE_D",
     "Resolution": 16,
-    "Signed": true
+    "Signed": true,
+    "MaxValue": 32767
   },
   {
     "Key": "MC_MOTOR_POWER"
