@@ -65,6 +65,11 @@ namespace Ion.Pro.Analyser.Web
             TimingService Watch = wrapper.Watch;
 
             HttpHeaderRequest request = await Task.Run(() => HttpHeaderRequest.ReadFromProtocolReader(reader));
+            if (request.RequestType == HttpRequestType.UNKNOWN)
+            {
+                Watch.Stop();
+                return;
+            }
             Watch.Mark("Read and parsed http");
             HttpHeaderResponse response = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
             HttpContext context = new HttpContext() { Request = request, Response = response, Wrapper = wrapper };
