@@ -51,6 +51,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
+    kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
 
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));

@@ -270,3 +270,20 @@ span.table-resize{
     align-items: center;
 }
 
+.carousel {height: 100%;}
+
+.carousel_contentWrapper {
+    height: calc(100% - 40px);
+}
+
+.carousel_navWrapper {
+    height: 30px;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.carousel_navWrapper img {
+    height: 100%;
+    width: auto;
+}
