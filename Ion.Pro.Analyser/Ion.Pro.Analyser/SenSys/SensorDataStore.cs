@@ -148,6 +148,17 @@ namespace Ion.Pro.Analyser.SenSys
         }
     }
 
+    public class InFluxDBSensorProvider : ISensorProvider
+    {
+        public string KeyIDMapPath { get; } = "Sensors/Data2016/Sensor.json";
+        public string CalibrationFilePath { get; } = "Sensors/Data2016/SensorInfo.json";
+
+        public ISensorReader GetSensorReader(string name)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SensorManager
     {
         public const string SensorNameFile = "Sensors/SensorInformation.json";
