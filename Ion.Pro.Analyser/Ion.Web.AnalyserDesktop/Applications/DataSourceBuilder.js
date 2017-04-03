@@ -33,7 +33,7 @@ var Carousel = (function () {
         this.btn_next.setAttribute("src", "arrow.png");
         this.navWrapper.appendChild(this.btn_next);
         this.btn_next.style.cssFloat = "right";
-        this.navWrapper.style.userSelect = "none";
+        this.navWrapper.style.msUserSelect = "none";
         this.contentWrapper = this.mk.tag("div", "carousel_contentWrapper");
         this.btn_back.addEventListener("click", function () {
             if (_this.visibleSlide > 0) {

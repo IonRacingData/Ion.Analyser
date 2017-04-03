@@ -53,6 +53,7 @@
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="Controllers\BarController.ts" />
     <TypeScriptCompile Include="Controllers\Controller.ts" />
+    <TypeScriptCompile Include="Controllers\DSBController.ts" />
     <TypeScriptCompile Include="Controllers\SteeringWheelController.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="Controllers\GPSController.ts" />

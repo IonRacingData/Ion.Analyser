@@ -1,13 +1,8 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var LineChartController = (function (_super) {
     __extends(LineChartController, _super);
     function LineChartController() {
@@ -157,16 +152,14 @@ var LineChartController = (function (_super) {
                 }
                 var lastPoint = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength = this.data[d].length();
-                var drawPoint = 0;
                 var checkPoint = lastPoint;
                 this.ctxMain.beginPath();
                 this.ctxMain.strokeStyle = this.data[d].color.toString();
                 for (var i = firstVisibleIdx; i < totalLength; i++) {
                     var point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                        this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
-                        this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                        drawPoint++;
+                        this.ctxMain.moveTo(point.x, point.y);
+                        this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
                         checkPoint = point;
                     }
                     if (point.x > this.width) {

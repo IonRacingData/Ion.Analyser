@@ -47,7 +47,7 @@ class Carousel {
 
         this.navWrapper.appendChild(this.btn_next);
         this.btn_next.style.cssFloat = "right";
-        this.navWrapper.style.userSelect = "none";        
+        this.navWrapper.style.msUserSelect = "none";        
 
         this.contentWrapper = this.mk.tag("div", "carousel_contentWrapper");
 

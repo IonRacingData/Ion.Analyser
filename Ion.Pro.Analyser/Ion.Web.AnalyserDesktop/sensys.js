@@ -79,7 +79,6 @@ var SensorManager = (function () {
                     | raw.charCodeAt(i * 28 + 18) << 48
                     | raw.charCodeAt(i * 28 + 19) << 56,
             };
-            /* tslint:enable:no-bitwise */
         }
         return ret;
     };
@@ -259,7 +258,6 @@ var SensorInfoHelper = (function () {
         else {
             /* tslint:disable:no-bitwise */
             val = (1 << temp.Resolution) - 1;
-            /* tslint:enable:no-bitwise */
         }
         return val;
     };

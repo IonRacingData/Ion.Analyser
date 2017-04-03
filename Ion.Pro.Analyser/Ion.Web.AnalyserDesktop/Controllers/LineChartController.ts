@@ -171,9 +171,9 @@
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
+                
                 var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength: number = this.data[d].length();
-                var drawPoint: number = 0;
                 var checkPoint: Point = lastPoint;
 
                 this.ctxMain.beginPath();
@@ -182,9 +182,8 @@
                 for (var i: number = firstVisibleIdx; i < totalLength; i++) {
                     var point: Point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                        this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
-                        this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                        drawPoint++;
+                        this.ctxMain.moveTo(point.x, point.y);
+                        this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
                         checkPoint = point;
                     }
 
