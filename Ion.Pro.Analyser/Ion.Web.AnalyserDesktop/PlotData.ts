@@ -141,6 +141,9 @@ class PlotDataHelper {
     }
 
     public static getIndexOf(plotData: IDataSource<Point>, p: Point): number {
+        if (plotData.length() == 0) {
+            return -1;
+        }
         var min: number = 0;
         var max: number = plotData.length() - 1;
         var half: number;

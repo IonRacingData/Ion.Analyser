@@ -117,6 +117,9 @@ var PlotDataHelper = (function () {
         return plotData.getValue(PlotDataHelper.getIndexOf(plotData, p));
     };
     PlotDataHelper.getIndexOf = function (plotData, p) {
+        if (plotData.length() == 0) {
+            return -1;
+        }
         var min = 0;
         var max = plotData.length() - 1;
         var half;
