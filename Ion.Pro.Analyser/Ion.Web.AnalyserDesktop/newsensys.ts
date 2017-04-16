@@ -128,6 +128,9 @@
         private pushToCache(data: ISensorPackage[]): SensorDataContainer {
             if (data.length > 0) {
                 let key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                if (!key) {
+                    key = data[0].ID.toString();
+                }
                 let temp = this.loadedDataSet[0].SensorData[key];
 
                 temp.insertSensorPackage(data);

@@ -111,6 +111,9 @@ var Kernel;
             SensorManager.prototype.pushToCache = function (data) {
                 if (data.length > 0) {
                     var key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                    if (!key) {
+                        key = data[0].ID.toString();
+                    }
                     var temp = this.loadedDataSet[0].SensorData[key];
                     temp.insertSensorPackage(data);
                     console.log(this.dataSources);

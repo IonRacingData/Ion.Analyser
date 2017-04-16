@@ -62,8 +62,6 @@ namespace Ion.Pro.Analyser
 
         static void Main(string[] args)
         {
-            
-
             //manager.Load("../../Data/Sets/126_usart_data.log16");
 
             //Console.Read();
@@ -75,7 +73,6 @@ namespace Ion.Pro.Analyser
                 //rpiManager.Connect();
                 //Console.ReadLine();
             }
-
             Console.WriteLine("Ion Analyser Server");
             try
             {
@@ -97,7 +94,7 @@ namespace Ion.Pro.Analyser
             SensorManager manager = SensorManager.GetDefault();
             manager.RegisterProvider("log16", new LegacySensorProvider());
             manager.RegisterProvider("log", new LegacySensorProvider());
-            ComBus.GetDefault().RegisterClient(new NewSensorComService());
+            ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
         }
 
         static void CreateSinData()
@@ -369,10 +366,12 @@ namespace Ion.Pro.Analyser
     {
         List<RealSensorPackage> SendCache = new List<RealSensorPackage>();
         DateTime lastSend = new DateTime();
+        SensorManager manager;
 
-        public NewSensorComService()
+        public NewSensorComService(SensorManager manager)
         {
-            SensorManager.GetDefault().DataReceived += SensorManager_DataReceived;
+            this.manager = manager;
+            this.manager.DataReceived += SensorManager_DataReceived;
         }
 
         private void SensorManager_DataReceived(object sender, SensorEventArgs e)
@@ -408,7 +407,7 @@ namespace Ion.Pro.Analyser
                 if (parts[1] == "getdata")
                 {
                     SensorNumPackage package = message.ReadData<SensorNumPackage>();
-                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(SensorManager.GetDefault().GetBinaryData(package.dataset, package.num)) }, message, this);
+                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(manager.GetBinaryData(package.dataset, package.num)) }, message, this);
                 }
             }
         }

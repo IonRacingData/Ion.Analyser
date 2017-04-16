@@ -67,15 +67,17 @@ namespace Ion.Pro.Analyser.SenSys
         {
             string key = pack.ID.ToString();
             RealSensorPackage realPack;
-            if (IdKeyMap.ContainsKey(pack.ID))
+            if (!IdKeyMap.ContainsKey(pack.ID))
+                IdKeyMap.Add(pack.ID, pack.ID.ToString());
+            key = IdKeyMap[pack.ID];
+            if (AllInfos.ContainsKey(key))
             {
-                key = IdKeyMap[pack.ID];
                 realPack = new RealSensorPackage()
                 {
                     ID = pack.ID,
                     TimeStamp = pack.TimeStamp,
                     AbsoluteTimeStamp = pack.AbsoluteTimeStamp,
-                    Value = AllInfos[IdKeyMap[pack.ID]].ConvertValue(pack.Value)
+                    Value = AllInfos[key].ConvertValue(pack.Value)
                 };
             }
             else
@@ -111,6 +113,10 @@ namespace Ion.Pro.Analyser.SenSys
             if (IdKeyMap.ContainsKey(id))
             {
                 return GetBinaryData(IdKeyMap[id]);
+            }
+            else if (AllData.ContainsKey(id.ToString()))
+            {
+                return GetBinaryData(id.ToString());
             }
             return new byte[0];
         }
