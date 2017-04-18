@@ -7,11 +7,15 @@ var GPSController = (function (_super) {
     __extends(GPSController, _super);
     function GPSController(width, height) {
         var _this = _super.call(this) || this;
+        _this.lastID = "";
         _this.color = "white";
         _this.movePoint = new Point(0, 0);
         _this.scalePoint = new Point(1, 1);
         _this.width = width;
         _this.height = height;
+        _this.padding = _this.width * 0.05;
+        _this.availablePlotWidth = _this.width - (_this.padding * 2);
+        _this.availablePlotHeight = _this.height - (_this.padding * 2);
         return _this;
     }
     GPSController.prototype.generate = function () {
@@ -20,55 +24,47 @@ var GPSController = (function (_super) {
         this.wrapper.className = "plot-wrapper";
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.width = this.canvas.getWidth();
-        this.height = this.canvas.getHeight();
-        this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
-        this.relSize = null;
+        this.canvas.setSize(this.width, this.height);
         return this.wrapper;
     };
     GPSController.prototype.onSizeChange = function () {
         this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
+        this.availablePlotWidth = this.width - (this.padding * 2);
+        this.availablePlotHeight = this.height - (this.padding * 2);
         this.draw();
     };
     GPSController.prototype.draw = function () {
-        if (this.posData) {
+        if (this.data && this.data.length() > 0) {
             var offsetX = void 0;
             var offsetY = void 0;
+            var posDataLength = this.data.length();
             this.ctxMain.clear();
             this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.color;
-            this.findMinMax();
             this.rescale();
-            this.rescale();
-            if (this.posData.points.length > 0) {
-                var firstPoint = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
-                this.ctxMain.moveTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+            offsetX = (this.width - this.plotWidth) / 2;
+            offsetY = (this.height - this.plotHeight) / 2;
+            if (posDataLength > 0) {
+                var firstPoint = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
+                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
-            for (var i = 0; i < this.posData.points.length; i++) {
-                var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
+            for (var i = 0; i < posDataLength; i++) {
+                var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 var absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
             }
             this.ctxMain.stroke();
         }
     };
     GPSController.prototype.findMinMax = function () {
-        if (this.relSize === null && this.posData.points.length > 0) {
-            this.relSize = { min: null, max: null };
-            this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
-            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);
+        var posDataLength = this.data.length();
+        if (posDataLength > 0) {
+            var firstPoint = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+            this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
         }
-        for (var i = 0; i < this.posData.points.length; i++) {
-            var relPoint = new Point(this.posData.points[i].x, this.posData.points[i].y);
+        for (var i = 0; i < posDataLength; i++) {
+            var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
             this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
             this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
             this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
@@ -76,12 +72,11 @@ var GPSController = (function (_super) {
         }
     };
     GPSController.prototype.rescale = function () {
-        var newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        var newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
-        this.absWidth = newWidth;
-        this.absHeight = newHeight;
-        var xRatio = this.width / newWidth;
-        var yRatio = this.height / newHeight;
+        this.findMinMax();
+        var oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        var oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        var xRatio = this.availablePlotWidth / oldWidth;
+        var yRatio = this.availablePlotHeight / oldHeight;
         var ratio = Math.min(xRatio, yRatio);
         var first = new Point(this.relSize.min.x, this.relSize.min.y);
         this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
@@ -89,14 +84,24 @@ var GPSController = (function (_super) {
         var sec = this.getAbsolute(first);
         sec.y = this.height - sec.y;
         this.movePoint = this.movePoint.sub(sec);
-    };
-    GPSController.prototype.setData = function (d) {
-        this.posData = d;
-        console.log(d);
-        this.onDataChange();
+        this.plotWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        this.plotHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
     };
     GPSController.prototype.onDataChange = function () {
         this.draw();
+    };
+    GPSController.prototype.setData = function (d) {
+        this.data = d;
+        if (this.data) {
+            var curID = this.data.infos.Keys[0];
+            if (curID != this.lastID) {
+                this.lastSensorInfo = this.data.infos.SensorInfos[0];
+                this.lastID = curID;
+            }
+            else {
+                this.onDataChange();
+            }
+        }
     };
     return GPSController;
 }(CanvasController));

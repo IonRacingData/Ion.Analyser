@@ -168,7 +168,7 @@ var LineChartTester = (function () {
 }());
 var GaugeTester = (function () {
     function GaugeTester() {
-        this.plotType = "Gauge Chart";
+        this.plotType = "Gauge";
         this.type = Point;
         this.val = 0;
     }
@@ -195,7 +195,7 @@ var GaugeTester = (function () {
 }());
 var GPSPlotTester = (function () {
     function GPSPlotTester() {
-        this.plotType = "GPS Chart";
+        this.plotType = "GPS";
         this.type = Point3D;
         this.points = [];
     }
@@ -206,6 +206,7 @@ var GPSPlotTester = (function () {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
+        this.plotWindow = this.window;
         /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -217,11 +218,8 @@ var GPSPlotTester = (function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
     };
-    GPSPlotTester.prototype.draw = function () {
-        this.plot.setData(this.testData);
-        this.plot.setSize(this.window.width, this.window.height);
-    };
     GPSPlotTester.prototype.dataUpdate = function () {
+        this.plot.setData(this.dataSource);
     };
     return GPSPlotTester;
 }());
@@ -266,7 +264,7 @@ var BarTester = (function () {
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, true, true);
+        this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
         this.window.addEventListener(AppWindow.event_resize, function () {
@@ -312,5 +310,36 @@ var LegacyRPIManager = (function () {
         this.window.content.appendChild(wrapper);
     };
     return LegacyRPIManager;
+}());
+var SteeringWheelTester = (function () {
+    function SteeringWheelTester() {
+        this.val = 0.5;
+        this.type = Point;
+        this.plotType = "Bar";
+    }
+    SteeringWheelTester.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.wheel = new SteeringWheelController(this.window.width, this.window.height);
+        var wheelWrapper = this.wheel.generate();
+        this.window.content.appendChild(wheelWrapper);
+        this.wheel.setPer(this.val);
+        wheelWrapper.addEventListener("wheel", function (e) {
+            _this.val -= e.deltaY / 100;
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.val = _this.val > 1 ? 1 : _this.val;
+            _this.wheel.setPer(_this.val);
+        });
+        this.window.addEventListener(AppWindow.event_resize, function () {
+            _this.wheel.setSize(_this.window.width, _this.window.height);
+        });
+    };
+    SteeringWheelTester.prototype.dataUpdate = function () {
+        this.wheel.setData(this.dataSource);
+    };
+    return SteeringWheelTester;
 }());
 //# sourceMappingURL=TestApps.js.map
