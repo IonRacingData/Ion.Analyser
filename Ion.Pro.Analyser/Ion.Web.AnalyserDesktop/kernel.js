@@ -37,8 +37,8 @@ function registerLaunchers() {
     //kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
-    kernel.appMan.registerApplication("Test", new Launcher(TaskManager, "Task Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
 }
 /* tslint:enable:interface-name */
 var Launcher = (function () {

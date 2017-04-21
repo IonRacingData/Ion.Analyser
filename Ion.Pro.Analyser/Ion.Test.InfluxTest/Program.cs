@@ -21,7 +21,7 @@ namespace Ion.Test.InfluxTest
             HttpClient client = new HttpClient();
             SensorManager manager = new SensorManager();
 
-            manager.RegisterProvider("log16", new LegacySensorProvider());
+            manager.RegisterFileProvider("log16", new LegacySensorProvider());
 
             SensorDataSet set = manager.Load(dataset);
 

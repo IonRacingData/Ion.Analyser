@@ -170,6 +170,16 @@ class CsvGenerator implements IApplication {
     }
 }
 
+class StorageTester implements IApplication {
+    public application: Application;
+
+    public main(): void {
+        
+    }
+}
+
+
+
 class LineChartTester implements IApplication, ICollectionViewer<Point> {
     plotType: string = "Line Chart";
     plotWindow: AppWindow;
@@ -217,8 +227,6 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.eh.close();
     }
 }
-
-
 
 class GaugeTester implements IApplication, IViewer<Point> {
     plotType: string = "Gauge Chart";

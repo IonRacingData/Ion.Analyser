@@ -23,12 +23,12 @@ namespace Ion.Pro.Analyser.SenSys
     public class SensorDataSet
     {
         public string Name { get; set; }
-        public ISensorProvider Provider { get; private set; }
+        public ISensorReaderProvider Provider { get; private set; }
         public Dictionary<string, NewSensorInformation> AllInfos { get; } = new Dictionary<string, NewSensorInformation>();
         public Dictionary<int, string> IdKeyMap { get; } = new Dictionary<int, string>();
         public Dictionary<string, List<RealSensorPackage>> AllData { get; } = new Dictionary<string, List<RealSensorPackage>>();
 
-        public SensorDataSet(string filename, ISensorProvider provider)
+        public SensorDataSet(string filename, ISensorReaderProvider provider)
         {
             this.Name = filename;
             this.Provider = provider;
@@ -135,15 +135,23 @@ namespace Ion.Pro.Analyser.SenSys
         }
     }
 
-    public interface ISensorProvider
+    public interface ISensorInfoProvider
     {
         string KeyIDMapPath { get; }
-        string CalibrationFilePath { get;  }
+        string CalibrationFilePath { get; }
+    }
 
+    public interface ISensorProvider : ISensorReaderProvider
+    {
+        string[] AvailableDataSets();
+    }
+
+    public interface ISensorReaderProvider : ISensorInfoProvider
+    {
         ISensorReader GetSensorReader(string name);
     }
 
-    public class LegacySensorProvider : ISensorProvider
+    public class LegacySensorProvider : ISensorReaderProvider
     {
         public string KeyIDMapPath { get; } = "Sensors/Data2016/Sensor.json";
         public string CalibrationFilePath { get; } = "Sensors/Data2016/SensorInfo.json";
@@ -159,6 +167,11 @@ namespace Ion.Pro.Analyser.SenSys
         public string KeyIDMapPath { get; } = "Sensors/Data2016/Sensor.json";
         public string CalibrationFilePath { get; } = "Sensors/Data2016/SensorInfo.json";
 
+        public string[] AvailableDataSets()
+        {
+            throw new NotImplementedException();
+        }
+
         public ISensorReader GetSensorReader(string name)
         {
             throw new NotImplementedException();
@@ -170,7 +183,7 @@ namespace Ion.Pro.Analyser.SenSys
         public const string SensorNameFile = "Sensors/SensorInformation.json";
         public List<string> SensorLocations { get; private set; } = new List<string>();
         public Dictionary<string, DisplaySensorInformationInformation> SensorDisplayInformation { get; } = new Dictionary<string, DisplaySensorInformationInformation>();
-        public Dictionary<string, ISensorProvider> SensorProviders { get; } = new Dictionary<string, ISensorProvider>();
+        public Dictionary<string, ISensorReaderProvider> FileProviders { get; } = new Dictionary<string, ISensorReaderProvider>();
 
         public Dictionary<string, SensorDataSet> LoadedDataSets { get; } = new Dictionary<string, SensorDataSet>();
 
@@ -222,9 +235,9 @@ namespace Ion.Pro.Analyser.SenSys
             OnDataReceived(this.Add(dataSet, package));
         }
 
-        public void RegisterProvider(string fileExtension, ISensorProvider provider)
+        public void RegisterFileProvider(string fileExtension, ISensorReaderProvider provider)
         {
-            SensorProviders.Add(fileExtension, provider);
+            FileProviders.Add(fileExtension, provider);
         }
 
         public SensorDataSet Load(string dataSet)
@@ -239,9 +252,9 @@ namespace Ion.Pro.Analyser.SenSys
                 throw new FileNotFoundException(fi.FullName + " not found");
             }
             string extension = fi.Extension.Remove(0, 1).ToLower();
-            if (SensorProviders.ContainsKey(extension))
+            if (FileProviders.ContainsKey(extension))
             {
-                SensorDataSet set = new SensorDataSet(dataSet, SensorProviders[extension]);
+                SensorDataSet set = new SensorDataSet(dataSet, FileProviders[extension]);
                 set.Load();
                 set.SetNames(this);
                 LoadedDataSets.Add(set.Name, set);
