@@ -60,4 +60,11 @@ var DataSourceInfo = (function () {
     }
     return DataSourceInfo;
 }());
+var DataSourceTemplate = (function () {
+    function DataSourceTemplate() {
+        this.sources = [];
+        this.layers = [];
+    }
+    return DataSourceTemplate;
+}());
 //# sourceMappingURL=app.js.map

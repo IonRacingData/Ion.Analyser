@@ -1,6 +1,7 @@
 ﻿class ApplicationManager implements IEventManager {
     appList: Application[] = [];
     launchers: { [category: string]: Launcher[] } = {};
+    allApps: { [name: string]: Launcher } = {};
     eventManager: EventManager = new EventManager();
     nextPID: number = 0;
 
@@ -18,11 +19,18 @@
         this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
     }
 
+    start(appName: string): void {
+        if (this.allApps[appName]) {
+            this.launchApplication(this.allApps[appName]);
+        }
+    }
+
     registerApplication(category: string, launcher: Launcher): void {
         if (!this.launchers[category]) {
             this.launchers[category] = [];
         }
         this.launchers[category].push(launcher);
+        this.allApps[(<any>launcher.mainFunction).name] = launcher;
     }
 
     addEventListener(type: string, listener: any): void {

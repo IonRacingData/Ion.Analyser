@@ -1,0 +1,669 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Ion.Pro.Analyser.ServiceManager" Collapsed="true">
+    <Position X="29" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAggAAA=</HashCode>
+      <FileName>CacheService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Singelton&lt;T&gt;" Collapsed="true">
+    <Position X="20.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAABAAAAAAAAAAAAAAAAAAAACAAAAAgAAAAAAA=</HashCode>
+      <FileName>CacheService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.FileSerice" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CacheService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.CacheService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>CacheService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ComBus" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAiAAIAAAACAAgAAgAAAACAAAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ComMessage" Collapsed="true">
+    <Position X="27.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAIAAAAAAAAAACAAABBEAAAAAAAAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ComBusClient" Collapsed="true">
+    <Position X="2.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAACAAIA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ComBusRelay" Collapsed="true">
+    <Position X="0.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAACCAAQAAAAAAAACAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.WebSocketComBusClient" Collapsed="true">
+    <Position X="0.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAgQAAAAQABACAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ComBusExtension" Collapsed="true">
+    <Position X="25.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Program" Collapsed="true">
+    <Position X="29" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAABAAAAAAAAAAAAAAAAAAQABEBAApQAAAAE=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.LegacySSHManager" Collapsed="true">
+    <Position X="23.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABIAQCAAAgAQAAJQAAAAIEAAAAAAAAAIAAAAgACAAg=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.LegacyPIService" Collapsed="true">
+    <Position X="18.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.NewSensorComService" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAQAAAAAAEACAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SensorNumPackage" Collapsed="true">
+    <Position X="20.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SensorComService" Collapsed="true">
+    <Position X="5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAQAAAAAAAAAACAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SessionService" Collapsed="true">
+    <Position X="18.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgABAAACAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SessionService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Session" Collapsed="true">
+    <Position X="16.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAQAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>SessionService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.MimeTypes" Collapsed="true">
+    <Position X="25.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAgAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpHeader" Collapsed="true">
+    <Position X="9.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpHeaderResponse" Collapsed="true">
+    <Position X="8.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EACAAAAAAAAQAQAAAEAgAAAIAAAAABAAAAAQAAAACAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpCookie" Collapsed="true">
+    <Position X="16.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQEAAAAAQAAAgAAAAAAIAAgAAAAACA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpHeaderRequest" Collapsed="true">
+    <Position X="10.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAQAAAQIRAAAAgBgAgABABBDkAAAAAIAIgAAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ProtocolReader" Collapsed="true">
+    <Position X="16.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CADgCAAAAAgMAAACEEQEIAAogAAIAEAIAAhACACQAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpServer" Collapsed="true">
+    <Position X="18.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ReceiveEventArgs" Collapsed="true">
+    <Position X="18.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.TcpFetcher" Collapsed="true">
+    <Position X="23.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAQAAAAAAAAAAYAAAAAAAAQAAAAAgAAAAA=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpWrapper" Collapsed="true">
+    <Position X="20.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAEAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.TimingService" Collapsed="true">
+    <Position X="25.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAIACAAAAAAAA=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.HttpContext" Collapsed="true">
+    <Position X="29" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAABAAQAAAAAAAAAgAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\HttpServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controller" Collapsed="true">
+    <Position X="2.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAQAAQAAAAQAAAAAFAAAAAAAAACAAAgA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ActionContext" Collapsed="true">
+    <Position X="16.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ErrorResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAACAAACA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.ViewResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.StringResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAABAAAAAQAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.FileResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAAAAABAAAAAAAAAAAAAAAABAAQAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.JsonResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABBAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.HomeController" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.Socket" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\Socket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.WebSocketClient" Collapsed="true">
+    <Position X="29" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAgAAAAQAAAQAAAACQAAA=</HashCode>
+      <FileName>Controllers\Socket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.WebSocketFrame" Collapsed="true">
+    <Position X="16.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAACAAAAAASAAABQgABEAAAAAACAAgAQ=</HashCode>
+      <FileName>Controllers\Socket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.WebSocketResult" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAABAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\Socket.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.TestController" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAEAEEAAAAACBAACAAABQAEAAEAAgAAEAAAIAAAA=</HashCode>
+      <FileName>Controllers\TestController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Controllers.SensorDataSetInformation" Collapsed="true">
+    <Position X="23.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAhAQAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Controllers\TestController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.LegacySensorReader" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.SensorExtracter" Collapsed="true">
+    <Position X="29" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAIAAAAAAACAAAAgAAAAAAEAAAgAAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.SensorConverter" Collapsed="true">
+    <Position X="20.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAgAAAEAAAAAAACAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.GPSUtil" Collapsed="true">
+    <Position X="25.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAgAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.GPSDataReader" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAgAAAAAAQABAAAAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.GPXDataReader" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Data.DataWrapper&lt;T&gt;" Collapsed="true">
+    <Position X="29" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Data\SensorDataReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorInformation" Collapsed="true">
+    <Position X="16.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAQAIAAAAAQAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorValueInformation" Collapsed="true">
+    <Position X="25.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAwAIAAAAAAAAAAgQAAQAABgAAAAAAg=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorSetInformation" Collapsed="true">
+    <Position X="23.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAgAAAAAAAAAACAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorPackageViewModel" Collapsed="true">
+    <Position X="22" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAACAAAEAgAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorEventArgs" Collapsed="true">
+    <Position X="27.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorDataSet" Collapsed="true">
+    <Position X="22" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAgAAAAQAEAAAAAAAABAQAAAAAAAAAAACAAAACAAI=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.LegacySensorProvider" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAMAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.InFluxDBSensorProvider" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAMAAAAAgAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorManager" Collapsed="true">
+    <Position X="18.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAoAgAAAAAAAAgBAKAIAJAAAEABIABAgAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.SensorDataStore" Collapsed="true">
+    <Position X="25.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAoAAAAAAAAAAADACAKQJEAASADYABggQEEACCIEAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.NewSensorInformation" Collapsed="true">
+    <Position X="27.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQgAAgAwAIAAAAAQAAAAgQAAQAABgAAAAAAg=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.KeyIDSensorInformation" Collapsed="true">
+    <Position X="16.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.DisplaySensorInformationInformation" Collapsed="true">
+    <Position X="16.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAIAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.SenSys.CalibrationSensorInformation" Collapsed="true">
+    <Position X="20.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAwAAAAAAAAAAAAgQAAAAABgAAAAAAg=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ion.Pro.Analyser.Web.IonAnalyserWebPage" Collapsed="true">
+    <Position X="23.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAQAAACACAAAACAAAAgkAQAiAAAAI=</HashCode>
+      <FileName>Web\IonWebPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.CodeContainer" Collapsed="true">
+    <Position X="22" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAEAEEABAAAAgAIAAoACAAQAAAAAAAAEAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONObject" Collapsed="true">
+    <Position X="27.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAqAACBAgAAIAKAABEAAIAAAACQAkAAAAAAAABAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONNode" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONString" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAEAAAAAEAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONNumber" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAoAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONBool" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONNull" Collapsed="true">
+    <Position X="7.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONField" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAAAAAAAEAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONNodeObject" Collapsed="true">
+    <Position X="12" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONNodeArray" Collapsed="true">
+    <Position X="14.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.JSONExtension" Collapsed="true">
+    <Position X="25.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAACAAAAAAAAAAAAAEABAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NicroWare.Pro.DmxControl.JSON.SerializeIgnoreAttribute" Collapsed="true">
+    <Position X="27.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Ion.Pro.Analyser.SenSys.SensorPackage" Collapsed="true">
+    <Position X="18.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAACAAAEAoAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Ion.Pro.Analyser.SenSys.RealSensorPackage" Collapsed="true">
+    <Position X="16.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAACAAAEAgAAAAIAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>SenSys\Models.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="Ion.Pro.Analyser.IFileService" Collapsed="true">
+    <Position X="20.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CacheService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.IComBus" Collapsed="true">
+    <Position X="18.5" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.IActionResult" Collapsed="true">
+    <Position X="16.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.SenSys.ISensorReader" Collapsed="true">
+    <Position X="23.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.SenSys.ISensorInfoProvider" Collapsed="true">
+    <Position X="8.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.SenSys.ISensorProvider" Collapsed="true">
+    <Position X="8.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Ion.Pro.Analyser.SenSys.ISensorReaderProvider" Collapsed="true">
+    <Position X="8.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SenSys\SensorDataStore.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NicroWare.Pro.DmxControl.JSON.IJSONSerializable" Collapsed="true">
+    <Position X="22" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\JSON.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="Ion.Pro.Analyser.ComMessageStatus" Collapsed="true">
+    <Position X="16.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ComBus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Ion.Pro.Analyser.RunMode" Collapsed="true">
+    <Position X="22" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABgAAAAAAAAAQAAAAAIAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Ion.Pro.Analyser.HttpRequestType" Collapsed="true">
+    <Position X="18.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAYAAACABAEAQAAAAAAAgAABAAgAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Ion.Pro.Analyser.HttpStatus" Collapsed="true">
+    <Position X="20.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAIAAAAQAAAgABAAEQ4QEAAAAAAAAAABAAA=</HashCode>
+      <FileName>Web\Http.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="Ion.Pro.Analyser.HttpAction" Collapsed="true">
+    <Position X="16.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Web\MvcService.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

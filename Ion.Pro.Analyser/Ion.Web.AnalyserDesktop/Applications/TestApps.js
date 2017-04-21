@@ -126,6 +126,13 @@ var CsvGenerator = (function () {
     };
     return CsvGenerator;
 }());
+var StorageTester = (function () {
+    function StorageTester() {
+    }
+    StorageTester.prototype.main = function () {
+    };
+    return StorageTester;
+}());
 var LineChartTester = (function () {
     function LineChartTester() {
         this.plotType = "Line Chart";

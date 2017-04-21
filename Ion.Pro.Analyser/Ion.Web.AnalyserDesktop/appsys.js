@@ -2,6 +2,7 @@ var ApplicationManager = (function () {
     function ApplicationManager() {
         this.appList = [];
         this.launchers = {};
+        this.allApps = {};
         this.eventManager = new EventManager();
         this.nextPID = 0;
     }
@@ -14,11 +15,17 @@ var ApplicationManager = (function () {
         appTemp.start();
         this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
     };
+    ApplicationManager.prototype.start = function (appName) {
+        if (this.allApps[appName]) {
+            this.launchApplication(this.allApps[appName]);
+        }
+    };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {
         if (!this.launchers[category]) {
             this.launchers[category] = [];
         }
         this.launchers[category].push(launcher);
+        this.allApps[launcher.mainFunction.name] = launcher;
     };
     ApplicationManager.prototype.addEventListener = function (type, listener) {
         this.eventManager.addEventListener(type, listener);

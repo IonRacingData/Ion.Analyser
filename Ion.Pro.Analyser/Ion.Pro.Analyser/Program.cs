@@ -92,8 +92,8 @@ namespace Ion.Pro.Analyser
         static void InitSenSys()
         {
             SensorManager manager = SensorManager.GetDefault();
-            manager.RegisterProvider("log16", new LegacySensorProvider());
-            manager.RegisterProvider("log", new LegacySensorProvider());
+            manager.RegisterFileProvider("log16", new LegacySensorProvider());
+            manager.RegisterFileProvider("log", new LegacySensorProvider());
             ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
         }
 

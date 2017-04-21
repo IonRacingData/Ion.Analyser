@@ -97,3 +97,15 @@ interface IViewer<T> extends IViewerBase<T> {
 interface ICollectionViewer<T> extends IViewerBase<T>{
     dataCollectionSource: IDataSource<T>[];
 }
+
+class DataSourceTemplate {
+    public key: string;
+    public sources: ISensorDataContainerTemplate[] = [];
+    public grouptype: string;
+    public layers: string[] = [];
+}
+
+interface ISensorDataContainerTemplate {
+    name: string;
+    key: string
+}
