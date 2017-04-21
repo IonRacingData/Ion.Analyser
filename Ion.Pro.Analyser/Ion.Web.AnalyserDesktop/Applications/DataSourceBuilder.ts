@@ -2,19 +2,48 @@
     application: Application;
     window: AppWindow;
     mk: HtmlHelper = new HtmlHelper();
+    eh: EventHandler = new EventHandler();
 
-    public main() {
+    public main(): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Source Builder");
 
-        let first: HTMLElement = this.mk.tag("a", "", null, "first");
-        let second: HTMLElement = this.mk.tag("a", "", null, "second");
-        let third: HTMLElement = this.mk.tag("a", "", null, "third");
-        let car: Carousel = new Carousel();
-        car.addSlide(first, "first");
-        car.addSlide(second, "the second");
-        car.addSlide(third, "a third");
-        
-        this.window.content.appendChild(car.wrapper);
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => this.draw());
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => this.draw());
+        this.eh.on(this.window, AppWindow.event_close, () => this.window_close());
+
+        this.draw();
+    }
+
+    private window_close() {
+        this.eh.close();
+    }
+
+    private draw(): void {
+        this.window.content.innerHTML = "";
+
+        let mk = this.mk;
+        let divLeft = mk.tag("div");
+        let divRight = mk.tag("div");
+        let tableGen = new HtmlTableGen("table selectable");
+        let senMan: sensys.SensorManager = kernel.senMan;
+        let last: HTMLElement = null;
+        tableGen.addHeader("Plot name");
+        for (let i = 0; i < senMan.viewers.length; i++) {
+            let curPlot = senMan.viewers[i];
+            tableGen.addRow(curPlot.plotType);
+        }
+
+        divLeft.appendChild(tableGen.generate());
+        divLeft.style.minWidth = "250px";
+        divLeft.style.flexGrow = "1";
+        divLeft.style.overflowY = "auto";
+
+        divRight.style.minWidth = "250px";
+        divRight.style.flexGrow = "2";
+        divRight.style.overflowY = "auto";
+
+        this.window.content.appendChild(divLeft);
+        this.window.content.appendChild(divRight);
     }
 }
 
@@ -72,7 +101,7 @@ class Carousel {
     }
 
     public addSlide(content: HTMLElement, description?: string) {        
-        let des = description ? description : "";
+        let des = description || "";
         let slide: ISlide = { slide: content, description: des };
 
         if (this.slides.length === 0) {
