@@ -26,6 +26,7 @@ class SensorGroup<T> implements IDataSource<T> {
 
     infos: SensorPlotInfo = new SensorPlotInfo();
     color: Color;
+    static numGroups: number;
 
     public constructor(type: IClassType<T>) {
         this.type = type;
@@ -47,14 +48,15 @@ class SensorGroup<T> implements IDataSource<T> {
 
 class PointSensorGroup extends SensorGroup<Point>{
     private data: SensorDataContainer;
+    static numGroups: number = 1;
 
-    constructor(data: SensorDataContainer) {
+    constructor(data: SensorDataContainer[]) {
         super(Point);
-        this.data = data;
+        this.data = data[0];
 
-        this.infos.Keys[0] = data.ID;
-        this.infos.SensorInfos[0] = data.info;
-        this.color = data.color;
+        this.infos.Keys[0] = data[0].ID;
+        this.infos.SensorInfos[0] = data[0].info;
+        this.color = data[0].color;
     }
 
     public getValue(index: number): Point {

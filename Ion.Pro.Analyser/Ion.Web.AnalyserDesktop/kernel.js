@@ -11,6 +11,7 @@ function startUp() {
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     // kernel.senMan.setGlobal(841);
     registerLaunchers();
+    registerSensorGroups();
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
@@ -22,6 +23,9 @@ function startUp() {
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
     });
+}
+function registerSensorGroups() {
+    kernel.senMan.registerGroup(PointSensorGroup);
 }
 function registerLaunchers() {
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
@@ -39,15 +43,56 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    registerGridPresets();
+}
+function registerGridPresets() {
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Preset 1", {
+        grid: {
+            data: [
+                { name: "DataAssigner", data: null },
+                { name: "LineChartTester", data: ["speed", "current"] },
+                {
+                    data: [
+                        { name: "LineChartTester", data: ["speed"] },
+                        { name: "LineChartTester", data: ["current"] }
+                    ]
+                }
+            ]
+        },
+        sensorsets: [
+            {
+                grouptype: "PointSensorGroup",
+                key: "speed",
+                layers: [],
+                sources: [
+                    { key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }
+                ]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "current",
+                layers: [],
+                sources: [
+                    { key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }
+                ]
+            }
+        ]
+    }));
 }
 /* tslint:enable:interface-name */
 var Launcher = (function () {
     function Launcher(mainFunction, name) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
         this.mainFunction = mainFunction;
         this.name = name;
+        this.args = args;
     }
     Launcher.prototype.createInstance = function () {
-        kernel.appMan.launchApplication(this);
+        (_a = kernel.appMan).launchApplication.apply(_a, [this].concat(this.args));
+        var _a;
     };
     return Launcher;
 }());

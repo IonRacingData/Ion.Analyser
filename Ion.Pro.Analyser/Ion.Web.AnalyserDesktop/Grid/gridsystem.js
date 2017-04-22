@@ -9,7 +9,8 @@ var GridViewer = (function () {
         this.mk = new HtmlHelper();
         this.childWindows = [];
     }
-    GridViewer.prototype.main = function () {
+    GridViewer.prototype.main = function (temp) {
+        console.log(temp);
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
         this.selectorWindow.setSize(92, 92);
@@ -24,7 +25,12 @@ var GridViewer = (function () {
         var template = document.getElementById("temp-grid");
         var test = new GridHContainer(this);
         var clone = test.baseNode;
-        this.window.content.appendChild(clone);
+        if (temp) {
+            this.applyTemplate(temp);
+        }
+        else {
+            this.window.content.appendChild(clone);
+        }
         this.generateSelector();
         this.selectedContainer = test;
     };
@@ -107,6 +113,91 @@ var GridViewer = (function () {
         window.recalculateSize();
         window.onResize();
         this.handleResize();
+    };
+    GridViewer.prototype.applyTemplate = function (gridTemplate) {
+        console.log(gridTemplate);
+        var dataSets = {};
+        for (var _i = 0, _a = gridTemplate.sensorsets; _i < _a.length; _i++) {
+            var a = _a[_i];
+            dataSets[a.key] = kernel.senMan.createDataSource(a);
+        }
+        console.log(dataSets);
+        this.handleHContainer(gridTemplate.grid, this.window.content, dataSets);
+        this.handleResize();
+    };
+    GridViewer.prototype.handleHContainer = function (template, body, dataSets) {
+        console.log("HCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridHContainer(this), this.handleVContainer, dataSets);
+    };
+    GridViewer.prototype.handleVContainer = function (template, body, dataSets) {
+        console.log("VCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridVContainer(this), this.handleHContainer, dataSets);
+    };
+    GridViewer.prototype.handleContainer = function (template, body, container, next, dataSets) {
+        console.log("Con");
+        console.log(this);
+        var lastBox = null; // = a.gridBoxes[0];
+        var _loop_1 = function (temp) {
+            if (lastBox == null) {
+                lastBox = container.gridBoxes[0];
+            }
+            else {
+                lastBox = container.insertChildAfter(lastBox);
+            }
+            if (GridViewer.isIGridLauncher(temp)) {
+                var app = kernel.appMan.start(temp.name);
+                if (temp.data) {
+                    var viewer_1 = app.application;
+                    if (sensys.SensorManager.isViewer(viewer_1)) {
+                        var singleViewer_1 = viewer_1;
+                        viewer_1.dataSource = dataSets[temp.data[0]];
+                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
+                            singleViewer_1.dataUpdate();
+                        });
+                    }
+                    else if (sensys.SensorManager.isCollectionViewer(viewer_1)) {
+                        var colViewer = viewer_1;
+                        for (var _i = 0, _a = temp.data; _i < _a.length; _i++) {
+                            var a = _a[_i];
+                            viewer_1.dataCollectionSource.push(dataSets[a]);
+                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
+                                viewer_1.dataUpdate();
+                            });
+                        }
+                    }
+                }
+                var window_1 = app.windows[0];
+                this_1.childWindows.push(window_1);
+                window_1.changeWindowMode(WindowMode.BORDERLESSFULL);
+                lastBox.content.appendChild(window_1.handle);
+                window_1.recalculateSize();
+                window_1.onResize();
+                this_1.handleResize();
+            }
+            else {
+                next.call(this_1, temp, lastBox.content, dataSets);
+            }
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = template.data; _i < _a.length; _i++) {
+            var temp = _a[_i];
+            _loop_1(temp);
+        }
+        body.appendChild(container.baseNode);
+    };
+    GridViewer.isIGridLauncher = function (data) {
+        if (data.name) {
+            return true;
+        }
+        return false;
+    };
+    GridViewer.isIGridTemplate = function (data) {
+        if (Array.isArray(data.data)) {
+            return true;
+        }
+        return false;
     };
     GridViewer.prototype.generateSelector = function () {
         var _this = this;
@@ -223,6 +314,19 @@ var GridViewer = (function () {
     };
     return GridViewer;
 }());
+var test = {
+    sensorsets: null,
+    grid: {
+        data: [
+            { name: "LineChartTester", data: null },
+            {
+                data: [
+                    { name: "DataAssigner", data: null }
+                ]
+            }
+        ]
+    }
+};
 var GridContainer = (function () {
     // last: HTMLElement;
     function GridContainer(appWindow) {
