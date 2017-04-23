@@ -6,6 +6,7 @@
         private loadedDataSet: SensorDataSet[] = [];
         public viewers: IViewerBase<any>[] = [];
         private dataSources: IDataSource<any>[] = [];
+        public groups: (new (containers: SensorDataContainer[]) => SensorGroup<any>)[] = [];
 
         static readonly event_registerViewer = "registerViewer";
         static readonly event_unregisterViewer = "unregisterViewer";
@@ -88,10 +89,12 @@
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
                     let dataSet = new SensorDataSet(data);
+                    this.loadedDataSet.push(dataSet); 3
                     for (let v in dataSet.SensorData) {
-                        this.dataSources.push(new PointSensorGroup(dataSet.SensorData[v]));
+                        this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+                        //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                     }
-                    this.loadedDataSet.push(dataSet);
+                    
                 }
                 console.log(data);
                 if (callback) {
@@ -103,6 +106,10 @@
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
             this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+        }
+
+        public registerGroup(group: new (containers: SensorDataContainer[]) => SensorGroup<any>): void {
+            this.groups.push(group);
         }
 
         public unregister<T>(viewer: IViewerBase<T>): void {
@@ -165,6 +172,45 @@
 
         }
 
+        public getDataSet(name: string): SensorDataSet {
+            for (let v of this.loadedDataSet) {
+                if (v.Name === name) {
+                    return v;
+                }
+            }
+            console.log("Could not find dataset: " + name);
+            return null;
+        }
+
+        public getSensorDataContainer(info: ISensorDataContainerTemplate): SensorDataContainer {
+            let set: SensorDataSet = this.getDataSet(info.name);
+            if (set) {
+                let container: SensorDataContainer = set.SensorData[info.key];
+                return container;
+            }
+            console.log("Could not find sensordatacontainer: " + info.name);
+            return null;
+        }
+
+        public getGroup(name: string): new (containers: SensorDataContainer[]) => SensorGroup<any> {
+            for (let v of this.groups) {
+                if ((<any>v).name === name) {
+                    return v;
+                }
+            }
+            console.log("Could not find group: " + name);
+            return null;
+        }
+
+        public createDataSource<T>(template: DataSourceTemplate): IDataSource<T> {
+            let sources: SensorDataContainer[] = [];
+            for (let v of template.sources) {
+                sources.push(this.getSensorDataContainer(v));
+            }
+            let group = this.getGroup(template.grouptype);
+            return new group(sources);
+        }
+
         public static isDatasource<T>(source: IDataSource<T>, type: IClassType<T>): source is IDataSource<T> {
             return source.type === type;
         }
@@ -176,6 +222,8 @@
         public static isCollectionViewer(value: IViewerBase<any>): value is ICollectionViewer<any> {
             return (<ICollectionViewer<any>>value).dataCollectionSource !== undefined;
         }
+
+        
     }
 
     export class SensorDataSet {
@@ -243,6 +291,3 @@
         SensorSet: SensorDataSet;
     }
 }
-
-
-

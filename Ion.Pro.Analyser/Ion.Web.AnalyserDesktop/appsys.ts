@@ -8,20 +8,22 @@
     static event_appLaunch = "appLaunch";
     static event_appClose = "appClose";
 
-    launchApplication(launcher: Launcher): void {
+    launchApplication(launcher: Launcher, ...args: any[]): Application {
         var temp: IApplication = new launcher.mainFunction();
         var appTemp = new Application(temp);
         appTemp.name = launcher.name;
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
 
-        appTemp.start();
+        appTemp.start(...args);
         this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
+
+        return appTemp;
     }
 
-    start(appName: string): void {
+    start(appName: string): Application {
         if (this.allApps[appName]) {
-            this.launchApplication(this.allApps[appName]);
+            return this.launchApplication(this.allApps[appName]);
         }
     }
 

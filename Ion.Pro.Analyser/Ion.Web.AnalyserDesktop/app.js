@@ -38,10 +38,10 @@ var PointSensorGroup = (function (_super) {
     __extends(PointSensorGroup, _super);
     function PointSensorGroup(data) {
         var _this = _super.call(this, Point) || this;
-        _this.data = data;
-        _this.infos.Keys[0] = data.ID;
-        _this.infos.SensorInfos[0] = data.info;
-        _this.color = data.color;
+        _this.data = data[0];
+        _this.infos.Keys[0] = data[0].ID;
+        _this.infos.SensorInfos[0] = data[0].info;
+        _this.color = data[0].color;
         return _this;
     }
     PointSensorGroup.prototype.getValue = function (index) {
@@ -55,6 +55,7 @@ var PointSensorGroup = (function (_super) {
     };
     return PointSensorGroup;
 }(SensorGroup));
+PointSensorGroup.numGroups = 1;
 var DataSourceInfo = (function () {
     function DataSourceInfo() {
     }

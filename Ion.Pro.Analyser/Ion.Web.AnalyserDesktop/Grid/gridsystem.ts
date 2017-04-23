@@ -6,7 +6,8 @@
     childWindows: AppWindow[] = [];
     selectorWindow: AppWindow;
 
-    main(): void {
+    main(temp): void {
+        console.log(temp);
         this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
         this.selectorWindow.setSize(92, 92);
@@ -24,7 +25,13 @@
         var test = new GridHContainer(this);
         var clone = test.baseNode;
 
-        this.window.content.appendChild(clone);
+        if (temp) {
+            this.applyTemplate(temp);
+        }
+        else {
+            this.window.content.appendChild(clone);
+        }
+
         this.generateSelector();
         this.selectedContainer = test;
     }
@@ -46,7 +53,7 @@
     }
 
     handle_release(dir: string) {
-        let box = null;
+        let box: GridBox = null;
         if (this.selectedContainer.gridBoxes.length === 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length === 0) {
             box = this.selectedContainer.gridBoxes[0];
         }
@@ -114,6 +121,100 @@
         window.recalculateSize();
         window.onResize();
         this.handleResize();
+    }
+
+    applyTemplate(gridTemplate: IGridLanchTemplate) {
+        console.log(gridTemplate);
+        let dataSets: { [key: string]: IDataSource<any>} = { };
+        for (let a of gridTemplate.sensorsets) {
+            dataSets[a.key] = kernel.senMan.createDataSource(a);
+        }
+        console.log(dataSets);
+        this.handleHContainer(gridTemplate.grid, this.window.content, dataSets);
+        this.handleResize();
+    }
+
+    handleHContainer(template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) {
+        console.log("HCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridHContainer(this), this.handleVContainer, dataSets);
+    }
+
+    handleVContainer(template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) {
+        console.log("VCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridVContainer(this), this.handleHContainer, dataSets);
+    }
+
+    handleContainer(
+        template: IGridTemplate,
+        body: HTMLElement,
+        container: GridContainer,
+        next: (template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) => void,
+        dataSets: { [key: string]: IDataSource<any> }
+    ) {
+        console.log("Con");
+        console.log(this);
+        let lastBox: GridBox = null;// = a.gridBoxes[0];
+
+        for (let temp of template.data) {
+            if (lastBox == null) {
+                lastBox = container.gridBoxes[0];
+            }
+            else {
+                lastBox = container.insertChildAfter(lastBox);
+            }
+            if (GridViewer.isIGridLauncher(temp)) {
+                let app = kernel.appMan.start(temp.name);
+                if (temp.data) {
+                    let viewer = <any>app.application
+                    if (sensys.SensorManager.isViewer(viewer)) {
+                        let singleViewer = viewer;
+                        viewer.dataSource = dataSets[temp.data[0]];
+                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
+                            singleViewer.dataUpdate();
+                        });
+                    }
+                    else if (sensys.SensorManager.isCollectionViewer(viewer)) {
+                        let colViewer = viewer;
+                        for (let a of temp.data) {
+                            viewer.dataCollectionSource.push(dataSets[a]);
+                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
+                                viewer.dataUpdate();
+                            });
+                        }
+                    }
+
+                }
+                let window = app.windows[0];
+                this.childWindows.push(window);
+                window.changeWindowMode(WindowMode.BORDERLESSFULL);
+                lastBox.content.appendChild(window.handle);
+
+                window.recalculateSize();
+                window.onResize();
+                this.handleResize();
+            }
+            else {
+                next.call(this, temp, lastBox.content, dataSets);
+                //next(temp, lastBox.content);
+            }
+        }
+        body.appendChild(container.baseNode);
+    }
+
+    static isIGridLauncher(data: any): data is IGridLaucher {
+        if (data.name) {
+            return true;
+        }
+        return false;
+    }
+
+    static isIGridTemplate(data: any): data is IGridTemplate {
+        if (Array.isArray(data.data)) {
+            return true;
+        }
+        return false;
     }
 
     generateSelector() {
@@ -248,6 +349,36 @@
             this.selectorWindow.hide();
         }
     }
+}
+
+let test: IGridLanchTemplate = {
+    sensorsets: null,
+    grid: {
+        data: [
+            { name: "LineChartTester", data: null },
+            {
+                data: [
+                    { name: "DataAssigner", data: null }
+                ]
+            }
+        ]
+    }
+}
+
+
+interface IGridTemplate
+{
+    data: (IGridLaucher | IGridTemplate)[];
+}
+
+interface IGridLaucher {
+    name: string;
+    data: string[];
+}
+
+interface IGridLanchTemplate {
+    grid: IGridTemplate;
+    sensorsets: DataSourceTemplate[];
 }
 
 class GridContainer {

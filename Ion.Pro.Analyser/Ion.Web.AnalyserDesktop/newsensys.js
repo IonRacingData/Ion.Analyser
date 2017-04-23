@@ -9,6 +9,7 @@ var Kernel;
                 this.loadedDataSet = [];
                 this.viewers = [];
                 this.dataSources = [];
+                this.groups = [];
                 //this.loadSensorInformation();
             }
             SensorManager.prototype.addEventListener = function (type, handeler) {
@@ -75,10 +76,11 @@ var Kernel;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
                         var dataSet = new SensorDataSet(data);
-                        for (var v in dataSet.SensorData) {
-                            _this.dataSources.push(new PointSensorGroup(dataSet.SensorData[v]));
-                        }
                         _this.loadedDataSet.push(dataSet);
+                        3;
+                        for (var v in dataSet.SensorData) {
+                            _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+                        }
                     }
                     console.log(data);
                     if (callback) {
@@ -89,6 +91,9 @@ var Kernel;
             SensorManager.prototype.register = function (viewer) {
                 this.viewers.push(viewer);
                 this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+            };
+            SensorManager.prototype.registerGroup = function (group) {
+                this.groups.push(group);
             };
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);
@@ -143,6 +148,44 @@ var Kernel;
                 for (var i = 0; i < source.infos.Keys.length; i++) {
                     this.loadData(source.infos.SensorInfos[i], multiback.createCallback());
                 }
+            };
+            SensorManager.prototype.getDataSet = function (name) {
+                for (var _i = 0, _a = this.loadedDataSet; _i < _a.length; _i++) {
+                    var v = _a[_i];
+                    if (v.Name === name) {
+                        return v;
+                    }
+                }
+                console.log("Could not find dataset: " + name);
+                return null;
+            };
+            SensorManager.prototype.getSensorDataContainer = function (info) {
+                var set = this.getDataSet(info.name);
+                if (set) {
+                    var container = set.SensorData[info.key];
+                    return container;
+                }
+                console.log("Could not find sensordatacontainer: " + info.name);
+                return null;
+            };
+            SensorManager.prototype.getGroup = function (name) {
+                for (var _i = 0, _a = this.groups; _i < _a.length; _i++) {
+                    var v = _a[_i];
+                    if (v.name === name) {
+                        return v;
+                    }
+                }
+                console.log("Could not find group: " + name);
+                return null;
+            };
+            SensorManager.prototype.createDataSource = function (template) {
+                var sources = [];
+                for (var _i = 0, _a = template.sources; _i < _a.length; _i++) {
+                    var v = _a[_i];
+                    sources.push(this.getSensorDataContainer(v));
+                }
+                var group = this.getGroup(template.grouptype);
+                return new group(sources);
             };
             SensorManager.isDatasource = function (source, type) {
                 return source.type === type;

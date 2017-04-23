@@ -7,17 +7,22 @@ var ApplicationManager = (function () {
         this.nextPID = 0;
     }
     ApplicationManager.prototype.launchApplication = function (launcher) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         var temp = new launcher.mainFunction();
         var appTemp = new Application(temp);
         appTemp.name = launcher.name;
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
-        appTemp.start();
+        appTemp.start.apply(appTemp, args);
         this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
+        return appTemp;
     };
     ApplicationManager.prototype.start = function (appName) {
         if (this.allApps[appName]) {
-            this.launchApplication(this.allApps[appName]);
+            return this.launchApplication(this.allApps[appName]);
         }
     };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {

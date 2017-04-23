@@ -23,6 +23,7 @@ function startUp() {
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
+    registerSensorGroups();
 
 
     let mk: HtmlHelper = new HtmlHelper();
@@ -41,6 +42,10 @@ function startUp() {
     document.addEventListener("contextmenu", (e: PointerEvent) => {
         e.preventDefault();
     });
+}
+
+function registerSensorGroups() {
+    kernel.senMan.registerGroup(PointSensorGroup);
 }
 
 function registerLaunchers() {
@@ -68,6 +73,43 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+
+    registerGridPresets();
+}
+
+function registerGridPresets() {
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Preset 1", <IGridLanchTemplate>{
+        grid: {
+            data: [
+                { name: "DataAssigner", data: null },
+                { name: "LineChartTester", data: ["speed", "current"] },
+                {
+                    data: [
+                        { name: "LineChartTester", data: ["speed"] },
+                        { name: "LineChartTester", data: ["current"] }
+                    ]
+                }
+            ]
+        },
+        sensorsets: [
+            {
+                grouptype: "PointSensorGroup",
+                key: "speed",
+                layers: [],
+                sources: [
+                    { key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }
+                ]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "current",
+                layers: [],
+                sources: [
+                    { key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }
+                ]
+            }
+        ]
+    }));
 }
 
 /* tslint:disable:interface-name */
@@ -83,13 +125,15 @@ interface HTMLElement {
 class Launcher {
     mainFunction: new () => IApplication;
     name: string;
+    args: any[];
 
-    constructor(mainFunction: new () => IApplication, name: string) {
+    constructor(mainFunction: new () => IApplication, name: string, ...args: any[]) {
         this.mainFunction = mainFunction;
         this.name = name;
+        this.args = args;
     }
 
     createInstance(): void {
-        kernel.appMan.launchApplication(this);
+        kernel.appMan.launchApplication(this, ...this.args);
     }
 }

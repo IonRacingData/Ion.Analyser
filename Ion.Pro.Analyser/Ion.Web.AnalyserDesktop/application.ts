@@ -14,8 +14,8 @@ class Application {
         app.application = this;
     }
 
-    start(): void {
-        this.application.main();
+    start(...args: any[]): void {
+        this.application.main(...args);
     }
 
     onClose(): void {
