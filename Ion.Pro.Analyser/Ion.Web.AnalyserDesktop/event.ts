@@ -40,7 +40,7 @@ class EventManager implements IEventManager {
     events: { [type: string]: ((e: any) => void)[] } = {};
 
     addEventListener(type: string, listener: any): void {
-        console.log("secondStep");
+        //console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }

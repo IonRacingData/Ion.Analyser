@@ -39,28 +39,35 @@ var SensorDataContainer = (function () {
     SensorDataContainer.prototype.insertSensorPackage = function (p) {
         this.insertData(p.map(function (value, index, array) { return new SensorValue(value.Value, value.TimeStamp); }));
     };
+    SensorDataContainer.prototype.pushArray = function (to, from) {
+        for (var i = 0; i < from.length; i++) {
+            to.push(from[i]);
+        }
+    };
     SensorDataContainer.prototype.insertData = function (p) {
         if (p.length > 0) {
             if (this.points.length === 0) {
-                (_a = this.points).push.apply(_a, p);
-            }
-            var first = p[0];
-            var last = p[p.length - 1];
-            if (first.timestamp > this.last().timestamp) {
-                (_b = this.points).push.apply(_b, p);
-            }
-            else if (last.timestamp < this.points[0].timestamp) {
-                (_c = this.points).splice.apply(_c, [0, 0].concat(p));
+                this.pushArray(this.points, p);
             }
             else {
-                var index = this.getClosesIndexOf(first);
-                if (first.timestamp > this.points[index].timestamp) {
-                    index--;
+                var first = p[0];
+                var last = p[p.length - 1];
+                if (first.timestamp > this.last().timestamp) {
+                    this.pushArray(this.points, p);
                 }
-                (_d = this.points).splice.apply(_d, [index, 0].concat(p));
+                else if (last.timestamp < this.points[0].timestamp) {
+                    (_a = this.points).splice.apply(_a, [0, 0].concat(p));
+                }
+                else {
+                    var index = this.getClosesIndexOf(first);
+                    if (first.timestamp > this.points[index].timestamp) {
+                        index--;
+                    }
+                    (_b = this.points).splice.apply(_b, [index, 0].concat(p));
+                }
             }
         }
-        var _a, _b, _c, _d;
+        var _a, _b;
     };
     SensorDataContainer.prototype.last = function () {
         return this.points[this.points.length - 1];

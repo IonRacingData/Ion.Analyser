@@ -10,6 +10,7 @@ var Kernel;
                 this.viewers = [];
                 this.dataSources = [];
                 this.groups = [];
+                this.callbackStack = [];
                 //this.loadSensorInformation();
             }
             SensorManager.prototype.addEventListener = function (type, handeler) {
@@ -128,9 +129,24 @@ var Kernel;
             };
             SensorManager.prototype.loadData = function (info, callback) {
                 var _this = this;
+                console.log("loadData");
+                console.log(info);
+                for (var i = 0; i < this.callbackStack.length; i++) {
+                    var item = this.callbackStack[i];
+                    if (item.name === info.SensorSet.Name && item.key === info.Key) {
+                        this.callbackStack[i].callbacks.push(callback);
+                        return;
+                    }
+                }
+                var all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
+                this.callbackStack.push(all);
                 kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, function (data) {
                     var dataContainer = _this.pushToCache(_this.convertToSensorPackage(data.Sensors));
-                    callback(dataContainer);
+                    console.log(all);
+                    for (var i = 0; i < all.callbacks.length; i++) {
+                        all.callbacks[i](dataContainer);
+                    }
+                    _this.callbackStack.splice(_this.callbackStack.indexOf(all), 1);
                 });
                 /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
                     this.dataCache[id] = data;
@@ -138,6 +154,10 @@ var Kernel;
                 });*/
             };
             SensorManager.prototype.fillDataSource = function (source, callback) {
+                if (source.length() > 0) {
+                    callback();
+                    return;
+                }
                 var multiback = new Multicallback(source.infos.Keys.length, function () {
                     var params = [];
                     for (var _i = 0; _i < arguments.length; _i++) {

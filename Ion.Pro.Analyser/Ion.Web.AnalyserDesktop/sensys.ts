@@ -270,17 +270,17 @@
 */
 
 class Multicallback {
-    callback: (...param: any[]) => void;
-    responses: any[] = [];
-    curId: number = 0;
-    returned: number = 0;
-    count: number;
+    private callback: (...param: any[]) => void;
+    private responses: any[] = [];
+    private curId: number = 0;
+    private returned: number = 0;
+    private count: number;
     constructor(count: number, callback: (...param: any[]) => void) {
         this.callback = callback;
         this.count = count;
     }
 
-    createCallback(): (param: any) => void {
+    createCallback(): (param?: any) => void {
         let current = this.curId;
         this.curId++;
         return (param: any) => {

@@ -150,10 +150,25 @@
         }
 
         private loadData(info: ISensorInformation, callback: (data: SensorDataContainer) => void): void {
+            console.log("loadData");
+            console.log(info);
 
+            for (let i = 0; i < this.callbackStack.length; i++) {
+                let item = this.callbackStack[i];
+                if (item.name === info.SensorSet.Name && item.key === info.Key) {
+                    this.callbackStack[i].callbacks.push(callback);
+                    return;
+                }
+            }
+            let all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
+            this.callbackStack.push(all);
             kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, (data: any) => {
                 let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors));
-                callback(dataContainer);
+                console.log(all);
+                for (let i = 0; i < all.callbacks.length; i++) {
+                    all.callbacks[i](dataContainer);
+                }
+                this.callbackStack.splice(this.callbackStack.indexOf(all), 1);
             });
             /*requestAction("getdata?number=" + id.toString(), (data: ISensorPackage[]) => {
                 this.dataCache[id] = data;
@@ -161,7 +176,13 @@
             });*/
         }
 
+        private callbackStack: { name: string, key: string, callbacks: ((data: SensorDataContainer) => void)[] }[] = [];
+
         public fillDataSource<T>(source: IDataSource<T>, callback: () => void): void {
+            if (source.length() > 0) {
+                callback();
+                return;
+            }
             let multiback = new Multicallback(source.infos.Keys.length, (...params: SensorDataContainer[]) => {
                 callback();
             });
