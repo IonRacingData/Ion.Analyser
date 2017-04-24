@@ -26,7 +26,7 @@
         let divRight = this.sensorTable = mk.tag("div");
         let tableGen = new HtmlTableGen("table selectable");
         let senMan: sensys.SensorManager = kernel.senMan;
-        let last: HTMLElement = null;
+        let last: { item: HTMLElement } = { item: null };
         // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.viewers.length; i++) {
@@ -51,19 +51,19 @@
     }
 
 
-    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: HTMLElement): void {
+    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: { item: HTMLElement }): void {
         let name = "Single Plot";
         if (isMulti) {
             name = "Multi Plot";
         }
-        tableGen.addRow([
+        tableGen.addRow([   
             {
                 event: "click", func: (e: Event) => {
-                    if (last !== null) {
-                        last.classList.remove("selectedrow");
+                    if (last.item !== null) {
+                        last.item.classList.remove("selectedrow");
                     }
-                    last = this.findTableRow(<HTMLElement>e.target);
-                    last.classList.add("selectedrow");
+                    last.item = this.findTableRow(<HTMLElement>e.target);
+                    last.item.classList.add("selectedrow");
                     let sources = kernel.senMan.getDataSources(curPlot.type);
                     if (isMulti) {
                         this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);

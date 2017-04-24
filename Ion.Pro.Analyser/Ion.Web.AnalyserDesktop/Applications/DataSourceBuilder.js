@@ -2,40 +2,127 @@ var DataSourceBuilder = (function () {
     function DataSourceBuilder() {
         this.mk = new HtmlHelper();
         this.eh = new EventHandler();
+        this.dsbOpen = false;
+        this.lastRow = null;
     }
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Source Builder");
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () { return _this.draw(); });
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () { return _this.draw(); });
+        this.wrapper = this.mk.tag("div");
+        this.wrapper.style.display = "flex";
+        this.wrapper.style.flexDirection = "column";
+        this.wrapper.style.height = "100%";
+        this.wrapper.style.justifyContent = "space-between";
+        this.innerWrapper = this.mk.tag("div");
+        this.innerWrapper.style.display = "flex";
+        this.innerWrapper.style.flexDirection = "row";
+        this.bottomDiv = this.mk.tag("div");
+        this.wrapper.appendChild(this.innerWrapper);
+        this.wrapper.appendChild(this.bottomDiv);
+        this.window.content.appendChild(this.wrapper);
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () {
+            if (!_this.dsbOpen) {
+                _this.drawLeft();
+            }
+        });
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () {
+            if (!_this.dsbOpen) {
+                _this.drawLeft();
+            }
+        });
         this.eh.on(this.window, AppWindow.event_close, function () { return _this.window_close(); });
-        this.draw();
+        this.drawInner();
     };
     DataSourceBuilder.prototype.window_close = function () {
         this.eh.close();
     };
-    DataSourceBuilder.prototype.draw = function () {
-        this.window.content.innerHTML = "";
+    DataSourceBuilder.prototype.drawInner = function () {
+        this.innerWrapper.innerHTML = "";
         var mk = this.mk;
-        var divLeft = mk.tag("div");
-        var divRight = mk.tag("div");
+        this.divLeft = mk.tag("div");
+        this.divRight = mk.tag("div");
+        this.drawLeft();
+        this.divRight.style.flexGrow = "1";
+        this.divRight.style.flexBasis = "0";
+        this.innerWrapper.appendChild(this.divLeft);
+        this.innerWrapper.appendChild(this.divRight);
+    };
+    DataSourceBuilder.prototype.drawLeft = function () {
+        this.divLeft.innerHTML = "";
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
-        var last = null;
         tableGen.addHeader("Plot name");
         for (var i = 0; i < senMan.viewers.length; i++) {
             var curPlot = senMan.viewers[i];
-            tableGen.addRow(curPlot.plotType);
+            this.drawRow(curPlot, tableGen);
         }
-        divLeft.appendChild(tableGen.generate());
-        divLeft.style.minWidth = "250px";
-        divLeft.style.flexGrow = "1";
-        divLeft.style.overflowY = "auto";
-        divRight.style.minWidth = "250px";
-        divRight.style.flexGrow = "2";
-        divRight.style.overflowY = "auto";
-        this.window.content.appendChild(divLeft);
-        this.window.content.appendChild(divRight);
+        this.divLeft.appendChild(tableGen.generate());
+        this.divLeft.style.flexGrow = "1";
+        this.divLeft.style.flexBasis = "0";
+    };
+    DataSourceBuilder.prototype.drawRow = function (curPlot, tableGen) {
+        var _this = this;
+        tableGen.addRow([
+            {
+                event: "click", func: function (e) {
+                    if (_this.lastRow !== null) {
+                        _this.lastRow.classList.remove("selectedrow");
+                    }
+                    _this.lastRow = _this.findTableRow(e.target);
+                    _this.lastRow.classList.add("selectedrow");
+                    _this.displaySources(curPlot);
+                }
+            },
+            {
+                event: "mouseenter", func: function (e) {
+                    curPlot.plotWindow.highlight(true);
+                }
+            },
+            {
+                event: "mouseleave", func: function (e) {
+                    curPlot.plotWindow.highlight(false);
+                }
+            }
+        ], curPlot.plotType);
+    };
+    DataSourceBuilder.prototype.findTableRow = function (element) {
+        var curElement = element;
+        while (curElement !== null && curElement.tagName !== "TR") {
+            curElement = curElement.parentElement;
+        }
+        return curElement;
+    };
+    DataSourceBuilder.prototype.displaySources = function (curPlot) {
+        var _this = this;
+        this.divRight.innerHTML = "";
+        var add = this.mk.tag("p", "", [
+            {
+                event: "click", func: function (e) {
+                    _this.openDSB(curPlot);
+                }
+            }
+        ], "ADD SOURCE");
+        add.style.cursor = "pointer";
+        this.divRight.appendChild(add);
+    };
+    DataSourceBuilder.prototype.openDSB = function (curPlot) {
+        var _this = this;
+        this.dsbOpen = true;
+        this.innerWrapper.innerHTML = "";
+        this.dsb = new DSBController(curPlot);
+        this.innerWrapper.appendChild(this.dsb.wrapper);
+        var back = this.mk.tag("p", "", [
+            {
+                event: "click", func: function (e) {
+                    _this.dsbOpen = false;
+                    _this.drawInner();
+                    _this.bottomDiv.innerHTML = "";
+                    _this.displaySources(curPlot);
+                }
+            }
+        ], "BACK");
+        back.style.cursor = "pointer";
+        this.bottomDiv.appendChild(back);
     };
     return DataSourceBuilder;
 }());

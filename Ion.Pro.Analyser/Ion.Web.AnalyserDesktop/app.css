@@ -287,3 +287,13 @@ span.table-resize{
     height: 100%;
     width: auto;
 }
+
+.dsb-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.dsb-subdiv {
+    flex-grow: 1;
+}
