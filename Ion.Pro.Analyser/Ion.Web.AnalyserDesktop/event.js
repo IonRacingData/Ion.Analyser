@@ -25,7 +25,7 @@ var EventManager = (function () {
         this.events = {};
     }
     EventManager.prototype.addEventListener = function (type, listener) {
-        console.log("secondStep");
+        //console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }

@@ -177,11 +177,12 @@
                     }
                     else if (sensys.SensorManager.isCollectionViewer(viewer)) {
                         let colViewer = viewer;
-                        for (let a of temp.data) {
-                            viewer.dataCollectionSource.push(dataSets[a]);
-                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
-                                viewer.dataUpdate();
-                            });
+                        let back = new Multicallback(temp.data.length, () => {
+                            viewer.dataUpdate();
+                        });
+                        for (let name of temp.data) {
+                            viewer.dataCollectionSource.push(dataSets[name]);
+                            kernel.senMan.fillDataSource(dataSets[name], back.createCallback());
                         }
                     }
 

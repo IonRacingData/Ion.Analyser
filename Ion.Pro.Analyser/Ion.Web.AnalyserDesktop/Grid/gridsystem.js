@@ -159,12 +159,13 @@ var GridViewer = (function () {
                     }
                     else if (sensys.SensorManager.isCollectionViewer(viewer_1)) {
                         var colViewer = viewer_1;
+                        var back = new Multicallback(temp.data.length, function () {
+                            viewer_1.dataUpdate();
+                        });
                         for (var _i = 0, _a = temp.data; _i < _a.length; _i++) {
-                            var a = _a[_i];
-                            viewer_1.dataCollectionSource.push(dataSets[a]);
-                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
-                                viewer_1.dataUpdate();
-                            });
+                            var name_1 = _a[_i];
+                            viewer_1.dataCollectionSource.push(dataSets[name_1]);
+                            kernel.senMan.fillDataSource(dataSets[name_1], back.createCallback());
                         }
                     }
                 }

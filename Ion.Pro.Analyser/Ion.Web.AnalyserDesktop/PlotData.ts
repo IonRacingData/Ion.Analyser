@@ -58,25 +58,35 @@ class SensorDataContainer {
         this.insertData(p.map((value: ISensorPackage, index: number, array: ISensorPackage[]) => { return new SensorValue(value.Value, value.TimeStamp); }));
     }
 
+    pushArray<T>(to: T[], from: T[]) {
+        for (let i = 0; i < from.length; i++) {
+            to.push(from[i]);
+        }
+    }
+
     insertData(p: SensorValue[]) {
         if (p.length > 0) {
             if (this.points.length === 0) {
-                this.points.push(...p);
-            }
-            let first = p[0];
-            let last = p[p.length - 1];
-            if (first.timestamp > this.last().timestamp) {
-                this.points.push(...p);
-            }
-            else if (last.timestamp < this.points[0].timestamp) {
-                this.points.splice(0, 0, ...p);
+                this.pushArray(this.points, p);
+                //this.points.push(...p);
             }
             else {
-                let index = this.getClosesIndexOf(first);
-                if (first.timestamp > this.points[index].timestamp) {
-                    index--;
+                let first = p[0];
+                let last = p[p.length - 1];
+                if (first.timestamp > this.last().timestamp) {
+                    this.pushArray(this.points, p);
+                    //this.points.push(...p);
                 }
-                this.points.splice(index, 0, ...p);
+                else if (last.timestamp < this.points[0].timestamp) {
+                    this.points.splice(0, 0, ...p);
+                }
+                else {
+                    let index = this.getClosesIndexOf(first);
+                    if (first.timestamp > this.points[index].timestamp) {
+                        index--;
+                    }
+                    this.points.splice(index, 0, ...p);
+                }
             }
         }
     }
