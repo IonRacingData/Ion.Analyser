@@ -90,4 +90,26 @@ var MainMenu = (function (_super) {
     };
     return MainMenu;
 }(Applet));
+var ChangeTheme = (function (_super) {
+    __extends(ChangeTheme, _super);
+    function ChangeTheme(content) {
+        var _this = _super.call(this) || this;
+        _this.isDark = true;
+        _this.content = content;
+        var mk = new HtmlHelper();
+        _this.content.appendChild(mk.tag("div", "taskbar-button-text", [{ event: "click", func: function (e) { return _this.click_theme(e); } }], "Theme"));
+        return _this;
+    }
+    ChangeTheme.prototype.click_theme = function (e) {
+        if (this.isDark) {
+            kernel.winMan.changeTheme("app-style");
+            this.isDark = false;
+        }
+        else {
+            kernel.winMan.changeTheme("app-style-dark");
+            this.isDark = true;
+        }
+    };
+    return ChangeTheme;
+}(Applet));
 //# sourceMappingURL=TaskBar.js.map

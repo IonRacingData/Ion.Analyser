@@ -30,18 +30,22 @@ function startUp() {
 
     let content: HTMLElement = mk.tag("div", "taskbar-applet");
     let menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
+    let themeChange: HTMLElement = mk.tag("div", "taskbar-applet");
 
     let wl: WindowList = new WindowList(content);
     let menu: MainMenu = new MainMenu(menuContent);
+    let theme: ChangeTheme = new ChangeTheme(themeChange);
 
     let taskbar: Element = document.getElementsByClassName("taskbar")[0];
 
     taskbar.appendChild(menu.content);
+    taskbar.appendChild(theme.content);
     taskbar.appendChild(wl.content);
 
     document.addEventListener("contextmenu", (e: PointerEvent) => {
         e.preventDefault();
     });
+
 }
 
 function registerSensorGroups() {

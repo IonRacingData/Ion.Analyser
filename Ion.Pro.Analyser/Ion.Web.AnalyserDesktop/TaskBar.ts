@@ -87,3 +87,29 @@ class MainMenu extends Applet {
         this.menuHandle.show();
     }
 }
+
+class ChangeTheme extends Applet {
+    constructor(content: HTMLElement) {
+        super();
+        this.content = content;
+        let mk: HtmlHelper = new HtmlHelper();
+        this.content.appendChild(mk.tag(
+            "div"
+            , "taskbar-button-text"
+            , [{ event: "click", func: (e: Event): void => this.click_theme(<MouseEvent>e) }]
+            , "Theme"
+        )); 
+    }
+    private isDark: boolean = true;
+
+    public click_theme(e: MouseEvent): void {
+        if (this.isDark) {
+            kernel.winMan.changeTheme("app-style");
+            this.isDark = false;
+        }
+        else {
+            kernel.winMan.changeTheme("app-style-dark");
+            this.isDark = true;
+        }
+    }
+}

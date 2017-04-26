@@ -6,6 +6,8 @@ var WindowManager = (function () {
         this.events = {};
         this.tileZone = 20;
         this.topBar = 40;
+        this.availableThemes = ["app-style", "app-style-dark"];
+        this.avaiableRules = {};
         this.body = container;
         this.template = document.getElementById("temp-window");
         window.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
@@ -16,7 +18,22 @@ var WindowManager = (function () {
         // this.addEventListener = this.eventManager.addEventListener;
         // this.addEventListener2 = this.eventManager.addEventListener;
         // addEventListener
+        this.modifyCurrentStylesheet();
     }
+    WindowManager.prototype.modifyCurrentStylesheet = function () {
+        for (var i = 0; i < document.styleSheets.length; i++) {
+            var a = document.styleSheets[i];
+            if (a.title == "app-style") {
+                this.current = a;
+                break;
+            }
+        }
+        this.avaiableRules = {};
+        for (var i = 0; i < this.current.cssRules.length; i++) {
+            var a = this.current.cssRules[i];
+            this.avaiableRules[a.selectorText] = a;
+        }
+    };
     WindowManager.prototype.mouseMove = function (e) {
         this.handleMouseMoving(e.pageX, e.pageY, e);
     };
@@ -122,6 +139,22 @@ var WindowManager = (function () {
         this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     };
+    WindowManager.prototype.getRule = function (name) {
+        if (this.avaiableRules[name]) {
+            return this.avaiableRules[name];
+        }
+        console.log("The css rule: " + name + " does not exist");
+        return null;
+    };
+    WindowManager.prototype.changeTheme = function (theme) {
+        var _this = this;
+        var style = document.getElementById("main-theme");
+        style.onload = function () {
+            _this.modifyCurrentStylesheet();
+            _this.raiseEvent(WindowManager.event_themeChange, null);
+        };
+        style.href = "/" + theme + ".css";
+    };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
         var div = document.createElement("div");
         div.className = "window-wrapper";
@@ -174,4 +207,5 @@ WindowManager.event_globalUp = "globalUp;";
 WindowManager.event_windowOpen = "windowOpen";
 WindowManager.event_windowSelect = "windowSelect";
 WindowManager.event_windowClose = "windowClose";
+WindowManager.event_themeChange = "themeChange";
 //# sourceMappingURL=winsys.js.map

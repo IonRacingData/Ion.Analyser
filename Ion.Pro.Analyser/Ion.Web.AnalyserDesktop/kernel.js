@@ -15,10 +15,13 @@ function startUp() {
     var mk = new HtmlHelper();
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
+    var themeChange = mk.tag("div", "taskbar-applet");
     var wl = new WindowList(content);
     var menu = new MainMenu(menuContent);
+    var theme = new ChangeTheme(themeChange);
     var taskbar = document.getElementsByClassName("taskbar")[0];
     taskbar.appendChild(menu.content);
+    taskbar.appendChild(theme.content);
     taskbar.appendChild(wl.content);
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
