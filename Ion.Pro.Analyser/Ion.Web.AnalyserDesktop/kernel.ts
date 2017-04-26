@@ -81,6 +81,7 @@ function registerLaunchers() {
 
 function registerGridPresets() {
     kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Preset 1", <IGridLanchTemplate>{
+        name: "Preset 1",
         grid: {
             data: [
                 { name: "DataAssigner", data: null },

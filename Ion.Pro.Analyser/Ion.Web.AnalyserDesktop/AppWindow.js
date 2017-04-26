@@ -6,6 +6,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
+        this._showTaskbar = true;
         this.topMost = false;
         this.eventMan = new EventManager();
         this.outerBoxMargin = 8;
@@ -41,6 +42,7 @@ var AppWindow = (function () {
         set: function (value) {
             this._title = value;
             this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
+            this.onUpdate();
         },
         enumerable: true,
         configurable: true
@@ -55,6 +57,17 @@ var AppWindow = (function () {
     Object.defineProperty(AppWindow.prototype, "totalHeight", {
         get: function () {
             return this.windowElement.clientHeight;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AppWindow.prototype, "showTaskbar", {
+        get: function () {
+            return this._showTaskbar;
+        },
+        set: function (value) {
+            this._showTaskbar = value;
+            this.onUpdate();
         },
         enumerable: true,
         configurable: true
@@ -195,6 +208,9 @@ var AppWindow = (function () {
     AppWindow.prototype.onDragRelease = function (x, y, window) {
         console.log("Release");
         this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
+    };
+    AppWindow.prototype.onUpdate = function () {
+        this.eventMan.raiseEvent(AppWindow.event_update, null);
     };
     AppWindow.prototype.close = function () {
         this.onClose();
@@ -360,6 +376,7 @@ AppWindow.event_maximize = "maximize";
 AppWindow.event_mouseMove = "mouseMove";
 AppWindow.event_dragOver = "dragOver";
 AppWindow.event_dragRelease = "dragRelease";
+AppWindow.event_update = "update";
 AppWindow.event_close = "close";
 var AppMouseEvent = (function () {
     function AppMouseEvent(x, y) {

@@ -25,8 +25,9 @@
     static event_windowOpen = "windowOpen";
     static event_windowSelect = "windowSelect";
     static event_windowClose = "windowClose";
+    static event_windowUpdate = "windowUpdate";
 
-    static event_themeChange = "themeChange";
+    static event_themeChange = "themeChange";    
 
     private availableThemes: string[] = ["app-style", "app-style-dark"];
 
@@ -173,7 +174,14 @@
 
     private makeWindow(app: Application): AppWindow {
         var tempWindow: AppWindow = new AppWindow(app);
+        tempWindow.addEventListener(AppWindow.event_update, () => {
+            this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        });
         return tempWindow;
+    }
+
+    private appWindow_update() {
+
     }
 
     private registerWindow(app: AppWindow): void {

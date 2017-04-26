@@ -11,8 +11,9 @@ var GridViewer = (function () {
     }
     GridViewer.prototype.main = function (temp) {
         console.log(temp);
-        this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+        this.window = kernel.winMan.createWindow(this.application, "New Grid");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
         this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
@@ -107,6 +108,7 @@ var GridViewer = (function () {
         }
         var windowBody = kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
+        window.showTaskbar = false;
         window.changeWindowMode(WindowMode.BORDERLESSFULL);
         this.childWindows.push(window);
         box.content.appendChild(windowBody);
@@ -116,6 +118,7 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.applyTemplate = function (gridTemplate) {
         console.log(gridTemplate);
+        this.window.title = gridTemplate.name;
         var dataSets = {};
         for (var _i = 0, _a = gridTemplate.sensorsets; _i < _a.length; _i++) {
             var a = _a[_i];
@@ -170,6 +173,7 @@ var GridViewer = (function () {
                     }
                 }
                 var window_1 = app.windows[0];
+                window_1.showTaskbar = false;
                 this_1.childWindows.push(window_1);
                 window_1.changeWindowMode(WindowMode.BORDERLESSFULL);
                 lastBox.content.appendChild(window_1.handle);
@@ -316,6 +320,7 @@ var GridViewer = (function () {
     return GridViewer;
 }());
 var test = {
+    name: "some Grid",
     sensorsets: null,
     grid: {
         data: [

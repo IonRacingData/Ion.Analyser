@@ -22,6 +22,7 @@ var WindowList = (function (_super) {
         winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programOpen(); });
         winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.programClose(); });
         winMan.addEventListener(WindowManager.event_windowSelect, function () { return _this.programSelect(); });
+        winMan.addEventListener(WindowManager.event_windowUpdate, function () { return _this.windowUpdate(); });
         _this.addWindows();
         return _this;
     }
@@ -30,20 +31,26 @@ var WindowList = (function (_super) {
         this.content.innerHTML = "";
         var _loop_1 = function (i) {
             var cur = this_1.winMan.windows[i];
-            var ctrl = document.createElement("div");
-            ctrl.innerHTML = cur.title;
-            ctrl.classList.add("taskbar-button-text");
-            if (cur === this_1.winMan.activeWindow) {
-                ctrl.classList.add("taskbar-button-select");
+            if (cur.showTaskbar) {
+                var ctrl = document.createElement("div");
+                ctrl.innerHTML = cur.title;
+                ctrl.classList.add("taskbar-button-text");
+                if (cur === this_1.winMan.activeWindow) {
+                    ctrl.classList.add("taskbar-button-select");
+                }
+                ctrl.window = cur;
+                ctrl.addEventListener("mousedown", function () { _this.winMan.selectWindow(cur); });
+                this_1.content.appendChild(ctrl);
             }
-            ctrl.window = cur;
-            ctrl.addEventListener("mousedown", function () { _this.winMan.selectWindow(cur); });
-            this_1.content.appendChild(ctrl);
         };
         var this_1 = this;
         for (var i = 0; i < this.winMan.windows.length; i++) {
             _loop_1(i);
         }
+    };
+    WindowList.prototype.windowUpdate = function () {
+        console.log("Window update");
+        this.addWindows();
     };
     WindowList.prototype.programOpen = function () {
         console.log("Program Open");

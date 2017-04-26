@@ -8,8 +8,9 @@
 
     main(temp): void {
         console.log(temp);
-        this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+        this.window = kernel.winMan.createWindow(this.application, "New Grid");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
         this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
@@ -113,6 +114,7 @@
         }
         var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
+        window.showTaskbar = false;
         window.changeWindowMode(WindowMode.BORDERLESSFULL);
 
         this.childWindows.push(window);
@@ -125,6 +127,7 @@
 
     applyTemplate(gridTemplate: IGridLanchTemplate) {
         console.log(gridTemplate);
+        this.window.title = gridTemplate.name;
         let dataSets: { [key: string]: IDataSource<any>} = { };
         for (let a of gridTemplate.sensorsets) {
             dataSets[a.key] = kernel.senMan.createDataSource(a);
@@ -188,6 +191,7 @@
 
                 }
                 let window = app.windows[0];
+                window.showTaskbar = false;
                 this.childWindows.push(window);
                 window.changeWindowMode(WindowMode.BORDERLESSFULL);
                 lastBox.content.appendChild(window.handle);
@@ -353,6 +357,7 @@
 }
 
 let test: IGridLanchTemplate = {
+    name: "some Grid",
     sensorsets: null,
     grid: {
         data: [
@@ -378,6 +383,7 @@ interface IGridLaucher {
 }
 
 interface IGridLanchTemplate {
+    name: string
     grid: IGridTemplate;
     sensorsets: DataSourceTemplate[];
 }

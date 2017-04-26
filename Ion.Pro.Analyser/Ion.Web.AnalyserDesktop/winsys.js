@@ -127,8 +127,14 @@ var WindowManager = (function () {
         return window;
     };
     WindowManager.prototype.makeWindow = function (app) {
+        var _this = this;
         var tempWindow = new AppWindow(app);
+        tempWindow.addEventListener(AppWindow.event_update, function () {
+            _this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        });
         return tempWindow;
+    };
+    WindowManager.prototype.appWindow_update = function () {
     };
     WindowManager.prototype.registerWindow = function (app) {
         app.winMan = this;
@@ -207,5 +213,6 @@ WindowManager.event_globalUp = "globalUp;";
 WindowManager.event_windowOpen = "windowOpen";
 WindowManager.event_windowSelect = "windowSelect";
 WindowManager.event_windowClose = "windowClose";
+WindowManager.event_windowUpdate = "windowUpdate";
 WindowManager.event_themeChange = "themeChange";
 //# sourceMappingURL=winsys.js.map
