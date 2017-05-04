@@ -109,5 +109,5 @@ class DataSourceTemplate {
 
 interface ISensorDataContainerTemplate {
     name: string;
-    key: string
+    key: string;
 }
