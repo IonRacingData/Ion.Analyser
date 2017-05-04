@@ -7,6 +7,7 @@
     set title(value: string) {
         this._title = value;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
+        this.onUpdate();
     }
 
     get totalWidth(): number {
@@ -14,6 +15,16 @@
     }
     get totalHeight(): number {
         return this.windowElement.clientHeight;
+    }
+
+    private _showTaskbar: boolean = true;
+
+    get showTaskbar(): boolean {
+        return this._showTaskbar;
+    }
+    set showTaskbar(value: boolean) {
+        this._showTaskbar = value;
+        this.onUpdate();
     }
 
     handle: HTMLElement;
@@ -35,6 +46,7 @@
     static readonly event_dragOver = "dragOver";
     static readonly event_dragRelease = "dragRelease";
 
+    static readonly event_update = "update";
     static readonly event_close = "close";
 
     x: number;
@@ -264,6 +276,10 @@
     onDragRelease(x: number, y: number, window: AppWindow): void {
         console.log("Release");
         this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
+    }
+
+    onUpdate(): void {
+        this.eventMan.raiseEvent(AppWindow.event_update, null);
     }
 
     close() {

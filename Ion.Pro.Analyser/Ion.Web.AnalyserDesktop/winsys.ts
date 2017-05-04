@@ -1,23 +1,23 @@
 ﻿class WindowManager implements IEventManager {
-    body: HTMLElement;
-    template: HTMLTemplateElement;
+    private body: HTMLElement;
+    private template: HTMLTemplateElement;
 
-    dragging: boolean;
-    resizing: boolean;
+    public dragging: boolean;
+    public resizing: boolean;
 
-    activeWindow: AppWindow;
+    public activeWindow: AppWindow;
 
-    windows: AppWindow[] = [];
-    order: AppWindow[] = [];
+    public windows: AppWindow[] = [];
+    private order: AppWindow[] = [];
 
-    eventManager: EventManager;
+    private eventManager: EventManager;
 
-    events: any = {};
+    private events: any = {};
 
-    tileZone = 20;
-    topBar = 40;
+    private tileZone = 20;
+    private topBar = 40;
 
-    addEventListener2: (type: string, listner: any) => void;
+    private addEventListener2: (type: string, listner: any) => void;
 
     static event_globalDrag = "globalDrag";
     static event_globalUp = "globalUp;";
@@ -25,6 +25,12 @@
     static event_windowOpen = "windowOpen";
     static event_windowSelect = "windowSelect";
     static event_windowClose = "windowClose";
+    static event_windowUpdate = "windowUpdate";
+
+    static event_themeChange = "themeChange";    
+
+    private availableThemes: string[] = ["app-style", "app-style-dark"];
+
 
 
     constructor(container: HTMLElement) {
@@ -40,18 +46,39 @@
         // this.addEventListener = this.eventManager.addEventListener;
         // this.addEventListener2 = this.eventManager.addEventListener;
         // addEventListener
+
+        this.modifyCurrentStylesheet();
     }
 
-    mouseMove(e: MouseEvent): void {
+    private current: CSSStyleSheet;
+    private avaiableRules: { [name: string]: CSSStyleRule } = {};
+
+    private modifyCurrentStylesheet() {
+        for (let i = 0; i < document.styleSheets.length; i++) {
+            let a = document.styleSheets[i];
+            if (a.title == "app-style")
+            {
+                this.current = <CSSStyleSheet>a;
+                break;
+            }
+        }
+        this.avaiableRules = {};
+        for (let i = 0; i < this.current.cssRules.length; i++) {
+            let a = <CSSStyleRule>this.current.cssRules[i];
+            this.avaiableRules[a.selectorText] = a;
+        }
+    }
+
+    public mouseMove(e: MouseEvent): void {
         this.handleMouseMoving(e.pageX, e.pageY, e);
     }
 
-    touchMove(e: TouchEvent): void {
+    public touchMove(e: TouchEvent): void {
         e.preventDefault();
         this.handleMouseMoving(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
     }
 
-    handleMouseMoving(x: number, y: number, e: Event): void {
+    public handleMouseMoving(x: number, y: number, e: Event): void {
         if (this.dragging) {
             this.activeWindow.__setRelativePos(x, y);
             var tileZone: number = this.tileZone;
@@ -135,7 +162,7 @@
         this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
-    createWindow(app: Application, title: string): AppWindow {
+    public createWindow(app: Application, title: string): AppWindow {
         var window: AppWindow = this.makeWindow(app);
         // window.setTitle(title);
         window.title = title;
@@ -147,7 +174,14 @@
 
     private makeWindow(app: Application): AppWindow {
         var tempWindow: AppWindow = new AppWindow(app);
+        tempWindow.addEventListener(AppWindow.event_update, () => {
+            this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        });
         return tempWindow;
+    }
+
+    private appWindow_update() {
+
     }
 
     private registerWindow(app: AppWindow): void {
@@ -160,7 +194,24 @@
         this.selectWindow(app);
     }
 
-    makeWindowHandle(appWindow: AppWindow): HTMLElement {
+    public getRule(name: string): CSSStyleRule {
+        if (this.avaiableRules[name]) {
+            return this.avaiableRules[name];
+        }
+        console.log("The css rule: " + name + " does not exist");
+        return null;
+    }
+
+    public changeTheme(theme: string): void {
+        let style = <HTMLLinkElement>document.getElementById("main-theme");
+        style.onload = () => {
+            this.modifyCurrentStylesheet();
+            this.raiseEvent(WindowManager.event_themeChange, null);
+        }
+        style.href = "/" + theme + ".css";
+    }
+
+    public makeWindowHandle(appWindow: AppWindow): HTMLElement {
         var div: HTMLElement = document.createElement("div");
         div.className = "window-wrapper";
         var clone: HTMLElement = <HTMLElement>document.importNode(this.template.content, true);
@@ -168,21 +219,21 @@
         return div;
     }
 
-    selectWindow(appWindow: AppWindow): void {
+    public selectWindow(appWindow: AppWindow): void {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
         this.raiseEvent(WindowManager.event_windowSelect, null);
     }
 
-    makeTopMost(appWindow: AppWindow): void {
+    public makeTopMost(appWindow: AppWindow): void {
         let index: number = this.order.indexOf(appWindow);
         this.order.splice(index, 1);
         this.order.push(appWindow);
         this.reorderWindows();
     }
 
-    closeWindow(appWindow: AppWindow): void {
+    public closeWindow(appWindow: AppWindow): void {
         appWindow.handle.parentElement.removeChild(appWindow.handle);
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
@@ -190,7 +241,7 @@
         this.raiseEvent(WindowManager.event_windowClose, null);
     }
 
-    reorderWindows(): void {
+    public reorderWindows(): void {
         for (let i: number = 0; i < this.order.length; i++) {
             if (this.order[i].topMost) {
                 this.order[i].handle.style.zIndex = ((i + 1) * 100000).toString();
@@ -201,11 +252,11 @@
         }
     }
 
-    addEventListener(type: string, listner: any): void {
+    public addEventListener(type: string, listner: any): void {
         this.eventManager.addEventListener(type, listner);
     }
 
-    removeEventListener(type: string, listener: any): void {
+    public removeEventListener(type: string, listener: any): void {
         this.eventManager.removeEventListener(type, listener);
     }
 
