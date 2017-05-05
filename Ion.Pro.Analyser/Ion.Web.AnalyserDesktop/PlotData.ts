@@ -224,6 +224,10 @@ class Point implements IPoint<Point> {
         return new Point(this.x / p.x, this.y / p.y);
     }
 
+    copy(): Point {
+        return new Point(this.x, this.y);
+    }
+
     toString(): string {
         return "x: " + this.x.toString() + "  y: " + this.y.toString();
     }

@@ -4,6 +4,17 @@ window.addEventListener("load", () => {
     startUp();
 });
 
+window.onbeforeunload = function (e) {
+    e = e || window.event;
+
+    // For IE and Firefox prior to version 4
+    if (e) {
+        e.returnValue = 'Sure?';
+    }
+
+    // For Safari
+    return 'Sure?';
+};
 
 interface IClassType<T> {
     new (...param: any[]): T;
@@ -98,5 +109,5 @@ class DataSourceTemplate {
 
 interface ISensorDataContainerTemplate {
     name: string;
-    key: string
+    key: string;
 }

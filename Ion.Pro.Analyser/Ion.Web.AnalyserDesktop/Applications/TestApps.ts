@@ -244,7 +244,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
 }
 
 class GaugeTester implements IApplication, IViewer<Point> {
-    plotType: string = "Gauge Chart";
+    plotType: string = "Gauge";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
     dataSource: IDataSource<Point>;
@@ -294,7 +294,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
 }
 
 class GPSPlotTester implements IApplication, IViewer<Point3D> {
-    plotType: string = "GPS Chart";
+    plotType: string = "GPS";
     plotWindow: AppWindow;
     type: IClassType<Point3D> = Point3D;
     dataSource: IDataSource<Point3D>;
@@ -303,7 +303,6 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     window: AppWindow;
     points: Point3D[] = [];
     plot: GPSController;
-    testData: GPSPlotData;
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
@@ -324,7 +323,6 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-
         /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -337,13 +335,8 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         });
     }
 
-    draw(): void {
-        this.plot.setData(this.testData);
-        this.plot.setSize(this.window.width, this.window.height);
-    }
-
     dataUpdate() {
-
+        this.plot.setData(this.dataSource);
     }
 }
 
@@ -424,7 +417,7 @@ class BarTester implements IApplication, IViewer<Point> {
         this.window.content.style.overflow = "hidden";
         
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, true, true);
+        this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
 
@@ -438,6 +431,7 @@ class BarTester implements IApplication, IViewer<Point> {
     }
 
 }
+
 
 class LegacyRPIManager implements IApplication {
     public application: Application;
@@ -477,4 +471,42 @@ class LegacyRPIManager implements IApplication {
         }], "StopReceive"));
         this.window.content.appendChild(wrapper);
     }
+}
+
+class SteeringWheelTester implements IViewer<Point> {
+    application: Application;
+    window: AppWindow;
+    wheel: SteeringWheelController;
+    val: number = 0.5;
+    type: IClassType<Point> = Point;
+    dataSource: IDataSource<Point>;
+    plotType: string = "Bar";
+    plotWindow: AppWindow;
+
+    main() {
+        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window.content.style.overflow = "hidden";
+        this.plotWindow = this.window;
+        kernel.senMan.register(this);
+        this.wheel = new SteeringWheelController(this.window.width, this.window.height);
+        let wheelWrapper = this.wheel.generate();
+        this.window.content.appendChild(wheelWrapper);
+        this.wheel.setPer(this.val);
+
+        wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
+            this.val -= e.deltaY / 100;
+            this.val = this.val < 0 ? 0 : this.val;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.wheel.setPer(this.val);
+        });
+
+        this.window.addEventListener(AppWindow.event_resize, () => {
+            this.wheel.setSize(this.window.width, this.window.height);
+        });
+    }
+
+    dataUpdate(): void {
+        this.wheel.setData(this.dataSource);
+    }
+
 }

@@ -24,7 +24,7 @@ var DataAssigner = (function () {
         var divRight = this.sensorTable = mk.tag("div");
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
-        var last = null;
+        var last = { item: null };
         // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (var i = 0; i < senMan.viewers.length; i++) {
@@ -56,11 +56,11 @@ var DataAssigner = (function () {
         tableGen.addRow([
             {
                 event: "click", func: function (e) {
-                    if (last !== null) {
-                        last.classList.remove("selectedrow");
+                    if (last.item !== null) {
+                        last.item.classList.remove("selectedrow");
                     }
-                    last = _this.findTableRow(e.target);
-                    last.classList.add("selectedrow");
+                    last.item = _this.findTableRow(e.target);
+                    last.item.classList.add("selectedrow");
                     var sources = kernel.senMan.getDataSources(curPlot.type);
                     if (isMulti) {
                         _this.drawMultiSensors(curPlot, sources);

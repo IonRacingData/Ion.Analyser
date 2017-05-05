@@ -253,7 +253,7 @@ span.table-resize{
 }
 
 .bar-controller-barWrapper2 {
-    flex-grow: 1;
+    flex-grow: 1;    
 }
 
 .bar-controller-bar1 {
@@ -264,4 +264,36 @@ span.table-resize{
     background-color: red;    
 }
 
+.steeringWheel-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.carousel {height: 100%;}
+
+.carousel_contentWrapper {
+    height: calc(100% - 40px);
+}
+
+.carousel_navWrapper {
+    height: 30px;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.carousel_navWrapper img {
+    height: 100%;
+    width: auto;
+}
+
+.dsb-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.dsb-subdiv {
+    flex-grow: 1;
+}

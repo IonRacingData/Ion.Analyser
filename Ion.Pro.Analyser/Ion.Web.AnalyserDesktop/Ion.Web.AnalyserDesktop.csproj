@@ -25,10 +25,12 @@
     <Content Include="app-style-dark.css" />
     <Content Include="app-style.css" />
     <Content Include="app.css" />
+    <Content Include="arrow.png" />
     <Content Include="Grid\grid.js" />
     <Content Include="Grid\index.html" />
     <Content Include="Grid\grid-style.css" />
     <Content Include="Grid\grid.css" />
+    <Content Include="steeringWheel.png" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
     <Content Include="web.config" />
@@ -38,6 +40,7 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="application.ts" />
     <TypeScriptCompile Include="Applications\CanDataViewer.ts" />
+    <TypeScriptCompile Include="Applications\DataSourceBuilder.ts" />
     <TypeScriptCompile Include="Applications\DataViewer.ts" />
     <TypeScriptCompile Include="Applications\FileExplorer.ts" />
     <TypeScriptCompile Include="Applications\LogViewer.ts" />
@@ -50,6 +53,8 @@
     <TypeScriptCompile Include="comsys.ts" />
     <TypeScriptCompile Include="Controllers\BarController.ts" />
     <TypeScriptCompile Include="Controllers\Controller.ts" />
+    <TypeScriptCompile Include="Controllers\DSBController.ts" />
+    <TypeScriptCompile Include="Controllers\SteeringWheelController.ts" />
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="Controllers\GPSController.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
