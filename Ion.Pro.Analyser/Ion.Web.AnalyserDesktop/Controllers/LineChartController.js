@@ -17,8 +17,6 @@ var LineChartController = (function (_super) {
         _this.movePoint_start = new Point(50, 50);
         _this.autoScroll = false;
         _this.autoScroll_plotMoved = false;
-        _this.gridColor = "rgba(100,100,100,0.3)";
-        _this.axisColor = "white";
         _this.mainColor = "white";
         _this.defaultCursor = "default";
         _this.movePoint = _this.movePoint_start.copy();
@@ -47,12 +45,22 @@ var LineChartController = (function (_super) {
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.wrapper.addEventListener("keydown", function (e) { return _this.wrapper_keyDown(e); });
         this.wrapper.addEventListener("keyup", function (e) { return _this.wrapper_keyUp(e); });
+        this.setColors();
         this.draw();
         return this.wrapper;
     };
+    LineChartController.prototype.setColors = function () {
+        this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
+        this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
+        this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
+    };
+    LineChartController.prototype.updateTheme = function () {
+        this.setColors();
+        this.draw();
+    };
     LineChartController.prototype.drawMarking = function () {
         this.ctxMarking.clear();
-        this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
+        this.ctxMarking.fillStyle = this.markingColor;
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
@@ -174,10 +182,14 @@ var LineChartController = (function (_super) {
             if (this.selectedPoint !== null) {
                 var abs = this.getAbsolute(this.selectedPoint);
                 var pointString = this.selectedPoint.toString();
+                this.ctxMain.strokeStyle = this.axisColor;
+                this.ctxMain.fillStyle = this.axisColor;
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
                 this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
+                this.ctxMain.fillStyle = this.mainColor;
+                this.ctxMain.strokeStyle = this.mainColor;
             }
         }
     };

@@ -1,18 +1,16 @@
 ﻿body {
-    background-color: #262626;
+    background-color: rgb(240, 240, 240);
     font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle, #202020 40%, #000000 90%);
 }
 
 .background{
-    background: url(IonLogo.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: auto 75%;
+    background: none;
 }
 
+/*  Window  */
+
 .window {
-    background-color: white;
+    background-color: rgb(245, 245, 245);
     /*background-color: #262626;
     color: white;*/
     border-radius: 4px 4px 0 0;
@@ -30,17 +28,18 @@
     width: 100%;
     height: 100%;
     display: none;
-    background: rgba(0,0,203,0.5);
+    background: rgba(160, 164, 184, 0.3);
 }
 
 .window-title {
-    color: #009F99;
+    color: black;
 }
 
 .window-header {
-    background-color: #1A1A1A;
-    color: white;
+    background-color: #119ed9;
+    color: black;
     border-radius: 1px 1px 0 0;
+    border-bottom: 1px solid rgb(107, 107, 107);
 }
 
 .window-control{
@@ -49,12 +48,14 @@
 }
 
 .window-control span:hover {
-    background-color: #101010;
+    background-color: rgba(102, 102, 102, 0.35);
 }
 
 .window-control .window-control-exit:hover {
-    background-color: #DD0000;
+    background-color: rgb(204, 98, 98);
 }
+
+/*  Taskbar  */
 
 .taskbar {
     color: white;
@@ -70,18 +71,21 @@
 
 }
 
+/*   Table   */
+
 
 table.table {
-    border: 1px solid black;
+    background-color: #e7e7e7;
 }
 
 .table tr:nth-child(2n) {
-    background-color: #babfd1;
+    background-color: #f9f9f9;
 }
 
 .table thead {
-    background-color: #383e47;
-    color: white;
+    background-color: #d9d9d9;
+    color: #3e3e3e;
+    border: none;
 }
 
 table.table.selectable tr.selectedrow {
@@ -92,6 +96,8 @@ table.table.selectable tr.selectedrow {
 span.table-resize{
     background-color: #23262f;
 }
+
+/*  Menu Window  */
 
 .menu-window{
     background-color: white;
@@ -110,12 +116,19 @@ span.table-resize{
     background-color: #29292D;
 }
 
+/*  Controllers  */
+
 .gauge-plot {
     color: darkgray;
     /* needle color */    
     border-color: red;
 }
 
-.plot-wrapper {
-    background-color: rgb(45, 45, 45);
+.line-chart {
+    /*axes and labels*/
+    border-color: rgb(60, 60, 60);
+    /*grid*/
+    color: rgba(100,100,100,0.3);
+    /*marking fill*/
+    background-color: rgba(0,184,220,0.2);
 }

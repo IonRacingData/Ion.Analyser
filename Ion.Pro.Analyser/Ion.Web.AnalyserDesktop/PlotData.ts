@@ -229,7 +229,7 @@ class Point implements IPoint<Point> {
     }
 
     toString(): string {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();
+        return "x: " + this.x.toFixed(2) + "  y: " + this.y.toFixed(2);
     }
 }
 

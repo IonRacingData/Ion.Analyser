@@ -156,11 +156,11 @@ var LineChartTester = (function () {
         });
         this.eh.on(this.plotWindow, AppWindow.event_close, function () { return _this.window_close(); });
         this.window.content.style.overflow = "hidden";
-        kernel.senMan.register(this);
-        this.createEvents(this.eh);
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
+        kernel.senMan.register(this);
+        this.createEvents(this.eh);
     };
     LineChartTester.prototype.window_close = function () {
         console.log("closing");
@@ -177,6 +177,12 @@ var LineChartTester = (function () {
         });
         eh.on(this.window, AppWindow.event_close, function () {
             _this.close();
+        });
+        eh.on(this.plotWindow, AppWindow.event_close, function () {
+            _this.window_close();
+        });
+        eh.on(kernel.winMan, WindowManager.event_themeChange, function () {
+            _this.lineChart.updateTheme();
         });
     };
     LineChartTester.prototype.close = function () {

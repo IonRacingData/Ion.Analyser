@@ -152,16 +152,14 @@ table.table {
 }*/
 
 .table thead {
-    font-size: 1.1em;
-    padding: 0px;
-    border: 1px solid black;
+    font-size: 1em;    
 
     /*background-color: #383e47;
     color: white;*/
 }
 
-.table th {
-    padding-right: 7px;
+.table td, th {
+    padding: 5px;
 }
 
 /*table.table.selectable tr.selectedrow {
