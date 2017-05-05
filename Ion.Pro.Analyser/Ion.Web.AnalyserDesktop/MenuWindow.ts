@@ -29,8 +29,15 @@
         // console.log(e);
     }
 
+    static isIMenuItem(obj: any): obj is IMenuItem {
+        if (obj.name && obj.runner) {
+            return true;
+        }
+        return false;
+    }
+
     add(item: any, category: string = ""): void {
-        let name: string = (item instanceof Launcher) ? (<Launcher>item).name : item.toString();
+        let name: string = MenuWindow.isIMenuItem(item) ? item.name : item.toString();
         if (category === "") {
             this.items.push(new MenuItem(name, item));
         }
@@ -72,8 +79,8 @@
             let a: HTMLAnchorElement = <HTMLAnchorElement>mk.tag("a", "", [{
                 event: "click", func: (e: Event): void => {
                     e.preventDefault();
-                    if (curItem.value instanceof Launcher) {
-                        (<Launcher>curItem.value).createInstance();
+                    if (MenuWindow.isIMenuItem(curItem.value)) {
+                        curItem.value.runner();
                         this.hide();
                     }
                     else if (curItem.value instanceof Array) {
@@ -89,6 +96,9 @@
             li.appendChild(a);
             a.href = "#";
             if (curItem.value instanceof Array) {
+                let arrow = mk.tag("span", "", null, "&gt;");
+                arrow.style.cssFloat = "right";
+                a.appendChild(arrow);
                 curItem.subMenu = this.makeList(<MenuItem[]>curItem.value, mk);
                 curItem.subMenu.style.display = "none";
                 li.appendChild(curItem.subMenu);

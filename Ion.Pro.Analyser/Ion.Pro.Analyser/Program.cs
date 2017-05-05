@@ -66,12 +66,19 @@ namespace Ion.Pro.Analyser
 
             //Console.Read();
             //return;
-            plinkPath = LegacyPIService.TryFindPlink();
-            if (plinkPath != null)
+            try
             {
-                rpiManager = new LegacySSHManager(plinkPath);
-                //rpiManager.Connect();
-                //Console.ReadLine();
+                plinkPath = LegacyPIService.TryFindPlink();
+                if (plinkPath != null)
+                {
+                    rpiManager = new LegacySSHManager(plinkPath);
+                    //rpiManager.Connect();
+                    //Console.ReadLine();
+                }
+            }
+            catch
+            {
+                Console.WriteLine("PLink not available");
             }
             Console.WriteLine("Ion Analyser Server");
             try
@@ -86,7 +93,32 @@ namespace Ion.Pro.Analyser
                 Console.WriteLine("Ohh no, something horrible went wrong");
                 Console.WriteLine(e);
             }
-            Console.Read();
+            bool avaiableRead = true;
+            try
+            {
+                Console.Read();
+            }
+            catch
+            {
+                avaiableRead = false;
+            }
+
+            if (!avaiableRead)
+            {
+                Console.CancelKeyPress += Console_CancelKeyPress;
+                do
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+                while (!exit);
+            }
+        }
+
+        static bool exit = false;
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            exit = true;
         }
 
         static void InitSenSys()

@@ -204,10 +204,21 @@
 
     public changeTheme(theme: string): void {
         let style = <HTMLLinkElement>document.getElementById("main-theme");
-        style.onload = () => {
-            this.modifyCurrentStylesheet();
-            this.raiseEvent(WindowManager.event_themeChange, null);
+        if (navigator.userAgent.match(/firefox/i)) {
+            style.onload = () => {
+                console.log("hello");
+                this.modifyCurrentStylesheet();
+                this.raiseEvent(WindowManager.event_themeChange, null);
+            }
         }
+        else {
+            setTimeout(() => {
+                console.log("hello");
+                this.modifyCurrentStylesheet();
+                this.raiseEvent(WindowManager.event_themeChange, null);
+            }, 200);
+        }
+        
         style.href = "/" + theme + ".css";
     }
 

@@ -3,11 +3,12 @@ var DataAssigner = (function () {
         this.mk = new HtmlHelper();
         this.eh = new EventHandler();
     }
-    DataAssigner.prototype.main = function () {
+    DataAssigner.prototype.main = function (preSelect) {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
+        this.selected = preSelect;
         this.draw();
         this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () { return _this.draw(); });
         this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () { return _this.draw(); });
@@ -29,7 +30,12 @@ var DataAssigner = (function () {
         for (var i = 0; i < senMan.viewers.length; i++) {
             var curPlot = senMan.viewers[i];
             var isMulti = curPlot.dataCollectionSource !== undefined;
-            this.drawRow(curPlot, isMulti, tableGen, last);
+            if (this.selected) {
+                this.drawRow(curPlot, isMulti, tableGen, last, true);
+            }
+            else {
+                this.drawRow(curPlot, isMulti, tableGen, last, false);
+            }
         }
         divLeft.appendChild(tableGen.generate());
         divLeft.style.minWidth = "250px";
@@ -41,7 +47,7 @@ var DataAssigner = (function () {
         this.window.content.appendChild(divLeft);
         this.window.content.appendChild(divRight);
     };
-    DataAssigner.prototype.drawRow = function (curPlot, isMulti, tableGen, last) {
+    DataAssigner.prototype.drawRow = function (curPlot, isMulti, tableGen, last, preSelect) {
         var _this = this;
         var name = "Single Plot";
         if (isMulti) {
@@ -75,6 +81,13 @@ var DataAssigner = (function () {
                 }
             },
         ], curPlot.plotType, name);
+        var sources = kernel.senMan.getDataSources(curPlot.type);
+        if (isMulti) {
+            this.drawMultiSensors(curPlot, sources);
+        }
+        else {
+            this.drawSingleSensors(curPlot, sources);
+        }
     };
     DataAssigner.prototype.findTableRow = function (element) {
         var curElement = element;

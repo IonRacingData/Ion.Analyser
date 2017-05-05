@@ -46,6 +46,13 @@ function startUp() {
         e.preventDefault();
     });
 
+
+
+}
+
+interface IMenuItem {
+    name: string;
+    runner: () => void;
 }
 
 function registerSensorGroups() {
@@ -59,9 +66,8 @@ function registerLaunchers() {
 
     // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
-    kernel.appMan.registerApplication("Data", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
-
     kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
     kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
@@ -72,6 +78,7 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
 
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
@@ -80,17 +87,16 @@ function registerLaunchers() {
 }
 
 function registerGridPresets() {
-    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Preset 1", <IGridLanchTemplate>{
-        name: "Preset 1",
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Speed and Current", <IGridLanchTemplate>{
+        name: "Preset Speed and Current",
         grid: {
             data: [
-                { name: "DataAssigner", data: null },
+                /*{ name: "DataAssigner", data: null },*/
                 { name: "LineChartTester", data: ["speed", "current"] },
                 {
                     data: [
                         { name: "LineChartTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["current"] }
-                    ]
+                        { name: "LineChartTester", data: ["current"] }]
                 }
             ]
         },
@@ -99,17 +105,13 @@ function registerGridPresets() {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [
-                    { key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }
-                ]
+                sources: [ { key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" } ]
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [
-                    { key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }
-                ]
+                sources: [ { key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" } ]
             }
         ]
     }));
@@ -125,7 +127,7 @@ interface HTMLElement {
 }
 /* tslint:enable:interface-name */
 
-class Launcher {
+class Launcher implements IMenuItem {
     mainFunction: new () => IApplication;
     name: string;
     args: any[];
@@ -134,6 +136,10 @@ class Launcher {
         this.mainFunction = mainFunction;
         this.name = name;
         this.args = args;
+    }
+
+    runner(): void {
+        this.createInstance();
     }
 
     createInstance(): void {

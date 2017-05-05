@@ -192,9 +192,23 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     lineChart: LineChartController;
     data: ISensorPackage[];
     eh: EventHandler = new EventHandler();
-    
+    testWindow = new MenuWindow(document.body);
+
+
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+
+        this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
+            this.testWindow.x = e.x;
+            this.testWindow.y = e.y;
+            this.testWindow.show();
+        };
+        this.testWindow.add({
+            name: "Change data", runner: () => {
+                kernel.appMan.start("DataAssigner", this);
+            }
+        });
+
         this.eh.on(this.plotWindow, AppWindow.event_close, () => this.window_close());
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
@@ -202,6 +216,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
+
     }
 
     private window_close() {
@@ -239,8 +254,23 @@ class GaugeTester implements IApplication, IViewer<Point> {
     gauge: GaugeController;
     val: number = 0;
 
+    
+
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
+
+        let testWindow: MenuWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: () => {
+                kernel.appMan.start("DataAssigner", this);
+            }
+        });
+
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
 
@@ -276,11 +306,25 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     testData: GPSPlotData;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+
+        let testWindow: MenuWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: () => {
+                kernel.appMan.start("DataAssigner", this);
+            }
+        });
+
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
+
         /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -315,9 +359,20 @@ class LabelTester implements IApplication, IViewer<Point> {
     val: number = 0;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        let testWindow: MenuWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: () => {
+                kernel.appMan.start("DataAssigner", this);
+            }
+        });
+
         this.window.content.style.overflow = "hidden";
-        this.plotWindow = this.window;
         kernel.senMan.register(this);
 
         this.label = new LabelController(this.window.width, this.window.height);
@@ -352,9 +407,22 @@ class BarTester implements IApplication, IViewer<Point> {
     val: number = 0;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "BarTester");
+
+        let testWindow: MenuWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: () => {
+                kernel.appMan.start("DataAssigner", this);
+            }
+        });
+
         this.window.content.style.overflow = "hidden";
-        this.plotWindow = this.window;
+        
         kernel.senMan.register(this);
         this.bar = new BarController(this.window.width, this.window.height, true, true);
         let barWrapper = this.bar.generate();

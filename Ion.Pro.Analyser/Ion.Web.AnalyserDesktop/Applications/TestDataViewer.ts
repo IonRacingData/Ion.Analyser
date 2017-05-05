@@ -4,11 +4,13 @@
     mk = new HtmlHelper();
     sensorTable: HTMLElement;
     eh: EventHandler = new EventHandler();
+    selected: IViewerBase<any>;
 
-    main(): void {
+    main(preSelect: any): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
+        this.selected = preSelect;
         this.draw();
         this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => this.draw());
         this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => this.draw());
@@ -32,8 +34,13 @@
         for (let i = 0; i < senMan.viewers.length; i++) {
             let curPlot = senMan.viewers[i];
             let isMulti = (<ICollectionViewer<any>>curPlot).dataCollectionSource !== undefined;
-
-            this.drawRow(curPlot, isMulti, tableGen, last);
+            if (this.selected) {
+                this.drawRow(curPlot, isMulti, tableGen, last, true);
+            }
+            else {
+                this.drawRow(curPlot, isMulti, tableGen, last, false);
+            }
+            
         }
 
 
@@ -51,7 +58,7 @@
     }
 
 
-    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: HTMLElement): void {
+    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: HTMLElement, preSelect: boolean): void {
         let name = "Single Plot";
         if (isMulti) {
             name = "Multi Plot";
@@ -84,6 +91,14 @@
                 }
             },
         ], curPlot.plotType, name);
+
+        let sources = kernel.senMan.getDataSources(curPlot.type);
+        if (isMulti) {
+            this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
+        }
+        else {
+            this.drawSingleSensors(<IViewer<any>>curPlot, sources);
+        }
     }
 
     findTableRow(element: HTMLElement): HTMLElement {
