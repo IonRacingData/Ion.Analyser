@@ -195,13 +195,14 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
-        this.eh.on(this.plotWindow, AppWindow.event_close, () => this.window_close());
         this.window.content.style.overflow = "hidden";
-        kernel.senMan.register(this);
-        this.createEvents(this.eh);
+
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
+        
+        kernel.senMan.register(this);
+        this.createEvents(this.eh);                
     }
 
     private window_close() {
@@ -221,6 +222,13 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         eh.on(this.window, AppWindow.event_close, () => {
             this.close();
         });
+        eh.on(this.plotWindow, AppWindow.event_close, () => {
+            this.window_close()
+        });
+        eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
+            this.lineChart.updateTheme();
+        });
+                
     }
 
     close() {

@@ -182,7 +182,7 @@ var Point = (function () {
         return new Point(this.x, this.y);
     };
     Point.prototype.toString = function () {
-        return "x: " + this.x.toString() + "  y: " + this.y.toString();
+        return "x: " + this.x.toFixed(2) + "  y: " + this.y.toFixed(2);
     };
     return Point;
 }());

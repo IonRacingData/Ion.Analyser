@@ -14,9 +14,12 @@
     private movePoint_start: Point = new Point(50, 50);
     private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
-    private gridColor = "rgba(100,100,100,0.3)";
-    private axisColor = "white";
+
+    private gridColor;
+    private axisColor;
     private mainColor = "white";
+    private markingColor;
+
     private defaultCursor: string = "default";
 
     constructor() {
@@ -52,13 +55,26 @@
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
         this.wrapper.addEventListener("keyup", (e: KeyboardEvent) => this.wrapper_keyUp(e));
 
+        this.setColors();
+
         this.draw();
         return this.wrapper;
     }
 
+    private setColors(): void {
+        this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
+        this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
+        this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
+    }
+
+    public updateTheme(): void {
+        this.setColors();
+        this.draw();
+    }
+
     private drawMarking(): void {
         this.ctxMarking.clear();
-        this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
+        this.ctxMarking.fillStyle = this.markingColor;
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
@@ -203,10 +219,14 @@
             if (this.selectedPoint !== null) {
                 var abs: Point = this.getAbsolute(this.selectedPoint);
                 var pointString: string = this.selectedPoint.toString();
+                this.ctxMain.strokeStyle = this.axisColor;
+                this.ctxMain.fillStyle = this.axisColor;
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
-                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
+                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);                
+                this.ctxMain.fillStyle = this.mainColor;
+                this.ctxMain.strokeStyle = this.mainColor;
             }
         }
     }
