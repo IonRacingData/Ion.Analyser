@@ -226,7 +226,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
             this.window_close()
         });
         eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
-            this.lineChart.updateTheme();
+            this.lineChart.updateColors();
         });
                 
     }

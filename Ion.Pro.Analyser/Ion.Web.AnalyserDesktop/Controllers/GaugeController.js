@@ -10,8 +10,6 @@ var GaugeController = (function (_super) {
         _this.padding = 5;
         _this.totalAngle = (3 * Math.PI) / 2;
         _this.startAngle = -(3 * Math.PI) / 4;
-        _this.color = "black";
-        _this.needleColor = "black";
         _this.size = Math.min(width, height);
         var labels = [];
         for (var i = min; i <= max; i += step) {
@@ -44,6 +42,7 @@ var GaugeController = (function (_super) {
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
         this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
+        this.setColor();
         this.setSize(this.size, this.size);
         return this.wrapper;
     };
@@ -104,6 +103,15 @@ var GaugeController = (function (_super) {
     };
     GaugeController.prototype.onDataChange = function () {
         this.drawNeedle();
+    };
+    GaugeController.prototype.setColor = function () {
+        this.color = kernel.winMan.getRule(".gauge").style.color;
+        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor;
+        this.color = kernel.winMan.getRule(".gauge").style.backgroundColor;
+    };
+    GaugeController.prototype.updateColors = function () {
+        this.setColor();
+        this.draw();
     };
     return GaugeController;
 }(SingleValueCanvasController));

@@ -169,7 +169,7 @@ var LineChartTester = (function () {
             _this.window_close();
         });
         eh.on(kernel.winMan, WindowManager.event_themeChange, function () {
-            _this.lineChart.updateTheme();
+            _this.lineChart.updateColors();
         });
     };
     LineChartTester.prototype.close = function () {

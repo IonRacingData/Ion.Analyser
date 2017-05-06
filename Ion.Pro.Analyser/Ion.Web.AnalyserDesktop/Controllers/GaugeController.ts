@@ -10,8 +10,10 @@
     private needle: ImageData;
     private offsetX: number;
     private offsetY: number;
-    private color: string = "black";
-    private needleColor: string = "black";
+
+    private color: string;
+    private needleColor: string;
+    private centerColor: string;
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         super();
@@ -51,7 +53,9 @@
         this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
         this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
 
+        this.setColor();
         this.setSize(this.size, this.size);
+
         return this.wrapper;
     }
 
@@ -99,7 +103,6 @@
 
         let val = this.percent * 100;
 
-
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
         let radius = this.size / 2;
@@ -126,5 +129,16 @@
 
     protected onDataChange(): void {        
         this.drawNeedle();
+    }
+
+    private setColor(): void {
+        this.color = kernel.winMan.getRule(".gauge").style.color;
+        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor;
+        this.color = kernel.winMan.getRule(".gauge").style.backgroundColor;
+    }
+
+    public updateColors(): void {
+        this.setColor();
+        this.draw();
     }
 }

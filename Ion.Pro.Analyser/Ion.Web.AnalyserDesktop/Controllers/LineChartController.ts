@@ -67,7 +67,7 @@
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
     }
 
-    public updateTheme(): void {
+    public updateColors(): void {
         this.setColors();
         this.draw();
     }

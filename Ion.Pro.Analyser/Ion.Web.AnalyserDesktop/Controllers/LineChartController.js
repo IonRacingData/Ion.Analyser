@@ -54,7 +54,7 @@ var LineChartController = (function (_super) {
         this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
     };
-    LineChartController.prototype.updateTheme = function () {
+    LineChartController.prototype.updateColors = function () {
         this.setColors();
         this.draw();
     };
