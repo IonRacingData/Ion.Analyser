@@ -155,10 +155,20 @@ var WindowManager = (function () {
     WindowManager.prototype.changeTheme = function (theme) {
         var _this = this;
         var style = document.getElementById("main-theme");
-        style.onload = function () {
-            _this.modifyCurrentStylesheet();
-            _this.raiseEvent(WindowManager.event_themeChange, null);
-        };
+        if (navigator.userAgent.match(/firefox/i)) {
+            style.onload = function () {
+                console.log("hello");
+                _this.modifyCurrentStylesheet();
+                _this.raiseEvent(WindowManager.event_themeChange, null);
+            };
+        }
+        else {
+            setTimeout(function () {
+                console.log("hello");
+                _this.modifyCurrentStylesheet();
+                _this.raiseEvent(WindowManager.event_themeChange, null);
+            }, 200);
+        }
         style.href = "/" + theme + ".css";
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {

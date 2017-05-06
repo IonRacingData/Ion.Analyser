@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ComBus.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Web\Socket.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Data\SensorDataReader.cs" />
     <Compile Include="Web\CacheService.cs" />
@@ -57,7 +58,6 @@
     <Compile Include="SenSys\Models.cs" />
     <Compile Include="SenSys\SensorDataStore.cs" />
     <Compile Include="Web\SessionService.cs" />
-    <Compile Include="Web\Socket.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

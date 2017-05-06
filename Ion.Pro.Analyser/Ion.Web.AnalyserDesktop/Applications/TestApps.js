@@ -139,9 +139,22 @@ var LineChartTester = (function () {
         this.type = Point;
         this.dataCollectionSource = [];
         this.eh = new EventHandler();
+        this.testWindow = new MenuWindow(document.body);
     }
     LineChartTester.prototype.main = function () {
+        var _this = this;
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+        this.plotWindow.content.oncontextmenu = function (e) {
+            _this.testWindow.x = e.x;
+            _this.testWindow.y = e.y;
+            _this.testWindow.show();
+        };
+        this.testWindow.add({
+            name: "Change data", runner: function () {
+                kernel.appMan.start("DataAssigner", _this);
+            }
+        });
+        this.eh.on(this.plotWindow, AppWindow.event_close, function () { return _this.window_close(); });
         this.window.content.style.overflow = "hidden";
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
@@ -186,6 +199,17 @@ var GaugeTester = (function () {
     GaugeTester.prototype.main = function () {
         var _this = this;
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
+        var testWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = function (e) {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: function () {
+                kernel.appMan.start("DataAssigner", _this);
+            }
+        });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.drawMeter();
@@ -212,12 +236,22 @@ var GPSPlotTester = (function () {
     }
     GPSPlotTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        var testWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = function (e) {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: function () {
+                kernel.appMan.start("DataAssigner", _this);
+            }
+        });
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        this.plotWindow = this.window;
         /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
             for (let i = 0; i < d.length; i++) {
                 this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
@@ -242,9 +276,19 @@ var LabelTester = (function () {
     }
     LabelTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        var testWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = function (e) {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: function () {
+                kernel.appMan.start("DataAssigner", _this);
+            }
+        });
         this.window.content.style.overflow = "hidden";
-        this.plotWindow = this.window;
         kernel.senMan.register(this);
         this.label = new LabelController(this.window.width, this.window.height);
         var div = this.label.generate();
@@ -271,9 +315,19 @@ var BarTester = (function () {
     }
     BarTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        var testWindow = new MenuWindow(document.body);
+        this.plotWindow.content.oncontextmenu = function (e) {
+            testWindow.x = e.x;
+            testWindow.y = e.y;
+            testWindow.show();
+        };
+        testWindow.add({
+            name: "Change data", runner: function () {
+                kernel.appMan.start("DataAssigner", _this);
+            }
+        });
         this.window.content.style.overflow = "hidden";
-        this.plotWindow = this.window;
         kernel.senMan.register(this);
         this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         var barWrapper = this.bar.generate();

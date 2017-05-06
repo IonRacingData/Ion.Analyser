@@ -21,8 +21,12 @@ var ApplicationManager = (function () {
         return appTemp;
     };
     ApplicationManager.prototype.start = function (appName) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         if (this.allApps[appName]) {
-            return this.launchApplication(this.allApps[appName]);
+            return this.launchApplication.apply(this, [this.allApps[appName]].concat(args));
         }
     };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {

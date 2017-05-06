@@ -21,15 +21,15 @@
         return appTemp;
     }
 
-    start(appName: string): Application {
+    start(appName: string, ...args: any[]): Application {
         if (this.allApps[appName]) {
-            return this.launchApplication(this.allApps[appName]);
+            return this.launchApplication(this.allApps[appName], ...args);
         }
     }
 
     registerApplication(category: string, launcher: Launcher): void {
         if (!this.launchers[category]) {
-            this.launchers[category] = [];
+            this.launchers[category] = [];  
         }
         this.launchers[category].push(launcher);
         this.allApps[(<any>launcher.mainFunction).name] = launcher;
