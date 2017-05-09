@@ -514,6 +514,9 @@ var ContextFixer = (function () {
     ContextFixer.prototype.beginPath = function () {
         this.ctx.beginPath();
     };
+    ContextFixer.prototype.closePath = function () {
+        this.ctx.closePath();
+    };
     ContextFixer.prototype.stroke = function () {
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();

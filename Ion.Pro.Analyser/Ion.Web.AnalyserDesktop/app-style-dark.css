@@ -122,18 +122,21 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.gauge-plot {
-    color: lightgray;
-    /* needle color */    
-    border-color: red;
-}
-
 .bar-controller {
     background-color: green;
 }
 
 .disabled {
     color: darkgray;
+}
+
+.gauge {
+    /*  ring and labels  */
+    color: darkgray;
+    /* needle color */
+    border-color: red;
+    /*  center  */
+    background-color: darkgray;
 }
 
 .line-chart {

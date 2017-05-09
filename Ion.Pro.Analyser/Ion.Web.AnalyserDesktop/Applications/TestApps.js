@@ -195,6 +195,7 @@ var GaugeTester = (function () {
         this.plotType = "Gauge";
         this.type = Point;
         this.val = 0;
+        this.eh = new EventHandler();
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
@@ -216,6 +217,9 @@ var GaugeTester = (function () {
         this.gauge.setSize(this.window.width, this.window.height);
         this.window.addEventListener(AppWindow.event_resize, function () {
             _this.gauge.setSize(_this.window.width, _this.window.height);
+        });
+        this.eh.on(kernel.winMan, WindowManager.event_themeChange, function () {
+            _this.gauge.updateColors();
         });
     };
     GaugeTester.prototype.drawMeter = function () {

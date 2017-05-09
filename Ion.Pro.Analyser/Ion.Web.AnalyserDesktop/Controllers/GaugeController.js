@@ -47,21 +47,24 @@ var GaugeController = (function (_super) {
         return this.wrapper;
     };
     GaugeController.prototype.draw = function () {
+        this.ctxMain.clear();
+        this.ctxCenter.clear();
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         var radius = this.size / 2;
         // center dot
         this.ctxCenter.fillStyle = this.color;
         this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
-        // this.ctxCenter.beginPath();
+        this.ctxCenter.beginPath();
         this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
         this.ctxCenter.fill();
+        this.ctxCenter.closePath();
         // ring
         this.ctxMain.beginPath();
         this.ctxMain.translate(radius + this.offsetX, radius + this.offsetY);
         this.ctxMain.arc(0, 0, radius - this.padding, 3 * Math.PI / 4, Math.PI / 4);
         this.ctxMain.stroke();
-        this.ctxMain.ctx.closePath();
+        this.ctxMain.closePath();
         // labels
         this.ctxMain.textBaseline = "middle";
         this.ctxMain.textAlign = "center";
@@ -77,6 +80,8 @@ var GaugeController = (function (_super) {
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
         }
+        this.ctxMain.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctxCenter.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.drawNeedle();
     };
     GaugeController.prototype.drawNeedle = function () {
@@ -93,6 +98,7 @@ var GaugeController = (function (_super) {
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
+        this.ctxNeedle.ctx.setTransform(1, 0, 0, 1, 0, 0);
     };
     GaugeController.prototype.onSizeChange = function () {
         this.size = Math.min(this.width, this.height);

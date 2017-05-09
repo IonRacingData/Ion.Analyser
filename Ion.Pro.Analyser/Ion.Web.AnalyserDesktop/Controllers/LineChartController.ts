@@ -630,6 +630,9 @@ class ContextFixer {
     beginPath(): void {
         this.ctx.beginPath();
     }
+    closePath(): void {
+        this.ctx.closePath();
+    }
     stroke(): void {
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();

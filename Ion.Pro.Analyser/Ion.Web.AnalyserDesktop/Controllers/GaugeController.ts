@@ -4,12 +4,12 @@
     private ctxCenter: ContextFixer;
     private size: number;
     private padding: number = 5;
-    private labels: string[];
     private totalAngle: number = (3 * Math.PI) / 2;
     private startAngle: number = -(3 * Math.PI) / 4;
-    private needle: ImageData;
     private offsetX: number;
     private offsetY: number;
+
+    private labels: string[];
 
     private color: string;
     private needleColor: string;
@@ -60,6 +60,10 @@
     }
 
     protected draw(): void {
+
+        this.ctxMain.clear();
+        this.ctxCenter.clear();
+
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
         let radius = this.size / 2;
@@ -67,16 +71,17 @@
         // center dot
         this.ctxCenter.fillStyle = this.color;
         this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
-        // this.ctxCenter.beginPath();
+        this.ctxCenter.beginPath();
         this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
         this.ctxCenter.fill();
+        this.ctxCenter.closePath();
 
         // ring
         this.ctxMain.beginPath();
         this.ctxMain.translate(radius + this.offsetX, radius + this.offsetY);
         this.ctxMain.arc(0, 0, radius - this.padding, 3 * Math.PI / 4, Math.PI / 4);
         this.ctxMain.stroke();
-        this.ctxMain.ctx.closePath();
+        this.ctxMain.closePath();
 
         // labels
         this.ctxMain.textBaseline = "middle";
@@ -95,6 +100,9 @@
             this.ctxMain.translate(0, radius * 0.8);
             this.ctxMain.rotate(-ang);
         }
+
+        this.ctxMain.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctxCenter.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         this.drawNeedle();
     }
@@ -117,6 +125,8 @@
         this.ctxNeedle.rotate(-this.startAngle);
         this.ctxNeedle.rotate(-ang);
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
+
+        this.ctxNeedle.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }    
 
     protected onSizeChange(): void {

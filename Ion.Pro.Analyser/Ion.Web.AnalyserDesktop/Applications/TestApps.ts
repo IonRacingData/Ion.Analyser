@@ -263,7 +263,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
     gauge: GaugeController;
     val: number = 0;
 
-    
+    private eh: EventHandler = new EventHandler();
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
@@ -288,6 +288,9 @@ class GaugeTester implements IApplication, IViewer<Point> {
 
         this.window.addEventListener(AppWindow.event_resize, () => {
             this.gauge.setSize(this.window.width, this.window.height);
+        });
+        this.eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
+            this.gauge.updateColors();
         });
     }
 
