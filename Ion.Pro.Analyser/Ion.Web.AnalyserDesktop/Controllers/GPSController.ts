@@ -1,18 +1,28 @@
 ﻿class GPSController extends CanvasController {
-    posData: GPSPlotData;
-    ctxMain: ContextFixer;
-    relSize: IRelativeSize;
-    padding: number;
-    absWidth: number;
-    absHeight: number;
+    private data: IDataSource<Point3D>;
+    private lastID: string = "";
+    private lastSensorInfo: sensys.ISensorInformation;   
+
+    private ctxMain: ContextFixer;
+    private relSize: IRelativeSize;
+    private availablePlotWidth: number;
+    private availablePlotHeight: number;
+    private plotWidth: number;
+    private plotHeight: number;
+    private padding: number;
+
     color: string = "white";
 
     constructor(width: number, height: number) {
-        super();
+        super();        
         this.movePoint = new Point(0, 0);
         this.scalePoint = new Point(1, 1);
         this.width = width;
         this.height = height;
+        this.padding = this.width * 0.05;
+
+        this.availablePlotWidth = this.width - (this.padding * 2);
+        this.availablePlotHeight = this.height - (this.padding * 2);
     }
 
     public generate(): HTMLElement {
@@ -22,53 +32,44 @@
 
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.width = this.canvas.getWidth();
-        this.height = this.canvas.getHeight();
-        this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
-        this.relSize = null;
-        
+        this.canvas.setSize(this.width, this.height);
         return this.wrapper;
     }
 
     protected onSizeChange(): void {
         this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;
-        this.width -= this.padding * 2;
-        this.height -= this.padding * 2;
+        this.availablePlotWidth = this.width - (this.padding * 2);
+        this.availablePlotHeight = this.height - (this.padding * 2);
+    
         this.draw();
     }
 
     protected draw(): void {
-        if (this.posData) {
-
+        if (this.data && this.data.length() > 0) {
             let offsetX: number;
             let offsetY: number;
+            let posDataLength: number = this.data.length();
 
             this.ctxMain.clear();
             this.ctxMain.beginPath();
             this.ctxMain.strokeStyle = this.color;
-            this.findMinMax();
 
             this.rescale();
-            this.rescale();
 
-            if (this.posData.points.length > 0) {
-                let firstPoint: Point = this.getAbsolute(new Point(this.posData.points[0].x, this.posData.points[0].y));
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
-                this.ctxMain.moveTo(firstPoint.x + this.padding + offsetX, firstPoint.y + this.padding - offsetY);
+            offsetX = (this.width - this.plotWidth) / 2;
+            offsetY = (this.height - this.plotHeight) / 2;
+
+            if (posDataLength > 0) {
+                let firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
+                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
-            for (let i = 0; i < this.posData.points.length; i++) {
+            for (let i = 0; i < posDataLength; i++) {
 
-                let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);
-
-                offsetX = (this.width - this.absWidth) / 2;
-                offsetY = (this.height - this.absHeight) / 2;
+                let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 let absPoint: Point = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + this.padding + offsetX, absPoint.y + this.padding - offsetY);
+                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
             this.ctxMain.stroke();
@@ -76,13 +77,15 @@
     }
 
     private findMinMax(): void {
-        if (this.relSize === null && this.posData.points.length > 0) {
-            this.relSize = { min: null, max: null };
-            this.relSize.min = new Point(this.posData.points[0].x, this.posData.points[0].y);
-            this.relSize.max = new Point(this.posData.points[0].x, this.posData.points[0].y);            
+        let posDataLength: number = this.data.length();
+
+        if (posDataLength > 0) {
+            let firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+            this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
         }
-        for (let i = 0; i < this.posData.points.length; i++) {
-            let relPoint: Point = new Point(this.posData.points[i].x, this.posData.points[i].y);
+
+        for (let i = 0; i < posDataLength; i++) {
+            let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
 
             this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
             this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
@@ -92,13 +95,13 @@
     }
 
     private rescale(): void {
+        this.findMinMax();        
 
-        let newWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        let newHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
-        this.absWidth = newWidth;
-        this.absHeight = newHeight;
-        let xRatio: number = this.width / newWidth;
-        let yRatio: number = this.height / newHeight;
+        let oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        let oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+
+        let xRatio: number = this.availablePlotWidth / oldWidth;
+        let yRatio: number = this.availablePlotHeight / oldHeight;
         let ratio: number = Math.min(xRatio, yRatio);
 
         let first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
@@ -110,16 +113,33 @@
         sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
-    }
 
-    public setData(d: GPSPlotData): void {
-        this.posData = d;
-        console.log(d);
-        this.onDataChange();
+        this.plotWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        this.plotHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
     }
 
     protected onDataChange(): void {
         this.draw();
+    }
+
+    public setData(d: IDataSource<Point3D>) {
+        this.data = d;
+
+        if (this.data) {
+            let curID = this.data.infos.Keys[0];
+            if (curID != this.lastID) {
+                this.lastSensorInfo = this.data.infos.SensorInfos[0];
+                this.lastID = curID;
+                /*kernel.senMan.getSensorInfoNew(this.data, (i: SensorInformation) => {
+                    this.lastSensorInfo = i;
+                    this.lastID = this.data.infos.IDs[0];                    
+                    this.onDataChange();
+                });*/
+            }
+            else {
+                this.onDataChange();
+            }
+        }
     }
 }
 

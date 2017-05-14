@@ -1,0 +1,447 @@
+﻿[
+  {
+    "Key": "SPEED",
+    "Name": "Speed",
+    "Unit": "km/h"
+  },
+  {
+    "Key": "VOLT_12",
+    "Name": "Voltage 12",
+    "Unit": "V"
+  },
+  {
+    "Key": "CURRENT",
+    "Name": "Current",
+    "Unit": "A"
+  },
+  {
+    "Key": "TEMP_MONO",
+    "Name": "Temperature Monocoque",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "TEMP_MONO_ENGINE",
+    "Name": "Temperature Engine Room",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "TEMP_MAIN_AREA",
+    "Name": "Temperature Main Monocoque",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "CRITICAL_ECU",
+    "Name": "Critical ECU Error",
+    "Unit": ""
+  },
+  {
+    "Key": "ERROR_PEDAL",
+    "Name": "Error Pedal Module",
+    "Unit": ""
+  },
+  {
+    "Key": "ERROR_BRAKE_PRESSURE",
+    "Name": "Error brake pressure",
+    "Unit": ""
+  },
+  {
+    "Key": "ERROR_BRAKE_W_THROTTLE",
+    "Name": "Error Brake While Throttle",
+    "Unit": ""
+  },
+
+  // #####--Gyro Accs and mag--######
+
+  {
+    "Key": "GYRO_X",
+    "Name": "Gyroscope X Axis",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "GYRO_Y",
+    "Name": "Gyroscope Y Axis",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "GYRO_Z",
+    "Name": "Gyroscope Z Axis",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "ACCEL_X",
+    "Name": "Accelerometer X Axis",
+    "Unit": "m/s^2"
+  },
+  {
+    "Key": "ACCEL_Y",
+    "Name": "Accelerometer Y Axis",
+    "Unit": "m/s^2"
+  },
+  {
+    "Key": "ACCEL_Z",
+    "Name": "Accelerometer Z Axis",
+    "Unit": "m/s^2"
+  },
+  {
+    "Key": "MAG_X",
+    "Name": "Magnetomerer X Axis",
+    "Unit": "T;"
+  },
+  {
+    "Key": "MAG_Y",
+    "Name": "Magnetomerer Y Axis",
+    "Unit": "T"
+  },
+  {
+    "Key": "MAG_Z",
+    "Name": "Magnetomerer Z Axis",
+    "Unit": "T"
+  },
+
+  // #####--BMS_RAW values--#####
+
+  {
+    "Key": "BMS_RAW_1",
+    "Name": "Raw BMS Value 1",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_2",
+    "Name": "Raw BMS Value 2",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_3",
+    "Name": "Raw BMS Value 3",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_4",
+    "Name": "Raw BMS Value 4",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_5",
+    "Name": "Raw BMS Value 5",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_6",
+    "Name": "Raw BMS Value 6",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_7",
+    "Name": "Raw BMS Value 7",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_8",
+    "Name": "Raw BMS Value 8",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_9",
+    "Name": "Raw BMS Value 9",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_CUSTOM",
+    "Name": "Raw Custom BMS Value",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RAW_NLG5",
+    "Name": "Raw NLG5 BMS Value",
+    "Unit": ""
+  },
+
+  // #####--BMS_VOLT--#####
+
+  {
+    "Key": "BMS_VOLT",
+    "Name": "BMS Voltage",
+    "Unit": "V"
+  },
+  {
+    "Key": "BMS_VOLT_MIN",
+    "Name": "BMS Minimum Voltage",
+    "Unit": "V"
+  },
+  {
+    "Key": "BMS_VOLT_MIN_ID",
+    "Name": "BMS Minimum Voltage ID",
+    "Unit": "ID"
+  },
+  {
+    "Key": "BMS_VOLT_MAX",
+    "Name": "BMS Maximum Voltage",
+    "Unit": "V"
+  },
+  {
+    "Key": "BMS_VOLT_MAX_ID",
+    "Name": "BMS Maximum Voltage ID",
+    "Unit": "ID"
+  },
+
+  // #####--BMS_CURRENT--#####
+
+  {
+    "Key": "BMS_CURRENT",
+    "Name": "BMS Current",
+    "Unit": "A"
+  },
+  {
+    "Key": "BMS_CHARGELIMIT",
+    "Name": "BMS Charge Limit",
+    "Unit": "A"
+  },
+  {
+    "Key": "BMS_DISCHARGELIMIT",
+    "Name": "BMS Discharge Limit",
+    "Unit": "A"
+  },
+
+  {
+    "Key": "BMS_TOTAL_ENERGY_IN",
+    "Name": "BMS Total Energy In",
+    "Unit": "kWh"
+  },
+  {
+    "Key": "BMS_TOTAL_ENERGY_OUT",
+    "Name": "BMS Total Energy Out",
+    "Unit": "kWh"
+  },
+
+  // #####--BMS Battery Info--#####
+
+  {
+    "Key": "BMS_SOC",
+    "Name": "BMS State Of Charge",
+    "Unit": "%"
+  },
+  {
+    "Key": "BMS_DOD",
+    "Name": "BMS Depth Of Discharge",
+    "Unit": "AH"
+  },
+  {
+    "Key": "BMS_CAPACITY",
+    "Name": "BMS Battery Capacity",
+    "Unit": "AH"
+  },
+  {
+    "Key": "BMS_00H",
+    "Name": "BMS Should only be 00",
+    "Unit": "%"
+  },
+  {
+    "Key": "BMS_SOH",
+    "Name": "BMS State Of Health",
+    "Unit": "%"
+  },
+
+  // #####--BMS_TEMP--#####
+
+  {
+    "Key": "BMS_TEMP_BAT",
+    "Name": "BMS Battery Temperature",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MIN",
+    "Name": "BMS Battery Minimum Temperature",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MIN_ID",
+    "Name": "BMS Battery Minimum Temperature ID",
+    "Unit": "ID"
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MAX",
+    "Name": "BMS Battery Maximum Temperature",
+    "Unit": "&deg;C"
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MAX_ID",
+    "Name": "BMS Battery Maximum Temperature ID",
+    "Unit": "ID"
+  },
+
+  // #####--BMS_RES--#####
+
+  {
+    "Key": "BMS_RES_BAT",
+    "Name": "BMS Battery Resistance",
+    "Unit": "Ohm"
+  },
+  {
+    "Key": "BMS_RES_BAT_MIN",
+    "Name": "BMS Battery Minimum Resistance",
+    "Unit": "Ohm"
+  },
+  {
+    "Key": "BMS_RES_BAT_MIN_ID",
+    "Name": "BMS Battery Minimum Resistance ID",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_RES_BAT_MAX",
+    "Name": "BMS Battery Maximum Resistance",
+    "Unit": "Ohm"
+  },
+  {
+    "Key": "BMS_RES_BAT_MAX_ID",
+    "Name": "BMS Battery Maximum Resistance ID",
+    "Unit": ""
+  },
+
+  // #####--BMS State Info--#####
+
+  {
+    "Key": "BMS_STATE",
+    "Name": "BMS State",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_TIMER",
+    "Name": "BMS Timer",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_FLAGS",
+    "Name": "BMS Flags",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_LASTFAULT",
+    "Name": "BMS Last Fault",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_LEVEL",
+    "Name": "BMS Level",
+    "Unit": ""
+  },
+  {
+    "Key": "BMS_WARNING",
+    "Name": "BMS Warning",
+    "Unit": ""
+  },
+
+
+  // #####--Car Info--#####
+
+  {
+    "Key": "BAR",
+    "Name": "Barometer",
+    "Unit": "?"
+  },
+  {
+    "Key": "BUTTON",
+    "Name": "Button in dashboard",
+    "Unit": ""
+  },
+
+  {
+    "Key": "BRAKE_LIGHT",
+    "Name": "Brake light",
+    "Unit": ""
+  },
+  {
+    "Key": "BRAKE_FORCE_FRONT",
+    "Name": "Brake force front",
+    "Unit": "Bar"
+  },
+  {
+    "Key": "BRAKE_FORCE_BACK",
+    "Name": "Brake force back",
+    "Unit": "Bar"
+  },
+  {
+    "Key": "PACKAGESHIFT",
+    "Name": "Indicator for Merged data sets",
+    "Unit": ""
+  },
+
+
+  // #####--GPS--######
+
+  {
+    "Key": "GPS_LAT",
+    "Name": "GPS Latitude",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "GPS_LONG",
+    "Name": "GPS Longitude",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "GPS_HIGHRES",
+    "Name": "GPS High resolution part of GPS",
+    "Unit": "&deg;"
+  },
+  {
+    "Key": "SIN1",
+    "Name": "Sinus 1",
+    "Unit": "%"
+  },
+  {
+    "Key": "SIN2",
+    "Name": "Sinus 2",
+    "Unit": "%"
+  },
+  {
+    "Key": "COS1",
+    "Name": "Cos 1",
+    "Unit": "%"
+  },
+
+  // #####--Motor Controller--#####
+  {
+    "Key": "MC_RAW",
+    "Name": "Motor Controller Raw"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_Q",
+    "Name": "MC VSI Current Q Axis"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_D",
+    "Name": "MC VSI Current Q Axis"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_Q",
+    "Name": "MC VSI Voltage Q Axis"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_D",
+    "Name": "MC VSI Voltage Q Axis"
+  },
+  {
+    "Key": "MC_MOTOR_POWER",
+    "Name": "MC Motor Power"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED",
+    "Name": "MC Motor Speed"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED_FILTER",
+    "Name": "MC Filted Motor Speed"
+  },
+  {
+    "Key": "MC_TEMP_MOTOR",
+    "Name": "MC Temperature Motor"
+  },
+  {
+    "Key": "MC_TEMP_IGBT",
+    "Name": "MC Temperature IGBT"
+  },
+  {
+    "Key": "MC_TEMP_VSI_AMBIENT",
+    "Name": "MC Temperature Ambient VSI"
+  }
+]

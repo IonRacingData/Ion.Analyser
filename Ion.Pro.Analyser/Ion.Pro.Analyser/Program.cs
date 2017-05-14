@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Net = System.Net;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Ion.Pro.Analyser.Data;
 using Ion.Pro.Analyser.SenSys;
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Threading;
+using Ion.Pro.Analyser.Web;
 
 namespace Ion.Pro.Analyser
 {
@@ -17,6 +20,7 @@ namespace Ion.Pro.Analyser
         OffLine,
         LiveTest,
         LiveTestSin,
+        LiveTestLegacy,
         SmallTest
     }
 
@@ -24,13 +28,9 @@ namespace Ion.Pro.Analyser
 
     class Program
     {
-        static Dictionary<string, Type> controllers = new Dictionary<string, Type>();
         static RunMode runMode = RunMode.OffLine;
-        static string DefaultAction = "index";
-        static string DefaultPath = "/home/index";
-        //public static string ContentPath = "../../Content/";
-        public static string ContentPath = "../../../Ion.Web.AnalyserDesktop/";
-        //public static string ContentPath = "html/";
+        
+
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
         {
@@ -48,6 +48,8 @@ namespace Ion.Pro.Analyser
                 (byte)(pack.TimeStamp >> 24),
             };
         }
+        public static string plinkPath;
+        public static LegacySSHManager rpiManager { get; private set; }
 
         static string[] files = new string[]
         {
@@ -59,6 +61,75 @@ namespace Ion.Pro.Analyser
         };
 
         static void Main(string[] args)
+        {
+            //manager.Load("../../Data/Sets/126_usart_data.log16");
+
+            //Console.Read();
+            //return;
+            try
+            {
+                plinkPath = LegacyPIService.TryFindPlink();
+                if (plinkPath != null)
+                {
+                    rpiManager = new LegacySSHManager(plinkPath);
+                    //rpiManager.Connect();
+                    //Console.ReadLine();
+                }
+            }
+            catch
+            {
+                Console.WriteLine("PLink not available");
+            }
+            Console.WriteLine("Ion Analyser Server");
+            try
+            {
+                InitSenSys();
+                //InitSensorStore();
+                //InsertSensorTestData();
+                IonAnalyserWebPage.Run();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ohh no, something horrible went wrong");
+                Console.WriteLine(e);
+            }
+            bool avaiableRead = true;
+            try
+            {
+                Console.Read();
+            }
+            catch
+            {
+                avaiableRead = false;
+            }
+
+            if (!avaiableRead)
+            {
+                Console.CancelKeyPress += Console_CancelKeyPress;
+                do
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+                while (!exit);
+            }
+        }
+
+        static bool exit = false;
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            exit = true;
+        }
+
+        static void InitSenSys()
+        {
+            SensorManager manager = SensorManager.GetDefault();
+            manager.RegisterFileProvider("log16", new LegacySensorProvider());
+            manager.RegisterFileProvider("log", new LegacySensorProvider());
+            ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
+        }
+
+        static void CreateSinData()
         {
             SensorPackage pack = new SensorPackage();
             BinaryWriter bw = new BinaryWriter(new FileStream("../../Data/sinus.log16", FileMode.Create));
@@ -82,23 +153,6 @@ namespace Ion.Pro.Analyser
 
             }
             bw.Close();
-
-
-            Console.WriteLine("Ion Analyser Server");
-            try
-            {
-                InitSensorStore();
-                InsertSensorTestData();
-                InitControllers();
-                HttpServer server = new HttpServer();
-                server.Bind(Net.IPAddress.Any, 4562, WebHandlerAsync);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Ohh no, something horrible went wrong");
-                Console.WriteLine(e);
-            }
-            Console.Read();
         }
 
         static void InitSensorStore()
@@ -112,8 +166,6 @@ namespace Ion.Pro.Analyser
             SensorDataStore.GetDefault().ReaderLinker.Add("gpx", typeof(GPXDataReader));
 
         }
-
-
 
         static void InsertSensorTestData()
         {
@@ -153,9 +205,11 @@ namespace Ion.Pro.Analyser
                     store.Add(new SensorPackage() { ID = 2, Value = 2, TimeStamp = 3 });
                     store.Add(new SensorPackage() { ID = 3, Value = 1000, TimeStamp = 3 });
                     break;
+                case RunMode.LiveTestLegacy:
+                    Task.Run(() => LegacyPIService.ReadLegacyTelemetry());
+                    break;
             }
         }
-
 
 
         static void DataInserter(string file)
@@ -183,183 +237,209 @@ namespace Ion.Pro.Analyser
                 Console.WriteLine(e);
             }
         }
+    }
 
-        static HttpAction testAction = null;
-        static SessionService service = new SessionService();
+    class LegacySSHManager
+    {
+        public string plinkPath { get; private set; }
+        public string IPAddress { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        List<string> readBuffer = new List<string>();
+        StreamWriter stdIn;
+        StreamReader stdOut;
+        public bool Connected { get; private set; } = false;
+        Task readTask;
+        bool continueRead = true;
 
-        public static async Task WebHandlerAsync(HttpWrapper wrapper)
+        public LegacySSHManager(string plinkPath)
         {
-            wrapper.Watch.Mark("Entered handler");
-            ProtocolReader reader = new ProtocolReader(wrapper.Client.GetStream());
+            this.plinkPath = plinkPath;
+            IPAddress = "10.0.0.3";
+            username = "pi";
+            password = "raspberry";
 
-            TimingService Watch = wrapper.Watch;
-
-            HttpHeaderRequest request = await Task.Run(() => HttpHeaderRequest.ReadFromProtocolReader(reader));
-            Watch.Mark("Read and parsed http");
-            HttpHeaderResponse response = HttpHeaderResponse.CreateDefault(HttpStatus.OK200);
-            HttpContext context = new HttpContext() { Request = request, Response = response, Wrapper = wrapper };
-
-            HandleSession(context);
-
-            Watch.Mark("Handle Session");
-
-            HandleContext(context, Watch);
         }
 
-        private static void HandleSession(HttpContext context)
+        public void Connect()
         {
-            Session s;
-            if (context.Request.Cookies.ContainsKey(SessionService.sessionKey))
+            if (!Connected)
             {
-                s = service.GetOrCreate(context.Request.Cookies[SessionService.sessionKey]);
-            }
-            else
-            {
-                s = service.CreateSession();
-                context.Response.SetCookie.Add(new HttpCookie() { Key = SessionService.sessionKey, Value = s.Key });
-            }
-            context.Session = s;
-        }
+                string connectString = $"{username}@{IPAddress}";
+                ProcessStartInfo startInfo = new ProcessStartInfo(plinkPath, connectString);
+                startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.UseShellExecute = false;
 
-        private static void HandleContext(HttpContext context, TimingService Watch)
-        {
-            Stream s = context.Wrapper.Client.GetStream();
-            Watch.Mark("Got stream");
-
-            IActionResult result = HandleResult(context, Watch);
-            Watch.Mark("Finished handling request");
-
-            Task t = result.ExecuteResultAsync(new ActionContext() { HttpContext = context });
-            t.Wait();
-            Watch.Mark("Finished Result run");
-
-            byte[] data = context.Response.GetBytes();
-            s.Write(data, 0, data.Length);
-            
-            s.Flush();
-            Watch.Stop();
-            if (context.Wrapper.PreventClose)
-            {
-                context.SocketHandler?.Invoke(context);
-            }
-            else
-            {
-                s.Close();
-                context.Wrapper.Client.Close();
-
-                Console.WriteLine($"Request \"{context.Request.FullRelativePath}\" handled in: {Watch.Watch.ElapsedTicks / 10}µs");
-
-                bool printTimes = false;
-                if (printTimes)
+                Process p = new Process();
+                p.StartInfo = startInfo;
+                bool success = p.Start();
+                stdIn = p.StandardInput;
+                stdOut = p.StandardOutput;
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                bool timeout = false;
+                readCanceled = new CancellationTokenSource();
+                readTask = ReadInput(stdOut);
+                while (readBuffer.Count < 1)
                 {
-                    PrintTimes(Watch);
-                }
-            }
-
-        }
-
-        private static IActionResult HandleResult(HttpContext context, TimingService Watch)
-        {
-            string requestPath = context.Request.RelativePath;
-            FileInfo fi = null;
-            try
-            {
-                fi = new FileInfo(Path.Combine(ContentPath, context.Request.RelativePath.Remove(0, 1)));
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            IActionResult result;
-            Watch.Mark("Prepared variables");
-            if (fi.Exists)
-            {
-                result = new FileResult(fi.FullName);
-                Watch.Mark("Created File Result");
-            }
-            else
-            {
-                context.Response.ContentType = MimeTypes.GetMimeType(".html");
-
-                //{Controller}/{Action}
-                string[] requestParts = (requestPath.Length == 1 ? DefaultPath : requestPath ).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (requestParts.Length > 0 && controllers.ContainsKey(requestParts[0].ToLower()))
-                {
-                    string requestAction = (requestParts.Length > 1) ? requestParts[1].ToLower() : DefaultAction;
-
-                    Controller temp = (Controller)Activator.CreateInstance(controllers[requestParts[0].ToLower()]);
-                    temp.HttpContext = context;
-
-                    result = InvokeAction(temp, temp.AllActions[requestAction], context);
-                    
-                    //result = ((HttpAction)temp.AllActions[requestAction].CreateDelegate(typeof(HttpAction), temp))();
-                    Watch.Mark("Created Http Action Result");
-                }
-                else
-                {
-                    result = new ErrorResult(HttpStatus.NotFound404, "");
-                    Watch.Mark("Created Error Result");
-                }
-            }
-            return result;
-        }
-
-        private static IActionResult InvokeAction(Controller controller, MethodInfo info, HttpContext context)
-        {
-            List<object> allData = new List<object>();
-            ParameterInfo[] param = info.GetParameters();
-            foreach (ParameterInfo paramInfo in param)
-            {
-                string name = paramInfo.Name;
-                if (context.Request.GETParameters.ContainsKey(name))
-                {
-                    allData.Add(context.Request.GETParameters[name]);
-                }
-                else
-                {
-                    allData.Add(null);
-                }
-            }
-            return (IActionResult)info.Invoke(controller, allData.ToArray());
-        }
-
-        private static void PrintTimes(TimingService Watch)
-        {
-            long lastTime = 0;
-            StringBuilder builder = new StringBuilder();
-            foreach (Tuple<long, string> record in Watch.Records)
-            {
-                builder.AppendLine($"\t{record.Item1 / 10.0}µs (+{(record.Item1 - lastTime) / 10.0}µs) {record.Item2}");
-                lastTime = record.Item1;
-            }
-            Console.WriteLine(builder.ToString());
-        }
-
-        public static string[] ReadHttp(ProtocolReader reader)
-        {
-            string currentLine = "";
-            List<string> allLines = new List<string>();
-            while ((currentLine = reader.ReadLine()).Length > 0)
-            {
-                allLines.Add(currentLine);
-            }
-            return allLines.ToArray();
-        }
-
-        static void InitControllers()
-        {
-            Assembly[] allAssembly = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly a in allAssembly)
-            {
-                Type[] types = a.GetTypes();
-                foreach (Type t in types)
-                {
-                    if (typeof(Controller).IsAssignableFrom(t) && t != typeof(Controller))
+                    if (watch.ElapsedMilliseconds > 5000)
                     {
-                        string name = t.Name.Replace("Controller", "").ToLower();
-                        controllers.Add(name, t);
+                        timeout = true;
+                        break;
                     }
+                    System.Threading.Thread.Yield();
+                }
+                watch.Stop();
+                if (!timeout)
+                {
+                    Connected = true;
+                    //readTask = ReadInput();
+                    stdIn.WriteLine(password);
+                }
+                else
+                {
+                    readCanceled.Cancel(true);
+                    Console.WriteLine("Connect to RPI Timed out, please check ip settings");
+                    stdIn.WriteLine((char)3);
+                }
+            }
+        }
+        CancellationTokenSource readCanceled = new CancellationTokenSource();
+
+        private async Task ReadInput(StreamReader stdOut)
+        {
+            while (continueRead)
+            {
+                byte[] readBuffer = new byte[1024];
+                int read = 0;
+                try
+                {
+                    read = await stdOut.BaseStream.ReadAsync(readBuffer, 0, 1024, readCanceled.Token);
+                }
+                catch (Exception e)
+                {
+
+                }
+                if (readCanceled.IsCancellationRequested)
+                    break;
+                List<byte> removedOtherChars = new List<byte>();
+                string s = Encoding.Default.GetString(readBuffer, 0, read);
+                Console.Write(s);
+                this.readBuffer.Add(s);
+            }
+        }
+
+        public void StartReceive()
+        {
+            if (Connected)
+            {
+                stdIn.WriteLine("sudo ./start");
+            }
+        }
+
+        public void Stop()
+        {
+            //System.Threading.Thread.Sleep(5000);
+            stdIn.WriteLine((char)3);
+        }
+
+    }
+
+    public class LegacyPIService
+    {
+        public static void ReadLegacyTelemetry()
+        {
+            UdpClient client = new UdpClient(16300);
+            DateTime startTime = DateTime.Now;
+            while (true)
+            {
+                Net.IPEndPoint endPoint = new Net.IPEndPoint(Net.IPAddress.Any, 0);
+                byte[] bytes = client.Receive(ref endPoint);
+
+                for (int i = 0; i < bytes.Length; i += 6)
+                {
+                    SensorPackage package = new SensorPackage();
+                    package.ID = BitConverter.ToUInt16(bytes, i);
+                    package.Value = BitConverter.ToInt32(bytes, i + 2);
+                    package.TimeStamp = (long)(DateTime.Now - startTime).TotalMilliseconds;
+                    SensorDataStore.GetDefault().AddLive(package);
+                }
+            }
+        }
+
+        public static string TryFindPlink()
+        {
+            string[] searchPaths = new[] {
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
+
+            foreach (string s in searchPaths)
+            {
+                DirectoryInfo di = new DirectoryInfo(s);
+                DirectoryInfo[] dis = di.GetDirectories("putty");
+                if (dis.Length > 0)
+                {
+                    FileInfo fi = dis[0].GetFiles("plink.exe").FirstOrDefault();
+                    if (fi != null)
+                    {
+                        Console.WriteLine("Found plink: " + fi.FullName);
+                        return fi.FullName;
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    public class NewSensorComService : ComBusClient
+    {
+        List<RealSensorPackage> SendCache = new List<RealSensorPackage>();
+        DateTime lastSend = new DateTime();
+        SensorManager manager;
+
+        public NewSensorComService(SensorManager manager)
+        {
+            this.manager = manager;
+            this.manager.DataReceived += SensorManager_DataReceived;
+        }
+
+        private void SensorManager_DataReceived(object sender, SensorEventArgs e)
+        {
+            DateTime current = DateTime.Now;
+            SendCache.Add(e.Package);
+            if ((current - lastSend).TotalMilliseconds > 100)
+            {
+                List<byte> allBytes = new List<byte>();
+                foreach (RealSensorPackage sp in SendCache)
+                {
+                    allBytes.AddRange(sp.GetBinary());
+                }
+                SendCache.Clear();
+                ComBus.SendMessage(new ComMessage()
+                {
+                    MessageId = 10,
+                    Status = (int)ComMessageStatus.Request110,
+                    Path = "/sensor/update",
+                    NodeId = this.Id,
+                    Data = JSONObject.Create(new { Sensors = Convert.ToBase64String(allBytes.ToArray()) }).ToJsonString()
+                });
+
+                lastSend = current;
+            }
+        }
+
+        public override void ReceiveMessage(ComMessage message)
+        {
+            string[] parts = message.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts[0] == "sensor")
+            {
+                if (parts[1] == "getdata")
+                {
+                    SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(manager.GetBinaryData(package.dataset, package.num)) }, message, this);
                 }
             }
         }
@@ -367,6 +447,7 @@ namespace Ion.Pro.Analyser
 
     public class SensorNumPackage
     {
+        public string dataset { get; set; }
         public int num { get; set; }
     }
 

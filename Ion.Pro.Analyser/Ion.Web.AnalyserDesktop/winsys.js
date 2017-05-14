@@ -6,6 +6,8 @@ var WindowManager = (function () {
         this.events = {};
         this.tileZone = 20;
         this.topBar = 40;
+        this.availableThemes = ["app-style", "app-style-dark"];
+        this.avaiableRules = {};
         this.body = container;
         this.template = document.getElementById("temp-window");
         window.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
@@ -13,10 +15,25 @@ var WindowManager = (function () {
         window.addEventListener("touchmove", function (e) { return _this.touchMove(e); });
         window.addEventListener("touchend", function (e) { return _this.touchEnd(e); });
         this.eventManager = new EventManager();
-        //this.addEventListener = this.eventManager.addEventListener;
-        //this.addEventListener2 = this.eventManager.addEventListener;
-        //addEventListener
+        // this.addEventListener = this.eventManager.addEventListener;
+        // this.addEventListener2 = this.eventManager.addEventListener;
+        // addEventListener
+        this.modifyCurrentStylesheet();
     }
+    WindowManager.prototype.modifyCurrentStylesheet = function () {
+        for (var i = 0; i < document.styleSheets.length; i++) {
+            var a = document.styleSheets[i];
+            if (a.title == "app-style") {
+                this.current = a;
+                break;
+            }
+        }
+        this.avaiableRules = {};
+        for (var i = 0; i < this.current.cssRules.length; i++) {
+            var a = this.current.cssRules[i];
+            this.avaiableRules[a.selectorText] = a;
+        }
+    };
     WindowManager.prototype.mouseMove = function (e) {
         this.handleMouseMoving(e.pageX, e.pageY, e);
     };
@@ -63,8 +80,9 @@ var WindowManager = (function () {
     WindowManager.prototype.getWindowAt = function (x, y, ignoreActive) {
         for (var i = this.order.length - 1; i >= 0; i--) {
             var curWindow = this.windows[i];
-            if (ignoreActive && curWindow === this.activeWindow)
+            if (ignoreActive && curWindow === this.activeWindow) {
                 continue;
+            }
             if (this.intersects(x, y, curWindow)) {
                 return curWindow;
             }
@@ -78,7 +96,7 @@ var WindowManager = (function () {
             && y < window.y + window.totalHeight;
     };
     WindowManager.prototype.mouseUp = function (e) {
-        //console.log(e);
+        // console.log(e);
         var x = e.layerX;
         var y = e.layerY;
         var appWindow = this.getWindowAt(x, y, true);
@@ -102,15 +120,23 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
-        //window.setTitle(title);
+        // window.setTitle(title);
         window.title = title;
         app.windows.push(window);
         this.registerWindow(window);
         return window;
     };
     WindowManager.prototype.makeWindow = function (app) {
+        var _this = this;
         var tempWindow = new AppWindow(app);
+        var extra = this.windows.length % 10 * 50;
+        tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
+        tempWindow.addEventListener(AppWindow.event_update, function () {
+            _this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        });
         return tempWindow;
+    };
+    WindowManager.prototype.appWindow_update = function () {
     };
     WindowManager.prototype.registerWindow = function (app) {
         app.winMan = this;
@@ -120,6 +146,32 @@ var WindowManager = (function () {
         this.reorderWindows();
         this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
+    };
+    WindowManager.prototype.getRule = function (name) {
+        if (this.avaiableRules[name]) {
+            return this.avaiableRules[name];
+        }
+        console.log("The css rule: " + name + " does not exist");
+        return null;
+    };
+    WindowManager.prototype.changeTheme = function (theme) {
+        var _this = this;
+        var style = document.getElementById("main-theme");
+        if (navigator.userAgent.match(/firefox/i)) {
+            style.onload = function () {
+                console.log("hello");
+                _this.modifyCurrentStylesheet();
+                _this.raiseEvent(WindowManager.event_themeChange, null);
+            };
+        }
+        else {
+            setTimeout(function () {
+                console.log("hello");
+                _this.modifyCurrentStylesheet();
+                _this.raiseEvent(WindowManager.event_themeChange, null);
+            }, 200);
+        }
+        style.href = "/" + theme + ".css";
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
         var div = document.createElement("div");
@@ -173,4 +225,6 @@ WindowManager.event_globalUp = "globalUp;";
 WindowManager.event_windowOpen = "windowOpen";
 WindowManager.event_windowSelect = "windowSelect";
 WindowManager.event_windowClose = "windowClose";
+WindowManager.event_windowUpdate = "windowUpdate";
+WindowManager.event_themeChange = "themeChange";
 //# sourceMappingURL=winsys.js.map

@@ -6,6 +6,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
+        this._showTaskbar = true;
         this.topMost = false;
         this.eventMan = new EventManager();
         this.outerBoxMargin = 8;
@@ -31,7 +32,7 @@ var AppWindow = (function () {
         this.setPos(300, 50);
         this.setSize(500, 400);
         this.windowElement = handle.getElementsByClassName("window")[0];
-        this.content = this.sizeHandle; //<HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.content = this.sizeHandle; // <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
         this.content.addEventListener("mousemove", function (e) { return _this.content_mouseMove(e); });
     }
     Object.defineProperty(AppWindow.prototype, "title", {
@@ -41,6 +42,7 @@ var AppWindow = (function () {
         set: function (value) {
             this._title = value;
             this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
+            this.onUpdate();
         },
         enumerable: true,
         configurable: true
@@ -55,6 +57,17 @@ var AppWindow = (function () {
     Object.defineProperty(AppWindow.prototype, "totalHeight", {
         get: function () {
             return this.windowElement.clientHeight;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AppWindow.prototype, "showTaskbar", {
+        get: function () {
+            return this._showTaskbar;
+        },
+        set: function (value) {
+            this._showTaskbar = value;
+            this.onUpdate();
         },
         enumerable: true,
         configurable: true
@@ -74,7 +87,7 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.header_mouseDown = function (e) {
         e.stopPropagation();
-        //console.log("headerDown");
+        // console.log("headerDown");
         this.deltaX = this.handle.offsetLeft - e.pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.pageY + this.outerBoxMargin;
         this.winMan.dragging = true;
@@ -82,7 +95,7 @@ var AppWindow = (function () {
     };
     AppWindow.prototype.header_touchStart = function (e) {
         e.stopPropagation();
-        //e.preventDefault();
+        // e.preventDefault();
         console.log(e);
         this.deltaX = this.handle.offsetLeft - e.targetTouches[0].pageX + this.outerBoxMargin;
         this.deltaY = this.handle.offsetTop - e.targetTouches[0].pageY + this.outerBoxMargin;
@@ -155,8 +168,9 @@ var AppWindow = (function () {
         for (var i = 0; i < 4; i++) {
             curHandle.style.width = "100%";
             curHandle.style.height = "100%";
-            if (i == 3)
+            if (i === 3) {
                 break;
+            }
             curHandle = curHandle.parentElement;
         }
         curHandle.style.padding = "0";
@@ -174,6 +188,12 @@ var AppWindow = (function () {
     AppWindow.prototype.changeStateTo = function (state) {
         this.prevState = this.state;
         this.state = state;
+    };
+    AppWindow.prototype.remoteShadow = function () {
+        this.windowElement.style.boxShadow = "none";
+    };
+    AppWindow.prototype.restoreShadow = function () {
+        this.windowElement.style.boxShadow = null;
     };
     /*Events*/
     AppWindow.prototype.onResize = function () {
@@ -194,6 +214,9 @@ var AppWindow = (function () {
     AppWindow.prototype.onDragRelease = function (x, y, window) {
         console.log("Release");
         this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
+    };
+    AppWindow.prototype.onUpdate = function () {
+        this.eventMan.raiseEvent(AppWindow.event_update, null);
     };
     AppWindow.prototype.close = function () {
         this.onClose();
@@ -334,10 +357,12 @@ var AppWindow = (function () {
         if (storeSize === void 0) { storeSize = true; }
         var newWidth = width + this.deltaX;
         var newHeight = height + this.deltaY;
-        if (newWidth < 230)
+        if (newWidth < 230) {
             newWidth = 230;
-        if (newHeight < 150)
+        }
+        if (newHeight < 150) {
             newHeight = 150;
+        }
         this.sizeHandle.style.width = (newWidth).toString() + "px";
         this.sizeHandle.style.height = (newHeight).toString() + "px";
         this.width = newWidth;
@@ -357,6 +382,7 @@ AppWindow.event_maximize = "maximize";
 AppWindow.event_mouseMove = "mouseMove";
 AppWindow.event_dragOver = "dragOver";
 AppWindow.event_dragRelease = "dragRelease";
+AppWindow.event_update = "update";
 AppWindow.event_close = "close";
 var AppMouseEvent = (function () {
     function AppMouseEvent(x, y) {

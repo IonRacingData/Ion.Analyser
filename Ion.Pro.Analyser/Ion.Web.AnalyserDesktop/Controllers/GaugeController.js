@@ -54,7 +54,7 @@ var GaugeController = (function (_super) {
         // center dot
         this.ctxCenter.fillStyle = this.color;
         this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
-        //this.ctxCenter.beginPath();
+        // this.ctxCenter.beginPath();
         this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
         this.ctxCenter.fill();
         // ring

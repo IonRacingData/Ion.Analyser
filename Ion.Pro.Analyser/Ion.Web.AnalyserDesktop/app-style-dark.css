@@ -13,7 +13,7 @@
 }
 
 .window {
-    background-color: white;
+    /*background-color: white;*/
     /*background-color: #262626;
     color: white;*/
     border-radius: 4px 4px 0 0;
@@ -47,6 +47,7 @@
     background-color: #1A1A1A;
     color: white;
     border-radius: 1px 1px 0 0;
+    border-bottom: none;
 }
 
 .window-control{
@@ -77,17 +78,18 @@
 }
 
 
-table.table {
-    border: 1px solid black;
-}
-
 .table tr:nth-child(2n) {
     background-color: #3c3c3c;
+}
+
+.table tr {
+    background-color: black;
 }
 
 .table thead {
     background-color: #111215;
     color: white;
+    border: none;
 }
 
 .table tr.error {
@@ -120,10 +122,6 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.plot-canvas {    
-    
-}
-
 .gauge-plot {
     color: lightgray;
     /* needle color */    
@@ -132,4 +130,17 @@ span.table-resize{
 
 .bar-controller {
     background-color: green;
+}
+
+.disabled {
+    color: darkgray;
+}
+
+.line-chart {
+    /*axes and labels*/
+    border-color: white;
+    /*grid*/
+    color: rgba(100,100,100,0.3);
+    /*marking fill*/
+    background-color: rgba(0,184,220,0.2);
 }

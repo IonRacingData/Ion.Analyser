@@ -9,22 +9,31 @@ var GridViewer = (function () {
         this.mk = new HtmlHelper();
         this.childWindows = [];
     }
-    GridViewer.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+    GridViewer.prototype.main = function (temp) {
+        console.log(temp);
+        this.window = kernel.winMan.createWindow(this.application, "New Grid");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
+        this.selectorWindow.content.style.background = "none";
+        this.selectorWindow.remoteShadow();
         this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
         this.selectorWindow.topMost = true;
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         this.selectorWindow.hide();
-        //(<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
+        // (<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
         var mk = this.mk;
         this.registerEvents(this.eh);
         var template = document.getElementById("temp-grid");
         var test = new GridHContainer(this);
         var clone = test.baseNode;
-        this.window.content.appendChild(clone);
+        if (temp) {
+            this.applyTemplate(temp);
+        }
+        else {
+            this.window.content.appendChild(clone);
+        }
         this.generateSelector();
         this.selectedContainer = test;
     };
@@ -42,11 +51,11 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.handle_release = function (dir) {
         var box = null;
-        if (this.selectedContainer.gridBoxes.length == 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length == 0) {
+        if (this.selectedContainer.gridBoxes.length === 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length === 0) {
             box = this.selectedContainer.gridBoxes[0];
         }
         else {
-            if (dir == "left") {
+            if (dir === "left") {
                 if (this.selectedContainer instanceof GridHContainer) {
                     box = this.selectedContainer.insertChildBefore(this.selectedBox);
                 }
@@ -59,7 +68,7 @@ var GridViewer = (function () {
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "right") {
+            else if (dir === "right") {
                 if (this.selectedContainer instanceof GridHContainer) {
                     box = this.selectedContainer.insertChildAfter(this.selectedBox);
                 }
@@ -72,7 +81,7 @@ var GridViewer = (function () {
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "up") {
+            else if (dir === "up") {
                 if (this.selectedContainer instanceof GridVContainer) {
                     box = this.selectedContainer.insertChildBefore(this.selectedBox);
                 }
@@ -85,7 +94,7 @@ var GridViewer = (function () {
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "down") {
+            else if (dir === "down") {
                 if (this.selectedContainer instanceof GridVContainer) {
                     box = this.selectedContainer.insertChildAfter(this.selectedBox);
                 }
@@ -101,12 +110,101 @@ var GridViewer = (function () {
         }
         var windowBody = kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
+        window.showTaskbar = false;
         window.changeWindowMode(WindowMode.BORDERLESSFULL);
         this.childWindows.push(window);
         box.content.appendChild(windowBody);
         window.recalculateSize();
         window.onResize();
         this.handleResize();
+    };
+    GridViewer.prototype.applyTemplate = function (gridTemplate) {
+        console.log(gridTemplate);
+        this.window.title = gridTemplate.name;
+        var dataSets = {};
+        for (var _i = 0, _a = gridTemplate.sensorsets; _i < _a.length; _i++) {
+            var a = _a[_i];
+            dataSets[a.key] = kernel.senMan.createDataSource(a);
+        }
+        console.log(dataSets);
+        this.handleHContainer(gridTemplate.grid, this.window.content, dataSets);
+        this.handleResize();
+    };
+    GridViewer.prototype.handleHContainer = function (template, body, dataSets) {
+        console.log("HCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridHContainer(this), this.handleVContainer, dataSets);
+    };
+    GridViewer.prototype.handleVContainer = function (template, body, dataSets) {
+        console.log("VCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridVContainer(this), this.handleHContainer, dataSets);
+    };
+    GridViewer.prototype.handleContainer = function (template, body, container, next, dataSets) {
+        console.log("Con");
+        console.log(this);
+        var lastBox = null; // = a.gridBoxes[0];
+        var _loop_1 = function (temp) {
+            if (lastBox == null) {
+                lastBox = container.gridBoxes[0];
+            }
+            else {
+                lastBox = container.insertChildAfter(lastBox);
+            }
+            if (GridViewer.isIGridLauncher(temp)) {
+                var app = kernel.appMan.start(temp.name);
+                if (temp.data) {
+                    var viewer_1 = app.application;
+                    if (sensys.SensorManager.isViewer(viewer_1)) {
+                        var singleViewer_1 = viewer_1;
+                        viewer_1.dataSource = dataSets[temp.data[0]];
+                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
+                            singleViewer_1.dataUpdate();
+                        });
+                    }
+                    else if (sensys.SensorManager.isCollectionViewer(viewer_1)) {
+                        var colViewer = viewer_1;
+                        var back = new Multicallback(temp.data.length, function () {
+                            viewer_1.dataUpdate();
+                        });
+                        for (var _i = 0, _a = temp.data; _i < _a.length; _i++) {
+                            var name_1 = _a[_i];
+                            viewer_1.dataCollectionSource.push(dataSets[name_1]);
+                            kernel.senMan.fillDataSource(dataSets[name_1], back.createCallback());
+                        }
+                    }
+                }
+                var window_1 = app.windows[0];
+                window_1.showTaskbar = false;
+                this_1.childWindows.push(window_1);
+                window_1.changeWindowMode(WindowMode.BORDERLESSFULL);
+                lastBox.content.appendChild(window_1.handle);
+                window_1.recalculateSize();
+                window_1.onResize();
+                this_1.handleResize();
+            }
+            else {
+                next.call(this_1, temp, lastBox.content, dataSets);
+            }
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = template.data; _i < _a.length; _i++) {
+            var temp = _a[_i];
+            _loop_1(temp);
+        }
+        body.appendChild(container.baseNode);
+    };
+    GridViewer.isIGridLauncher = function (data) {
+        if (data.name) {
+            return true;
+        }
+        return false;
+    };
+    GridViewer.isIGridTemplate = function (data) {
+        if (Array.isArray(data.data)) {
+            return true;
+        }
+        return false;
     };
     GridViewer.prototype.generateSelector = function () {
         var _this = this;
@@ -140,17 +238,19 @@ var GridViewer = (function () {
         eh.on(this.window, AppWindow.event_move, function () { return _this.handleMove(); });
     };
     GridViewer.prototype.handleClose = function () {
-        for (var i in this.childWindows) {
-            this.childWindows[i].close();
+        for (var _i = 0, _a = this.childWindows; _i < _a.length; _i++) {
+            var cur = _a[_i];
+            cur.close();
         }
         this.eh.close();
         this.selectorWindow.close();
     };
     GridViewer.prototype.handleResize = function () {
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
-        for (var i in this.childWindows) {
-            this.childWindows[i].recalculateSize();
-            this.childWindows[i].onResize();
+        for (var _i = 0, _a = this.childWindows; _i < _a.length; _i++) {
+            var cur = _a[_i];
+            cur.recalculateSize();
+            cur.onResize();
         }
     };
     GridViewer.prototype.handleMove = function () {
@@ -162,7 +262,7 @@ var GridViewer = (function () {
             && windowY > 0
             && windowX < this.window.width
             && windowY < this.window.height
-            && e.window != this.window) {
+            && e.window !== this.window) {
             var containers = this.window.handle.getElementsByClassName("grid-con");
             for (var i = containers.length - 1; i >= 0; i--) {
                 var cur = containers[i];
@@ -185,7 +285,8 @@ var GridViewer = (function () {
                     && windowY < cur.offsetTop + cur.offsetHeight) {
                     this.selectedBox = cur.gridBox;
                     this.selectorWindow.setPos(this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45, this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
-                    //this.selectedBox.box.offsetTop + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
+                    // this.selectedBox.box.offsetTop 
+                    // + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                     break;
                 }
             }
@@ -214,14 +315,28 @@ var GridViewer = (function () {
     GridViewer.prototype.globalUp = function (e) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
-        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window != this.window) {
+        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
             this.selectorWindow.hide();
         }
     };
     return GridViewer;
 }());
+var test = {
+    name: "some Grid",
+    sensorsets: null,
+    grid: {
+        data: [
+            { name: "LineChartTester", data: null },
+            {
+                data: [
+                    { name: "DataAssigner", data: null }
+                ]
+            }
+        ]
+    }
+};
 var GridContainer = (function () {
-    //last: HTMLElement;
+    // last: HTMLElement;
     function GridContainer(appWindow) {
         var _this = this;
         this.mk = new HtmlHelper();
@@ -270,7 +385,7 @@ var GridContainer = (function () {
         }
         var child = null;
         var insertString = "";
-        if (dir == "before") {
+        if (dir === "before") {
             child = this.createChildBefore(box);
             insertString = "beforebegin";
         }
@@ -281,8 +396,8 @@ var GridContainer = (function () {
         box.box.insertAdjacentElement(insertString, child);
         box.box.insertAdjacentElement(insertString, seperator);
         child.gridBox[this.set](1 / newTotal, 6);
-        //this.baseNode.appendChild(seperator);
-        //this.baseNode.appendChild(child);
+        // this.baseNode.appendChild(seperator);
+        // this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", function (e) {
             var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos], _this.correction);
             seperator.parentElement.onmousemove = function (e) {
@@ -337,7 +452,7 @@ var GridContainer = (function () {
     GridContainer.prototype.createRelativeChild = function (box, rel) {
         var nBox = new GridBox();
         for (var i = 0; i < this.gridBoxes.length; i++) {
-            if (this.gridBoxes[i] == box) {
+            if (this.gridBoxes[i] === box) {
                 this.gridBoxes.splice(i + rel, 0, nBox);
                 break;
             }
@@ -351,6 +466,7 @@ var GridContainer = (function () {
     };
     return GridContainer;
 }());
+/* tslint:enable:interface-name */
 var GridBox = (function () {
     function GridBox() {
         this.width = 1;

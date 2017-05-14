@@ -4,13 +4,21 @@
     mk = new HtmlHelper();
     sensorTable: HTMLElement;
     eh: EventHandler = new EventHandler();
+    selected: IViewerBase<any>;
 
-    main(): void {
+    main(preSelect: any): void {
         this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
+        this.selected = preSelect;
         this.draw();
-        this.eh.on(kernel.senMan, SensorManager.event_registerIPlot, () => this.draw());
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => this.draw());
+        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => this.draw());
+        this.eh.on(this.window, AppWindow.event_close, () => this.window_close());
+    }
+
+    private window_close() {
+        this.eh.close();
     }
 
     draw() {
@@ -19,64 +27,20 @@
         let divLeft = mk.tag("div");
         let divRight = this.sensorTable = mk.tag("div");
         let tableGen = new HtmlTableGen("table selectable");
-        let senMan: SensorManager = kernel.senMan;
-        let last: HTMLElement = null;
-        //let selectedPlot: IPlot = null;
+        let senMan: sensys.SensorManager = kernel.senMan;
+        let last: { item: HTMLElement } = { item: null };
+        // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
-        for (let i = 0; i < senMan.plotter.length; i++) {
-            let curPlot = senMan.plotter[i];
-            let isMulti = Array.isArray((<any>curPlot).plotData);
-
-            if (isMulti) {
-                tableGen.addRow([
-                    {
-                        event: "click", func: (e: Event) => {
-                            if (last !== null) {
-                                last.classList.remove("selectedrow");
-                            }
-                            last = this.findTableRow(<HTMLElement>e.target);
-                            last.classList.add("selectedrow");
-
-                            kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawMultiSensors(<IMultiPlot>curPlot, x));
-                        }
-                    },
-                    {
-                        event: "mouseenter", func: (e: Event) => {
-                            curPlot.plotWindow.highlight(true);
-                        }
-                    },
-                    {
-                        event: "mouseleave", func: (e: Event) => {
-                            curPlot.plotWindow.highlight(false);
-                        }
-                    },
-                ], curPlot.plotType, "Multi Plot");
+        for (let i = 0; i < senMan.viewers.length; i++) {
+            let curPlot = senMan.viewers[i];
+            let isMulti = (<ICollectionViewer<any>>curPlot).dataCollectionSource !== undefined;
+            if (this.selected) {
+                this.drawRow(curPlot, isMulti, tableGen, last, true);
             }
             else {
-                tableGen.addRow([
-                    {
-                        event: "click", func: (e: Event) => {
-                            if (last !== null) {
-                                last.classList.remove("selectedrow");
-                            }
-                            last = this.findTableRow(<HTMLElement>e.target);
-                            last.classList.add("selectedrow");
-
-                            kernel.senMan.getLoadedInfos((x: SensorInformation[]) => this.drawSingleSensors(<ISinglePlot>curPlot, x));
-                        },
-                    },
-                    {
-                        event: "mouseenter", func: (e: Event) => {
-                            curPlot.plotWindow.highlight(true);
-                        }
-                    },
-                    {
-                        event: "mouseleave", func: (e: Event) => {
-                            curPlot.plotWindow.highlight(false);
-                        }
-                    }
-                ], curPlot.plotType, "Single Plot");
+                this.drawRow(curPlot, isMulti, tableGen, last, false);
             }
+            
         }
 
 
@@ -93,6 +57,50 @@
         this.window.content.appendChild(divRight);
     }
 
+
+    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: { item: HTMLElement }, preSelect: boolean): void {
+        let name = "Single Plot";
+        if (isMulti) {
+            name = "Multi Plot";
+        }
+        tableGen.addRow([   
+            {
+                event: "click", func: (e: Event) => {
+                    if (last.item !== null) {
+                        last.item.classList.remove("selectedrow");
+                    }
+                    last.item = this.findTableRow(<HTMLElement>e.target);
+                    last.item.classList.add("selectedrow");
+                    let sources = kernel.senMan.getDataSources(curPlot.type);
+                    if (isMulti) {
+                        this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
+                    }
+                    else {
+                        this.drawSingleSensors(<IViewer<any>>curPlot, sources);
+                    }
+                }
+            },
+            {
+                event: "mouseenter", func: (e: Event) => {
+                    curPlot.plotWindow.highlight(true);
+                }
+            },
+            {
+                event: "mouseleave", func: (e: Event) => {
+                    curPlot.plotWindow.highlight(false);
+                }
+            },
+        ], curPlot.plotType, name);
+
+        let sources = kernel.senMan.getDataSources(curPlot.type);
+        if (isMulti) {
+            this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
+        }
+        else {
+            this.drawSingleSensors(<IViewer<any>>curPlot, sources);
+        }
+    }
+
     findTableRow(element: HTMLElement): HTMLElement {
         let curElement: HTMLElement = element;
 
@@ -103,39 +111,47 @@
     }
 
 
-    drawSingleSensors(plot: ISinglePlot, info: SensorInformation[]) {
-        this.drawSensors<ISinglePlot>(plot, info, this.createSingleSensor);
+    drawSingleSensors(plot: IViewer<any>, info: IDataSource<any>[]) {
+        this.drawSensors<IViewer<any>>(plot, info, this.createSingleSensor);
     }
 
-    drawMultiSensors(plot: IMultiPlot, info: SensorInformation[]) {
-        this.drawSensors<IMultiPlot>(plot, info, this.createMultiSensor);
+    drawMultiSensors(plot: ICollectionViewer<any>, info: IDataSource<any>[]) {
+        this.drawSensors<ICollectionViewer<any>>(plot, info, this.createMultiSensor);
     }
 
 
-    createSingleSensor(plot: ISinglePlot, sensor: SensorInformation): HTMLElement {
+    createSingleSensor(plot: IViewer<any>, sensor: IDataSource<any>): HTMLElement {
         let radio = <HTMLInputElement>this.mk.tag("input");
         radio.type = "radio";
         radio.name = "sensor";
-        if (plot.plotData && plot.plotData.ID == sensor.ID) {
+        if (plot.dataSource && plot.dataSource === sensor) {
             radio.checked = true;
         }
         radio.addEventListener("change", (e: Event) => {
             radio.disabled = true;
             console.log("Single checkbox click");
-            kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                plot.plotData = new PlotDataViewer(data);
+            plot.dataSource = sensor;
+            if (sensor.length() == 0) {
+                kernel.senMan.fillDataSource(sensor, () => {
+                    plot.dataUpdate();
+                    radio.disabled = false;
+                });
+            }
+            else
+            {
                 plot.dataUpdate();
                 radio.disabled = false;
-            });
+            }
+            
         });
         return radio;
     }
 
-    createMultiSensor(plot: IMultiPlot, sensor: SensorInformation): HTMLElement {
+    createMultiSensor(plot: ICollectionViewer<any>, sensor: IDataSource<any>): HTMLElement {
         let checkBox = <HTMLInputElement>this.mk.tag("input");
         checkBox.type = "checkbox";
-        for (let i = 0; i < plot.plotData.length; i++) {
-            if (plot.plotData[i].ID == sensor.ID) {
+        for (let i = 0; i < plot.dataCollectionSource.length; i++) {
+            if (plot.dataCollectionSource[i] === sensor) {
                 checkBox.checked = true;
                 break;
             }
@@ -145,16 +161,22 @@
             checkBox.disabled = true;
             console.log("Multi checkbox click");
             if (checkBox.checked) {
-                kernel.senMan.getPlotData(sensor.ID, (data: PlotData) => {
-                    plot.plotData.push(new PlotDataViewer(data));
+                plot.dataCollectionSource.push(sensor);
+                if (sensor.length() == 0) {
+                    kernel.senMan.fillDataSource(sensor, () => {
+                        plot.dataUpdate();
+                        checkBox.disabled = false;
+                    });
+                }
+                else {
                     plot.dataUpdate();
                     checkBox.disabled = false;
-                });
+                }
             }
             else {
-                for (let i = 0; i < plot.plotData.length; i++) {
-                    if (plot.plotData[i].ID == sensor.ID) {
-                        plot.plotData.splice(i, 1);
+                for (let i = 0; i < plot.dataCollectionSource.length; i++) {
+                    if (plot.dataCollectionSource[i] === sensor) {
+                        plot.dataCollectionSource.splice(i, 1);
                         plot.dataUpdate();
                         checkBox.disabled = false;
                         break;
@@ -162,37 +184,40 @@
                 }
             }
         });
-        return checkBox
+        return checkBox;
     }
 
-    drawSensors<T extends IPlot>(plot: T, info: SensorInformation[], drawMethod: (plot: T, sensor: SensorInformation) => HTMLElement) {
+    drawSensors<T extends IViewerBase<any>>(plot: T, info: IDataSource<any>[], drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
         this.sensorTable.innerHTML = "";
         for (let i = 0; i < info.length; i++) {
             let sensor = info[i];
             let ctrl = drawMethod.call(this, plot, sensor);
             let label = this.mk.tag("label");
-            label.title = sensor.ID.toString() + " (0x" + sensor.ID.toString(16) + ") " + (sensor.Key ? sensor.Key : " No key found");
-            if (!sensor.Key) {
+            let firstInfo = sensor.infos.SensorInfos[0];
+            label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
+            if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
-            label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
+            //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
+            label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
             this.sensorTable.appendChild(this.mk.tag("br"));
         }
     }
 }
 
-class TestDataViewer implements IApplication, ISinglePlot {
+/*class TestDataViewer implements IApplication, ISinglePlot {
     application: Application;
     window: AppWindow;
-    plotData: IPlotData;
+    plotData: IPlotData1;
     plotType: string = "Test Data Viewer";
     plotWindow: AppWindow;
+    plotDataType = PlotType.I1D;
 
     main(): void {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Test Data Viewer");
-        kernel.senMan.register(this);
+        kernel.senMan.registerDeprecated(this);
     }
 
     draw(): void {
@@ -205,14 +230,14 @@ class TestDataViewer implements IApplication, ISinglePlot {
 
         this.window.content.appendChild(gen.generate());
 
-        //console.log("Here we should draw something, but you know, we are lazy");
+        // console.log("Here we should draw something, but you know, we are lazy");
     }
 
     dataUpdate(): void {
         this.draw();
     }
 }
-
+*/
 class SensorSetSelector implements IApplication {
     public application: Application;
     private window: AppWindow;
@@ -222,25 +247,25 @@ class SensorSetSelector implements IApplication {
     public main(): void {
         this.wrapper = this.mk.tag("div");
         this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
-        requestAction("GetAvaiableSets", (data: SensorSetInformation[]) => this.drawData(data));
+        requestAction("GetAvaiableSets", (data: ISensorSetInformation[]) => this.drawData(data));
         this.window.content.appendChild(this.wrapper);
     }
 
-    private drawData(data: SensorSetInformation[]): void {
+    private drawData(data: ISensorSetInformation[]): void {
         this.wrapper.innerHTML = "";
         var table = new HtmlTableGen("table selectable");
-        
+
         table.addHeader("File name", "File size", "Sensor reader");
         for (let a of data) {
             table.addRow(
                 [
                     {
                         "event": "click",
-                        "func": (event: Event) =>
-                        {
-                            //console.log("you clicked on: " + a.FileName);
-                            requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
-                            kernel.senMan.clearCache();
+                        "func": (event: Event) => {
+                            // console.log("you clicked on: " + a.FileName);
+                            kernel.senMan.load(a.FullFileName);
+                            //requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
+                            //kernel.senMan.clearCache();
                         }
                     }
                 ],
@@ -254,7 +279,7 @@ class SensorSetSelector implements IApplication {
     }
 }
 
-interface SensorSetInformation {
+interface ISensorSetInformation {
     FileName: string;
     FullFileName: string;
     Size: number;

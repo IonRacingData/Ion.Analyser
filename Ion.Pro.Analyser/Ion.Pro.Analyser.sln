@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ion.Pro.Analyser", "Ion.Pro.Analyser\Ion.Pro.Analyser.csproj", "{CBB7A351-23FE-43CE-9ED5-E6578EEBDCBA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ion.Web.AnalyserDesktop", "Ion.Web.AnalyserDesktop\Ion.Web.AnalyserDesktop.csproj", "{85CA0160-2A0B-4A49-82DF-834B7B4E5027}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ion.Test.InfluxTest", "Ion.Test.InfluxTest\Ion.Test.InfluxTest.csproj", "{9717B10A-6BD8-4808-84D8-26BEC932AC7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{85CA0160-2A0B-4A49-82DF-834B7B4E5027}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85CA0160-2A0B-4A49-82DF-834B7B4E5027}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85CA0160-2A0B-4A49-82DF-834B7B4E5027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9717B10A-6BD8-4808-84D8-26BEC932AC7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9717B10A-6BD8-4808-84D8-26BEC932AC7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9717B10A-6BD8-4808-84D8-26BEC932AC7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9717B10A-6BD8-4808-84D8-26BEC932AC7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

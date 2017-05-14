@@ -1,4 +1,4 @@
-﻿class LineChartController extends MultiValueCanvasController{
+﻿class LineChartController extends MultiValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
     private mouseMod: Point;
@@ -10,22 +10,29 @@
     private marking: IMarking;
     private displayGrid: boolean = true;
     private stickyAxes: boolean = true;
+    private scalePoint_start: Point = new Point(0.05, 6);
+    private movePoint_start: Point = new Point(50, 50);
     private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
-    private gridColor = "rgba(100,100,100,0.3)";
-    private axisColor = "white";//"black"; // "black";
+
+    private gridColor;
+    private axisColor;
     private mainColor = "white";
+    private markingColor;
+
+    private defaultCursor: string = "default";
 
     constructor() {
         super();
-        this.movePoint = new Point(50, 50);
-        this.scalePoint = new Point(0.05, 6);
+        this.movePoint = this.movePoint_start.copy();
+        this.scalePoint = this.scalePoint_start.copy();
     }
 
     generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
+        this.wrapper.style.cursor = this.defaultCursor;
 
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
@@ -46,14 +53,30 @@
 
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
+        this.wrapper.addEventListener("keyup", (e: KeyboardEvent) => this.wrapper_keyUp(e));
+
+        this.setColors();
 
         this.draw();
         return this.wrapper;
     }
+    darkTheme: boolean = true;
+    private setColors(): void {
+        
+        this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
+        this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
+        this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
+    }
+
+    public updateTheme(): void {
+        this.darkTheme = !this.darkTheme;
+        this.setColors();
+        this.draw();
+    }
 
     private drawMarking(): void {
         this.ctxMarking.clear();
-        this.ctxMarking.fillStyle = "rgba(0,184,220,0.2)";
+        this.ctxMarking.fillStyle = this.markingColor;
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
         this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
@@ -86,7 +109,7 @@
     
     private moveToLastPoint(): void {
         if (this.data[0]) {
-            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].getLength() - 1));
+            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
             if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
                 this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
             }
@@ -95,11 +118,11 @@
 
     private selectPoint(e: Point): void {
         if (this.data) {
-            //var mp: Point = this.getMousePoint(e);
+            // var mp: Point = this.getMousePoint(e);
             var mp = e;
             var p: Point = null;
             for (let i: number = 0; i < this.data.length; i++) {
-                //var closest: Point = this.data[i].getClosest(this.getRelative(mp));
+                // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
@@ -155,34 +178,37 @@
     }
 
     protected draw(): void {
-        this.ctxMain.clear();        
+        this.ctxMain.clear();
 
         this.drawXAxis();
         this.drawYAxis();
 
         if (this.data) {
-
             for (var d: number = 0; d < this.data.length; d++) {
-                //var firstVisibleIdx: number = this.data[d].getIndexOf(this.getRelative(new Point(0, 0)));
                 var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
-
+                
                 var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-                var totalLength: number = this.data[d].getLength();
-                var drawPoint: number = 0;
+                var totalLength: number = this.data[d].length();
                 var checkPoint: Point = lastPoint;
 
                 this.ctxMain.beginPath();
-                this.ctxMain.strokeStyle = this.data[d].color.toString();
+                if (this.darkTheme) {
+                    console.log("Dark theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString();
+                }
+                else {
+                    console.log("Light theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString(true);
+                }
 
                 for (var i: number = firstVisibleIdx; i < totalLength; i++) {
                     var point: Point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                        this.ctxMain.moveTo(Math.floor(point.x), Math.floor(point.y));
-                        this.ctxMain.lineTo(Math.floor(checkPoint.x), Math.floor(checkPoint.y));
-                        drawPoint++;
+                        this.ctxMain.moveTo(point.x, point.y);
+                        this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
                         checkPoint = point;
                     }
 
@@ -202,12 +228,16 @@
             if (this.selectedPoint !== null) {
                 var abs: Point = this.getAbsolute(this.selectedPoint);
                 var pointString: string = this.selectedPoint.toString();
+                this.ctxMain.strokeStyle = this.axisColor;
+                this.ctxMain.fillStyle = this.axisColor;
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
-                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
+                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);                
+                this.ctxMain.fillStyle = this.mainColor;
+                this.ctxMain.strokeStyle = this.mainColor;
             }
-        }        
+        }
     }
 
     private drawXAxis(): void {
@@ -399,11 +429,14 @@
         let max: number = 0;
 
         for (let i = 0; i < this.data.length; i++) {
-            let info = this.sensorInfos[this.data[i].ID.toString()];
-            let dmin: number = SensorInfoHelper.minValue(info);
-            let dmax: number = SensorInfoHelper.maxValue(info);            
-            min = dmin < min ? dmin : min;
-            max = dmax > max ? dmax : max;
+            
+            let info = this.data[i].infos.SensorInfos[0];
+            if (info) {
+                let dmin: number = SensorInfoHelper.minValue(info);
+                let dmax: number = SensorInfoHelper.maxValue(info);
+                min = dmin < min ? dmin : min;
+                max = dmax > max ? dmax : max;
+            }
         }
 
         if (min !== max) {
@@ -421,19 +454,21 @@
             sec = this.height - sec;
             this.movePoint.y -= sec;
 
-            this.draw();            
+            this.scalePoint_start.y = this.scalePoint.y;
+            this.movePoint_start.y = this.movePoint.y;
+            this.draw();
         }
 
     }
 
-    private wrapper_keyDown(e: KeyboardEvent) {
+    private wrapper_keyDown(e: KeyboardEvent): void {
         switch (e.key) {
             case "g":
                 this.displayGrid = this.displayGrid === true ? false : true;
                 break;
             case "r":
-                this.scalePoint = new Point(1, 1);
-                this.movePoint = new Point(50, 50);
+                this.scalePoint = this.scalePoint_start.copy();
+                this.movePoint = this.movePoint_start.copy();
                 break;
             case "a":
                 this.stickyAxes = this.stickyAxes === true ? false : true;
@@ -441,13 +476,27 @@
             case "k":
                 this.autoScroll = this.autoScroll === true ? false : true;
                 break;
+            case "Control":
+                this.wrapper.style.cursor = "w-resize";
+                break;
+            case "Alt":
+                this.wrapper.style.cursor = "crosshair";
+                break;
+            case "Shift":
+                this.wrapper.style.cursor = "n-resize";
+                break;
         }
         this.draw();
+    }
+
+    private wrapper_keyUp(e: KeyboardEvent): void {
+        this.wrapper.style.cursor = this.defaultCursor;
     }
 
     private wrapper_mouseLeave(e: MouseEvent) {
         this.mouseDown = false;
         this.isMarking = false;
+        this.wrapper.style.cursor = "default";
         this.ctxMarking.clear();
     }
 
@@ -469,7 +518,7 @@
                 this.drawMarking();
             }
             else {
-                this.autoScroll_plotMoved = true;
+                this.autoScroll_plotMoved = true;                                
                 this.isDragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();
@@ -482,7 +531,7 @@
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
-            this.isDragging = false;
+            this.isDragging = false;            
         }
         else if (this.isMarking) {
             this.isMarking = false;
@@ -493,6 +542,7 @@
         else {
             this.selectPoint(this.getMousePoint(e));
         }
+        this.wrapper.style.cursor = this.defaultCursor;
     }
 
     private wrapper_touchStart(e: TouchEvent): void {
@@ -607,7 +657,7 @@ class ContextFixer {
         let newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {        
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     }
@@ -632,7 +682,7 @@ class LayeredCanvas {
     }
 
     addCanvas(): HTMLCanvasElement {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");        
+        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");
         this.wrapper.appendChild(canvas);
         this.canvases.push(canvas);
         return canvas;

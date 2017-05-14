@@ -1,0 +1,413 @@
+﻿[
+  {
+    "Key": "SPEED",
+    "Resolution": 12,
+    "MinValue": 0,
+    "MaxValue": 100
+  },
+  {
+    "Key": "VOLT_12"
+  },
+  {
+    "Key": "CURRENT",
+    "Resolution": 12,
+    "MinValue": 0,
+    "MaxValue": 250
+  },
+  {
+    "Key": "TEMP_MONO",
+    "Resolution": 12,
+    "Signed": true,
+    "MaxValue": 204.8,
+    "MinDisplay": -10,
+    "MaxDisplay": 60
+  },
+  {
+    "Key": "TEMP_MONO_ENGINE",
+    "Resolution": 12
+  },
+  {
+    "Key": "TEMP_MAIN_AREA",
+    "Resolution": 12
+  },
+  {
+    "Key": "CRITICAL_ECU" //Should have something for defining this as a value type file
+  },
+  {
+    "Key": "ERROR_PEDAL"
+  },
+  {
+    "Key": "ERROR_BRAKE_PRESSURE"
+  },
+  {
+    "Key": "ERROR_BRAKE_W_THROTTLE"
+  },
+
+  // #####--Gyro Accs and mag--######
+
+  {
+    "Key": "GYRO_X",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+  {
+    "Key": "GYRO_Y",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+  {
+    "Key": "GYRO_Z",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+  {
+    "Key": "ACCEL_X",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 39.2266 // 4G
+  },
+  {
+    "Key": "ACCEL_Y",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 39.2266 // 4G
+  },
+  {
+    "Key": "ACCEL_Z",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 39.2266 // 4G
+  },
+  {
+    "Key": "MAG_X",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+  {
+    "Key": "MAG_Y",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+  {
+    "Key": "MAG_Z",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
+  },
+
+  // #####--BMS_RAW values--#####
+
+  {
+    "Key": "BMS_RAW_1"
+  },
+  {
+    "Key": "BMS_RAW_2"
+  },
+  {
+    "Key": "BMS_RAW_3"
+  },
+  {
+    "Key": "BMS_RAW_4"
+  },
+  {
+    "Key": "BMS_RAW_5"
+  },
+  {
+    "Key": "BMS_RAW_6"
+  },
+  {
+    "Key": "BMS_RAW_7"
+  },
+  {
+    "Key": "BMS_RAW_8"
+  },
+  {
+    "Key": "BMS_RAW_9"
+  },
+  {
+    "Key": "BMS_RAW_CUSTOM"
+  },
+  {
+    "Key": "BMS_RAW_NLG5"
+  },
+
+  // #####--BMS_VOLT--#####
+
+  {
+    "Key": "BMS_VOLT",
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 65535,
+    "MinDisplay": 0,
+    "MaxDisplay": 500
+  },
+  {
+    "Key": "BMS_VOLT_MIN",
+    "Resolution": 8,
+    "MinValue": 0,
+    "MaxValue": 25.5
+  },
+  {
+    "Key": "BMS_VOLT_MIN_ID",
+    "Resolution": 8
+
+  },
+  {
+    "Key": "BMS_VOLT_MAX",
+    "Resolution": 8,
+    "MinValue": 0,
+    "MaxValue": 25.5
+  },
+  {
+    "Key": "BMS_VOLT_MAX_ID",
+    "Resolution": 8
+  },
+
+  // #####--BMS_CURRENT--#####
+
+  {
+    "Key": "BMS_CURRENT",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 32767
+  },
+  {
+    "Key": "BMS_CHARGELIMIT",
+    "Resolution": 16,
+    "Signed": false,
+    "MaxValue": 65535
+  },
+  {
+    "Key": "BMS_DISCHARGELIMIT",
+    "Resolution": 16,
+    "Signed": false,
+    "MaxValue": 65535
+  },
+
+  {
+    "Key": "BMS_TOTAL_ENERGY_IN",
+    "Resolution": 32,
+    "Signed": false,
+    "MaxValue": 4294967295
+  },
+  {
+    "Key": "BMS_TOTAL_ENERGY_OUT",
+    "Resolution": 32,
+    "Signed": false,
+    "MaxValue": 4294967295
+  },
+
+  // #####--BMS Battery Info--#####
+
+  {
+    "Key": "BMS_SOC",
+    "Resolution": 8,
+    "Signed": false,
+    "MaxValue": 255
+  },
+  {
+    "Key": "BMS_DOD",
+    "Resolution": 16,
+    "Signed": false,
+    "MaxValue": 65535
+  },
+  {
+    "Key": "BMS_CAPACITY",
+    "Resolution": 16,
+    "Signed": false,
+    "MaxValue": 65535
+  },
+  {
+    "Key": "BMS_00H",
+    "Resolution": 8
+  },
+  {
+    "Key": "BMS_SOH",
+    "Resolution": 8,
+    "Signed": false,
+    "MaxValue": 255
+  },
+
+  // #####--BMS_TEMP--#####
+
+  {
+    "Key": "BMS_TEMP_BAT",
+    "Resolution": 8,
+    "Signed": true,
+    "MaxValue": 127
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MIN",
+    "Resolution": 8,
+    "Signed": true,
+    "MaxValue": 127
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MIN_ID",
+    "Resolution": 8
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MAX",
+    "Resolution": 8,
+    "Signed": true,
+    "MaxValue": 127
+  },
+  {
+    "Key": "BMS_TEMP_BAT_MAX_ID",
+    "Resolution": 8
+  },
+
+  // #####--BMS_RES--#####
+
+  {
+    "Key": "BMS_RES_BAT",
+    "Resolution": 16,
+    "Signed": false,
+    "MaxValue": 6553.5
+  },
+  {
+    "Key": "BMS_RES_BAT_MIN",
+    "Resolution": 8,
+    "Signed": false,
+    "MaxValue": 25.5
+  },
+  {
+    "Key": "BMS_RES_BAT_MIN_ID",
+    "Resolution": 8
+  },
+  {
+    "Key": "BMS_RES_BAT_MAX",
+    "Resolution": 8,
+    "Signed": false,
+    "MaxValue": 25.5
+  },
+  {
+    "Key": "BMS_RES_BAT_MAX_ID",
+    "Resolution": 8
+  },
+
+  // #####--BMS State Info--#####
+
+  {
+    "Key": "BMS_STATE"
+  },
+  {
+    "Key": "BMS_TIMER"
+  },
+  {
+    "Key": "BMS_FLAGS"
+  },
+  {
+    "Key": "BMS_LASTFAULT"
+  },
+  {
+    "Key": "BMS_LEVEL"
+  },
+  {
+    "Key": "BMS_WARNING"
+  },
+
+
+  // #####--Car Info--#####
+
+  {
+    "Key": "BAR"
+  },
+  {
+    "Key": "BUTTON"
+  },
+
+  {
+    "Key": "BRAKE_LIGHT"
+  },
+  {
+    "Key": "BRAKE_FORCE_FRONT",
+    "Resolution": 12
+  },
+  {
+    "Key": "BRAKE_FORCE_BACK",
+    "Resolution": 12
+  },
+  {
+    "Key": "PACKAGESHIFT"
+  },
+
+
+  // #####--GPS--######
+
+  {
+    "Key": "GPS_LAT"
+  },
+  {
+    "Key": "GPS_LONG"
+  },
+  {
+    "Key": "GPS_HIGHRES"
+  },
+
+
+
+
+
+
+  // #####--Sinus test curves--#####
+  {
+    "Key": "SIN1",
+    "Signed": false,
+    "MaxValue": 100,
+    "Resolution": 8
+  },
+  {
+    "Key": "SIN2",
+    "Signed": true,
+    "MaxValue": 100,
+    "Resolution": 8
+  },
+  {
+    "Key": "COS1",
+    "Signed": false,
+    "MaxValue": 100,
+    "Resolution": 8
+
+  },
+
+  // #####--Motor Controller--#####
+  {
+    "Key": "MC_RAW"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_Q"
+  },
+  {
+    "Key": "MC_VSI_CURRENT_D"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_Q"
+  },
+  {
+    "Key": "MC_VSI_VOLTAGE_D"
+  },
+  {
+    "Key": "MC_MOTOR_POWER"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED"
+  },
+  {
+    "Key": "MC_MOTOR_SPEED_FILTER"
+  },
+  {
+    "Key": "MC_TEMP_MOTOR"
+  },
+  {
+    "Key": "MC_TEMP_IGBT"
+  },
+  {
+    "Key": "MC_TEMP_VSI_AMBIENT"
+  }
+]

@@ -6,16 +6,23 @@
     childWindows: AppWindow[] = [];
     selectorWindow: AppWindow;
 
-    main(): void {
-        this.window = kernel.winMan.createWindow(this.application, "Grid Viewer");
+    main(temp): void {
+        console.log(temp);
+        this.window = kernel.winMan.createWindow(this.application, "New Grid");
         this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
+        this.selectorWindow.content.style.background = "none";
+        this.selectorWindow.remoteShadow();
+
         this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
         this.selectorWindow.topMost = true;
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         this.selectorWindow.hide();
-        //(<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
+        
+        
+        // (<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
 
         var mk = this.mk;
         this.registerEvents(this.eh);
@@ -24,7 +31,13 @@
         var test = new GridHContainer(this);
         var clone = test.baseNode;
 
-        this.window.content.appendChild(clone);
+        if (temp) {
+            this.applyTemplate(temp);
+        }
+        else {
+            this.window.content.appendChild(clone);
+        }
+
         this.generateSelector();
         this.selectedContainer = test;
     }
@@ -46,12 +59,12 @@
     }
 
     handle_release(dir: string) {
-        let box = null;
-        if (this.selectedContainer.gridBoxes.length == 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length == 0) {
+        let box: GridBox = null;
+        if (this.selectedContainer.gridBoxes.length === 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length === 0) {
             box = this.selectedContainer.gridBoxes[0];
         }
         else {
-            if (dir == "left") {
+            if (dir === "left") {
                 if (this.selectedContainer instanceof GridHContainer) {
                     box = this.selectedContainer.insertChildBefore(this.selectedBox);
                 }
@@ -64,7 +77,7 @@
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "right") {
+            else if (dir === "right") {
                 if (this.selectedContainer instanceof GridHContainer) {
                     box = this.selectedContainer.insertChildAfter(this.selectedBox);
                 }
@@ -77,7 +90,7 @@
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "up") {
+            else if (dir === "up") {
                 if (this.selectedContainer instanceof GridVContainer) {
                     box = this.selectedContainer.insertChildBefore(this.selectedBox);
                 }
@@ -90,7 +103,7 @@
                     this.selectedBox.setContent(newGridbox.baseNode);
                 }
             }
-            else if (dir == "down") {
+            else if (dir === "down") {
                 if (this.selectedContainer instanceof GridVContainer) {
                     box = this.selectedContainer.insertChildAfter(this.selectedBox);
                 }
@@ -106,6 +119,7 @@
         }
         var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
+        window.showTaskbar = false;
         window.changeWindowMode(WindowMode.BORDERLESSFULL);
 
         this.childWindows.push(window);
@@ -116,11 +130,108 @@
         this.handleResize();
     }
 
+    applyTemplate(gridTemplate: IGridLanchTemplate) {
+        console.log(gridTemplate);
+        this.window.title = gridTemplate.name;
+        let dataSets: { [key: string]: IDataSource<any>} = { };
+        for (let a of gridTemplate.sensorsets) {
+            dataSets[a.key] = kernel.senMan.createDataSource(a);
+        }
+        console.log(dataSets);
+        this.handleHContainer(gridTemplate.grid, this.window.content, dataSets);
+        this.handleResize();
+    }
+
+    handleHContainer(template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) {
+        console.log("HCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridHContainer(this), this.handleVContainer, dataSets);
+    }
+
+    handleVContainer(template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) {
+        console.log("VCon");
+        console.log(this);
+        this.handleContainer(template, body, new GridVContainer(this), this.handleHContainer, dataSets);
+    }
+
+    handleContainer(
+        template: IGridTemplate,
+        body: HTMLElement,
+        container: GridContainer,
+        next: (template: IGridTemplate, body: HTMLElement, dataSets: { [key: string]: IDataSource<any> }) => void,
+        dataSets: { [key: string]: IDataSource<any> }
+    ) {
+        console.log("Con");
+        console.log(this);
+        let lastBox: GridBox = null;// = a.gridBoxes[0];
+
+        for (let temp of template.data) {
+            if (lastBox == null) {
+                lastBox = container.gridBoxes[0];
+            }
+            else {
+                lastBox = container.insertChildAfter(lastBox);
+            }
+            if (GridViewer.isIGridLauncher(temp)) {
+                let app = kernel.appMan.start(temp.name);
+                if (temp.data) {
+                    let viewer = <any>app.application
+                    if (sensys.SensorManager.isViewer(viewer)) {
+                        let singleViewer = viewer;
+                        viewer.dataSource = dataSets[temp.data[0]];
+                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
+                            singleViewer.dataUpdate();
+                        });
+                    }
+                    else if (sensys.SensorManager.isCollectionViewer(viewer)) {
+                        let colViewer = viewer;
+                        let back = new Multicallback(temp.data.length, () => {
+                            viewer.dataUpdate();
+                        });
+                        for (let name of temp.data) {
+                            viewer.dataCollectionSource.push(dataSets[name]);
+                            kernel.senMan.fillDataSource(dataSets[name], back.createCallback());
+                        }
+                    }
+
+                }
+                let window = app.windows[0];
+                window.showTaskbar = false;
+                this.childWindows.push(window);
+                window.changeWindowMode(WindowMode.BORDERLESSFULL);
+                lastBox.content.appendChild(window.handle);
+
+                window.recalculateSize();
+                window.onResize();
+                this.handleResize();
+            }
+            else {
+                next.call(this, temp, lastBox.content, dataSets);
+                //next(temp, lastBox.content);
+            }
+        }
+        body.appendChild(container.baseNode);
+    }
+
+    static isIGridLauncher(data: any): data is IGridLaucher {
+        if (data.name) {
+            return true;
+        }
+        return false;
+    }
+
+    static isIGridTemplate(data: any): data is IGridTemplate {
+        if (Array.isArray(data.data)) {
+            return true;
+        }
+        return false;
+    }
+
     generateSelector() {
         let mk = this.mk;
         let selector = mk.tag("div", "dock-selector");
         let up = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseUp() }]);
-        up.appendChild(mk.tag("div", "dock-up")); 
+        up.appendChild(mk.tag("div", "dock-up"));
         let left = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseLeft() }]);
         left.appendChild(mk.tag("div", "dock-left"));
         let right = mk.tag("div", "dock-item dock-active", [{ event: "mouseup", func: (e: MouseEvent) => this.handle_releaseRight() }]);
@@ -150,8 +261,9 @@
     }
 
     handleClose() {
-        for (var i in this.childWindows) {
-            this.childWindows[i].close();
+        for (var cur of this.childWindows) {
+            cur.close();
+            // this.childWindows[cur].close();
         }
         this.eh.close();
         this.selectorWindow.close();
@@ -159,14 +271,16 @@
 
     handleResize() {
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
-        for (var i in this.childWindows) {
-            this.childWindows[i].recalculateSize();
-            this.childWindows[i].onResize();
+        for (var cur of this.childWindows) {
+            cur.recalculateSize();
+            cur.onResize();
+            // this.childWindows[cur].recalculateSize();
+            // this.childWindows[cur].onResize();
         }
     }
 
     handleMove() {
-        
+
     }
 
     globalDrag(e: IWindowEvent) {
@@ -176,7 +290,7 @@
             && windowY > 0
             && windowX < this.window.width
             && windowY < this.window.height
-            && e.window != this.window) {
+            && e.window !== this.window) {
 
             var containers = this.window.handle.getElementsByClassName("grid-con");
             for (let i = containers.length - 1; i >= 0; i--) {
@@ -204,13 +318,14 @@
                     this.selectorWindow.setPos(
                         this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45
                         , this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
-                    //this.selectedBox.box.offsetTop + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
+                    // this.selectedBox.box.offsetTop 
+                    // + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                     break;
                 }
             }
             this.selectorWindow.show();
 
-            //console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
+            // console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
         }
         else {
             this.selectorWindow.hide();
@@ -240,10 +355,42 @@
     globalUp(e: IWindowEvent) {
         var windowX = e.mouse.clientX - this.window.x - 9;
         var windowY = e.mouse.clientY - this.window.y - 39;
-        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window != this.window) {
+        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
             this.selectorWindow.hide();
         }
     }
+}
+
+let test: IGridLanchTemplate = {
+    name: "some Grid",
+    sensorsets: null,
+    grid: {
+        data: [
+            { name: "LineChartTester", data: null },
+            {
+                data: [
+                    { name: "DataAssigner", data: null }
+                ]
+            }
+        ]
+    }
+}
+
+
+interface IGridTemplate
+{
+    data: (IGridLaucher | IGridTemplate)[];
+}
+
+interface IGridLaucher {
+    name: string;
+    data: string[];
+}
+
+interface IGridLanchTemplate {
+    name: string
+    grid: IGridTemplate;
+    sensorsets: DataSourceTemplate[];
 }
 
 class GridContainer {
@@ -256,13 +403,13 @@ class GridContainer {
 
     set: string = "setWidth";
     dir: string = "clientWidth";
-    
+
     offset: string = "offsetLeft";
     mouse: string = "clientX";
     dir2: string = "width";
     pos: string = "x";
     correction: number = 0;
-    //last: HTMLElement;
+    // last: HTMLElement;
 
     constructor(appWindow: GridViewer) {
         this.baseNode = this.create("");
@@ -306,7 +453,7 @@ class GridContainer {
         }
         let child = null;
         let insertString = "";
-        if (dir == "before") {
+        if (dir === "before") {
             child = this.createChildBefore(box);
             insertString = "beforebegin";
         }
@@ -320,10 +467,18 @@ class GridContainer {
 
         child.gridBox[this.set](1 / newTotal, 6);
 
-        //this.baseNode.appendChild(seperator);
-        //this.baseNode.appendChild(child);
+        // this.baseNode.appendChild(seperator);
+        // this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
-            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos], this.correction);
+            let container = new ResizeContainer(
+                seperator,
+                this.dir,
+                this.offset,
+                this.set,
+                this.mouse,
+                this.appWindow.window[this.pos],
+                this.correction
+            );
 
             seperator.parentElement.onmousemove = (e: MouseEvent) => {
                 this.appWindow.handleResize();
@@ -331,8 +486,8 @@ class GridContainer {
             };
             seperator.parentElement.onmouseup = (e: MouseEvent) => {
                 seperator.parentElement.onmousemove = null;
-                seperator.parentElement.onmouseup = null
-            }
+                seperator.parentElement.onmouseup = null;
+            };
         });
         return child.gridBox;
     }
@@ -351,7 +506,15 @@ class GridContainer {
         this.baseNode.appendChild(seperator);
         this.baseNode.appendChild(child);
         seperator.addEventListener("mousedown", (e: MouseEvent) => {
-            let container = new ResizeContainer(seperator, this.dir, this.offset, this.set, this.mouse, this.appWindow.window[this.pos], this.correction);
+            let container = new ResizeContainer(
+                seperator,
+                this.dir,
+                this.offset,
+                this.set,
+                this.mouse,
+                this.appWindow.window[this.pos],
+                this.correction
+            );
 
             seperator.parentElement.onmousemove = (e: MouseEvent) => {
                 this.appWindow.handleResize();
@@ -359,17 +522,17 @@ class GridContainer {
             };
             seperator.parentElement.onmouseup = (e: MouseEvent) => {
                 seperator.parentElement.onmousemove = null;
-                seperator.parentElement.onmouseup = null
-            }
+                seperator.parentElement.onmouseup = null;
+            };
         });
         return child.gridBox;
     }
-    
+
     resize(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
 
     }
 
-    resizeCommon(gridWindow: HTMLElement, event: MouseEvent): void{
+    resizeCommon(gridWindow: HTMLElement, event: MouseEvent): void {
         gridWindow.style.flexGrow = "0";
         gridWindow.style.flexBasis = "unset";
     }
@@ -385,7 +548,7 @@ class GridContainer {
     createRelativeChild(box: GridBox, rel: number) {
         var nBox = new GridBox();
         for (let i = 0; i < this.gridBoxes.length; i++) {
-            if (this.gridBoxes[i] == box) {
+            if (this.gridBoxes[i] === box) {
                 this.gridBoxes.splice(i + rel, 0, nBox);
                 break;
             }
@@ -400,10 +563,12 @@ class GridContainer {
     }
 }
 
+/* tslint:disable:interface-name */
 interface HTMLElement {
     gridBox: GridBox;
     gridContainer: GridContainer;
 }
+/* tslint:enable:interface-name */
 
 class GridBox {
     box: HTMLElement;
@@ -482,7 +647,7 @@ class ResizeContainer {
 
         let prevWidth = this.startPercent + curPercentMove;
         let nextWidth = (this.part / this.total) - prevWidth;
-        
+
 
         this.prev.gridBox[this.style](prevWidth, 6);
         this.next.gridBox[this.style](nextWidth, 6);
@@ -588,20 +753,20 @@ function addEvents() {
         editFunction = function (event) {
 
             resizeHeight(window1, event, container);
-        }
+        };
         document.body.style.cursor = "ns-resize";
         moving = true;
     });
     bar2.addEventListener("mousedown", function (event: MouseEvent) {
         container = findWindow(<HTMLElement>this);
-        
+
         editFunction = function handle(event) {
-            
+
             console.log(container);
             console.log(event);
             resizeWidth(window2, event, container);
 
-        }
+        };
         document.body.style.cursor = "ew-resize";
         moving = true;
     });
@@ -616,7 +781,7 @@ function findWindow(element: HTMLElement): AppWindow {
     return temp;
 }
 
-function resizeWidth(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void{
+function resizeWidth(gridWindow: HTMLElement, event: MouseEvent, appWindow: AppWindow): void {
     gridWindow.style.width = (appWindow.width - (event.clientX - appWindow.x) - 4) + "px";
     resizeCommon(gridWindow, event);
 }

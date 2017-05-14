@@ -23,9 +23,15 @@ var MenuWindow = (function () {
         this.hide();
         // console.log(e);
     };
+    MenuWindow.isIMenuItem = function (obj) {
+        if (obj.name && obj.runner) {
+            return true;
+        }
+        return false;
+    };
     MenuWindow.prototype.add = function (item, category) {
         if (category === void 0) { category = ""; }
-        var name = (item instanceof Launcher) ? item.name : item.toString();
+        var name = MenuWindow.isIMenuItem(item) ? item.name : item.toString();
         if (category === "") {
             this.items.push(new MenuItem(name, item));
         }
@@ -63,8 +69,8 @@ var MenuWindow = (function () {
             var a = mk.tag("a", "", [{
                     event: "click", func: function (e) {
                         e.preventDefault();
-                        if (curItem.value instanceof Launcher) {
-                            curItem.value.createInstance();
+                        if (MenuWindow.isIMenuItem(curItem.value)) {
+                            curItem.value.runner();
                             _this.hide();
                         }
                         else if (curItem.value instanceof Array) {
@@ -80,6 +86,9 @@ var MenuWindow = (function () {
             li.appendChild(a);
             a.href = "#";
             if (curItem.value instanceof Array) {
+                var arrow = mk.tag("span", "", null, "&gt;");
+                arrow.style.cssFloat = "right";
+                a.appendChild(arrow);
                 curItem.subMenu = this_1.makeList(curItem.value, mk);
                 curItem.subMenu.style.display = "none";
                 li.appendChild(curItem.subMenu);

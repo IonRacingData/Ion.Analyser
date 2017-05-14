@@ -1,6 +1,6 @@
 ﻿interface IApplication {
     application: Application;
-    main(): void;
+    main(...params: any[]): void;
 }
 
 class Application {
@@ -14,12 +14,12 @@ class Application {
         app.application = this;
     }
 
-    start(): void {
-        this.application.main();
+    start(...args: any[]): void {
+        this.application.main(...args);
     }
 
     onClose(): void {
-        if (this.windows.length == 1) {
+        if (this.windows.length === 1) {
             kernel.appMan.closeApplication(this);
         }
     }

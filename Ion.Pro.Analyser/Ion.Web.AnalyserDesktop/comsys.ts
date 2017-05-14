@@ -1,11 +1,13 @@
 ﻿function requestAction(action: string, callback: (data: any) => void): void {
     var request = new XMLHttpRequest();
+
     request.responseType = "json";
+
     request.onreadystatechange = () => {
-        if (request.readyState == 4 && request.status == 200) {
+        if (request.readyState === 4 && request.status === 200) {
             callback(request.response);
         }
-    }
+    };
     request.open("GET", "/test/" + action, true);
     request.send();
 }
@@ -25,13 +27,13 @@ class NetworkManager {
 
         this.socket.onmessage = (ev: MessageEvent) => {
             this.receiveMessage(ev);
-            //console.log(ev);
-            //console.log(ev.data);
-        }
+            // console.log(ev);
+            // console.log(ev.data);
+        };
 
         this.socket.onopen = (ev: Event) => {
             this.isReady = true;
-        }
+        };
     }
 
     registerService(callbackId: number, callback: (data: any) => void) {
@@ -62,7 +64,7 @@ class NetworkManager {
     receiveMessage(ev: MessageEvent) {
         let message: IComMessage = JSON.parse(ev.data);
 
-        if (message.Status == ComMessageStatus.Request110) {
+        if (message.Status === ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
                 this.serviceCallback[message.MessageId](JSON.parse(message.Data));
             }
@@ -71,7 +73,7 @@ class NetworkManager {
                 console.log(ev);
             }
         }
-        else if (message.Status == ComMessageStatus.OK200) {
+        else if (message.Status === ComMessageStatus.OK200) {
             console.log(ev);
             if (this.callback[message.MessageId]) {
                 this.callback[message.MessageId](JSON.parse(message.Data));

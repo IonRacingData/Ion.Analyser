@@ -12,8 +12,9 @@ var EventHandler = (function () {
         manager.addEventListener(type, handeler);
     };
     EventHandler.prototype.close = function () {
-        for (var i in this.localEvents) {
-            var cur = this.localEvents[i];
+        for (var _i = 0, _a = this.localEvents; _i < _a.length; _i++) {
+            var cur = _a[_i];
+            // var cur = this.localEvents[i];
             cur.manager.removeEventListener(cur.type, cur.handler);
         }
     };
@@ -24,7 +25,7 @@ var EventManager = (function () {
         this.events = {};
     }
     EventManager.prototype.addEventListener = function (type, listener) {
-        console.log("secondStep");
+        //console.log("secondStep");
         if (!this.events[type]) {
             this.events[type] = [];
         }
@@ -42,7 +43,7 @@ var EventManager = (function () {
             }
             return true;
         }
-        //console.error("event of type: " + type + " does not exist!");
+        // console.error("event of type: " + type + " does not exist!");
         return false;
     };
     return EventManager;
