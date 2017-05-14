@@ -14,7 +14,7 @@
     /*background-color: #262626;
     color: white;*/
     border-radius: 4px 4px 0 0;
-    box-shadow: 0 0 8px 2px #111111;
+    box-shadow: 0 0 8px 2px rgba(17, 17, 17, 0.3);
 }
 
 .window-body-wrapper {
