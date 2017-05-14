@@ -29,7 +29,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        
+        public static bool liveSim = true;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
@@ -84,8 +84,12 @@ namespace Ion.Pro.Analyser
             try
             {
                 InitSenSys();
-                //InitSensorStore();
+                InitSensorStore();
                 //InsertSensorTestData();
+                if (liveSim)
+                {
+                    Task.Run(() => DataInserter("../../Data/Sets/195_usart_data.log16"));
+                }
                 IonAnalyserWebPage.Run();
             }
             catch (Exception e)
@@ -226,9 +230,16 @@ namespace Ion.Pro.Analyser
                     //Console.WriteLine("Tick");
                     SensorPackage pack = all[i];
                     //pack.TimeStamp *= 1000;
-                    SensorDataStore.GetDefault().AddLive(pack);
+                    SensorManager.GetDefault().AddLive("telemetry", pack);
+                    //SensorDataStore.GetDefault().AddLive(pack);
                     //Console.WriteLine("At: " + pack.TimeStamp.ToString());
-                    System.Threading.Thread.Sleep((int)(all[i + 1].TimeStamp - all[i].TimeStamp));
+                    int time = (int)(all[i + 1].TimeStamp - all[i].TimeStamp);
+                    if (time < 0)
+                    {
+                        Console.WriteLine("Less then null detected");
+                        time = 0;
+                    }
+                    Thread.Sleep(time);
                     i++;
                 }
             }
