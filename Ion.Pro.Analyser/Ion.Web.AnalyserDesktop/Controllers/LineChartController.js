@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var LineChartController = (function (_super) {
     __extends(LineChartController, _super);
     function LineChartController() {
@@ -19,6 +24,7 @@ var LineChartController = (function (_super) {
         _this.autoScroll_plotMoved = false;
         _this.mainColor = "white";
         _this.defaultCursor = "default";
+        _this.darkTheme = true;
         _this.movePoint = _this.movePoint_start.copy();
         _this.scalePoint = _this.scalePoint_start.copy();
         return _this;
@@ -55,6 +61,7 @@ var LineChartController = (function (_super) {
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
     };
     LineChartController.prototype.updateColors = function () {
+        this.darkTheme = !this.darkTheme;
         this.setColors();
         this.draw();
     };
@@ -162,7 +169,14 @@ var LineChartController = (function (_super) {
                 var totalLength = this.data[d].length();
                 var checkPoint = lastPoint;
                 this.ctxMain.beginPath();
-                this.ctxMain.strokeStyle = this.data[d].color.toString();
+                if (this.darkTheme) {
+                    console.log("Dark theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString();
+                }
+                else {
+                    console.log("Light theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString(true);
+                }
                 for (var i = firstVisibleIdx; i < totalLength; i++) {
                     var point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {

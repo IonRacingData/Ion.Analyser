@@ -5,7 +5,7 @@ window.addEventListener("load", () => {
 });
 
 window.onbeforeunload = function (e) {
-    e = e || window.event;
+    /*e = e || window.event;
 
     // For IE and Firefox prior to version 4
     if (e) {
@@ -13,7 +13,7 @@ window.onbeforeunload = function (e) {
     }
 
     // For Safari
-    return 'Sure?';
+    return 'Sure?';*/
 };
 
 interface IClassType<T> {

@@ -8,12 +8,21 @@ var Color = (function () {
             this.a = a;
         }
     }
-    Color.prototype.toString = function () {
+    Color.prototype.toString = function (invert) {
+        if (invert === void 0) { invert = false; }
+        var r = this.r;
+        var g = this.g;
+        var b = this.b;
+        if (invert) {
+            r = 255 - r;
+            g = 255 - g;
+            b = 255 - b;
+        }
         if (this.a) {
-            return "rgba(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ", " + this.a.toString() + ")";
+            return "rgba(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ", " + this.a.toString() + ")";
         }
         else {
-            return "rgb(" + this.r.toString() + ", " + this.g.toString() + ", " + this.b.toString() + ")";
+            return "rgb(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ")";
         }
     };
     Color.randomColor = function (lowLimit, highLimit) {
@@ -24,7 +33,7 @@ var Color = (function () {
             r = Math.floor(Math.random() * 256);
             g = Math.floor(Math.random() * 256);
             b = Math.floor(Math.random() * 256);
-        } while (r + g + b > lowLimit && r + g + b < highLimit);
+        } while ((r + g + b) < lowLimit || (r + g + b) > highLimit);
         return new Color(r, g, b);
     };
     return Color;
@@ -34,7 +43,8 @@ var SensorDataContainer = (function () {
         if (p === void 0) { p = []; }
         this.ID = id;
         this.points = p;
-        this.color = Color.randomColor(0, 255 + 128);
+        //this.color = Color.randomColor(0, 255 + 128);
+        this.color = Color.randomColor(255 + 128, 255 * 3);
     }
     SensorDataContainer.prototype.insertSensorPackage = function (p) {
         this.insertData(p.map(function (value, index, array) { return new SensorValue(value.Value, value.TimeStamp); }));
@@ -48,12 +58,14 @@ var SensorDataContainer = (function () {
         if (p.length > 0) {
             if (this.points.length === 0) {
                 this.pushArray(this.points, p);
+                //this.points.push(...p);
             }
             else {
                 var first = p[0];
                 var last = p[p.length - 1];
                 if (first.timestamp > this.last().timestamp) {
                     this.pushArray(this.points, p);
+                    //this.points.push(...p);
                 }
                 else if (last.timestamp < this.points[0].timestamp) {
                     (_a = this.points).splice.apply(_a, [0, 0].concat(p));

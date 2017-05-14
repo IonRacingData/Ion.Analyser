@@ -5,9 +5,9 @@
 }
 
 /*Containers*/
-.dock-selector{
+.dock-selector {
     border: 1px solid black;
-    background: lightgrey;
+    background-color: rgba(211, 211,211, 0.5);/* #d3d3d380;*/
 }
 .dock-active{
     border: 1px solid black;

@@ -60,14 +60,16 @@
         this.draw();
         return this.wrapper;
     }
-
+    darkTheme: boolean = true;
     private setColors(): void {
+        
         this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
         this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
     }
 
     public updateColors(): void {
+        this.darkTheme = !this.darkTheme;
         this.setColors();
         this.draw();
     }
@@ -193,7 +195,14 @@
                 var checkPoint: Point = lastPoint;
 
                 this.ctxMain.beginPath();
-                this.ctxMain.strokeStyle = this.data[d].color.toString();
+                if (this.darkTheme) {
+                    console.log("Dark theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString();
+                }
+                else {
+                    console.log("Light theme");
+                    this.ctxMain.strokeStyle = this.data[d].color.toString(true);
+                }
 
                 for (var i: number = firstVisibleIdx; i < totalLength; i++) {
                     var point: Point = this.getAbsolute(this.data[d].getValue(i));

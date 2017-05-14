@@ -129,6 +129,8 @@ var WindowManager = (function () {
     WindowManager.prototype.makeWindow = function (app) {
         var _this = this;
         var tempWindow = new AppWindow(app);
+        var extra = this.windows.length % 10 * 50;
+        tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
         tempWindow.addEventListener(AppWindow.event_update, function () {
             _this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
         });

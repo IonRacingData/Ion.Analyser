@@ -66,6 +66,7 @@ var Kernel;
                             | raw.charCodeAt(i * 28 + 18) << 48
                             | raw.charCodeAt(i * 28 + 19) << 56,
                     };
+                    /* tslint:enable:no-bitwise */
                 }
                 return ret;
             };
@@ -81,6 +82,7 @@ var Kernel;
                         3;
                         for (var v in dataSet.SensorData) {
                             _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+                            //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                         }
                     }
                     console.log(data);

@@ -18,8 +18,9 @@ function startUp() {
     };
 
     kernel.senMan = new sensys.SensorManager();  // Late init because it needs netMan
-    kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
+    //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
@@ -62,29 +63,31 @@ function registerSensorGroups() {
 function registerLaunchers() {
 
 
-    kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    
 
     // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
-    kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
+    //kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
 
-    kernel.appMan.registerApplication("Plot", new Launcher(LineChartTester, "Line Chart Tester"));
-    kernel.appMan.registerApplication("Plot", new Launcher(GaugeTester, "Gauge Tester"));
-    kernel.appMan.registerApplication("Plot", new Launcher(GPSPlotTester, "GPSPlot Tester"));
-    kernel.appMan.registerApplication("Plot", new Launcher(LabelTester, "Label Test"));
-    kernel.appMan.registerApplication("Plot", new Launcher(BarTester, "Bar Test"));
-    kernel.appMan.registerApplication("Plot", new Launcher(SteeringWheelTester, "Steering Wheel Test"));
-    //kernel.appMan.registerApplication("Plot", new Launcher(TestDataViewer, "Test Viewer"));
+    kernel.appMan.registerApplication("Charts", new Launcher(LineChartTester, "Line Chart"));
+    kernel.appMan.registerApplication("Charts", new Launcher(GaugeTester, "Gauge"));
+    kernel.appMan.registerApplication("Charts", new Launcher(GPSPlotTester, "GPS Viewer"));
+    kernel.appMan.registerApplication("Charts", new Launcher(LabelTester, "Label"));
+    kernel.appMan.registerApplication("Charts", new Launcher(BarTester, "Bar Chart"));
+    kernel.appMan.registerApplication("Charts", new Launcher(SteeringWheelTester, "Steering Wheel"));
+    // kernel.appMan.registerApplication("Charts", new Launcher(TestDataViewer, "Test Viewer"));
 
 
-    kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
-    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
-    kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    // kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
+    // kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    // kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
 
-    kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
-    kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    // kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
+    // kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+
+    kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
     registerGridPresets();
 }

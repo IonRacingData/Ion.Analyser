@@ -10,7 +10,7 @@
 /*  Window  */
 
 .window {
-    background-color: rgb(245, 245, 245);
+    
     /*background-color: #262626;
     color: white;*/
     border-radius: 4px 4px 0 0;
@@ -19,6 +19,10 @@
 
 .window-body-wrapper {
     position: relative;
+}
+
+.window-body {
+    background-color: rgb(245, 245, 245);
 }
 
 .window-overlay {

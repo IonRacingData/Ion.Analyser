@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
@@ -188,6 +193,12 @@ var AppWindow = (function () {
     AppWindow.prototype.changeStateTo = function (state) {
         this.prevState = this.state;
         this.state = state;
+    };
+    AppWindow.prototype.remoteShadow = function () {
+        this.windowElement.style.boxShadow = "none";
+    };
+    AppWindow.prototype.restoreShadow = function () {
+        this.windowElement.style.boxShadow = null;
     };
     /*Events*/
     AppWindow.prototype.onResize = function () {
