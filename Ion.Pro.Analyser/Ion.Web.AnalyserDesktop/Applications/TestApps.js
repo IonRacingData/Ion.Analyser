@@ -140,10 +140,11 @@ var LineChartTester = (function () {
         this.dataCollectionSource = [];
         this.eh = new EventHandler();
         this.testWindow = new MenuWindow(document.body);
+        this.darkTheme = true;
     }
     LineChartTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart");
         this.plotWindow.content.oncontextmenu = function (e) {
             _this.testWindow.x = e.x;
             _this.testWindow.y = e.y;
@@ -182,6 +183,7 @@ var LineChartTester = (function () {
             _this.window_close();
         });
         eh.on(kernel.winMan, WindowManager.event_themeChange, function () {
+            _this.darkTheme = !_this.darkTheme;
             _this.lineChart.updateTheme();
         });
     };
@@ -198,7 +200,7 @@ var GaugeTester = (function () {
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -236,7 +238,7 @@ var GPSPlotTester = (function () {
     }
     GPSPlotTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPS Viewer");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -276,7 +278,7 @@ var LabelTester = (function () {
     }
     LabelTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Label");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -315,7 +317,7 @@ var BarTester = (function () {
     }
     BarTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Bar Chart");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -384,7 +386,7 @@ var SteeringWheelTester = (function () {
     }
     SteeringWheelTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window = kernel.winMan.createWindow(this.application, "Steering wheel");
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);

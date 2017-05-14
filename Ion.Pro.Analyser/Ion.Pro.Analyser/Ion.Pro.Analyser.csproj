@@ -65,6 +65,7 @@
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\freq.log16" />
     <None Include="Data\Sets\167_usart_data.log16" />
+    <None Include="Data\Sets\195_usart_data.log" />
     <None Include="Data\sinus.log16" />
     <None Include="Sensors\Data2016\SensorInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -93,7 +94,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" />
+      <UserProperties Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

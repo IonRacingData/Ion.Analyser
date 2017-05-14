@@ -196,7 +196,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
 
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart");
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             this.testWindow.x = e.x;
             this.testWindow.y = e.y;
@@ -242,10 +242,13 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
             this.window_close()
         });
         eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
+            this.darkTheme = !this.darkTheme;
             this.lineChart.updateTheme();
         });
                 
     }
+
+    darkTheme: boolean = true;
 
     close() {
         this.eh.close();
@@ -266,7 +269,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
     
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -314,7 +317,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     plot: GPSController;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPSPlot Tester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPS Viewer");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -361,7 +364,7 @@ class LabelTester implements IApplication, IViewer<Point> {
     val: number = 0;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "LabelTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Label");
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
@@ -409,7 +412,7 @@ class BarTester implements IApplication, IViewer<Point> {
     val: number = 0;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Bar Chart");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -493,7 +496,7 @@ class SteeringWheelTester implements IViewer<Point> {
     plotWindow: AppWindow;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "BarTester");
+        this.window = kernel.winMan.createWindow(this.application, "Steering wheel");
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);

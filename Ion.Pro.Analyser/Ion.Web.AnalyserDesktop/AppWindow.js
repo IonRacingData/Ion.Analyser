@@ -189,6 +189,12 @@ var AppWindow = (function () {
         this.prevState = this.state;
         this.state = state;
     };
+    AppWindow.prototype.remoteShadow = function () {
+        this.windowElement.style.boxShadow = "none";
+    };
+    AppWindow.prototype.restoreShadow = function () {
+        this.windowElement.style.boxShadow = null;
+    };
     /*Events*/
     AppWindow.prototype.onResize = function () {
         this.eventMan.raiseEvent(AppWindow.event_resize, null);

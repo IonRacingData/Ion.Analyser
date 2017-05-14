@@ -252,6 +252,14 @@
         this.state = state;
     }
 
+    public remoteShadow() {
+        this.windowElement.style.boxShadow = "none";
+    }
+
+    public restoreShadow() {
+        this.windowElement.style.boxShadow = null;
+    }
+
     /*Events*/
     onResize(): void {
         this.eventMan.raiseEvent(AppWindow.event_resize, null);

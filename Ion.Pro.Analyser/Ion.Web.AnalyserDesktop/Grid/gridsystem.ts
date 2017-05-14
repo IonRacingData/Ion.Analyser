@@ -13,10 +13,15 @@
         this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
+        this.selectorWindow.content.style.background = "none";
+        this.selectorWindow.remoteShadow();
+
         this.selectorWindow.changeWindowMode(WindowMode.BORDERLESS);
         this.selectorWindow.topMost = true;
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         this.selectorWindow.hide();
+        
+        
         // (<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
 
         var mk = this.mk;
