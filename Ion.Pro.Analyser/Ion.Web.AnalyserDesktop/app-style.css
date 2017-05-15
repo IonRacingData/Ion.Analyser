@@ -139,3 +139,11 @@ span.table-resize{
     /*marking fill*/
     background-color: rgba(0,184,220,0.2);
 }
+
+.bar-controller-bar1 {
+    background-color: blue;
+}
+
+.bar-controller-bar2 {
+    background-color: red;
+}

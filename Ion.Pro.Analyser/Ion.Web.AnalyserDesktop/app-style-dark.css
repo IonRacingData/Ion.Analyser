@@ -122,13 +122,11 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.bar-controller {
-    background-color: green;
-}
-
 .disabled {
     color: darkgray;
 }
+
+/*  Controllers  */
 
 .gauge {
     /*  ring and labels  */
@@ -146,4 +144,12 @@ span.table-resize{
     color: rgba(100,100,100,0.3);
     /*marking fill*/
     background-color: rgba(0,184,220,0.2);
+}
+
+.bar-controller-bar1 {
+    background-color: blue;
+}
+
+.bar-controller-bar2 {
+    background-color: red;
 }
