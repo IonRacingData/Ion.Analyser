@@ -109,7 +109,7 @@ var Kernel;
                         _this.loadedDataSet.push(dataSet);
                         _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {
-                            _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] }));
+                            //this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] }));
                             _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
                         }
                     }

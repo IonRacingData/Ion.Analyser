@@ -29,7 +29,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        public static bool liveSim = true;
+        public static bool liveSim = false;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
