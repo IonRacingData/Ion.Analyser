@@ -295,3 +295,20 @@ span.table-resize{
 .dsb-subdiv {
     flex-grow: 1;
 }
+
+/*Lists*/
+.listitem {
+    display: block;
+    padding: 2px 0;
+}
+
+.listitem:hover {
+    background-color: #202020;
+}
+.small {
+    font-size: 0.6em;
+}
+
+table.table.selectable tbody tr:hover {
+    background-color: #202020;
+}

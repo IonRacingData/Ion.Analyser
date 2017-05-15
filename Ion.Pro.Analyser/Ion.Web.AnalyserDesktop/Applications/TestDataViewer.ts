@@ -192,17 +192,23 @@
         for (let i = 0; i < info.length; i++) {
             let sensor = info[i];
             let ctrl = drawMethod.call(this, plot, sensor);
-            let label = this.mk.tag("label");
+            let label = this.mk.tag("label", "listitem");
             let firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
+            let innerBox = this.mk.tag("div");
+            innerBox.style.display = "inline-block";
+            innerBox.style.verticalAlign = "middle";
+            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            label.appendChild(innerBox);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
-            label.appendChild(document.createTextNode(firstInfo.Name));
+            //label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
-            this.sensorTable.appendChild(this.mk.tag("br"));
+            //this.sensorTable.appendChild(this.mk.tag("br"));
         }
     }
 }

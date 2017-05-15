@@ -169,17 +169,22 @@ var DataAssigner = (function () {
         for (var i = 0; i < info.length; i++) {
             var sensor = info[i];
             var ctrl = drawMethod.call(this, plot, sensor);
-            var label = this.mk.tag("label");
+            var label = this.mk.tag("label", "listitem");
             var firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
+            var innerBox = this.mk.tag("div");
+            innerBox.style.display = "inline-block";
+            innerBox.style.verticalAlign = "middle";
+            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            label.appendChild(innerBox);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
-            label.appendChild(document.createTextNode(firstInfo.Name));
+            //label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
-            this.sensorTable.appendChild(this.mk.tag("br"));
         }
     };
     return DataAssigner;
