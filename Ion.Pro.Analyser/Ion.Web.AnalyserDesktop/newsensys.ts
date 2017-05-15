@@ -8,11 +8,42 @@
         private dataSources: IDataSource<any>[] = [];
         public groups: (new (containers: SensorDataContainer[]) => SensorGroup<any>)[] = [];
 
+        private telemetryDataSet: SensorDataSet = null;
+
         static readonly event_registerViewer = "registerViewer";
         static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
+            kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
             //this.loadSensorInformation();
+        }
+
+        private handleService(data: ISensorPackage[]) {
+            //console.log("recived data!");
+            if (this.telemetryDataSet) {
+                for (let j = 0; j < data.length; j++) {
+                    let realData = data[j];
+                    //console.log(realData);
+                    let sensId = realData.ID;
+                    let realKey = this.telemetryDataSet.IdKeyMap[sensId];
+                    if (!realKey) {
+                        realKey = sensId.toString();
+                    }
+                    this.telemetryDataSet.SensorData[realKey].points.push(new SensorValue(realData.Value, realData.TimeStamp));
+                    /*if (!this.telemetryDataSet.dataCache[sensId]) {
+                        this.dataCache[sensId] = new SensorDataContainer(sensId);
+                    }
+                    this.dataCache[sensId].insertSensorPackage([realData]);*/
+                }
+                this.refreshViewers();
+            }
+            /**/
+        }
+
+        private refreshViewers() {
+            for (let v of this.viewers) {
+                v.dataUpdate();
+            }
         }
 
         public addEventListener(type: string, handeler: any): void {
@@ -89,9 +120,14 @@
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
                     let dataSet = new SensorDataSet(data);
-                    this.loadedDataSet.push(dataSet); 3
+                    data.Name = "telemetry";
+                    this.telemetryDataSet = new SensorDataSet(data);
+                    this.loadedDataSet.push(dataSet);
+                    this.loadedDataSet.push(this.telemetryDataSet);
                     for (let v in dataSet.SensorData) {
+                        this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] }));
                         this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                     }
                     

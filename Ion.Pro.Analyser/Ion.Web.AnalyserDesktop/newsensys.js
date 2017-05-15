@@ -4,15 +4,45 @@ var Kernel;
     (function (SenSys) {
         var SensorManager = (function () {
             function SensorManager() {
+                var _this = this;
                 this.eventManager = new EventManager();
                 this.sensorInformation = [];
                 this.loadedDataSet = [];
                 this.viewers = [];
                 this.dataSources = [];
                 this.groups = [];
+                this.telemetryDataSet = null;
                 this.callbackStack = [];
+                kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
                 //this.loadSensorInformation();
             }
+            SensorManager.prototype.handleService = function (data) {
+                //console.log("recived data!");
+                if (this.telemetryDataSet) {
+                    for (var j = 0; j < data.length; j++) {
+                        var realData = data[j];
+                        //console.log(realData);
+                        var sensId = realData.ID;
+                        var realKey = this.telemetryDataSet.IdKeyMap[sensId];
+                        if (!realKey) {
+                            realKey = sensId.toString();
+                        }
+                        this.telemetryDataSet.SensorData[realKey].points.push(new SensorValue(realData.Value, realData.TimeStamp));
+                        /*if (!this.telemetryDataSet.dataCache[sensId]) {
+                            this.dataCache[sensId] = new SensorDataContainer(sensId);
+                        }
+                        this.dataCache[sensId].insertSensorPackage([realData]);*/
+                    }
+                    this.refreshViewers();
+                }
+                /**/
+            };
+            SensorManager.prototype.refreshViewers = function () {
+                for (var _i = 0, _a = this.viewers; _i < _a.length; _i++) {
+                    var v = _a[_i];
+                    v.dataUpdate();
+                }
+            };
             SensorManager.prototype.addEventListener = function (type, handeler) {
                 this.eventManager.addEventListener(type, handeler);
             };
@@ -78,9 +108,12 @@ var Kernel;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
                         var dataSet = new SensorDataSet(data);
+                        data.Name = "telemetry";
+                        _this.telemetryDataSet = new SensorDataSet(data);
                         _this.loadedDataSet.push(dataSet);
-                        3;
+                        _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {
+                            _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] }));
                             _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
                             //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                         }
