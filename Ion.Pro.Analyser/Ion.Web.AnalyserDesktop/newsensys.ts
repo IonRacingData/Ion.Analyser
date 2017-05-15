@@ -119,9 +119,11 @@
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
+                    let data2: ISensorDataSet = JSON.parse(JSON.stringify(data));
+
                     let dataSet = new SensorDataSet(data);
-                    data.Name = "telemetry";
-                    this.telemetryDataSet = new SensorDataSet(data);
+                    data2.Name = "telemetry";
+                    this.telemetryDataSet = new SensorDataSet(data2);
                     this.loadedDataSet.push(dataSet);
                     this.loadedDataSet.push(this.telemetryDataSet);
                     for (let v in dataSet.SensorData) {

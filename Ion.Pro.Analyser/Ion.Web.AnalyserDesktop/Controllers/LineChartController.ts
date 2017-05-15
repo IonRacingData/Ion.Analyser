@@ -196,11 +196,11 @@
 
                 this.ctxMain.beginPath();
                 if (this.darkTheme) {
-                    console.log("Dark theme");
+                    //console.log("Dark theme");
                     this.ctxMain.strokeStyle = this.data[d].color.toString();
                 }
                 else {
-                    console.log("Light theme");
+                    //console.log("Light theme");
                     this.ctxMain.strokeStyle = this.data[d].color.toString(true);
                 }
 

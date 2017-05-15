@@ -155,6 +155,7 @@ var GridViewer = (function () {
                 var app = kernel.appMan.start(temp.name);
                 if (temp.data) {
                     var viewer_1 = app.application;
+                    console.log(viewer_1);
                     if (sensys.SensorManager.isViewer(viewer_1)) {
                         var singleViewer_1 = viewer_1;
                         viewer_1.dataSource = dataSets[temp.data[0]];

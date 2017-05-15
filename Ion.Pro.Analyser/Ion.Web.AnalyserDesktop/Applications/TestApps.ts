@@ -259,7 +259,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
     plotType: string = "Gauge";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
     application: Application;
     window: AppWindow;
@@ -309,7 +309,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     plotType: string = "GPS";
     plotWindow: AppWindow;
     type: IClassType<Point3D> = Point3D;
-    dataSource: IDataSource<Point3D>;
+    dataSource: IDataSource<Point3D> = null;
 
     application: Application;
     window: AppWindow;
@@ -356,7 +356,7 @@ class LabelTester implements IApplication, IViewer<Point> {
     plotType: string = "Label";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
     application: Application;
     window: AppWindow;
@@ -404,7 +404,7 @@ class BarTester implements IApplication, IViewer<Point> {
     plotType: string = "Bar Chart";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
     application: Application;
     window: AppWindow;
@@ -491,7 +491,7 @@ class SteeringWheelTester implements IViewer<Point> {
     wheel: SteeringWheelController;
     val: number = 0.5;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
     plotType: string = "Bar";
     plotWindow: AppWindow;
 

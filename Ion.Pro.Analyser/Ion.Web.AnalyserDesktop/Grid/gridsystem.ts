@@ -176,7 +176,9 @@
                 let app = kernel.appMan.start(temp.name);
                 if (temp.data) {
                     let viewer = <any>app.application
+                    console.log(viewer);
                     if (sensys.SensorManager.isViewer(viewer)) {
+                        
                         let singleViewer = viewer;
                         viewer.dataSource = dataSets[temp.data[0]];
                         kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {

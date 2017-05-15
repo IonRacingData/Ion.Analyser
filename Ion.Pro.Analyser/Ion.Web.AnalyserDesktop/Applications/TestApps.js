@@ -196,6 +196,7 @@ var GaugeTester = (function () {
     function GaugeTester() {
         this.plotType = "Gauge";
         this.type = Point;
+        this.dataSource = null;
         this.val = 0;
     }
     GaugeTester.prototype.main = function () {
@@ -234,6 +235,7 @@ var GPSPlotTester = (function () {
     function GPSPlotTester() {
         this.plotType = "GPS";
         this.type = Point3D;
+        this.dataSource = null;
         this.points = [];
     }
     GPSPlotTester.prototype.main = function () {
@@ -274,6 +276,7 @@ var LabelTester = (function () {
     function LabelTester() {
         this.plotType = "Label";
         this.type = Point;
+        this.dataSource = null;
         this.val = 0;
     }
     LabelTester.prototype.main = function () {
@@ -313,6 +316,7 @@ var BarTester = (function () {
     function BarTester() {
         this.plotType = "Bar Chart";
         this.type = Point;
+        this.dataSource = null;
         this.val = 0;
     }
     BarTester.prototype.main = function () {
@@ -382,6 +386,7 @@ var SteeringWheelTester = (function () {
     function SteeringWheelTester() {
         this.val = 0.5;
         this.type = Point;
+        this.dataSource = null;
         this.plotType = "Bar";
     }
     SteeringWheelTester.prototype.main = function () {

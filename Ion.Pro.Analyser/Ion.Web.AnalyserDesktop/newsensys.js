@@ -102,9 +102,10 @@ var Kernel;
                 var _this = this;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
+                        var data2 = JSON.parse(JSON.stringify(data));
                         var dataSet = new SensorDataSet(data);
-                        data.Name = "telemetry";
-                        _this.telemetryDataSet = new SensorDataSet(data);
+                        data2.Name = "telemetry";
+                        _this.telemetryDataSet = new SensorDataSet(data2);
                         _this.loadedDataSet.push(dataSet);
                         _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {

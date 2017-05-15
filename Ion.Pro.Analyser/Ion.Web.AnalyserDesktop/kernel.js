@@ -81,6 +81,53 @@ function registerGridPresets() {
             }
         ]
     }));
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Basic Receive", {
+        name: "Basic Receive",
+        grid: {
+            data: [
+                /*{ name: "DataAssigner", data: null },*/
+                { name: "LineChartTester", data: ["speed", "current", "volt"] },
+                {
+                    data: [
+                        {
+                            data: [
+                                { name: "BarTester", data: ["volt"] },
+                                { name: "GaugeTester", data: ["current"] }
+                            ]
+                        },
+                        { name: "LabelTester", data: ["speed"] },
+                        { name: "LineChartTester", data: ["temp"] }
+                    ]
+                }
+            ]
+        },
+        sensorsets: [
+            {
+                grouptype: "PointSensorGroup",
+                key: "speed",
+                layers: [],
+                sources: [{ key: "SPEED", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "current",
+                layers: [],
+                sources: [{ key: "CURRENT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "volt",
+                layers: [],
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp",
+                layers: [],
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
+            }
+        ]
+    }));
 }
 /* tslint:enable:interface-name */
 var Launcher = (function () {
