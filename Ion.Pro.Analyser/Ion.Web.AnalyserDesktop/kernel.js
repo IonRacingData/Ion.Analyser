@@ -8,8 +8,8 @@ function startUp() {
     };
     kernel.senMan = new sensys.SensorManager(); // Late init because it needs netMan
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
-    kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
-    //kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
+    //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     // kernel.senMan.setGlobal(841);
     registerLaunchers();
     registerSensorGroups();
@@ -17,13 +17,16 @@ function startUp() {
     var content = mk.tag("div", "taskbar-applet");
     var menuContent = mk.tag("div", "taskbar-applet");
     var themeChange = mk.tag("div", "taskbar-applet");
+    var statusbar = mk.tag("div", "taskbar-applet");
     var wl = new WindowList(content);
     var menu = new MainMenu(menuContent);
     var theme = new ChangeTheme(themeChange);
+    var bar = new StatusBar(statusbar);
     var taskbar = document.getElementsByClassName("taskbar")[0];
     taskbar.appendChild(menu.content);
     taskbar.appendChild(theme.content);
     taskbar.appendChild(wl.content);
+    taskbar.appendChild(bar.content);
     document.addEventListener("contextmenu", function (e) {
         e.preventDefault();
     });

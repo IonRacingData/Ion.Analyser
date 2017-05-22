@@ -122,3 +122,28 @@ class ChangeTheme extends Applet {
         }
     }
 }
+
+class StatusBar extends Applet {
+    private element: HTMLElement;
+    constructor(content: HTMLElement) {
+        super();
+        this.content = content;
+        this.content.style.cssFloat = "right";
+        let mk: HtmlHelper = new HtmlHelper();
+        this.content.appendChild(this.element = mk.tag(
+            "div"
+            , "taskbar-item"
+            , []
+            , "Not connected"
+        ));
+        if (kernel.netMan.connectionOpen) {
+            this.element.innerHTML = "Connected";
+        }
+        kernel.netMan.manager.addEventListener(NetworkManager.event_gotConnection, () => {
+            this.element.innerHTML = "Connected";
+        });
+        kernel.netMan.manager.addEventListener(NetworkManager.event_lostConnection, () => {
+            this.element.innerHTML = "Not connected";
+        });
+    }
+}

@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var GridViewer = (function () {
     function GridViewer() {
         this.eh = new EventHandler();
@@ -186,6 +191,7 @@ var GridViewer = (function () {
             }
             else {
                 next.call(this_1, temp, lastBox.content, dataSets);
+                //next(temp, lastBox.content);
             }
         };
         var this_1 = this;
@@ -242,6 +248,7 @@ var GridViewer = (function () {
         for (var _i = 0, _a = this.childWindows; _i < _a.length; _i++) {
             var cur = _a[_i];
             cur.close();
+            // this.childWindows[cur].close();
         }
         this.eh.close();
         this.selectorWindow.close();
@@ -252,6 +259,8 @@ var GridViewer = (function () {
             var cur = _a[_i];
             cur.recalculateSize();
             cur.onResize();
+            // this.childWindows[cur].recalculateSize();
+            // this.childWindows[cur].onResize();
         }
     };
     GridViewer.prototype.handleMove = function () {
@@ -292,6 +301,7 @@ var GridViewer = (function () {
                 }
             }
             this.selectorWindow.show();
+            // console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
         }
         else {
             this.selectorWindow.hide();

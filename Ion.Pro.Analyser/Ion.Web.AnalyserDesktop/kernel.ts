@@ -19,8 +19,8 @@ function startUp() {
 
     kernel.senMan = new sensys.SensorManager();  // Late init because it needs netMan
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
-    kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
-    //kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
+    //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
@@ -32,16 +32,19 @@ function startUp() {
     let content: HTMLElement = mk.tag("div", "taskbar-applet");
     let menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
     let themeChange: HTMLElement = mk.tag("div", "taskbar-applet");
+    let statusbar: HTMLElement = mk.tag("div", "taskbar-applet");
 
     let wl: WindowList = new WindowList(content);
     let menu: MainMenu = new MainMenu(menuContent);
     let theme: ChangeTheme = new ChangeTheme(themeChange);
+    let bar: StatusBar = new StatusBar(statusbar);
 
     let taskbar: Element = document.getElementsByClassName("taskbar")[0];
 
     taskbar.appendChild(menu.content);
     taskbar.appendChild(theme.content);
     taskbar.appendChild(wl.content);
+    taskbar.appendChild(bar.content);
 
     document.addEventListener("contextmenu", (e: PointerEvent) => {
         e.preventDefault();

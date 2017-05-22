@@ -122,9 +122,12 @@ body {
     display: inline-block;
 }
 
-.taskbar-button-text {
+.taskbar-item, .taskbar-button-text {
     display: inline-block;
     padding: 8.5px;
+}
+
+.taskbar-button-text {
     cursor: default;
 }
 

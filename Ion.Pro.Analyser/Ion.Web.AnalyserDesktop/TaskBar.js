@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Taskbar = (function () {
     function Taskbar() {
     }
@@ -118,5 +123,26 @@ var ChangeTheme = (function (_super) {
         }
     };
     return ChangeTheme;
+}(Applet));
+var StatusBar = (function (_super) {
+    __extends(StatusBar, _super);
+    function StatusBar(content) {
+        var _this = _super.call(this) || this;
+        _this.content = content;
+        _this.content.style.cssFloat = "right";
+        var mk = new HtmlHelper();
+        _this.content.appendChild(_this.element = mk.tag("div", "taskbar-item", [], "Not connected"));
+        if (kernel.netMan.connectionOpen) {
+            _this.element.innerHTML = "Connected";
+        }
+        kernel.netMan.manager.addEventListener(NetworkManager.event_gotConnection, function () {
+            _this.element.innerHTML = "Connected";
+        });
+        kernel.netMan.manager.addEventListener(NetworkManager.event_lostConnection, function () {
+            _this.element.innerHTML = "Not connected";
+        });
+        return _this;
+    }
+    return StatusBar;
 }(Applet));
 //# sourceMappingURL=TaskBar.js.map

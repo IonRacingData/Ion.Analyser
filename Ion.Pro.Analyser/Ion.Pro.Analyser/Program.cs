@@ -450,6 +450,7 @@ namespace Ion.Pro.Analyser
                 if (parts[1] == "getdata")
                 {
                     SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    manager.Load(package.dataset);
                     ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(manager.GetBinaryData(package.dataset, package.num)) }, message, this);
                 }
             }

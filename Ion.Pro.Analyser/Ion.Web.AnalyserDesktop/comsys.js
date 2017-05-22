@@ -11,21 +11,55 @@ function requestAction(action, callback) {
 }
 var NetworkManager = (function () {
     function NetworkManager() {
-        var _this = this;
         this.curId = 0;
         this.backlog = [];
         this.serviceCallback = [];
         this.callback = [];
-        this.socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
-        this.socket.onmessage = function (ev) {
+        this.reconnecter = null;
+        this.manager = new EventManager();
+        this.socket = this.createWebSocket();
+    }
+    NetworkManager.prototype.createWebSocket = function () {
+        var _this = this;
+        var socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+        socket.onmessage = function (ev) {
             _this.receiveMessage(ev);
             // console.log(ev);
             // console.log(ev.data);
         };
-        this.socket.onopen = function (ev) {
-            _this.isReady = true;
+        socket.onerror = function (ev) {
+            console.log(ev);
         };
-    }
+        socket.onclose = function (ev) {
+            _this.connectionOpen = false;
+            _this.socket = null;
+            _this.tryReconnect();
+            _this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
+        };
+        socket.onopen = function (ev) {
+            _this.connectionOpen = true;
+            console.log("Connection established");
+            _this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
+        };
+        return socket;
+    };
+    NetworkManager.prototype.tryReconnect = function () {
+        var _this = this;
+        var reconnectInterval = 2000;
+        console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval);
+        this.reconnecter = this.reconnecter = setInterval(function () {
+            if (_this.connectionOpen) {
+                clearInterval(_this.reconnecter);
+            }
+            requestAction("ping", function (data) {
+                console.log(data);
+                clearInterval(_this.reconnecter);
+                if (!_this.socket) {
+                    _this.socket = _this.createWebSocket();
+                }
+            });
+        }, reconnectInterval);
+    };
     NetworkManager.prototype.registerService = function (callbackId, callback) {
         this.serviceCallback[callbackId] = callback;
     };
@@ -37,7 +71,7 @@ var NetworkManager = (function () {
             MessageId: this.curId++
         };
         this.callback[pack.MessageId] = callback;
-        if (!this.isReady) {
+        if (!this.connectionOpen) {
             this.backlog.push(message);
         }
         else {
@@ -72,6 +106,8 @@ var NetworkManager = (function () {
     };
     return NetworkManager;
 }());
+NetworkManager.event_gotConnection = "websock_open";
+NetworkManager.event_lostConnection = "websock_close";
 var ComMessageStatus;
 (function (ComMessageStatus) {
     ComMessageStatus[ComMessageStatus["Request110"] = 110] = "Request110";

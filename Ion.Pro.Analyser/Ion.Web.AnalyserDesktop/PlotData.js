@@ -58,12 +58,14 @@ var SensorDataContainer = (function () {
         if (p.length > 0) {
             if (this.points.length === 0) {
                 this.pushArray(this.points, p);
+                //this.points.push(...p);
             }
             else {
                 var first = p[0];
                 var last = p[p.length - 1];
                 if (first.timestamp > this.last().timestamp) {
                     this.pushArray(this.points, p);
+                    //this.points.push(...p);
                 }
                 else if (last.timestamp < this.points[0].timestamp) {
                     (_a = this.points).splice.apply(_a, [0, 0].concat(p));

@@ -324,6 +324,7 @@ var SensorInfoHelper = (function () {
         else {
             /* tslint:disable:no-bitwise */
             val = (1 << info.Resolution) - 1;
+            /* tslint:enable:no-bitwise */
         }
         return val;
     };

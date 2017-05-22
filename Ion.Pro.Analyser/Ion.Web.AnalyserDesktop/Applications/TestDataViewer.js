@@ -185,6 +185,7 @@ var DataAssigner = (function () {
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
             //label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
+            //this.sensorTable.appendChild(this.mk.tag("br"));
         }
     };
     return DataAssigner;

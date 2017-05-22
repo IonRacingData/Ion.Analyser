@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Controller = (function () {
     function Controller() {
         this.mk = new HtmlHelper;
@@ -84,6 +89,9 @@ var MultiValueCanvasController = (function (_super) {
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
             this.updateSensorInfos(kernel.senMan.getInfos());
+            /*kernel.senMan.getInfos((infos: SensorInformation[]) => {
+                this.updateSensorInfos(infos);
+            });*/
         }
         this.onDataChange();
     };
@@ -228,6 +236,11 @@ var ScatterChartBase = (function (_super) {
                 this.lastSensorInfo = this.data.infos.SensorInfos[0];
                 this.lastID = curID;
                 this.onDataChange();
+                /*kernel.senMan.getSensorInfoNew(this.data, (i: SensorInformation) => {
+                    this.lastSensorInfo = i;
+                    this.lastID = this.data.infos.Keys[0];
+                    this.onDataChange();
+                });*/
             }
             else {
                 this.onDataChange();
