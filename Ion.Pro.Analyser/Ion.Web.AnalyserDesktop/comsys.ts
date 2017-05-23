@@ -25,8 +25,8 @@ class NetworkManager {
 
     public manager: EventManager = new EventManager();
 
-    onGotConnection = newEvent();
-    onLostConnection = newEvent();
+    onGotConnection = newEvent("NetworkManager.onGotConnection");
+    onLostConnection = newEvent("NetworkManager.onLoseConnection");
 
     constructor() {
         this.socket = this.createWebSocket();

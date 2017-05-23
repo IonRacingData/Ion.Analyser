@@ -22,6 +22,7 @@ interface IEventHandlerWrapper {
 
 interface INewEventHandlerWrapper {
     event: INewEvent;
+    info: string;
     handler: any;
 }
 
@@ -33,7 +34,7 @@ class EventHandler {
     public on(manager: IEventManager, type: string, handeler: any): void;
     public on(first: INewEvent | IEventManager, sec: any, handler: any = null): void {
         if (typeof (first) === "function") {
-            this.localNewEvent.push({ event: first, handler: sec });
+            this.localNewEvent.push({ event: first, info: first.info, handler: sec });
             first.addEventListener(sec);
         }
         else {

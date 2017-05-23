@@ -8,8 +8,8 @@
     //static event_appLaunch = "appLaunch";
     //static event_appClose = "appClose";
 
-    onAppLaunch = newEvent();
-    onAppClose = newEvent();
+    onAppLaunch = newEvent("ApplicationManager.onAppLaunch");
+    onAppClose = newEvent("ApplicationManager.onAppClose");
 
     launchApplication(launcher: Launcher, ...args: any[]): Application {
         var temp: IApplication = new launcher.mainFunction();

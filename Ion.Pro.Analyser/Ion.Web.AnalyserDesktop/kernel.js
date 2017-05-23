@@ -31,19 +31,20 @@ function startUp() {
         e.preventDefault();
     });
 }
-function newEvent() {
+function newEvent(info) {
     var callbacks = [];
     var handler = function EventHandler() {
         var params = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             params[_i] = arguments[_i];
         }
-        console.log("running events");
-        console.log(callbacks);
+        // console.log("running events");
+        // console.log(callbacks);
         for (var i = 0; i < callbacks.length; i++) {
             callbacks[i].apply(callbacks, params);
         }
     };
+    handler.info = info;
     handler.addEventListener = function addEventListener(callback) {
         callbacks.push(callback);
     };
@@ -60,7 +61,7 @@ function registerLaunchers() {
     // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
-    //kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
+    kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
     kernel.appMan.registerApplication("Charts", new Launcher(LineChartTester, "Line Chart"));
     kernel.appMan.registerApplication("Charts", new Launcher(GaugeTester, "Gauge"));
     kernel.appMan.registerApplication("Charts", new Launcher(GPSPlotTester, "GPS Viewer"));
@@ -68,11 +69,11 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Charts", new Launcher(BarTester, "Bar Chart"));
     kernel.appMan.registerApplication("Charts", new Launcher(SteeringWheelTester, "Steering Wheel"));
     // kernel.appMan.registerApplication("Charts", new Launcher(TestDataViewer, "Test Viewer"));
-    // kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
-    // kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
-    // kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
-    // kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
-    // kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
+    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     registerGridPresets();
 }

@@ -24,11 +24,12 @@
         tg.addHeader("PID", "Application", "# of Windows");
         var apps = kernel.appMan.appList;
         for (var i = 0; i < apps.length; i++) {
+            let tempApp = apps[i];
             tg.addRow(
                 [
                     {
                         event: "click",
-                        func: (e: MouseEvent) => this.onAppClick((<HTMLElement>e.target).parentElement)
+                        func: (e: MouseEvent) => this.onAppClick(tempApp)
                     }
                 ],
                 apps[i].pid,
@@ -38,18 +39,32 @@
         this.mainWindow.content.appendChild(table);
     }
 
-    onAppClick(tr: HTMLElement) {
-        var pid = parseInt(tr.firstChild.textContent, 10);
-        for (var i = 0; i < kernel.appMan.appList.length; i++) {
-            var app = kernel.appMan.appList[i];
-            if (app.pid === pid) {
-                var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
-                this.infoWindows.push(win);
-            }
-        }
+    onAppClick(app: Application) {
+        var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
+        this.infoWindows.push(win);
+        this.drawInfoWindow(app, win);
+
+
+        //var pid = parseInt(tr.firstChild.textContent, 10);
+        //for (var i = 0; i < kernel.appMan.appList.length; i++) {
+            //var app = kernel.appMan.appList[i];
+            //if (app.pid === pid) {
+                
+            //}
+        //}
     }
 
-    drawInfoWindow() {
+    drawInfoWindow(app: Application, win: AppWindow) {
+        let windowTab = new HtmlTableGen("table");
+        windowTab.addHeader("Title");
+        windowTab.addArray(app.windows, ["title"]);
+        let windowEvents = new HtmlTableGen("table");
+        windowEvents.addHeader("Event", "extra");
+        windowEvents.addArray(app.events.localNewEvent, ["info"]);
+        windowEvents.addArray(app.events.localEvents, ["type", "manager"]);
 
+        win.content.innerHTML = "";
+        win.content.appendChild(windowTab.generate());
+        win.content.appendChild(windowEvents.generate());
     }
 }

@@ -7,8 +7,8 @@ var ApplicationManager = (function () {
         this.nextPID = 0;
         //static event_appLaunch = "appLaunch";
         //static event_appClose = "appClose";
-        this.onAppLaunch = newEvent();
-        this.onAppClose = newEvent();
+        this.onAppLaunch = newEvent("ApplicationManager.onAppLaunch");
+        this.onAppClose = newEvent("ApplicationManager.onAppClose");
     }
     ApplicationManager.prototype.launchApplication = function (launcher) {
         var args = [];

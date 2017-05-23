@@ -17,8 +17,8 @@ var NetworkManager = (function () {
         this.callback = [];
         this.reconnecter = null;
         this.manager = new EventManager();
-        this.onGotConnection = newEvent();
-        this.onLostConnection = newEvent();
+        this.onGotConnection = newEvent("NetworkManager.onGotConnection");
+        this.onLostConnection = newEvent("NetworkManager.onLoseConnection");
         this.socket = this.createWebSocket();
     }
     NetworkManager.prototype.createWebSocket = function () {

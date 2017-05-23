@@ -16,13 +16,13 @@ var AppWindow = (function () {
         this.eventMan = new EventManager();
         this.outerBoxMargin = 8;
         /*Events*/
-        this.onResize = newEvent();
-        this.onMove = newEvent();
-        this.onClose = newEvent();
-        this.onMouseMove = newEvent();
-        this.onDragOver = newEvent();
-        this.onDragRelease = newEvent();
-        this.onUpdate = newEvent();
+        this.onResize = newEvent("AppWindow.onResize");
+        this.onMove = newEvent("AppWindow.onMove");
+        this.onClose = newEvent("AppWindow.onClose");
+        this.onMouseMove = newEvent("AppWindow.onMouseMove");
+        this.onDragOver = newEvent("AppWindow.onDragOver");
+        this.onDragRelease = newEvent("AppWindow.onDragRelease");
+        this.onUpdate = newEvent("AppWindow.onUpdate");
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);

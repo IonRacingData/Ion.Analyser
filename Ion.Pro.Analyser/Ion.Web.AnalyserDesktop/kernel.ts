@@ -55,20 +55,23 @@ function startUp() {
 
 interface INewEvent{
     (...params: any[]): void;
+    info: string;
     addEventListener(...params: any[]): void;
     removeEventListener(...params: any[]): void;
 }
 
-function newEvent(): INewEvent {
+function newEvent(info: string): INewEvent {
     let callbacks: ((...params: any[]) => void)[] = [];
 
     let handler = <any>function EventHandler(...params: any[]) {
-        console.log("running events");
-        console.log(callbacks);
+        // console.log("running events");
+        // console.log(callbacks);
         for (let i = 0; i < callbacks.length; i++) {
             callbacks[i](...params);
         }
     }
+
+    handler.info = info;
 
     handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
         callbacks.push(callback);
@@ -100,7 +103,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
-    //kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
+    kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
 
     kernel.appMan.registerApplication("Charts", new Launcher(LineChartTester, "Line Chart"));
     kernel.appMan.registerApplication("Charts", new Launcher(GaugeTester, "Gauge"));
@@ -111,12 +114,12 @@ function registerLaunchers() {
     // kernel.appMan.registerApplication("Charts", new Launcher(TestDataViewer, "Test Viewer"));
 
 
-    // kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
-    // kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
-    // kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
+    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
 
-    // kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
-    // kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
 
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 

@@ -141,8 +141,8 @@
             });
         }
 
-        public onRegisterViewer = newEvent();
-        public onUnRegisterViewer = newEvent();
+        public onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
+        public onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
 
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);

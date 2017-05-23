@@ -262,13 +262,15 @@
 
     /*Events*/
 
-    onResize = newEvent();
-    onMove = newEvent();
-    onClose = newEvent();
+    onResize = newEvent("AppWindow.onResize");
+    onMove = newEvent("AppWindow.onMove");
+    onClose = newEvent("AppWindow.onClose");
 
-    onMouseMove = newEvent();
-    onDragOver = newEvent();
-    onDragRelease = newEvent();
+    onMouseMove = newEvent("AppWindow.onMouseMove");
+    onDragOver = newEvent("AppWindow.onDragOver");
+    onDragRelease = newEvent("AppWindow.onDragRelease");
+
+    onUpdate = newEvent("AppWindow.onUpdate");
 
     private __onMouseMove(x: number, y: number): void {
         this.onMouseMove(new AppMouseEvent(x, y));
@@ -283,7 +285,7 @@
         this.onDragRelease(new AppMouseDragEvent(x, y, window));
     }
 
-    onUpdate = newEvent();
+    
 
     close() {
         this.onClose();

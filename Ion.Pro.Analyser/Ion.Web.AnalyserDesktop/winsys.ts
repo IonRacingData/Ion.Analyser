@@ -17,28 +17,15 @@
     private tileZone = 20;
     private topBar = 40;
 
-    private addEventListener2: (type: string, listner: any) => void;
+    onGlobalDrag = newEvent("WindowManager.onGlobalDrag");
+    onGlobalUp = newEvent("WindowManager.onGlobalUp");
 
+    onWindowOpen = newEvent("WindowManager.onWindowOpen");
+    onWindowSelect = newEvent("WindowManager.onWindowSelect");
+    onWindowClose = newEvent("WindowManager.onWindowClose");
+    onWindowUpdate = newEvent("WindowManager.onWindowUpdate");
 
-    /*static event_globalDrag = "globalDrag";
-    static event_globalUp = "globalUp;";
-
-    static event_windowOpen = "windowOpen";
-    static event_windowSelect = "windowSelect";
-    static event_windowClose = "windowClose";
-    static event_windowUpdate = "windowUpdate";
-
-    static event_themeChange = "themeChange";*/
-
-    onGlobalDrag = newEvent();
-    onGlobalUp = newEvent();
-
-    onWindowOpen = newEvent();
-    onWindowSelect = newEvent();
-    onWindowClose = newEvent();
-    onWindowUpdate = newEvent();
-
-    onThemeChange = newEvent();
+    onThemeChange = newEvent("WindowManager.onThemeChange");
 
     private availableThemes: string[] = ["app-style", "app-style-dark"];
 

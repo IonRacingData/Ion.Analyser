@@ -11,7 +11,7 @@ var EventHandler = (function () {
     EventHandler.prototype.on = function (first, sec, handler) {
         if (handler === void 0) { handler = null; }
         if (typeof (first) === "function") {
-            this.localNewEvent.push({ event: first, handler: sec });
+            this.localNewEvent.push({ event: first, info: first.info, handler: sec });
             first.addEventListener(sec);
         }
         else {
