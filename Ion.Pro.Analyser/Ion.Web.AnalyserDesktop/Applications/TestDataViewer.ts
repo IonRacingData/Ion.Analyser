@@ -1,24 +1,19 @@
 ﻿class DataAssigner implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
     mk = new HtmlHelper();
     sensorTable: HTMLElement;
-    eh: EventHandler = new EventHandler();
     selected: IViewerBase<any>;
 
     main(preSelect: any): void {
-        this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
+        this.window = kernel.winMan.createWindow(this.app, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
         this.selected = preSelect;
         this.draw();
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => this.draw());
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => this.draw());
-        this.eh.on(this.window, AppWindow.event_close, () => this.window_close());
-    }
 
-    private window_close() {
-        this.eh.close();
+        this.app.events.on(kernel.senMan.onRegisterViewer, () => this.draw());
+        this.app.events.on(kernel.senMan.onUnRegisterViewer, () => this.draw());
     }
 
     draw() {
@@ -245,14 +240,14 @@
 }
 */
 class SensorSetSelector implements IApplication {
-    public application: Application;
+    public app: Application;
     private window: AppWindow;
     private mk = new HtmlHelper();
     private wrapper: HTMLElement;
 
     public main(): void {
         this.wrapper = this.mk.tag("div");
-        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        this.window = kernel.winMan.createWindow(this.app, "Sensor Selector");
         requestAction("GetAvaiableSets", (data: ISensorSetInformation[]) => this.drawData(data));
         this.window.content.appendChild(this.wrapper);
     }

@@ -10,14 +10,13 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var GridViewer = (function () {
     function GridViewer() {
-        this.eh = new EventHandler();
         this.mk = new HtmlHelper();
         this.childWindows = [];
     }
     GridViewer.prototype.main = function (temp) {
         console.log(temp);
-        this.window = kernel.winMan.createWindow(this.application, "New Grid");
-        this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.window = kernel.winMan.createWindow(this.app, "New Grid");
+        this.selectorWindow = kernel.winMan.createWindow(this.app, "Selector");
         this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
@@ -29,7 +28,7 @@ var GridViewer = (function () {
         this.selectorWindow.hide();
         // (<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
         var mk = this.mk;
-        this.registerEvents(this.eh);
+        this.registerEvents(this.app.events);
         var template = document.getElementById("temp-grid");
         var test = new GridHContainer(this);
         var clone = test.baseNode;
@@ -238,11 +237,11 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.registerEvents = function (eh) {
         var _this = this;
-        eh.on(kernel.winMan, WindowManager.event_globalDrag, function (data) { return _this.globalDrag(data); });
-        eh.on(kernel.winMan, WindowManager.event_globalUp, function (data) { return _this.globalUp(data); });
-        eh.on(this.window, AppWindow.event_close, function () { return _this.handleClose(); });
-        eh.on(this.window, AppWindow.event_resize, function () { return _this.handleResize(); });
-        eh.on(this.window, AppWindow.event_move, function () { return _this.handleMove(); });
+        eh.on(kernel.winMan.onGlobalDrag, function (data) { return _this.globalDrag(data); });
+        eh.on(kernel.winMan.onGlobalUp, function (data) { return _this.globalUp(data); });
+        eh.on(this.window.onClose, function () { return _this.handleClose(); });
+        eh.on(this.window.onResize, function () { return _this.handleResize(); });
+        eh.on(this.window.onMove, function () { return _this.handleMove(); });
     };
     GridViewer.prototype.handleClose = function () {
         for (var _i = 0, _a = this.childWindows; _i < _a.length; _i++) {
@@ -250,7 +249,7 @@ var GridViewer = (function () {
             cur.close();
             // this.childWindows[cur].close();
         }
-        this.eh.close();
+        this.app.events.close();
         this.selectorWindow.close();
     };
     GridViewer.prototype.handleResize = function () {

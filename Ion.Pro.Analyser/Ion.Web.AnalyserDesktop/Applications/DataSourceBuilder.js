@@ -1,13 +1,12 @@
 var DataSourceBuilder = (function () {
     function DataSourceBuilder() {
         this.mk = new HtmlHelper();
-        this.eh = new EventHandler();
         this.dsbOpen = false;
         this.lastRow = null;
     }
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "Data Source Builder");
+        this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
         this.wrapper = this.mk.tag("div");
         this.wrapper.style.display = "flex";
         this.wrapper.style.flexDirection = "column";
@@ -20,21 +19,17 @@ var DataSourceBuilder = (function () {
         this.wrapper.appendChild(this.innerWrapper);
         this.wrapper.appendChild(this.bottomDiv);
         this.window.content.appendChild(this.wrapper);
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () {
+        this.app.events.on(kernel.senMan.onRegisterViewer, function () {
             if (!_this.dsbOpen) {
                 _this.drawLeft();
             }
         });
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () {
+        this.app.events.on(kernel.senMan.onUnRegisterViewer, function () {
             if (!_this.dsbOpen) {
                 _this.drawLeft();
             }
         });
-        this.eh.on(this.window, AppWindow.event_close, function () { return _this.window_close(); });
         this.drawInner();
-    };
-    DataSourceBuilder.prototype.window_close = function () {
-        this.eh.close();
     };
     DataSourceBuilder.prototype.drawInner = function () {
         this.innerWrapper.innerHTML = "";

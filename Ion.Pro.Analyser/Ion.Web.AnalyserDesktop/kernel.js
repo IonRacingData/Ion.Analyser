@@ -31,6 +31,28 @@ function startUp() {
         e.preventDefault();
     });
 }
+function newEvent() {
+    var callbacks = [];
+    var handler = function EventHandler() {
+        var params = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            params[_i] = arguments[_i];
+        }
+        console.log("running events");
+        console.log(callbacks);
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].apply(callbacks, params);
+        }
+    };
+    handler.addEventListener = function addEventListener(callback) {
+        callbacks.push(callback);
+    };
+    handler.removeEventListener = function removeEventListener(callback) {
+        var a = callbacks.indexOf(callback);
+        callbacks.splice(a, 1);
+    };
+    return handler;
+}
 function registerSensorGroups() {
     kernel.senMan.registerGroup(PointSensorGroup);
 }

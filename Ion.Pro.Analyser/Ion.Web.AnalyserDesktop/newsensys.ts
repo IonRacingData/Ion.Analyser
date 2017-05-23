@@ -10,8 +10,8 @@
 
         private telemetryDataSet: SensorDataSet = null;
 
-        static readonly event_registerViewer = "registerViewer";
-        static readonly event_unregisterViewer = "unregisterViewer";
+        //static readonly event_registerViewer = "registerViewer";
+        //static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
             kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
@@ -141,9 +141,14 @@
             });
         }
 
+        public onRegisterViewer = newEvent();
+        public onUnRegisterViewer = newEvent();
+
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
-            this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+            console.log("New register view");
+            this.onRegisterViewer();
+            //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
         }
 
         public registerGroup(group: new (containers: SensorDataContainer[]) => SensorGroup<any>): void {
@@ -153,7 +158,8 @@
         public unregister<T>(viewer: IViewerBase<T>): void {
             let index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);
-            this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
+            this.onUnRegisterViewer();
+            //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
         }
 
         public getInfos(): ISensorInformation[] {

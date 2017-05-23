@@ -1,29 +1,21 @@
 ﻿class TaskManager implements IApplication {
-    application: Application;
+    app: Application;
     mainWindow: AppWindow;
     infoWindows: AppWindow[] = [];
     mk: HtmlHelper;
-    eh: EventHandler = new EventHandler();
 
     main() {
-        this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        this.addEvents(this.eh);
+        this.mainWindow = kernel.winMan.createWindow(this.app, "Task Manager");
+        this.addEvents(this.app.events);
         this.draw();
     }
 
     addEvents(eh: EventHandler) {
+        eh.on(kernel.winMan.onWindowOpen, () => this.draw());
+        eh.on(kernel.winMan.onWindowClose, () => this.draw());
 
-        eh.on(kernel.winMan, WindowManager.event_windowOpen, () => this.draw());
-        eh.on(kernel.winMan, WindowManager.event_windowClose, () => this.draw());
-
-        eh.on(kernel.appMan, ApplicationManager.event_appLaunch, () => this.draw());
-        eh.on(kernel.appMan, ApplicationManager.event_appClose, () => this.draw());
-
-        eh.on(this.mainWindow, AppWindow.event_close, () => this.close());
-    }
-
-    close() {
-        this.eh.close();
+        eh.on(kernel.appMan.onAppLaunch, () => this.draw());
+        eh.on(kernel.appMan.onAppClose, () => this.draw());
     }
 
     draw() {
@@ -51,7 +43,7 @@
         for (var i = 0; i < kernel.appMan.appList.length; i++) {
             var app = kernel.appMan.appList[i];
             if (app.pid === pid) {
-                var win = kernel.winMan.createWindow(this.application, "Task Manager - " + app.name);
+                var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
                 this.infoWindows.push(win);
             }
         }
