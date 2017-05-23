@@ -1,8 +1,7 @@
 ﻿class DataSourceBuilder implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
     mk: HtmlHelper = new HtmlHelper();
-    eh: EventHandler = new EventHandler();
 
     private dsbOpen: boolean = false;
     private dsb: DSBController;
@@ -16,7 +15,7 @@
     private bottomDiv: HTMLElement;
 
     public main(): void {
-        this.window = kernel.winMan.createWindow(this.application, "Data Source Builder");
+        this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
         this.wrapper = this.mk.tag("div");
         this.wrapper.style.display = "flex";
         this.wrapper.style.flexDirection = "column";
@@ -31,23 +30,18 @@
         this.wrapper.appendChild(this.bottomDiv);
         this.window.content.appendChild(this.wrapper);
 
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => {
+        this.app.events.on(kernel.senMan.onRegisterViewer, () => {
             if (!this.dsbOpen) {
                 this.drawLeft()
             }
         });
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => {
+        this.app.events.on(kernel.senMan.onUnRegisterViewer, () => {
             if (!this.dsbOpen) {
                 this.drawLeft()
             }
         });
-        this.eh.on(this.window, AppWindow.event_close, () => this.window_close());
 
         this.drawInner();
-    }
-
-    private window_close() {
-        this.eh.close();
     }
 
     private drawInner(): void {

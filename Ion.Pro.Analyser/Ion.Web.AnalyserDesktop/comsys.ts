@@ -25,11 +25,10 @@ class NetworkManager {
 
     public manager: EventManager = new EventManager();
 
-    static readonly event_gotConnection = "websock_open";
-    static readonly event_lostConnection = "websock_close";
+    onGotConnection = newEvent();
+    onLostConnection = newEvent();
 
     constructor() {
-
         this.socket = this.createWebSocket();
     }
 
@@ -50,13 +49,15 @@ class NetworkManager {
             this.connectionOpen = false;
             this.socket = null;
             this.tryReconnect();
-            this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
+            this.onLostConnection();
+            //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         }
 
         socket.onopen = (ev: Event) => {
             this.connectionOpen = true;
             console.log("Connection established");
-            this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
+            this.onGotConnection();
+            //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
 
         return socket;

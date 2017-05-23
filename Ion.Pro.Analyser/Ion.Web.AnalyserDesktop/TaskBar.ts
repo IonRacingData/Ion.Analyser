@@ -11,10 +11,10 @@ class WindowList extends Applet {
         super();
         this.content = content;
         let winMan: WindowManager = this.winMan = kernel.winMan;
-        winMan.addEventListener(WindowManager.event_windowOpen, () => this.programOpen());
-        winMan.addEventListener(WindowManager.event_windowClose, () => this.programClose());
-        winMan.addEventListener(WindowManager.event_windowSelect, () => this.programSelect());
-        winMan.addEventListener(WindowManager.event_windowUpdate, () => this.windowUpdate());
+        winMan.onWindowOpen.addEventListener(() => this.programOpen());
+        winMan.onWindowClose.addEventListener(() => this.programClose());
+        winMan.onWindowSelect.addEventListener(() => this.programSelect());
+        winMan.onWindowUpdate.addEventListener(() => this.windowUpdate());
         this.addWindows();
     }
 
@@ -139,10 +139,10 @@ class StatusBar extends Applet {
         if (kernel.netMan.connectionOpen) {
             this.element.innerHTML = "Connected";
         }
-        kernel.netMan.manager.addEventListener(NetworkManager.event_gotConnection, () => {
+        kernel.netMan.onGotConnection.addEventListener(() => {
             this.element.innerHTML = "Connected";
         });
-        kernel.netMan.manager.addEventListener(NetworkManager.event_lostConnection, () => {
+        kernel.netMan.onLostConnection.addEventListener(() => {
             this.element.innerHTML = "Not connected";
         });
     }

@@ -4,7 +4,7 @@ var TestViewer = (function () {
     TestViewer.prototype.main = function () {
         var _this = this;
         this.mk = new HtmlHelper();
-        this.window = kernel.winMan.createWindow(this.application, "Test Window");
+        this.window = kernel.winMan.createWindow(this.app, "Test Window");
         requestAction("hello", function (data) {
             _this.helloData = data;
             _this.draw();
@@ -20,7 +20,7 @@ var DataViewer = (function () {
     function DataViewer() {
     }
     DataViewer.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
+        this.window = kernel.winMan.createWindow(this.app, "Data Viewer");
         //kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     };
     DataViewer.prototype.draw = function (data) {
@@ -59,7 +59,7 @@ var CsvGenerator = (function () {
         this.mk = new HtmlHelper();
     }
     CsvGenerator.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "CSV Creator");
+        this.window = kernel.winMan.createWindow(this.app, "CSV Creator");
         this.draw();
     };
     CsvGenerator.prototype.createInput = function (inputType, name, value, checked, disabled) {
@@ -138,13 +138,12 @@ var LineChartTester = (function () {
         this.plotType = "Line Chart";
         this.type = Point;
         this.dataCollectionSource = [];
-        this.eh = new EventHandler();
         this.testWindow = new MenuWindow(document.body);
         this.darkTheme = true;
     }
     LineChartTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Line Chart");
         this.plotWindow.content.oncontextmenu = function (e) {
             _this.testWindow.x = e.x;
             _this.testWindow.y = e.y;
@@ -155,40 +154,32 @@ var LineChartTester = (function () {
                 kernel.appMan.start("DataAssigner", _this);
             }
         });
-        this.eh.on(this.plotWindow, AppWindow.event_close, function () { return _this.window_close(); });
         this.window.content.style.overflow = "hidden";
         this.lineChart = new LineChartController();
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
         kernel.senMan.register(this);
-        this.createEvents(this.eh);
+        this.createEvents(this.app.events);
     };
     LineChartTester.prototype.window_close = function () {
-        console.log("closing");
+        console.log("Unregister from sensys");
         kernel.senMan.unregister(this);
-        this.eh.close();
     };
     LineChartTester.prototype.dataUpdate = function () {
         this.lineChart.setData(this.dataCollectionSource);
     };
     LineChartTester.prototype.createEvents = function (eh) {
         var _this = this;
-        eh.on(this.window, AppWindow.event_resize, function () {
+        eh.on(this.window.onResize, function () {
             _this.lineChart.setSize(_this.window.width, _this.window.height);
         });
-        eh.on(this.window, AppWindow.event_close, function () {
-            _this.close();
-        });
-        eh.on(this.plotWindow, AppWindow.event_close, function () {
+        eh.on(this.plotWindow.onClose, function () {
             _this.window_close();
         });
-        eh.on(kernel.winMan, WindowManager.event_themeChange, function () {
+        eh.on(kernel.winMan.onThemeChange, function () {
             _this.darkTheme = !_this.darkTheme;
             _this.lineChart.updateTheme();
         });
-    };
-    LineChartTester.prototype.close = function () {
-        this.eh.close();
     };
     return LineChartTester;
 }());
@@ -201,7 +192,7 @@ var GaugeTester = (function () {
     }
     GaugeTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Gauge");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -217,7 +208,7 @@ var GaugeTester = (function () {
         kernel.senMan.register(this);
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
-        this.window.addEventListener(AppWindow.event_resize, function () {
+        this.window.onResize.addEventListener(function () {
             _this.gauge.setSize(_this.window.width, _this.window.height);
         });
     };
@@ -240,7 +231,7 @@ var GPSPlotTester = (function () {
     }
     GPSPlotTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPS Viewer");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "GPS Viewer");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -263,7 +254,7 @@ var GPSPlotTester = (function () {
             this.testData = new GPSPlotData(this.points);
             this.draw();
         });*/
-        this.window.addEventListener(AppWindow.event_resize, function () {
+        this.window.onResize.addEventListener(function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
     };
@@ -281,7 +272,7 @@ var LabelTester = (function () {
     }
     LabelTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Label");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Label");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -303,7 +294,7 @@ var LabelTester = (function () {
             this.val -= e.deltaY;
             this.label.setValue(this.val);
         });*/
-        this.window.addEventListener(AppWindow.event_resize, function () {
+        this.window.onResize.addEventListener(function () {
             _this.label.setSize(_this.window.width, _this.window.height);
         });
     };
@@ -321,7 +312,7 @@ var BarTester = (function () {
     }
     BarTester.prototype.main = function () {
         var _this = this;
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Bar Chart");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Bar Chart");
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -338,7 +329,7 @@ var BarTester = (function () {
         this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
-        this.window.addEventListener(AppWindow.event_resize, function () {
+        this.window.onResize.addEventListener(function () {
             _this.bar.setSize(_this.window.width, _this.window.height);
         });
     };
@@ -352,7 +343,7 @@ var LegacyRPIManager = (function () {
         this.mk = new HtmlHelper();
     }
     LegacyRPIManager.prototype.main = function () {
-        this.window = kernel.winMan.createWindow(this.application, "Legacy RPI Manager");
+        this.window = kernel.winMan.createWindow(this.app, "Legacy RPI Manager");
         var wrapper = this.mk.tag("div");
         wrapper.appendChild(this.mk.tag("button", "", [{
                 event: "click",
@@ -391,7 +382,7 @@ var SteeringWheelTester = (function () {
     }
     SteeringWheelTester.prototype.main = function () {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "Steering wheel");
+        this.window = kernel.winMan.createWindow(this.app, "Steering wheel");
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);
@@ -405,7 +396,7 @@ var SteeringWheelTester = (function () {
             _this.val = _this.val > 1 ? 1 : _this.val;
             _this.wheel.setPer(_this.val);
         });
-        this.window.addEventListener(AppWindow.event_resize, function () {
+        this.window.onResize.addEventListener(function () {
             _this.wheel.setSize(_this.window.width, _this.window.height);
         });
     };

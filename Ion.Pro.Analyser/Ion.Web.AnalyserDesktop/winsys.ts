@@ -19,7 +19,8 @@
 
     private addEventListener2: (type: string, listner: any) => void;
 
-    static event_globalDrag = "globalDrag";
+
+    /*static event_globalDrag = "globalDrag";
     static event_globalUp = "globalUp;";
 
     static event_windowOpen = "windowOpen";
@@ -27,7 +28,17 @@
     static event_windowClose = "windowClose";
     static event_windowUpdate = "windowUpdate";
 
-    static event_themeChange = "themeChange";    
+    static event_themeChange = "themeChange";*/
+
+    onGlobalDrag = newEvent();
+    onGlobalUp = newEvent();
+
+    onWindowOpen = newEvent();
+    onWindowSelect = newEvent();
+    onWindowClose = newEvent();
+    onWindowUpdate = newEvent();
+
+    onThemeChange = newEvent();
 
     private availableThemes: string[] = ["app-style", "app-style-dark"];
 
@@ -105,8 +116,8 @@
             else if (x > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
-
-            this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
+            this.onGlobalDrag({ window: this.activeWindow, mouse: e });
+            //this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
             let appWindow = this.getWindowAt(x, y, true);
             if (appWindow) {
                 appWindow.handleGlobalDrag(x, y, this.activeWindow);
@@ -147,7 +158,8 @@
         }
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
     private touchEnd(e: TouchEvent): void {
@@ -159,7 +171,8 @@
         }
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
     public createWindow(app: Application, title: string): AppWindow {
@@ -176,8 +189,9 @@
         var tempWindow: AppWindow = new AppWindow(app);
         let extra = this.windows.length % 10 * 50;
         tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
-        tempWindow.addEventListener(AppWindow.event_update, () => {
-            this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        tempWindow.onUpdate.addEventListener(() => {
+            this.onWindowUpdate();
+            //this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
         });
         return tempWindow;
     }
@@ -192,7 +206,8 @@
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent(WindowManager.event_windowOpen, null);
+        this.onWindowOpen();
+        //this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     }
 
@@ -210,14 +225,16 @@
             style.onload = () => {
                 console.log("hello");
                 this.modifyCurrentStylesheet();
-                this.raiseEvent(WindowManager.event_themeChange, null);
+                this.onThemeChange();
+                //this.raiseEvent(WindowManager.event_themeChange, null);
             }
         }
         else {
             setTimeout(() => {
                 console.log("hello");
                 this.modifyCurrentStylesheet();
-                this.raiseEvent(WindowManager.event_themeChange, null);
+                this.onThemeChange();
+                //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
         
@@ -236,7 +253,8 @@
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent(WindowManager.event_windowSelect, null);
+        this.onWindowSelect();
+        //this.raiseEvent(WindowManager.event_windowSelect, null);
     }
 
     public makeTopMost(appWindow: AppWindow): void {
@@ -251,7 +269,8 @@
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.raiseEvent(WindowManager.event_windowClose, null);
+        this.onWindowClose();
+        //this.raiseEvent(WindowManager.event_windowClose, null);
     }
 
     public reorderWindows(): void {

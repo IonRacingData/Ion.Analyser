@@ -17,6 +17,8 @@ var NetworkManager = (function () {
         this.callback = [];
         this.reconnecter = null;
         this.manager = new EventManager();
+        this.onGotConnection = newEvent();
+        this.onLostConnection = newEvent();
         this.socket = this.createWebSocket();
     }
     NetworkManager.prototype.createWebSocket = function () {
@@ -34,12 +36,14 @@ var NetworkManager = (function () {
             _this.connectionOpen = false;
             _this.socket = null;
             _this.tryReconnect();
-            _this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
+            _this.onLostConnection();
+            //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         };
         socket.onopen = function (ev) {
             _this.connectionOpen = true;
             console.log("Connection established");
-            _this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
+            _this.onGotConnection();
+            //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
         return socket;
     };
@@ -106,8 +110,6 @@ var NetworkManager = (function () {
     };
     return NetworkManager;
 }());
-NetworkManager.event_gotConnection = "websock_open";
-NetworkManager.event_lostConnection = "websock_close";
 var ComMessageStatus;
 (function (ComMessageStatus) {
     ComMessageStatus[ComMessageStatus["Request110"] = 110] = "Request110";

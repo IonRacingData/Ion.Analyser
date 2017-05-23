@@ -1,21 +1,16 @@
 var DataAssigner = (function () {
     function DataAssigner() {
         this.mk = new HtmlHelper();
-        this.eh = new EventHandler();
     }
     DataAssigner.prototype.main = function (preSelect) {
         var _this = this;
-        this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
+        this.window = kernel.winMan.createWindow(this.app, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
         this.selected = preSelect;
         this.draw();
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, function () { return _this.draw(); });
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, function () { return _this.draw(); });
-        this.eh.on(this.window, AppWindow.event_close, function () { return _this.window_close(); });
-    };
-    DataAssigner.prototype.window_close = function () {
-        this.eh.close();
+        this.app.events.on(kernel.senMan.onRegisterViewer, function () { return _this.draw(); });
+        this.app.events.on(kernel.senMan.onUnRegisterViewer, function () { return _this.draw(); });
     };
     DataAssigner.prototype.draw = function () {
         this.window.content.innerHTML = "";
@@ -228,7 +223,7 @@ var SensorSetSelector = (function () {
     SensorSetSelector.prototype.main = function () {
         var _this = this;
         this.wrapper = this.mk.tag("div");
-        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        this.window = kernel.winMan.createWindow(this.app, "Sensor Selector");
         requestAction("GetAvaiableSets", function (data) { return _this.drawData(data); });
         this.window.content.appendChild(this.wrapper);
     };

@@ -1,15 +1,14 @@
 ﻿class GridViewer implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
-    eh: EventHandler = new EventHandler();
     mk: HtmlHelper = new HtmlHelper();
     childWindows: AppWindow[] = [];
     selectorWindow: AppWindow;
 
     main(temp): void {
         console.log(temp);
-        this.window = kernel.winMan.createWindow(this.application, "New Grid");
-        this.selectorWindow = kernel.winMan.createWindow(this.application, "Selector");
+        this.window = kernel.winMan.createWindow(this.app, "New Grid");
+        this.selectorWindow = kernel.winMan.createWindow(this.app, "Selector");
         this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
         this.selectorWindow.content.style.overflow = "hidden";
@@ -25,7 +24,7 @@
         // (<HTMLElement>this.selectorWindow.handle.getElementsByClassName("window")[0]).style.backgroundColor = null;
 
         var mk = this.mk;
-        this.registerEvents(this.eh);
+        this.registerEvents(this.app.events);
 
         var template: HTMLTemplateElement = <HTMLTemplateElement>document.getElementById("temp-grid");
         var test = new GridHContainer(this);
@@ -254,12 +253,12 @@
     }
 
     registerEvents(eh: EventHandler) {
-        eh.on(kernel.winMan, WindowManager.event_globalDrag, (data: IWindowEvent) => this.globalDrag(data));
-        eh.on(kernel.winMan, WindowManager.event_globalUp, (data: IWindowEvent) => this.globalUp(data));
-        eh.on(this.window, AppWindow.event_close, () => this.handleClose());
+        eh.on(kernel.winMan.onGlobalDrag, (data: IWindowEvent) => this.globalDrag(data));
+        eh.on(kernel.winMan.onGlobalUp, (data: IWindowEvent) => this.globalUp(data));
+        eh.on(this.window.onClose, () => this.handleClose());
 
-        eh.on(this.window, AppWindow.event_resize, () => this.handleResize());
-        eh.on(this.window, AppWindow.event_move, () => this.handleMove());
+        eh.on(this.window.onResize, () => this.handleResize());
+        eh.on(this.window.onMove, () => this.handleMove());
     }
 
     handleClose() {
@@ -267,7 +266,7 @@
             cur.close();
             // this.childWindows[cur].close();
         }
-        this.eh.close();
+        this.app.events.close();
         this.selectorWindow.close();
     }
 

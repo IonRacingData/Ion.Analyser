@@ -9,7 +9,6 @@ interface IKernel {
 
 function startUp() {
 
-
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
@@ -50,8 +49,37 @@ function startUp() {
         e.preventDefault();
     });
 
+    
+}
 
 
+interface INewEvent{
+    (...params: any[]): void;
+    addEventListener(...params: any[]): void;
+    removeEventListener(...params: any[]): void;
+}
+
+function newEvent(): INewEvent {
+    let callbacks: ((...params: any[]) => void)[] = [];
+
+    let handler = <any>function EventHandler(...params: any[]) {
+        console.log("running events");
+        console.log(callbacks);
+        for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i](...params);
+        }
+    }
+
+    handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
+        callbacks.push(callback);
+    }
+
+    handler.removeEventListener = function removeEventListener(callback: (...params: any[]) => void) {
+        let a = callbacks.indexOf(callback);
+        callbacks.splice(a, 1);
+    }
+
+    return handler;
 }
 
 interface IMenuItem {
