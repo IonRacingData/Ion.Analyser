@@ -11,10 +11,10 @@ class WindowList extends Applet {
         super();
         this.content = content;
         let winMan: WindowManager = this.winMan = kernel.winMan;
-        winMan.addEventListener(WindowManager.event_windowOpen, () => this.programOpen());
-        winMan.addEventListener(WindowManager.event_windowClose, () => this.programClose());
-        winMan.addEventListener(WindowManager.event_windowSelect, () => this.programSelect());
-        winMan.addEventListener(WindowManager.event_windowUpdate, () => this.windowUpdate());
+        winMan.onWindowOpen.addEventListener(() => this.programOpen());
+        winMan.onWindowClose.addEventListener(() => this.programClose());
+        winMan.onWindowSelect.addEventListener(() => this.programSelect());
+        winMan.onWindowUpdate.addEventListener(() => this.windowUpdate());
         this.addWindows();
     }
 
@@ -120,5 +120,30 @@ class ChangeTheme extends Applet {
             kernel.winMan.changeTheme("app-style-dark");
             this.isDark = true;
         }
+    }
+}
+
+class StatusBar extends Applet {
+    private element: HTMLElement;
+    constructor(content: HTMLElement) {
+        super();
+        this.content = content;
+        this.content.style.cssFloat = "right";
+        let mk: HtmlHelper = new HtmlHelper();
+        this.content.appendChild(this.element = mk.tag(
+            "div"
+            , "taskbar-item"
+            , []
+            , "Not connected"
+        ));
+        if (kernel.netMan.connectionOpen) {
+            this.element.innerHTML = "Connected";
+        }
+        kernel.netMan.onGotConnection.addEventListener(() => {
+            this.element.innerHTML = "Connected";
+        });
+        kernel.netMan.onLostConnection.addEventListener(() => {
+            this.element.innerHTML = "Not connected";
+        });
     }
 }

@@ -6,16 +6,28 @@ var EventData = (function () {
 var EventHandler = (function () {
     function EventHandler() {
         this.localEvents = [];
+        this.localNewEvent = [];
     }
-    EventHandler.prototype.on = function (manager, type, handeler) {
-        this.localEvents.push({ manager: manager, type: type, handler: handeler });
-        manager.addEventListener(type, handeler);
+    EventHandler.prototype.on = function (first, sec, handler) {
+        if (handler === void 0) { handler = null; }
+        if (typeof (first) === "function") {
+            this.localNewEvent.push({ event: first, info: first.info, handler: sec });
+            first.addEventListener(sec);
+        }
+        else {
+            this.localEvents.push({ manager: first, type: sec, handler: handler });
+            first.addEventListener(sec, handler);
+        }
     };
     EventHandler.prototype.close = function () {
         for (var _i = 0, _a = this.localEvents; _i < _a.length; _i++) {
             var cur = _a[_i];
             // var cur = this.localEvents[i];
             cur.manager.removeEventListener(cur.type, cur.handler);
+        }
+        for (var _b = 0, _c = this.localNewEvent; _b < _c.length; _b++) {
+            var temp = _c[_b];
+            temp.event.removeEventListener(temp.handler);
         }
     };
     return EventHandler;

@@ -88,16 +88,14 @@ body {
 }
 
 .window-control-exit {
-    margin-right: 5px;
-    font-size: 15px;
 }
 
 .window-control span {
-    padding: 3px 6px;
+    padding: 3px 0px;
     display: inline-block;
-    width: 15px;
+    width: 40px;
     text-align: center;
-    border-radius: 20px;
+    /*border-radius: 20px;*/
 }
 
 /*.window-control span:hover {
@@ -126,9 +124,12 @@ body {
     display: inline-block;
 }
 
-.taskbar-button-text {
+.taskbar-item, .taskbar-button-text {
     display: inline-block;
     padding: 8.5px;
+}
+
+.taskbar-button-text {
     cursor: default;
 }
 
@@ -290,4 +291,21 @@ span.table-resize{
 
 .dsb-subdiv {
     flex-grow: 1;
+}
+
+/*Lists*/
+.listitem {
+    display: block;
+    padding: 2px 0;
+}
+
+.listitem:hover {
+    background-color: #202020;
+}
+.small {
+    font-size: 0.6em;
+}
+
+table.table.selectable tbody tr:hover {
+    background-color: #202020;
 }

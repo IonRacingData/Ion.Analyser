@@ -10,8 +10,8 @@
 
         private telemetryDataSet: SensorDataSet = null;
 
-        static readonly event_registerViewer = "registerViewer";
-        static readonly event_unregisterViewer = "unregisterViewer";
+        //static readonly event_registerViewer = "registerViewer";
+        //static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
             kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
@@ -119,9 +119,11 @@
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
+                    let data2: ISensorDataSet = JSON.parse(JSON.stringify(data));
+
                     let dataSet = new SensorDataSet(data);
-                    data.Name = "telemetry";
-                    this.telemetryDataSet = new SensorDataSet(data);
+                    data2.Name = "telemetry";
+                    this.telemetryDataSet = new SensorDataSet(data2);
                     this.loadedDataSet.push(dataSet);
                     this.loadedDataSet.push(this.telemetryDataSet);
                     for (let v in dataSet.SensorData) {
@@ -139,9 +141,14 @@
             });
         }
 
+        public onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
+        public onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
+
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
-            this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+            console.log("New register view");
+            this.onRegisterViewer();
+            //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
         }
 
         public registerGroup(group: new (containers: SensorDataContainer[]) => SensorGroup<any>): void {
@@ -151,7 +158,8 @@
         public unregister<T>(viewer: IViewerBase<T>): void {
             let index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);
-            this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
+            this.onUnRegisterViewer();
+            //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
         }
 
         public getInfos(): ISensorInformation[] {

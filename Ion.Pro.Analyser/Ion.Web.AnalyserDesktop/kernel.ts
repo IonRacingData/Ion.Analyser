@@ -9,7 +9,6 @@ interface IKernel {
 
 function startUp() {
 
-
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
@@ -32,23 +31,58 @@ function startUp() {
     let content: HTMLElement = mk.tag("div", "taskbar-applet");
     let menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
     let themeChange: HTMLElement = mk.tag("div", "taskbar-applet");
+    let statusbar: HTMLElement = mk.tag("div", "taskbar-applet");
 
     let wl: WindowList = new WindowList(content);
     let menu: MainMenu = new MainMenu(menuContent);
     let theme: ChangeTheme = new ChangeTheme(themeChange);
+    let bar: StatusBar = new StatusBar(statusbar);
 
     let taskbar: Element = document.getElementsByClassName("taskbar")[0];
 
     taskbar.appendChild(menu.content);
     taskbar.appendChild(theme.content);
     taskbar.appendChild(wl.content);
+    taskbar.appendChild(bar.content);
 
     document.addEventListener("contextmenu", (e: PointerEvent) => {
         e.preventDefault();
     });
 
+    
+}
 
 
+interface INewEvent{
+    (...params: any[]): void;
+    info: string;
+    addEventListener(...params: any[]): void;
+    removeEventListener(...params: any[]): void;
+}
+
+function newEvent(info: string): INewEvent {
+    let callbacks: ((...params: any[]) => void)[] = [];
+
+    let handler = <any>function EventHandler(...params: any[]) {
+        // console.log("running events");
+        // console.log(callbacks);
+        for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i](...params);
+        }
+    }
+
+    handler.info = info;
+
+    handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
+        callbacks.push(callback);
+    }
+
+    handler.removeEventListener = function removeEventListener(callback: (...params: any[]) => void) {
+        let a = callbacks.indexOf(callback);
+        callbacks.splice(a, 1);
+    }
+
+    return handler;
 }
 
 interface IMenuItem {
@@ -69,7 +103,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
-    //kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
+    kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
 
     kernel.appMan.registerApplication("Charts", new Launcher(LineChartTester, "Line Chart"));
     kernel.appMan.registerApplication("Charts", new Launcher(GaugeTester, "Gauge"));
@@ -80,12 +114,12 @@ function registerLaunchers() {
     // kernel.appMan.registerApplication("Charts", new Launcher(TestDataViewer, "Test Viewer"));
 
 
-    // kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
-    // kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
-    // kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
+    kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
+    kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
+    kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
 
-    // kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
-    // kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
+    kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
 
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 
@@ -118,6 +152,54 @@ function registerGridPresets() {
                 key: "current",
                 layers: [],
                 sources: [ { key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" } ]
+            }
+        ]
+    }));
+
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Basic Receive", <IGridLanchTemplate>{
+        name: "Basic Receive",
+        grid: {
+            data: [
+                /*{ name: "DataAssigner", data: null },*/
+                { name: "LineChartTester", data: ["speed", "current", "volt"] },
+                {
+                    data: [
+                        {
+                            data: [
+                                { name: "BarTester", data: ["volt"] },
+                                { name: "GaugeTester", data: ["current"] }
+                            ]
+                        },
+                        { name: "LabelTester", data: ["speed"] },
+                        { name: "LineChartTester", data: ["temp"] }
+                    ]
+                }
+            ]
+        },
+        sensorsets: [
+            {
+                grouptype: "PointSensorGroup",
+                key: "speed",
+                layers: [],
+                sources: [{ key: "SPEED", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "current",
+                layers: [],
+                sources: [{ key: "CURRENT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "volt",
+                layers: [],
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp",
+                layers: [],
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
             }
         ]
     }));

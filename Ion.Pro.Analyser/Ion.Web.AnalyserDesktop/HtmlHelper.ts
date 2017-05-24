@@ -98,6 +98,8 @@ class HtmlTableGen {
             table.appendChild(thead);
         }
         var rows: any[][] = this.rows;
+        var tbody: HTMLElement = document.createElement("tbody");
+        table.appendChild(tbody);
         for (var row: number = 0; row < rows.length; row++) {
             var curRow: any[] = rows[row];
             var rowEle: HTMLTableRowElement = document.createElement("tr");
@@ -118,7 +120,7 @@ class HtmlTableGen {
                     rowEle.appendChild(colEle);
                 }
             }
-            table.appendChild(rowEle);
+            tbody.appendChild(rowEle);
         }
         return table;
     }

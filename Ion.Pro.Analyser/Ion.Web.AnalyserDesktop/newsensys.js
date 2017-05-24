@@ -3,6 +3,8 @@ var Kernel;
     var SenSys;
     (function (SenSys) {
         var SensorManager = (function () {
+            //static readonly event_registerViewer = "registerViewer";
+            //static readonly event_unregisterViewer = "unregisterViewer";
             function SensorManager() {
                 var _this = this;
                 this.eventManager = new EventManager();
@@ -12,6 +14,8 @@ var Kernel;
                 this.dataSources = [];
                 this.groups = [];
                 this.telemetryDataSet = null;
+                this.onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
+                this.onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
                 this.callbackStack = [];
                 kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
                 //this.loadSensorInformation();
@@ -107,9 +111,10 @@ var Kernel;
                 var _this = this;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
+                        var data2 = JSON.parse(JSON.stringify(data));
                         var dataSet = new SensorDataSet(data);
-                        data.Name = "telemetry";
-                        _this.telemetryDataSet = new SensorDataSet(data);
+                        data2.Name = "telemetry";
+                        _this.telemetryDataSet = new SensorDataSet(data2);
                         _this.loadedDataSet.push(dataSet);
                         _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {
@@ -126,7 +131,9 @@ var Kernel;
             };
             SensorManager.prototype.register = function (viewer) {
                 this.viewers.push(viewer);
-                this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
+                console.log("New register view");
+                this.onRegisterViewer();
+                //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
             };
             SensorManager.prototype.registerGroup = function (group) {
                 this.groups.push(group);
@@ -134,7 +141,8 @@ var Kernel;
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);
                 this.viewers.splice(index, 1);
-                this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
+                this.onUnRegisterViewer();
+                //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
             };
             SensorManager.prototype.getInfos = function () {
                 return this.loadedDataSet[0].AllInfos;
@@ -253,8 +261,6 @@ var Kernel;
             };
             return SensorManager;
         }());
-        SensorManager.event_registerViewer = "registerViewer";
-        SensorManager.event_unregisterViewer = "unregisterViewer";
         SenSys.SensorManager = SensorManager;
         var SensorDataSet = (function () {
             function SensorDataSet(data) {

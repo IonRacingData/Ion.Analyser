@@ -101,6 +101,8 @@ var HtmlTableGen = (function () {
             table.appendChild(thead);
         }
         var rows = this.rows;
+        var tbody = document.createElement("tbody");
+        table.appendChild(tbody);
         for (var row = 0; row < rows.length; row++) {
             var curRow = rows[row];
             var rowEle = document.createElement("tr");
@@ -121,7 +123,7 @@ var HtmlTableGen = (function () {
                     rowEle.appendChild(colEle);
                 }
             }
-            table.appendChild(rowEle);
+            tbody.appendChild(rowEle);
         }
         return table;
     };

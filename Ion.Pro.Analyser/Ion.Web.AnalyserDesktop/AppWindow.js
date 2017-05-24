@@ -15,6 +15,14 @@ var AppWindow = (function () {
         this.topMost = false;
         this.eventMan = new EventManager();
         this.outerBoxMargin = 8;
+        /*Events*/
+        this.onResize = newEvent("AppWindow.onResize");
+        this.onMove = newEvent("AppWindow.onMove");
+        this.onClose = newEvent("AppWindow.onClose");
+        this.onMouseMove = newEvent("AppWindow.onMouseMove");
+        this.onDragOver = newEvent("AppWindow.onDragOver");
+        this.onDragRelease = newEvent("AppWindow.onDragRelease");
+        this.onUpdate = newEvent("AppWindow.onUpdate");
         this.app = app;
         var handle = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
@@ -200,32 +208,19 @@ var AppWindow = (function () {
     AppWindow.prototype.restoreShadow = function () {
         this.windowElement.style.boxShadow = null;
     };
-    /*Events*/
-    AppWindow.prototype.onResize = function () {
-        this.eventMan.raiseEvent(AppWindow.event_resize, null);
+    AppWindow.prototype.__onMouseMove = function (x, y) {
+        this.onMouseMove(new AppMouseEvent(x, y));
     };
-    AppWindow.prototype.onMove = function () {
-        this.eventMan.raiseEvent(AppWindow.event_move, null);
+    AppWindow.prototype.__onDragOver = function (x, y, window) {
+        this.onDragOver(new AppMouseDragEvent(x, y, window));
     };
-    AppWindow.prototype.onClose = function () {
-        this.eventMan.raiseEvent(AppWindow.event_close, null);
-    };
-    AppWindow.prototype.onMouseMove = function (x, y) {
-        this.eventMan.raiseEvent(AppWindow.event_mouseMove, new AppMouseEvent(x, y));
-    };
-    AppWindow.prototype.onDragOver = function (x, y, window) {
-        this.eventMan.raiseEvent(AppWindow.event_dragOver, new AppMouseDragEvent(x, y, window));
-    };
-    AppWindow.prototype.onDragRelease = function (x, y, window) {
+    AppWindow.prototype.__onDragRelease = function (x, y, window) {
         console.log("Release");
-        this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
-    };
-    AppWindow.prototype.onUpdate = function () {
-        this.eventMan.raiseEvent(AppWindow.event_update, null);
+        this.onDragRelease(new AppMouseDragEvent(x, y, window));
     };
     AppWindow.prototype.close = function () {
         this.onClose();
-        this.app.onClose();
+        this.app.onWindowClose();
         this.winMan.closeWindow(this);
     };
     AppWindow.prototype.show = function () {
@@ -380,15 +375,6 @@ var AppWindow = (function () {
     };
     return AppWindow;
 }());
-AppWindow.event_move = "move";
-AppWindow.event_resize = "resize";
-AppWindow.event_minimize = "minimize";
-AppWindow.event_maximize = "maximize";
-AppWindow.event_mouseMove = "mouseMove";
-AppWindow.event_dragOver = "dragOver";
-AppWindow.event_dragRelease = "dragRelease";
-AppWindow.event_update = "update";
-AppWindow.event_close = "close";
 var AppMouseEvent = (function () {
     function AppMouseEvent(x, y) {
         this.x = x;

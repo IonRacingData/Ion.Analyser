@@ -5,8 +5,11 @@
     eventManager: EventManager = new EventManager();
     nextPID: number = 0;
 
-    static event_appLaunch = "appLaunch";
-    static event_appClose = "appClose";
+    //static event_appLaunch = "appLaunch";
+    //static event_appClose = "appClose";
+
+    onAppLaunch = newEvent("ApplicationManager.onAppLaunch");
+    onAppClose = newEvent("ApplicationManager.onAppClose");
 
     launchApplication(launcher: Launcher, ...args: any[]): Application {
         var temp: IApplication = new launcher.mainFunction();
@@ -16,7 +19,8 @@
         this.appList.push(appTemp);
 
         appTemp.start(...args);
-        this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
+        this.onAppLaunch();
+        //this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
 
         return appTemp;
     }
@@ -46,6 +50,7 @@
 
     closeApplication(app: Application): void {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
+        this.onAppClose();
+        //this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     }
 }

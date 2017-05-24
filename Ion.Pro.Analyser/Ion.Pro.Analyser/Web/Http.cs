@@ -15,6 +15,7 @@ namespace Ion.Pro.Analyser
             [".jpg"]    = "image/jpeg",
             [".jpeg"]   = "image/jpeg",
             [".gif"]    = "image/gif",
+            [".svg"]    = "image/svg+xml",
 
             [".pdf"]    = "application/pdf",
             [".log"]    = "application/log",

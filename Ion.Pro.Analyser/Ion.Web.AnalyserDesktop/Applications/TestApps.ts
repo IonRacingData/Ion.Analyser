@@ -1,5 +1,5 @@
 ﻿class TestViewer implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
     window2: AppWindow;
     helloData: IHelloPackage;
@@ -7,7 +7,7 @@
 
     main(): void {
         this.mk = new HtmlHelper();
-        this.window = kernel.winMan.createWindow(this.application, "Test Window");
+        this.window = kernel.winMan.createWindow(this.app, "Test Window");
 
         requestAction("hello", (data: IHelloPackage) => {
             this.helloData = data;
@@ -22,13 +22,13 @@
 }
 
 class DataViewer implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
     data: ISensorPackage[];
 
     innerTable: HTMLElement;
     main(): void {
-        this.window = kernel.winMan.createWindow(this.application, "Data Viewer");
+        this.window = kernel.winMan.createWindow(this.app, "Data Viewer");
         //kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
     }
 
@@ -71,12 +71,12 @@ class DataViewer implements IApplication {
 }
 
 class CsvGenerator implements IApplication {
-    public application: Application;
+    public app: Application;
     private window: AppWindow;
     private mk: HtmlHelper = new HtmlHelper();
 
     public main() {
-        this.window = kernel.winMan.createWindow(this.application, "CSV Creator");
+        this.window = kernel.winMan.createWindow(this.app, "CSV Creator");
         this.draw();
     }
 
@@ -171,7 +171,7 @@ class CsvGenerator implements IApplication {
 }
 
 class StorageTester implements IApplication {
-    public application: Application;
+    public app: Application;
 
     public main(): void {
         
@@ -187,16 +187,15 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     dataCollectionSource: IDataSource<Point>[] = [];
     
 
-    application: Application;
+    app: Application;
     window: AppWindow;
     lineChart: LineChartController;
     data: ISensorPackage[];
-    eh: EventHandler = new EventHandler();
     testWindow = new MenuWindow(document.body);
 
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Line Chart");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Line Chart");
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             this.testWindow.x = e.x;
             this.testWindow.y = e.y;
@@ -208,8 +207,6 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
             }
         });
 
-        this.eh.on(this.plotWindow, AppWindow.event_close, () => this.window_close());
-
         this.window.content.style.overflow = "hidden";
 
         this.lineChart = new LineChartController();
@@ -218,30 +215,26 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
 
         
         kernel.senMan.register(this);
-        this.createEvents(this.eh);
+        this.createEvents(this.app.events);
     }
 
     private window_close() {
-        console.log("closing");
+        console.log("Unregister from sensys");
         kernel.senMan.unregister(this);
-        this.eh.close();
     }
 
     dataUpdate() {
         this.lineChart.setData(this.dataCollectionSource);
     }
 
-    createEvents(eh: EventHandler) {
-        eh.on(this.window, AppWindow.event_resize, () => {
+    private createEvents(eh: EventHandler) {        
+        eh.on(this.window.onResize, () => {
             this.lineChart.setSize(this.window.width, this.window.height);
         });
-        eh.on(this.window, AppWindow.event_close, () => {
-            this.close();
-        });
-        eh.on(this.plotWindow, AppWindow.event_close, () => {
+        eh.on(this.plotWindow.onClose, () => {
             this.window_close()
         });
-        eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
+        eh.on(kernel.winMan.onThemeChange, () => {
             this.darkTheme = !this.darkTheme;
             this.lineChart.updateColors();
         });
@@ -249,27 +242,21 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     }
 
     darkTheme: boolean = true;
-
-    close() {
-        this.eh.close();
-    }
 }
 
 class GaugeTester implements IApplication, IViewer<Point> {
     plotType: string = "Gauge";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
-    application: Application;
+    app: Application;
     window: AppWindow;
     gauge: GaugeController;
     val: number = 0;
 
-    private eh: EventHandler = new EventHandler();
-
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Gauge");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Gauge");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -289,10 +276,10 @@ class GaugeTester implements IApplication, IViewer<Point> {
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
 
-        this.window.addEventListener(AppWindow.event_resize, () => {
+        this.window.onResize.addEventListener(() => {
             this.gauge.setSize(this.window.width, this.window.height);
         });
-        this.eh.on(kernel.winMan, WindowManager.event_themeChange, () => {
+        this.app.events.on(kernel.winMan.onThemeChange, () => {
             this.gauge.updateColors();
         });
     }
@@ -312,15 +299,15 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     plotType: string = "GPS";
     plotWindow: AppWindow;
     type: IClassType<Point3D> = Point3D;
-    dataSource: IDataSource<Point3D>;
+    dataSource: IDataSource<Point3D> = null;
 
-    application: Application;
+    app: Application;
     window: AppWindow;
     points: Point3D[] = [];
     plot: GPSController;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "GPS Viewer");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "GPS Viewer");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -345,7 +332,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
             this.testData = new GPSPlotData(this.points);
             this.draw();
         });*/
-        this.window.addEventListener(AppWindow.event_resize, () => {
+        this.window.onResize.addEventListener(() => {
             this.plot.setSize(this.window.width, this.window.height);
         });
     }
@@ -359,15 +346,15 @@ class LabelTester implements IApplication, IViewer<Point> {
     plotType: string = "Label";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
-    application: Application;
+    app: Application;
     window: AppWindow;
     label: LabelController;
     val: number = 0;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Label");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Label");
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
@@ -393,7 +380,7 @@ class LabelTester implements IApplication, IViewer<Point> {
             this.label.setValue(this.val);
         });*/
 
-        this.window.addEventListener(AppWindow.event_resize, () => {
+        this.window.onResize.addEventListener(() => {
             this.label.setSize(this.window.width, this.window.height);
         });
     }
@@ -407,15 +394,15 @@ class BarTester implements IApplication, IViewer<Point> {
     plotType: string = "Bar Chart";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
 
-    application: Application;
+    app: Application;
     window: AppWindow;
     bar: BarController;
     val: number = 0;
 
     main() {
-        this.plotWindow = this.window = kernel.winMan.createWindow(this.application, "Bar Chart");
+        this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Bar Chart");
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -436,7 +423,7 @@ class BarTester implements IApplication, IViewer<Point> {
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
 
-        this.window.addEventListener(AppWindow.event_resize, () => {
+        this.window.onResize.addEventListener(() => {
             this.bar.setSize(this.window.width, this.window.height);
         });
     }
@@ -449,12 +436,12 @@ class BarTester implements IApplication, IViewer<Point> {
 
 
 class LegacyRPIManager implements IApplication {
-    public application: Application;
+    public app: Application;
     public window: AppWindow;
     private mk: HtmlHelper = new HtmlHelper();
 
     public main() {
-        this.window = kernel.winMan.createWindow(this.application, "Legacy RPI Manager");
+        this.window = kernel.winMan.createWindow(this.app, "Legacy RPI Manager");
         let wrapper = this.mk.tag("div");
 
         wrapper.appendChild(this.mk.tag("button", "", [{
@@ -488,18 +475,18 @@ class LegacyRPIManager implements IApplication {
     }
 }
 
-class SteeringWheelTester implements IViewer<Point> {
-    application: Application;
+class SteeringWheelTester implements IApplication, IViewer<Point> {
+    app: Application;
     window: AppWindow;
     wheel: SteeringWheelController;
     val: number = 0.5;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point>;
+    dataSource: IDataSource<Point> = null;
     plotType: string = "Bar";
     plotWindow: AppWindow;
 
     main() {
-        this.window = kernel.winMan.createWindow(this.application, "Steering wheel");
+        this.window = kernel.winMan.createWindow(this.app, "Steering wheel");
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
         kernel.senMan.register(this);
@@ -515,7 +502,7 @@ class SteeringWheelTester implements IViewer<Point> {
             this.wheel.setPer(this.val);
         });
 
-        this.window.addEventListener(AppWindow.event_resize, () => {
+        this.window.onResize.addEventListener(() => {
             this.wheel.setSize(this.window.width, this.window.height);
         });
     }

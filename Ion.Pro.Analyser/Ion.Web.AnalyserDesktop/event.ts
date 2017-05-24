@@ -20,18 +20,37 @@ interface IEventHandlerWrapper {
     handler: any;
 }
 
+interface INewEventHandlerWrapper {
+    event: INewEvent;
+    info: string;
+    handler: any;
+}
+
 class EventHandler {
     localEvents: IEventHandlerWrapper[] = [];
+    localNewEvent: INewEventHandlerWrapper[] = [];
 
-    on(manager: IEventManager, type: string, handeler: any) {
-        this.localEvents.push({ manager: manager, type: type, handler: handeler });
-        manager.addEventListener(type, handeler);
+    public on(event: INewEvent, handler: any): void;
+    public on(manager: IEventManager, type: string, handeler: any): void;
+    public on(first: INewEvent | IEventManager, sec: any, handler: any = null): void {
+        if (typeof (first) === "function") {
+            this.localNewEvent.push({ event: first, info: first.info, handler: sec });
+            first.addEventListener(sec);
+        }
+        else {
+            this.localEvents.push({ manager: first, type: sec, handler: handler });
+            first.addEventListener(sec, handler);
+        }
     }
 
     close() {
         for (var cur of this.localEvents) {
             // var cur = this.localEvents[i];
             cur.manager.removeEventListener(cur.type, cur.handler);
+        }
+
+        for (var temp of this.localNewEvent) {
+            temp.event.removeEventListener(temp.handler);
         }
     }
 }

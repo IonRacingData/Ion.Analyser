@@ -24,10 +24,10 @@ var WindowList = (function (_super) {
         var _this = _super.call(this) || this;
         _this.content = content;
         var winMan = _this.winMan = kernel.winMan;
-        winMan.addEventListener(WindowManager.event_windowOpen, function () { return _this.programOpen(); });
-        winMan.addEventListener(WindowManager.event_windowClose, function () { return _this.programClose(); });
-        winMan.addEventListener(WindowManager.event_windowSelect, function () { return _this.programSelect(); });
-        winMan.addEventListener(WindowManager.event_windowUpdate, function () { return _this.windowUpdate(); });
+        winMan.onWindowOpen.addEventListener(function () { return _this.programOpen(); });
+        winMan.onWindowClose.addEventListener(function () { return _this.programClose(); });
+        winMan.onWindowSelect.addEventListener(function () { return _this.programSelect(); });
+        winMan.onWindowUpdate.addEventListener(function () { return _this.windowUpdate(); });
         _this.addWindows();
         return _this;
     }
@@ -123,5 +123,26 @@ var ChangeTheme = (function (_super) {
         }
     };
     return ChangeTheme;
+}(Applet));
+var StatusBar = (function (_super) {
+    __extends(StatusBar, _super);
+    function StatusBar(content) {
+        var _this = _super.call(this) || this;
+        _this.content = content;
+        _this.content.style.cssFloat = "right";
+        var mk = new HtmlHelper();
+        _this.content.appendChild(_this.element = mk.tag("div", "taskbar-item", [], "Not connected"));
+        if (kernel.netMan.connectionOpen) {
+            _this.element.innerHTML = "Connected";
+        }
+        kernel.netMan.onGotConnection.addEventListener(function () {
+            _this.element.innerHTML = "Connected";
+        });
+        kernel.netMan.onLostConnection.addEventListener(function () {
+            _this.element.innerHTML = "Not connected";
+        });
+        return _this;
+    }
+    return StatusBar;
 }(Applet));
 //# sourceMappingURL=TaskBar.js.map

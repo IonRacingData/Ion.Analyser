@@ -6,6 +6,13 @@ var WindowManager = (function () {
         this.events = {};
         this.tileZone = 20;
         this.topBar = 40;
+        this.onGlobalDrag = newEvent("WindowManager.onGlobalDrag");
+        this.onGlobalUp = newEvent("WindowManager.onGlobalUp");
+        this.onWindowOpen = newEvent("WindowManager.onWindowOpen");
+        this.onWindowSelect = newEvent("WindowManager.onWindowSelect");
+        this.onWindowClose = newEvent("WindowManager.onWindowClose");
+        this.onWindowUpdate = newEvent("WindowManager.onWindowUpdate");
+        this.onThemeChange = newEvent("WindowManager.onThemeChange");
         this.availableThemes = ["app-style", "app-style-dark"];
         this.avaiableRules = {};
         this.body = container;
@@ -67,7 +74,8 @@ var WindowManager = (function () {
             else if (x > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
-            this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
+            this.onGlobalDrag({ window: this.activeWindow, mouse: e });
+            //this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
             var appWindow = this.getWindowAt(x, y, true);
             if (appWindow) {
                 appWindow.handleGlobalDrag(x, y, this.activeWindow);
@@ -105,7 +113,8 @@ var WindowManager = (function () {
         }
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.touchEnd = function (e) {
         var x = e.touches[0].pageX;
@@ -116,7 +125,8 @@ var WindowManager = (function () {
         }
         this.dragging = false;
         this.resizing = false;
-        this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.createWindow = function (app, title) {
         var window = this.makeWindow(app);
@@ -131,8 +141,9 @@ var WindowManager = (function () {
         var tempWindow = new AppWindow(app);
         var extra = this.windows.length % 10 * 50;
         tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
-        tempWindow.addEventListener(AppWindow.event_update, function () {
-            _this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
+        tempWindow.onUpdate.addEventListener(function () {
+            _this.onWindowUpdate();
+            //this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
         });
         return tempWindow;
     };
@@ -144,7 +155,8 @@ var WindowManager = (function () {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.raiseEvent(WindowManager.event_windowOpen, null);
+        this.onWindowOpen();
+        //this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     };
     WindowManager.prototype.getRule = function (name) {
@@ -161,14 +173,16 @@ var WindowManager = (function () {
             style.onload = function () {
                 console.log("hello");
                 _this.modifyCurrentStylesheet();
-                _this.raiseEvent(WindowManager.event_themeChange, null);
+                _this.onThemeChange();
+                //this.raiseEvent(WindowManager.event_themeChange, null);
             };
         }
         else {
             setTimeout(function () {
                 console.log("hello");
                 _this.modifyCurrentStylesheet();
-                _this.raiseEvent(WindowManager.event_themeChange, null);
+                _this.onThemeChange();
+                //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
         style.href = "/" + theme + ".css";
@@ -184,7 +198,8 @@ var WindowManager = (function () {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.raiseEvent(WindowManager.event_windowSelect, null);
+        this.onWindowSelect();
+        //this.raiseEvent(WindowManager.event_windowSelect, null);
     };
     WindowManager.prototype.makeTopMost = function (appWindow) {
         var index = this.order.indexOf(appWindow);
@@ -197,7 +212,8 @@ var WindowManager = (function () {
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.raiseEvent(WindowManager.event_windowClose, null);
+        this.onWindowClose();
+        //this.raiseEvent(WindowManager.event_windowClose, null);
     };
     WindowManager.prototype.reorderWindows = function () {
         for (var i = 0; i < this.order.length; i++) {
@@ -220,11 +236,4 @@ var WindowManager = (function () {
     };
     return WindowManager;
 }());
-WindowManager.event_globalDrag = "globalDrag";
-WindowManager.event_globalUp = "globalUp;";
-WindowManager.event_windowOpen = "windowOpen";
-WindowManager.event_windowSelect = "windowSelect";
-WindowManager.event_windowClose = "windowClose";
-WindowManager.event_windowUpdate = "windowUpdate";
-WindowManager.event_themeChange = "themeChange";
 //# sourceMappingURL=winsys.js.map

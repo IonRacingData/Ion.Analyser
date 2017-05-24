@@ -14,27 +14,72 @@
 
 class NetworkManager {
     private socket: WebSocket;
-    public isReady: boolean;
+    public connectionOpen: boolean;
     public curId: number = 0;
 
     private backlog: IComMessage[] = [];
     private serviceCallback: ((data: any) => void)[] = [];
     private callback: ((data: any) => void)[] = [];
 
+    private reconnecter: number = null;
+
+    public manager: EventManager = new EventManager();
+
+    onGotConnection = newEvent("NetworkManager.onGotConnection");
+    onLostConnection = newEvent("NetworkManager.onLoseConnection");
+
     constructor() {
+        this.socket = this.createWebSocket();
+    }
 
-        this.socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+    createWebSocket(): WebSocket {
+        let socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
 
-        this.socket.onmessage = (ev: MessageEvent) => {
+        socket.onmessage = (ev: MessageEvent) => {
             this.receiveMessage(ev);
             // console.log(ev);
             // console.log(ev.data);
         };
 
-        this.socket.onopen = (ev: Event) => {
-            this.isReady = true;
+        socket.onerror = (ev: Event) => {
+            console.log(ev);
+        }
+
+        socket.onclose = (ev: Event) => {
+            this.connectionOpen = false;
+            this.socket = null;
+            this.tryReconnect();
+            this.onLostConnection();
+            //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
+        }
+
+        socket.onopen = (ev: Event) => {
+            this.connectionOpen = true;
+            console.log("Connection established");
+            this.onGotConnection();
+            //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
+
+        return socket;
     }
+
+    private tryReconnect() {
+        let reconnectInterval = 2000;
+        console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval)
+        this.reconnecter = this.reconnecter = setInterval(() => {
+            if (this.connectionOpen) {
+                clearInterval(this.reconnecter);
+            }
+            requestAction("ping", (data: any) => {
+                console.log(data);
+                clearInterval(this.reconnecter);
+                if (!this.socket) {
+                    this.socket = this.createWebSocket();
+                }
+            });
+        }, reconnectInterval);
+    }
+
 
     registerService(callbackId: number, callback: (data: any) => void) {
         this.serviceCallback[callbackId] = callback;
@@ -48,7 +93,7 @@ class NetworkManager {
             MessageId: this.curId++
         };
         this.callback[pack.MessageId] = callback;
-        if (!this.isReady) {
+        if (!this.connectionOpen) {
             this.backlog.push(message);
         }
         else {

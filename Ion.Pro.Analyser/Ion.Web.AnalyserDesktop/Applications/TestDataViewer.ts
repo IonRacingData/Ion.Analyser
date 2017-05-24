@@ -1,24 +1,19 @@
 ﻿class DataAssigner implements IApplication {
-    application: Application;
+    app: Application;
     window: AppWindow;
     mk = new HtmlHelper();
     sensorTable: HTMLElement;
-    eh: EventHandler = new EventHandler();
     selected: IViewerBase<any>;
 
     main(preSelect: any): void {
-        this.window = kernel.winMan.createWindow(this.application, "Data Assigner");
+        this.window = kernel.winMan.createWindow(this.app, "Data Assigner");
         this.window.content.style.display = "flex";
         this.window.content.style.flexWrap = "wrap";
         this.selected = preSelect;
         this.draw();
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_registerViewer, () => this.draw());
-        this.eh.on(kernel.senMan, sensys.SensorManager.event_unregisterViewer, () => this.draw());
-        this.eh.on(this.window, AppWindow.event_close, () => this.window_close());
-    }
 
-    private window_close() {
-        this.eh.close();
+        this.app.events.on(kernel.senMan.onRegisterViewer, () => this.draw());
+        this.app.events.on(kernel.senMan.onUnRegisterViewer, () => this.draw());
     }
 
     draw() {
@@ -192,17 +187,23 @@
         for (let i = 0; i < info.length; i++) {
             let sensor = info[i];
             let ctrl = drawMethod.call(this, plot, sensor);
-            let label = this.mk.tag("label");
+            let label = this.mk.tag("label", "listitem");
             let firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
+            let innerBox = this.mk.tag("div");
+            innerBox.style.display = "inline-block";
+            innerBox.style.verticalAlign = "middle";
+            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            label.appendChild(innerBox);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
-            label.appendChild(document.createTextNode(firstInfo.Name));
+            //label.appendChild(document.createTextNode(firstInfo.Name));
             this.sensorTable.appendChild(label);
-            this.sensorTable.appendChild(this.mk.tag("br"));
+            //this.sensorTable.appendChild(this.mk.tag("br"));
         }
     }
 }
@@ -239,14 +240,14 @@
 }
 */
 class SensorSetSelector implements IApplication {
-    public application: Application;
+    public app: Application;
     private window: AppWindow;
     private mk = new HtmlHelper();
     private wrapper: HTMLElement;
 
     public main(): void {
         this.wrapper = this.mk.tag("div");
-        this.window = kernel.winMan.createWindow(this.application, "Sensor Selector");
+        this.window = kernel.winMan.createWindow(this.app, "Sensor Selector");
         requestAction("GetAvaiableSets", (data: ISensorSetInformation[]) => this.drawData(data));
         this.window.content.appendChild(this.wrapper);
     }

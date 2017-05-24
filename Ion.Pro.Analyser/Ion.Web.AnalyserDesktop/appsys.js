@@ -5,6 +5,10 @@ var ApplicationManager = (function () {
         this.allApps = {};
         this.eventManager = new EventManager();
         this.nextPID = 0;
+        //static event_appLaunch = "appLaunch";
+        //static event_appClose = "appClose";
+        this.onAppLaunch = newEvent("ApplicationManager.onAppLaunch");
+        this.onAppClose = newEvent("ApplicationManager.onAppClose");
     }
     ApplicationManager.prototype.launchApplication = function (launcher) {
         var args = [];
@@ -17,7 +21,8 @@ var ApplicationManager = (function () {
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
         appTemp.start.apply(appTemp, args);
-        this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
+        this.onAppLaunch();
+        //this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
         return appTemp;
     };
     ApplicationManager.prototype.start = function (appName) {
@@ -44,10 +49,9 @@ var ApplicationManager = (function () {
     };
     ApplicationManager.prototype.closeApplication = function (app) {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
+        this.onAppClose();
+        //this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     };
     return ApplicationManager;
 }());
-ApplicationManager.event_appLaunch = "appLaunch";
-ApplicationManager.event_appClose = "appClose";
 //# sourceMappingURL=appsys.js.map

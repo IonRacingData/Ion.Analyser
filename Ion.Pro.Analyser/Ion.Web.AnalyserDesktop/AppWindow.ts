@@ -36,7 +36,7 @@
 
     private eventMan: EventManager = new EventManager();
 
-    static readonly event_move = "move";
+    /*static readonly event_move = "move";
     static readonly event_resize = "resize";
     static readonly event_minimize = "minimize";
     static readonly event_maximize = "maximize";
@@ -47,7 +47,7 @@
     static readonly event_dragRelease = "dragRelease";
 
     static readonly event_update = "update";
-    static readonly event_close = "close";
+    static readonly event_close = "close";*/
 
     x: number;
     y: number;
@@ -261,38 +261,35 @@
     }
 
     /*Events*/
-    onResize(): void {
-        this.eventMan.raiseEvent(AppWindow.event_resize, null);
+
+    onResize = newEvent("AppWindow.onResize");
+    onMove = newEvent("AppWindow.onMove");
+    onClose = newEvent("AppWindow.onClose");
+
+    onMouseMove = newEvent("AppWindow.onMouseMove");
+    onDragOver = newEvent("AppWindow.onDragOver");
+    onDragRelease = newEvent("AppWindow.onDragRelease");
+
+    onUpdate = newEvent("AppWindow.onUpdate");
+
+    private __onMouseMove(x: number, y: number): void {
+        this.onMouseMove(new AppMouseEvent(x, y));
     }
 
-    onMove(): void {
-        this.eventMan.raiseEvent(AppWindow.event_move, null);
+    private __onDragOver(x: number, y: number, window: AppWindow): void {
+        this.onDragOver(new AppMouseDragEvent(x, y, window));
     }
 
-    onClose(): void {
-        this.eventMan.raiseEvent(AppWindow.event_close, null);
-    }
-
-    onMouseMove(x: number, y: number): void {
-        this.eventMan.raiseEvent(AppWindow.event_mouseMove, new AppMouseEvent(x, y));
-    }
-
-    onDragOver(x: number, y: number, window: AppWindow): void {
-        this.eventMan.raiseEvent(AppWindow.event_dragOver, new AppMouseDragEvent(x, y, window));
-    }
-
-    onDragRelease(x: number, y: number, window: AppWindow): void {
+    private __onDragRelease(x: number, y: number, window: AppWindow): void {
         console.log("Release");
-        this.eventMan.raiseEvent(AppWindow.event_dragRelease, new AppMouseDragEvent(x, y, window));
+        this.onDragRelease(new AppMouseDragEvent(x, y, window));
     }
 
-    onUpdate(): void {
-        this.eventMan.raiseEvent(AppWindow.event_update, null);
-    }
+    
 
     close() {
         this.onClose();
-        this.app.onClose();
+        this.app.onWindowClose();
         this.winMan.closeWindow(this);
     }
 

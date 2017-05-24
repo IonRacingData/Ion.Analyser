@@ -1,8 +1,9 @@
 var Application = (function () {
     function Application(app) {
         this.windows = [];
+        this.events = new EventHandler();
         this.application = app;
-        app.application = this;
+        app.app = this;
     }
     Application.prototype.start = function () {
         var args = [];
@@ -12,9 +13,20 @@ var Application = (function () {
         (_a = this.application).main.apply(_a, args);
         var _a;
     };
-    Application.prototype.onClose = function () {
+    Application.prototype.closeWindows = function () {
+        for (var _i = 0, _a = this.windows; _i < _a.length; _i++) {
+            var win = _a[_i];
+            win.close();
+        }
+    };
+    Application.prototype.close = function () {
+        this.events.close();
+        //this.closeWindows();
+        kernel.appMan.closeApplication(this);
+    };
+    Application.prototype.onWindowClose = function () {
         if (this.windows.length === 1) {
-            kernel.appMan.closeApplication(this);
+            this.close();
         }
     };
     return Application;

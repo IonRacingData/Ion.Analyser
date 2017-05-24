@@ -1,29 +1,21 @@
 ﻿class TaskManager implements IApplication {
-    application: Application;
+    app: Application;
     mainWindow: AppWindow;
     infoWindows: AppWindow[] = [];
     mk: HtmlHelper;
-    eh: EventHandler = new EventHandler();
 
     main() {
-        this.mainWindow = kernel.winMan.createWindow(this.application, "Task Manager");
-        this.addEvents(this.eh);
+        this.mainWindow = kernel.winMan.createWindow(this.app, "Task Manager");
+        this.addEvents(this.app.events);
         this.draw();
     }
 
     addEvents(eh: EventHandler) {
+        eh.on(kernel.winMan.onWindowOpen, () => this.draw());
+        eh.on(kernel.winMan.onWindowClose, () => this.draw());
 
-        eh.on(kernel.winMan, WindowManager.event_windowOpen, () => this.draw());
-        eh.on(kernel.winMan, WindowManager.event_windowClose, () => this.draw());
-
-        eh.on(kernel.appMan, ApplicationManager.event_appLaunch, () => this.draw());
-        eh.on(kernel.appMan, ApplicationManager.event_appClose, () => this.draw());
-
-        eh.on(this.mainWindow, AppWindow.event_close, () => this.close());
-    }
-
-    close() {
-        this.eh.close();
+        eh.on(kernel.appMan.onAppLaunch, () => this.draw());
+        eh.on(kernel.appMan.onAppClose, () => this.draw());
     }
 
     draw() {
@@ -32,11 +24,12 @@
         tg.addHeader("PID", "Application", "# of Windows");
         var apps = kernel.appMan.appList;
         for (var i = 0; i < apps.length; i++) {
+            let tempApp = apps[i];
             tg.addRow(
                 [
                     {
                         event: "click",
-                        func: (e: MouseEvent) => this.onAppClick((<HTMLElement>e.target).parentElement)
+                        func: (e: MouseEvent) => this.onAppClick(tempApp)
                     }
                 ],
                 apps[i].pid,
@@ -46,18 +39,32 @@
         this.mainWindow.content.appendChild(table);
     }
 
-    onAppClick(tr: HTMLElement) {
-        var pid = parseInt(tr.firstChild.textContent, 10);
-        for (var i = 0; i < kernel.appMan.appList.length; i++) {
-            var app = kernel.appMan.appList[i];
-            if (app.pid === pid) {
-                var win = kernel.winMan.createWindow(this.application, "Task Manager - " + app.name);
-                this.infoWindows.push(win);
-            }
-        }
+    onAppClick(app: Application) {
+        var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
+        this.infoWindows.push(win);
+        this.drawInfoWindow(app, win);
+
+
+        //var pid = parseInt(tr.firstChild.textContent, 10);
+        //for (var i = 0; i < kernel.appMan.appList.length; i++) {
+            //var app = kernel.appMan.appList[i];
+            //if (app.pid === pid) {
+                
+            //}
+        //}
     }
 
-    drawInfoWindow() {
+    drawInfoWindow(app: Application, win: AppWindow) {
+        let windowTab = new HtmlTableGen("table");
+        windowTab.addHeader("Title");
+        windowTab.addArray(app.windows, ["title"]);
+        let windowEvents = new HtmlTableGen("table");
+        windowEvents.addHeader("Event", "extra");
+        windowEvents.addArray(app.events.localNewEvent, ["info"]);
+        windowEvents.addArray(app.events.localEvents, ["type", "manager"]);
 
+        win.content.innerHTML = "";
+        win.content.appendChild(windowTab.generate());
+        win.content.appendChild(windowEvents.generate());
     }
 }

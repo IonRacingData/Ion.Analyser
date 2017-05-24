@@ -67,6 +67,11 @@ namespace Ion.Pro.Analyser.Controllers
             return Json(new { });
         }
 
+        public IActionResult Ping()
+        {
+            return Json(new { Data = "pong" });
+        }
+
 
 
         public IActionResult Csv(string encoding, string values, string title)

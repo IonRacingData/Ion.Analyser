@@ -29,7 +29,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        public static bool liveSim = true;
+        public static bool liveSim = false;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
@@ -450,6 +450,7 @@ namespace Ion.Pro.Analyser
                 if (parts[1] == "getdata")
                 {
                     SensorNumPackage package = message.ReadData<SensorNumPackage>();
+                    manager.Load(package.dataset);
                     ComBus.ReplayMessage(new { Sensors = Convert.ToBase64String(manager.GetBinaryData(package.dataset, package.num)) }, message, this);
                 }
             }
