@@ -21,6 +21,65 @@
     }
 }
 
+class SVGEditor implements IApplication {
+    app: Application;
+    window: AppWindow;
+    mk: HtmlHelper = new HtmlHelper();
+    svgCanvas: SVGSVGElement;
+
+    main(): void {
+        
+        this.window = kernel.winMan.createWindow(this.app, "SVG Editor");
+        //this.window.content.addEventListener("click", (e) => this.mouseClick(e));
+        this.window.content.addEventListener("mousedown", (e) => this.mouseDown(e));
+        this.window.content.addEventListener("mousemove", (e) => this.mouseMove(e));
+        this.window.content.addEventListener("mouseup", (e) => this.mouseUp(e));
+        this.svgCanvas = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        this.svgCanvas.style.width = "100%";
+        this.svgCanvas.style.height = "calc(100% - 5px)";
+        this.window.content.appendChild(this.svgCanvas);
+        
+    }
+
+    curLine: SVGLineElement = null;
+
+    mouseDown(e: MouseEvent) {
+        this.curLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        let a = this.curLine;
+        a.x1.baseVal.value = e.layerX;
+        a.x2.baseVal.value = e.layerX;
+        a.y1.baseVal.value = e.layerY;
+        a.y2.baseVal.value = e.layerY;
+        a.style.stroke = "white";
+        a.style.strokeWidth = "1px";
+        this.svgCanvas.appendChild(a);
+    }
+
+    mouseMove(e: MouseEvent) {
+        let a = this.curLine;
+        if (a) {
+            a.x2.baseVal.value = e.layerX;
+            a.y2.baseVal.value = e.layerY;
+        }
+    }
+
+    mouseUp(e: MouseEvent) {
+        this.curLine = null;
+    }
+    
+    mouseClick(e: MouseEvent) {
+        console.log(e);
+        let a = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        a.x1.baseVal.value = 0;
+        a.x2.baseVal.value = e.layerX;
+        a.y1.baseVal.value = 0;
+        a.y2.baseVal.value = e.layerY;
+        a.style.stroke = "white";
+        a.style.strokeWidth = "1px";
+        this.svgCanvas.appendChild(a);
+    }
+}
+
 class DataViewer implements IApplication {
     app: Application;
     window: AppWindow;

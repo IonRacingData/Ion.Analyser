@@ -1,18 +1,34 @@
 var TaskManager = (function () {
     function TaskManager() {
         this.infoWindows = [];
+        this.appTable = null;
     }
     TaskManager.prototype.main = function () {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Task Manager");
         this.addEvents(this.app.events);
-        this.draw();
+        this.initializeComponents();
+        //this.draw();
     };
     TaskManager.prototype.addEvents = function (eh) {
         var _this = this;
-        eh.on(kernel.winMan.onWindowOpen, function () { return _this.draw(); });
-        eh.on(kernel.winMan.onWindowClose, function () { return _this.draw(); });
-        eh.on(kernel.appMan.onAppLaunch, function () { return _this.draw(); });
-        eh.on(kernel.appMan.onAppClose, function () { return _this.draw(); });
+        eh.on(kernel.winMan.onWindowOpen, function () { return _this.update(); });
+        eh.on(kernel.winMan.onWindowClose, function () { return _this.update(); });
+        eh.on(kernel.appMan.onAppLaunch, function () { return _this.update(); });
+        eh.on(kernel.appMan.onAppClose, function () { return _this.update(); });
+    };
+    TaskManager.prototype.initializeComponents = function () {
+        var _this = this;
+        var ta = this.appTable = new TableList();
+        ta.header = ["PID", "Application", "# Windows", "# Events"];
+        ta.selector = function (app) {
+            return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
+        };
+        ta.onItemClick.addEventListener(function (app) { return _this.onAppClick(app); });
+        ta.data = kernel.appMan.appList;
+        this.mainWindow.content.appendChild(ta.wrapper);
+    };
+    TaskManager.prototype.update = function () {
+        this.appTable.update();
     };
     TaskManager.prototype.draw = function () {
         var _this = this;
@@ -39,19 +55,13 @@ var TaskManager = (function () {
         var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
         this.infoWindows.push(win);
         this.drawInfoWindow(app, win);
-        //var pid = parseInt(tr.firstChild.textContent, 10);
-        //for (var i = 0; i < kernel.appMan.appList.length; i++) {
-        //var app = kernel.appMan.appList[i];
-        //if (app.pid === pid) {
-        //}
-        //}
     };
     TaskManager.prototype.drawInfoWindow = function (app, win) {
         var windowTab = new HtmlTableGen("table");
         windowTab.addHeader("Title");
         windowTab.addArray(app.windows, ["title"]);
         var windowEvents = new HtmlTableGen("table");
-        windowEvents.addHeader("Event", "extra");
+        windowEvents.addHeader("Event", "Extra");
         windowEvents.addArray(app.events.localNewEvent, ["info"]);
         windowEvents.addArray(app.events.localEvents, ["type", "manager"]);
         win.content.innerHTML = "";

@@ -2,6 +2,38 @@
 
 }
 
+interface INewEvent {
+    (...params: any[]): void;
+    info: string;
+    addEventListener(...params: any[]): void;
+    removeEventListener(...params: any[]): void;
+}
+
+function newEvent(info: string): INewEvent {
+    let callbacks: ((...params: any[]) => void)[] = [];
+
+    let handler = <any>function EventHandler(...params: any[]) {
+        // console.log("running events");
+        // console.log(callbacks);
+        for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i](...params);
+        }
+    }
+
+    handler.info = info;
+
+    handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
+        callbacks.push(callback);
+    }
+
+    handler.removeEventListener = function removeEventListener(callback: (...params: any[]) => void) {
+        let a = callbacks.indexOf(callback);
+        callbacks.splice(a, 1);
+    }
+
+    return handler;
+}
+
 interface IWindowEvent {
     window: AppWindow;
     mouse: MouseEvent;

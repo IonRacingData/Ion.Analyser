@@ -16,6 +16,57 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
+var SVGEditor = (function () {
+    function SVGEditor() {
+        this.mk = new HtmlHelper();
+        this.curLine = null;
+    }
+    SVGEditor.prototype.main = function () {
+        var _this = this;
+        this.window = kernel.winMan.createWindow(this.app, "SVG Editor");
+        //this.window.content.addEventListener("click", (e) => this.mouseClick(e));
+        this.window.content.addEventListener("mousedown", function (e) { return _this.mouseDown(e); });
+        this.window.content.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
+        this.window.content.addEventListener("mouseup", function (e) { return _this.mouseUp(e); });
+        this.svgCanvas = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        this.svgCanvas.style.width = "100%";
+        this.svgCanvas.style.height = "calc(100% - 5px)";
+        this.window.content.appendChild(this.svgCanvas);
+    };
+    SVGEditor.prototype.mouseDown = function (e) {
+        this.curLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        var a = this.curLine;
+        a.x1.baseVal.value = e.layerX;
+        a.x2.baseVal.value = e.layerX;
+        a.y1.baseVal.value = e.layerY;
+        a.y2.baseVal.value = e.layerY;
+        a.style.stroke = "white";
+        a.style.strokeWidth = "1px";
+        this.svgCanvas.appendChild(a);
+    };
+    SVGEditor.prototype.mouseMove = function (e) {
+        var a = this.curLine;
+        if (a) {
+            a.x2.baseVal.value = e.layerX;
+            a.y2.baseVal.value = e.layerY;
+        }
+    };
+    SVGEditor.prototype.mouseUp = function (e) {
+        this.curLine = null;
+    };
+    SVGEditor.prototype.mouseClick = function (e) {
+        console.log(e);
+        var a = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        a.x1.baseVal.value = 0;
+        a.x2.baseVal.value = e.layerX;
+        a.y1.baseVal.value = 0;
+        a.y2.baseVal.value = e.layerY;
+        a.style.stroke = "white";
+        a.style.strokeWidth = "1px";
+        this.svgCanvas.appendChild(a);
+    };
+    return SVGEditor;
+}());
 var DataViewer = (function () {
     function DataViewer() {
     }
