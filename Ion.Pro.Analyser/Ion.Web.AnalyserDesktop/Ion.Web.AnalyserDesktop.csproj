@@ -31,6 +31,8 @@
     <Content Include="Grid\grid-style.css" />
     <Content Include="Grid\grid.css" />
     <Content Include="icons\close.svg" />
+    <Content Include="icons\connected.png" />
+    <Content Include="icons\disconnected.png" />
     <Content Include="icons\max.svg" />
     <Content Include="icons\min.svg" />
     <Content Include="steeringWheel.png" />

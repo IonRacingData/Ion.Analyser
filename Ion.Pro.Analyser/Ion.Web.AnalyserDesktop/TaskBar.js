@@ -130,16 +130,30 @@ var StatusBar = (function (_super) {
         var _this = _super.call(this) || this;
         _this.content = content;
         _this.content.style.cssFloat = "right";
+        _this.content.style.padding = "8px";
         var mk = new HtmlHelper();
-        _this.content.appendChild(_this.element = mk.tag("div", "taskbar-item", [], "Not connected"));
+        _this.discon = mk.tag("img");
+        _this.discon.src = "/icons/disconnected.png";
+        _this.discon.style.width = "24px";
+        _this.discon.style.height = "24px";
+        _this.con = mk.tag("img");
+        _this.con.src = "/icons/connected.png";
+        _this.con.style.width = "24px";
+        _this.con.style.height = "24px";
+        _this.con.style.display = "none";
+        _this.content.appendChild(_this.discon);
+        _this.content.appendChild(_this.con);
         if (kernel.netMan.connectionOpen) {
-            _this.element.innerHTML = "Connected";
+            _this.con.style.display = "inherit";
+            _this.discon.style.display = "none";
         }
         kernel.netMan.onGotConnection.addEventListener(function () {
-            _this.element.innerHTML = "Connected";
+            _this.con.style.display = "inherit";
+            _this.discon.style.display = "none";
         });
         kernel.netMan.onLostConnection.addEventListener(function () {
-            _this.element.innerHTML = "Not connected";
+            _this.discon.style.display = "inherit";
+            _this.con.style.display = "none";
         });
         return _this;
     }

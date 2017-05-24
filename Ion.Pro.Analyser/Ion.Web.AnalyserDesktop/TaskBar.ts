@@ -125,25 +125,42 @@ class ChangeTheme extends Applet {
 
 class StatusBar extends Applet {
     private element: HTMLElement;
+    private discon: HTMLImageElement;
+    private con: HTMLImageElement;
+
     constructor(content: HTMLElement) {
         super();
         this.content = content;
         this.content.style.cssFloat = "right";
+        this.content.style.padding = "8px";
         let mk: HtmlHelper = new HtmlHelper();
-        this.content.appendChild(this.element = mk.tag(
-            "div"
-            , "taskbar-item"
-            , []
-            , "Not connected"
-        ));
+
+        this.discon = <HTMLImageElement>mk.tag("img");
+        this.discon.src = "/icons/disconnected.png";
+        this.discon.style.width = "24px";
+        this.discon.style.height = "24px";
+        
+
+        this.con = <HTMLImageElement>mk.tag("img");
+        this.con.src = "/icons/connected.png";
+        this.con.style.width = "24px";
+        this.con.style.height = "24px";
+        this.con.style.display = "none";
+        
+        this.content.appendChild(this.discon);
+        this.content.appendChild(this.con);
+
         if (kernel.netMan.connectionOpen) {
-            this.element.innerHTML = "Connected";
+            this.con.style.display = "inherit";
+            this.discon.style.display = "none";
         }
-        kernel.netMan.onGotConnection.addEventListener(() => {
-            this.element.innerHTML = "Connected";
+        kernel.netMan.onGotConnection.addEventListener(() => {            
+            this.con.style.display = "inherit";
+            this.discon.style.display = "none";
         });
         kernel.netMan.onLostConnection.addEventListener(() => {
-            this.element.innerHTML = "Not connected";
+            this.discon.style.display = "inherit";
+            this.con.style.display = "none";
         });
     }
 }
