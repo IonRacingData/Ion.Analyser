@@ -139,14 +139,15 @@ class StatusBar extends Applet {
         this.discon.src = "/icons/disconnected.png";
         this.discon.style.width = "24px";
         this.discon.style.height = "24px";
-        
+        this.discon.title = "Not connected";
 
         this.con = <HTMLImageElement>mk.tag("img");
         this.con.src = "/icons/connected.png";
         this.con.style.width = "24px";
         this.con.style.height = "24px";
         this.con.style.display = "none";
-        
+        this.con.title = "Connected";
+
         this.content.appendChild(this.discon);
         this.content.appendChild(this.con);
 

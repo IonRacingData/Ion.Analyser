@@ -136,11 +136,13 @@ var StatusBar = (function (_super) {
         _this.discon.src = "/icons/disconnected.png";
         _this.discon.style.width = "24px";
         _this.discon.style.height = "24px";
+        _this.discon.title = "Not connected";
         _this.con = mk.tag("img");
         _this.con.src = "/icons/connected.png";
         _this.con.style.width = "24px";
         _this.con.style.height = "24px";
         _this.con.style.display = "none";
+        _this.con.title = "Connected";
         _this.content.appendChild(_this.discon);
         _this.content.appendChild(_this.con);
         if (kernel.netMan.connectionOpen) {
