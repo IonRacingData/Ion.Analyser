@@ -1,5 +1,235 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var kernel;
+var Component = (function () {
+    function Component() {
+    }
+    return Component;
+}());
+var Button = (function (_super) {
+    __extends(Button, _super);
+    function Button() {
+        var _this = _super.call(this) || this;
+        _this.onclick = newEvent("Button.onclick");
+        _this.wrapper = document.createElement("div");
+        _this.wrapper.className = "comp-button";
+        _this.textNode = document.createTextNode("button");
+        _this.wrapper.appendChild(_this.textNode);
+        _this.wrapper.onclick = _this.onclick;
+        return _this;
+    }
+    Object.defineProperty(Button.prototype, "text", {
+        get: function () {
+            return this.textNode.nodeValue;
+        },
+        set: function (value) {
+            this.textNode.nodeValue = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Button;
+}(Component));
+var ListBox = (function (_super) {
+    __extends(ListBox, _super);
+    function ListBox() {
+        var _this = _super.call(this) || this;
+        _this.selector = null;
+        _this.onItemClick = newEvent("ListBox.onItemClick");
+        _this.wrapper = document.createElement("ul");
+        _this.wrapper.className = "comp-listBox";
+        return _this;
+    }
+    Object.defineProperty(ListBox.prototype, "data", {
+        get: function () {
+            return this.__data;
+        },
+        set: function (data) {
+            this.__data = data;
+            /*let oldPush = data.push;
+            let box = this;
+            data.push = function push(...items: any[]): number {
+                let num = oldPush.apply(data, items);
+                box.generateList();
+                return num;
+            }*/
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ListBox.prototype.update = function () {
+        this.generateList();
+    };
+    ListBox.prototype.generateList = function () {
+        var _this = this;
+        this.wrapper.innerHTML = "";
+        var _loop_1 = function (v) {
+            var row = document.createElement("li");
+            row.onclick = function () {
+                _this.onItemClick(v);
+            };
+            var txt = null;
+            if (this_1.selector) {
+                txt = this_1.selector(v);
+            }
+            else {
+                txt = v.toString();
+            }
+            row.appendChild(document.createTextNode(txt));
+            this_1.wrapper.appendChild(row);
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = this.__data; _i < _a.length; _i++) {
+            var v = _a[_i];
+            _loop_1(v);
+        }
+    };
+    return ListBox;
+}(Component));
+var TableList = (function (_super) {
+    __extends(TableList, _super);
+    function TableList() {
+        var _this = _super.call(this) || this;
+        _this.__header = [];
+        _this.selector = null;
+        _this.onItemClick = newEvent("TabelList.onItemClick");
+        _this.wrapper = document.createElement("table");
+        _this.wrapper.className = "table selectable";
+        _this.tableHeader = document.createElement("thead");
+        _this.tableBody = document.createElement("tbody");
+        _this.wrapper.appendChild(_this.tableHeader);
+        _this.wrapper.appendChild(_this.tableBody);
+        return _this;
+    }
+    Object.defineProperty(TableList.prototype, "data", {
+        get: function () {
+            return this.__data;
+        },
+        set: function (data) {
+            this.__data = data;
+            /*let oldPush = data.push;
+            let box = this;
+            data.push = function push(...items: any[]): number {
+                let num = oldPush.apply(data, items);
+                box.generateList();
+                return num;
+            }*/
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TableList.prototype, "header", {
+        get: function () {
+            return this.__header;
+        },
+        set: function (headers) {
+            this.__header = headers;
+            this.generateHeader();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TableList.prototype.update = function () {
+        this.generateList();
+    };
+    TableList.prototype.generateHeader = function () {
+        this.tableHeader.innerHTML = "";
+        var tr = document.createElement("tr");
+        this.tableHeader.appendChild(tr);
+        for (var _i = 0, _a = this.__header; _i < _a.length; _i++) {
+            var v = _a[_i];
+            var headerItem = document.createElement("th");
+            headerItem.appendChild(document.createTextNode(v));
+            tr.appendChild(headerItem);
+        }
+    };
+    TableList.prototype.generateList = function () {
+        var _this = this;
+        this.tableBody.innerHTML = "";
+        var _loop_2 = function (v) {
+            var row = document.createElement("tr");
+            row.onclick = function () {
+                _this.onItemClick(v);
+            };
+            var txt = [];
+            if (this_2.selector) {
+                txt = this_2.selector(v);
+            }
+            else {
+                txt = [v.toString()];
+            }
+            for (var _i = 0, txt_1 = txt; _i < txt_1.length; _i++) {
+                var d = txt_1[_i];
+                var cell = document.createElement("td");
+                cell.appendChild(document.createTextNode(d));
+                row.appendChild(cell);
+            }
+            this_2.tableBody.appendChild(row);
+        };
+        var this_2 = this;
+        for (var _i = 0, _a = this.__data; _i < _a.length; _i++) {
+            var v = _a[_i];
+            _loop_2(v);
+        }
+    };
+    return TableList;
+}(Component));
+var testing = false;
+function tester() {
+    window.document.body.innerHTML = "";
+    var b = new Button();
+    var b2 = new Button();
+    var lst = new ListBox();
+    var table = new TableList();
+    document.body.appendChild(b.wrapper);
+    document.body.appendChild(b2.wrapper);
+    document.body.appendChild(document.createElement("br"));
+    document.body.appendChild(lst.wrapper);
+    document.body.appendChild(table.wrapper);
+    b.text = "Click Me!";
+    b2.text = "Add Fourth";
+    b.onclick.addEventListener(function () { alert("Yeay"); });
+    var arr = [
+        { first: "Per", last: "Pettersen" },
+        { first: "Truls", last: "Trulsen" },
+        { first: "Bob", last: "Bobsen" }
+    ];
+    b2.onclick.addEventListener(function () {
+        arr.push({ first: "Fourth", last: "Tester" });
+        lst.update();
+        table.update();
+    });
+    table.header = ["Firstname", "Lastname"];
+    table.selector = function (item) {
+        return [item.first, item.last];
+    };
+    table.onItemClick.addEventListener(function (item) {
+        alert("You clicked on: " + item.last + ", " + item.first);
+    });
+    table.data = arr;
+    lst.selector = function (item) {
+        return item.first + " " + item.last;
+    };
+    lst.onItemClick.addEventListener(function (item) {
+        alert("You clicked on: " + item.last + ", " + item.first);
+    });
+    lst.data = arr;
+}
 function startUp() {
+    if (testing) {
+        tester();
+        return;
+    }
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
@@ -31,29 +261,6 @@ function startUp() {
         e.preventDefault();
     });
 }
-function newEvent(info) {
-    var callbacks = [];
-    var handler = function EventHandler() {
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
-        // console.log("running events");
-        // console.log(callbacks);
-        for (var i = 0; i < callbacks.length; i++) {
-            callbacks[i].apply(callbacks, params);
-        }
-    };
-    handler.info = info;
-    handler.addEventListener = function addEventListener(callback) {
-        callbacks.push(callback);
-    };
-    handler.removeEventListener = function removeEventListener(callback) {
-        var a = callbacks.indexOf(callback);
-        callbacks.splice(a, 1);
-    };
-    return handler;
-}
 function registerSensorGroups() {
     kernel.senMan.registerGroup(PointSensorGroup);
 }
@@ -74,6 +281,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Test", new Launcher(SensorSetSelector, "Sensor set Selector"));
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    kernel.appMan.registerApplication("Tools", new Launcher(SVGEditor, "SVG Editor"));
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
     registerGridPresets();
 }

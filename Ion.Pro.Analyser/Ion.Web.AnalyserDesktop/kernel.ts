@@ -7,7 +7,244 @@ interface IKernel {
     senMan: sensys.SensorManager;
 }
 
+class Component {
+    public wrapper: HTMLElement;
+}
+
+class Button extends Component {
+
+    private textNode: Text;
+
+    get text(): string {
+        return this.textNode.nodeValue;
+    }
+    set text(value: string) {
+        this.textNode.nodeValue = value;
+    }
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("div");
+        this.wrapper.className = "comp-button";
+        this.textNode = document.createTextNode("button");
+        this.wrapper.appendChild(this.textNode);
+        this.wrapper.onclick = this.onclick;
+    }
+
+    onclick = newEvent("Button.onclick");   
+}
+
+class ListBox extends Component {
+
+    private __data: any[];
+    public selector: <T>(obj: T) => string = null;
+
+    get data(): any[] {
+        return this.__data;
+    }
+    set data(data: any[]) {
+        this.__data = data;
+        /*let oldPush = data.push;
+        let box = this;
+        data.push = function push(...items: any[]): number {
+            let num = oldPush.apply(data, items);
+            box.generateList();
+            return num;
+        }*/
+        this.generateList();
+    }
+
+    onItemClick = newEvent("ListBox.onItemClick");
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("ul");
+        this.wrapper.className = "comp-listBox";
+    }
+
+    public update() {
+        this.generateList();
+    }
+
+    private generateList() {
+        this.wrapper.innerHTML = "";
+        for (let v of this.__data) {
+            let row = document.createElement("li");
+
+            row.onclick = () => {
+                this.onItemClick(v);
+            }
+            let txt = null;
+            if (this.selector) {
+                txt = this.selector(v);
+            }
+            else {
+                txt = v.toString();
+            }
+
+            row.appendChild(document.createTextNode(txt));
+            this.wrapper.appendChild(row);
+        }
+    }
+}
+
+class TableList extends Component {
+    private __data: any[];
+    private __header: string[] = [];
+
+    public selector: <T>(obj: T) => string[] = null;
+
+    onItemClick = newEvent("TabelList.onItemClick");
+
+    get data(): any[] {
+        return this.__data;
+    }
+    set data(data: any[]) {
+        this.__data = data;
+        /*let oldPush = data.push;
+        let box = this;
+        data.push = function push(...items: any[]): number {
+            let num = oldPush.apply(data, items);
+            box.generateList();
+            return num;
+        }*/
+        this.generateList();
+    }
+
+    get header(): string[] {
+        return this.__header;
+    }
+    set header(headers: string[]) {
+        this.__header = headers;
+        this.generateHeader();
+    }
+
+    tableHeader: HTMLTableSectionElement;
+    tableBody: HTMLTableSectionElement;
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("table");
+        this.wrapper.className = "table selectable";
+        this.tableHeader = document.createElement("thead");
+        this.tableBody = document.createElement("tbody");
+        this.wrapper.appendChild(this.tableHeader);
+        this.wrapper.appendChild(this.tableBody);
+    }
+
+    public update() {
+        this.generateList();
+    }
+
+    private generateHeader() {
+        this.tableHeader.innerHTML = "";
+        let tr = document.createElement("tr");
+        this.tableHeader.appendChild(tr);
+        for (let v of this.__header) {
+            let headerItem = document.createElement("th");
+            headerItem.appendChild(document.createTextNode(v));
+            tr.appendChild(headerItem);
+        }
+    }
+
+    private generateList() {
+        this.tableBody.innerHTML = "";
+        for (let v of this.__data) {
+            let row = document.createElement("tr");
+            
+
+            row.onclick = () => {
+                this.onItemClick(v);
+            }
+            let txt = [];
+            if (this.selector) {
+                txt = this.selector(v);
+            }
+            else {
+                txt = [v.toString()];
+            }
+            for (let d of txt) {
+                let cell = document.createElement("td");
+                cell.appendChild(document.createTextNode(d));
+                row.appendChild(cell);
+            }
+            this.tableBody.appendChild(row);
+        }
+    }
+}
+
+let testing = false;
+
+interface IPerson {
+    first: string;
+    last: string;
+}
+
+
+function tester() {
+    window.document.body.innerHTML = "";
+
+
+    let b = new Button();
+    let b2 = new Button();
+    let lst = new ListBox();
+    let table = new TableList();
+
+    document.body.appendChild(b.wrapper);
+    document.body.appendChild(b2.wrapper);
+    document.body.appendChild(document.createElement("br"));
+    document.body.appendChild(lst.wrapper);
+    document.body.appendChild(table.wrapper);
+
+    b.text = "Click Me!";
+    b2.text = "Add Fourth";
+
+    b.onclick.addEventListener(() => { alert("Yeay") });
+
+
+    let arr: IPerson[] = [
+        { first: "Per", last: "Pettersen" },
+        { first: "Truls", last: "Trulsen" },
+        { first: "Bob", last: "Bobsen" }
+    ];
+
+    b2.onclick.addEventListener(() => {
+        arr.push({ first: "Fourth", last: "Tester" })
+        lst.update();
+        table.update();
+    });
+
+    table.header = ["Firstname", "Lastname"];
+
+    table.selector = (item: IPerson) => {
+        return [item.first, item.last];
+    }
+
+    table.onItemClick.addEventListener((item: IPerson) => {
+        alert("You clicked on: " + item.last + ", " + item.first);
+    })
+
+
+
+    table.data = arr;
+
+    lst.selector = (item: IPerson) => {
+        return item.first + " " + item.last;
+    };
+
+    lst.onItemClick.addEventListener((item: IPerson) => {
+        alert("You clicked on: " + item.last + ", " + item.first);
+    })
+
+    lst.data = arr;
+}
+
+
 function startUp() {
+    if (testing) {
+        tester();   
+        return;
+    }
 
     kernel = {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
@@ -53,37 +290,7 @@ function startUp() {
 }
 
 
-interface INewEvent{
-    (...params: any[]): void;
-    info: string;
-    addEventListener(...params: any[]): void;
-    removeEventListener(...params: any[]): void;
-}
 
-function newEvent(info: string): INewEvent {
-    let callbacks: ((...params: any[]) => void)[] = [];
-
-    let handler = <any>function EventHandler(...params: any[]) {
-        // console.log("running events");
-        // console.log(callbacks);
-        for (let i = 0; i < callbacks.length; i++) {
-            callbacks[i](...params);
-        }
-    }
-
-    handler.info = info;
-
-    handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
-        callbacks.push(callback);
-    }
-
-    handler.removeEventListener = function removeEventListener(callback: (...params: any[]) => void) {
-        let a = callbacks.indexOf(callback);
-        callbacks.splice(a, 1);
-    }
-
-    return handler;
-}
 
 interface IMenuItem {
     name: string;
@@ -120,6 +327,7 @@ function registerLaunchers() {
 
     kernel.appMan.registerApplication("Admin", new Launcher(LegacyRPIManager, "Legacy RPI Manager"));
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
+    kernel.appMan.registerApplication("Tools", new Launcher(SVGEditor, "SVG Editor"));
 
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
 

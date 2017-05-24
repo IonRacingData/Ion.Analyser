@@ -76,7 +76,9 @@
     background-color: #313C53;
 
 }
-
+.table {
+    color: white;
+}
 
 .table tr:nth-child(2n) {
     background-color: #3c3c3c;

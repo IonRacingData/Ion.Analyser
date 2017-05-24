@@ -1,4 +1,6 @@
-﻿class BarController extends SingleValueController {
+﻿/// <reference path="Controller.ts" />
+
+class BarController extends SingleValueController {
     private bar1: HTMLElement;
     private bar2: HTMLElement;
     private barWrapper1: HTMLElement;

@@ -7,15 +7,34 @@
     main() {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Task Manager");
         this.addEvents(this.app.events);
-        this.draw();
+        this.initializeComponents();
+        //this.draw();
     }
 
     addEvents(eh: EventHandler) {
-        eh.on(kernel.winMan.onWindowOpen, () => this.draw());
-        eh.on(kernel.winMan.onWindowClose, () => this.draw());
+        eh.on(kernel.winMan.onWindowOpen, () => this.update());
+        eh.on(kernel.winMan.onWindowClose, () => this.update());
 
-        eh.on(kernel.appMan.onAppLaunch, () => this.draw());
-        eh.on(kernel.appMan.onAppClose, () => this.draw());
+        eh.on(kernel.appMan.onAppLaunch, () => this.update());
+        eh.on(kernel.appMan.onAppClose, () => this.update());
+    }
+
+
+    appTable: TableList = null;
+
+    initializeComponents() {
+        let ta = this.appTable = new TableList();
+        ta.header = ["PID", "Application", "# Windows", "# Events"];
+        ta.selector = (app: Application) => {
+            return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
+        };
+        ta.onItemClick.addEventListener((app: Application) => this.onAppClick(app));
+        ta.data = kernel.appMan.appList;
+        this.mainWindow.content.appendChild(ta.wrapper);
+    }
+
+    update() {
+        this.appTable.update();
     }
 
     draw() {
@@ -43,15 +62,6 @@
         var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
         this.infoWindows.push(win);
         this.drawInfoWindow(app, win);
-
-
-        //var pid = parseInt(tr.firstChild.textContent, 10);
-        //for (var i = 0; i < kernel.appMan.appList.length; i++) {
-            //var app = kernel.appMan.appList[i];
-            //if (app.pid === pid) {
-                
-            //}
-        //}
     }
 
     drawInfoWindow(app: Application, win: AppWindow) {
@@ -59,7 +69,7 @@
         windowTab.addHeader("Title");
         windowTab.addArray(app.windows, ["title"]);
         let windowEvents = new HtmlTableGen("table");
-        windowEvents.addHeader("Event", "extra");
+        windowEvents.addHeader("Event", "Extra");
         windowEvents.addArray(app.events.localNewEvent, ["info"]);
         windowEvents.addArray(app.events.localEvents, ["type", "manager"]);
 

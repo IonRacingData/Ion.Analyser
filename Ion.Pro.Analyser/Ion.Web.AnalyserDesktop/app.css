@@ -309,3 +309,40 @@ span.table-resize{
 table.table.selectable tbody tr:hover {
     background-color: #202020;
 }
+
+.comp-button {
+    background-color: #444;
+    display: inline-block;
+    padding: 3px 5px;
+    margin: 1px;
+    min-width: 70px;
+    text-align: center;
+    min-height: 23px;
+    color: white;
+}
+
+.comp-button:hover {
+    padding: 1px 3px;
+    border: 2px solid darkgray;
+}
+
+.comp-listBox {
+    vertical-align: top;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 120px;
+    background-color: #444;
+    margin: 1px;
+    color: white;
+    padding: 0;
+    display: inline-block;
+}
+
+    .comp-listBox li {
+        padding: 3px;
+        list-style: none;
+    }
+
+        .comp-listBox li:hover {
+            background-color: #222;
+        }
