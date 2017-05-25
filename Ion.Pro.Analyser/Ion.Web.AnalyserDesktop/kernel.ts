@@ -54,7 +54,7 @@ class ListBox extends Component {
         this.generateList();
     }
 
-    onItemClick = newEvent("ListBox.onItemClick");
+    onItemClick = newEvent<IDataEvent<any>>("ListBox.onItemClick");
 
     constructor() {
         super();
@@ -88,13 +88,17 @@ class ListBox extends Component {
     }
 }
 
+interface IDataEvent<T> extends IEventData {
+    data: T;
+}
+
 class TableList extends Component {
     private __data: any[];
     private __header: string[] = [];
 
     public selector: <T>(obj: T) => string[] = null;
 
-    onItemClick = newEvent("TabelList.onItemClick");
+    onItemClick = newEvent<IDataEvent<any>>("TabelList.onItemClick");
 
     get data(): any[] {
         return this.__data;
@@ -184,6 +188,7 @@ interface IPerson {
 function tester() {
     window.document.body.innerHTML = "";
 
+    let newT = newEvent<IEventData>("tester.test");
 
     let b = new Button();
     let b2 = new Button();
@@ -220,8 +225,8 @@ function tester() {
         return [item.first, item.last];
     }
 
-    table.onItemClick.addEventListener((item: IPerson) => {
-        alert("You clicked on: " + item.last + ", " + item.first);
+    table.onItemClick.addEventListener((item: IDataEvent<IPerson>) => {
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     })
 
 
@@ -232,8 +237,8 @@ function tester() {
         return item.first + " " + item.last;
     };
 
-    lst.onItemClick.addEventListener((item: IPerson) => {
-        alert("You clicked on: " + item.last + ", " + item.first);
+    lst.onItemClick.addEventListener((item: IDataEvent<IPerson>) => {
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     })
 
     lst.data = arr;

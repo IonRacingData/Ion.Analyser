@@ -5,15 +5,11 @@ var EventData = (function () {
 }());
 function newEvent(info) {
     var callbacks = [];
-    var handler = function EventHandler() {
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
+    var handler = function EventHandler(event) {
         // console.log("running events");
         // console.log(callbacks);
         for (var i = 0; i < callbacks.length; i++) {
-            callbacks[i].apply(callbacks, params);
+            callbacks[i](event);
         }
     };
     handler.info = info;

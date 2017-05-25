@@ -17,8 +17,8 @@
     private tileZone = 20;
     private topBar = 40;
 
-    onGlobalDrag = newEvent("WindowManager.onGlobalDrag");
-    onGlobalUp = newEvent("WindowManager.onGlobalUp");
+    onGlobalDrag = newEvent<IWindowEvent>("WindowManager.onGlobalDrag");
+    onGlobalUp = newEvent<IWindowEvent>("WindowManager.onGlobalUp");
 
     onWindowOpen = newEvent("WindowManager.onWindowOpen");
     onWindowSelect = newEvent("WindowManager.onWindowSelect");
@@ -76,7 +76,7 @@
         this.handleMouseMoving(e.targetTouches[0].pageX, e.targetTouches[0].pageY, e);
     }
 
-    public handleMouseMoving(x: number, y: number, e: Event): void {
+    public handleMouseMoving(x: number, y: number, e: MouseEvent | TouchEvent): void {
         if (this.dragging) {
             this.activeWindow.__setRelativePos(x, y);
             var tileZone: number = this.tileZone;
@@ -103,7 +103,7 @@
             else if (x > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
-            this.onGlobalDrag({ window: this.activeWindow, mouse: e });
+            this.onGlobalDrag({ target: this, window: this.activeWindow, mouse: e });
             //this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
             let appWindow = this.getWindowAt(x, y, true);
             if (appWindow) {
@@ -145,7 +145,7 @@
         }
         this.dragging = false;
         this.resizing = false;
-        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ target: this, window: this.activeWindow, mouse: e });
         //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
@@ -158,7 +158,7 @@
         }
         this.dragging = false;
         this.resizing = false;
-        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ target: this, window: this.activeWindow, mouse: e });
         //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     }
 
@@ -177,7 +177,7 @@
         let extra = this.windows.length % 10 * 50;
         tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
         tempWindow.onUpdate.addEventListener(() => {
-            this.onWindowUpdate();
+            this.onWindowUpdate(null);
             //this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
         });
         return tempWindow;
@@ -193,7 +193,7 @@
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.onWindowOpen();
+        this.onWindowOpen(null);
         //this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     }
@@ -212,7 +212,7 @@
             style.onload = () => {
                 console.log("hello");
                 this.modifyCurrentStylesheet();
-                this.onThemeChange();
+                this.onThemeChange(null);
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }
         }
@@ -220,7 +220,7 @@
             setTimeout(() => {
                 console.log("hello");
                 this.modifyCurrentStylesheet();
-                this.onThemeChange();
+                this.onThemeChange(null);
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
@@ -240,7 +240,7 @@
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.onWindowSelect();
+        this.onWindowSelect(null);
         //this.raiseEvent(WindowManager.event_windowSelect, null);
     }
 
@@ -256,7 +256,7 @@
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.onWindowClose();
+        this.onWindowClose(null);
         //this.raiseEvent(WindowManager.event_windowClose, null);
     }
 

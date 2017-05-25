@@ -36,13 +36,13 @@ var NetworkManager = (function () {
             _this.connectionOpen = false;
             _this.socket = null;
             _this.tryReconnect();
-            _this.onLostConnection();
+            _this.onLostConnection(null);
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         };
         socket.onopen = function (ev) {
             _this.connectionOpen = true;
             console.log("Connection established");
-            _this.onGotConnection();
+            _this.onGotConnection(null);
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
         return socket;

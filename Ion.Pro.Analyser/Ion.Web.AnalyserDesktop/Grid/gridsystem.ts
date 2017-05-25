@@ -125,7 +125,7 @@
         box.content.appendChild(windowBody);
 
         window.recalculateSize();
-        window.onResize();
+        window.onResize(null);
         this.handleResize();
     }
 
@@ -203,7 +203,7 @@
                 lastBox.content.appendChild(window.handle);
 
                 window.recalculateSize();
-                window.onResize();
+                window.onResize(null);
                 this.handleResize();
             }
             else {
@@ -274,7 +274,7 @@
         this.selectorWindow.setPos(this.window.x + this.window.width / 2 - 45, this.window.y + this.window.height / 2 - 45);
         for (var cur of this.childWindows) {
             cur.recalculateSize();
-            cur.onResize();
+            cur.onResize(null);
             // this.childWindows[cur].recalculateSize();
             // this.childWindows[cur].onResize();
         }
@@ -284,52 +284,64 @@
 
     }
 
+    private isMouseEvent(e: any): e is MouseEvent {
+        if (e.clientX && e.clientY) {
+            return true;
+        }
+        return false;
+    }
+
     globalDrag(e: IWindowEvent) {
-        var windowX = e.mouse.clientX - this.window.x - 9;
-        var windowY = e.mouse.clientY - this.window.y - 39;
-        if (windowX > 0
-            && windowY > 0
-            && windowX < this.window.width
-            && windowY < this.window.height
-            && e.window !== this.window) {
+        if (this.isMouseEvent(e.mouse)) {
+            var windowX = e.mouse.clientX - this.window.x - 9;
+            var windowY = e.mouse.clientY - this.window.y - 39;
+            if (windowX > 0
+                && windowY > 0
+                && windowX < this.window.width
+                && windowY < this.window.height
+                && e.window !== this.window) {
 
-            var containers = this.window.handle.getElementsByClassName("grid-con");
-            for (let i = containers.length - 1; i >= 0; i--) {
-                let cur = <HTMLElement>containers[i];
-                if (windowX > cur.offsetLeft
-                    && windowY > cur.offsetTop
-                    && windowX < cur.offsetLeft + cur.offsetWidth
-                    && windowY < cur.offsetTop + cur.offsetHeight) {
-                    console.log(cur);
-                    this.selectedContainer = cur.gridContainer;
-                    break;
+                var containers = this.window.handle.getElementsByClassName("grid-con");
+                for (let i = containers.length - 1; i >= 0; i--) {
+                    let cur = <HTMLElement>containers[i];
+                    if (windowX > cur.offsetLeft
+                        && windowY > cur.offsetTop
+                        && windowX < cur.offsetLeft + cur.offsetWidth
+                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                        console.log(cur);
+                        this.selectedContainer = cur.gridContainer;
+                        break;
+                    }
                 }
-            }
 
-            var gridBoxes = this.window.handle.getElementsByClassName("grid-box");
-            var foundGridWindow: HTMLElement = null;
-            for (let i = gridBoxes.length - 1; i >= 0; i--) {
-                let cur = <HTMLElement>gridBoxes[i];
+                var gridBoxes = this.window.handle.getElementsByClassName("grid-box");
+                var foundGridWindow: HTMLElement = null;
+                for (let i = gridBoxes.length - 1; i >= 0; i--) {
+                    let cur = <HTMLElement>gridBoxes[i];
 
-                if (windowX > cur.offsetLeft
-                    && windowY > cur.offsetTop
-                    && windowX < cur.offsetLeft + cur.offsetWidth
-                    && windowY < cur.offsetTop + cur.offsetHeight) {
-                    this.selectedBox = cur.gridBox;
-                    this.selectorWindow.setPos(
-                        this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45
-                        , this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
-                    // this.selectedBox.box.offsetTop 
-                    // + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
-                    break;
+                    if (windowX > cur.offsetLeft
+                        && windowY > cur.offsetTop
+                        && windowX < cur.offsetLeft + cur.offsetWidth
+                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                        this.selectedBox = cur.gridBox;
+                        this.selectorWindow.setPos(
+                            this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45
+                            , this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
+                        // this.selectedBox.box.offsetTop 
+                        // + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
+                        break;
+                    }
                 }
-            }
-            this.selectorWindow.show();
+                this.selectorWindow.show();
 
-            // console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
+                // console.log("global drag grid window: X: " + windowX + " Y: " + windowY);
+            }
+            else {
+                this.selectorWindow.hide();
+            }
         }
         else {
-            this.selectorWindow.hide();
+            console.log("Got an unhandled touch event in grid system");
         }
     }
 
@@ -354,10 +366,15 @@
     selectedBox: GridBox;
 
     globalUp(e: IWindowEvent) {
-        var windowX = e.mouse.clientX - this.window.x - 9;
-        var windowY = e.mouse.clientY - this.window.y - 39;
-        if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
-            this.selectorWindow.hide();
+        if (this.isMouseEvent(e.mouse)) {
+            var windowX = e.mouse.clientX - this.window.x - 9;
+            var windowY = e.mouse.clientY - this.window.y - 39;
+            if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
+                this.selectorWindow.hide();
+            }
+        }
+        else {
+            console.log("Got an unhandled touch event in gridsystem, (globalUp)");
         }
     }
 }

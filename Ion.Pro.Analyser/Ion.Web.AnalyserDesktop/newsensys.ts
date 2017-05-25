@@ -147,7 +147,7 @@
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
             console.log("New register view");
-            this.onRegisterViewer();
+            this.onRegisterViewer(null);
             //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
         }
 
@@ -158,7 +158,7 @@
         public unregister<T>(viewer: IViewerBase<T>): void {
             let index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);
-            this.onUnRegisterViewer();
+            this.onUnRegisterViewer(null);
             //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
         }
 

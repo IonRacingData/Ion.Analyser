@@ -132,7 +132,7 @@ var Kernel;
             SensorManager.prototype.register = function (viewer) {
                 this.viewers.push(viewer);
                 console.log("New register view");
-                this.onRegisterViewer();
+                this.onRegisterViewer(null);
                 //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
             };
             SensorManager.prototype.registerGroup = function (group) {
@@ -141,7 +141,7 @@ var Kernel;
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);
                 this.viewers.splice(index, 1);
-                this.onUnRegisterViewer();
+                this.onUnRegisterViewer(null);
                 //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
             };
             SensorManager.prototype.getInfos = function () {

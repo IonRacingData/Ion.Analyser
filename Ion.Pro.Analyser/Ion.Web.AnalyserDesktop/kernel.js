@@ -187,6 +187,7 @@ var TableList = (function (_super) {
 var testing = false;
 function tester() {
     window.document.body.innerHTML = "";
+    var newT = newEvent("tester.test");
     var b = new Button();
     var b2 = new Button();
     var lst = new ListBox();
@@ -214,14 +215,14 @@ function tester() {
         return [item.first, item.last];
     };
     table.onItemClick.addEventListener(function (item) {
-        alert("You clicked on: " + item.last + ", " + item.first);
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     table.data = arr;
     lst.selector = function (item) {
         return item.first + " " + item.last;
     };
     lst.onItemClick.addEventListener(function (item) {
-        alert("You clicked on: " + item.last + ", " + item.first);
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     lst.data = arr;
 }

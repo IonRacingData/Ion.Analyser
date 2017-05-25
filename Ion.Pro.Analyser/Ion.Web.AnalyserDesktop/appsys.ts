@@ -19,7 +19,7 @@
         this.appList.push(appTemp);
 
         appTemp.start(...args);
-        this.onAppLaunch();
+        this.onAppLaunch(null);
         //this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
 
         return appTemp;
@@ -50,7 +50,7 @@
 
     closeApplication(app: Application): void {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.onAppClose();
+        this.onAppClose(null);
         //this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     }
 }

@@ -28,7 +28,7 @@
         ta.selector = (app: Application) => {
             return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
         };
-        ta.onItemClick.addEventListener((app: Application) => this.onAppClick(app));
+        ta.onItemClick.addEventListener((e: IDataEvent<Application>) => this.onAppClick(e.data));
         ta.data = kernel.appMan.appList;
         this.mainWindow.content.appendChild(ta.wrapper);
     }

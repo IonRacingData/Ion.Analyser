@@ -23,7 +23,7 @@ var TaskManager = (function () {
         ta.selector = function (app) {
             return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
         };
-        ta.onItemClick.addEventListener(function (app) { return _this.onAppClick(app); });
+        ta.onItemClick.addEventListener(function (e) { return _this.onAppClick(e.data); });
         ta.data = kernel.appMan.appList;
         this.mainWindow.content.appendChild(ta.wrapper);
     };

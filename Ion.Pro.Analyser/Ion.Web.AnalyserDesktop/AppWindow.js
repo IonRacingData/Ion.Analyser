@@ -1,13 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var AppWindow = (function () {
     function AppWindow(app) {
         var _this = this;
@@ -55,7 +45,7 @@ var AppWindow = (function () {
         set: function (value) {
             this._title = value;
             this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
-            this.onUpdate();
+            this.onUpdate(null);
         },
         enumerable: true,
         configurable: true
@@ -80,7 +70,7 @@ var AppWindow = (function () {
         },
         set: function (value) {
             this._showTaskbar = value;
-            this.onUpdate();
+            this.onUpdate(null);
         },
         enumerable: true,
         configurable: true
@@ -92,7 +82,7 @@ var AppWindow = (function () {
         this.eventMan.removeEventListener(type, listener);
     };
     AppWindow.prototype.content_mouseMove = function (e) {
-        this.onMouseMove(e.layerX, e.layerY);
+        this.onMouseMove({ target: this, x: e.layerX, y: e.layerY });
     };
     /* Event handlers */
     AppWindow.prototype.main_mouseDown = function (e) {
@@ -156,10 +146,10 @@ var AppWindow = (function () {
         this.close();
     };
     AppWindow.prototype.handleGlobalDrag = function (x, y, window) {
-        this.onDragOver(x - this.x, y - this.y - 30, window);
+        this.onDragOver({ target: this, x: x, y: y, window: window });
     };
     AppWindow.prototype.handleGlobalRelease = function (x, y, window) {
-        this.onDragRelease(x - this.x, y - this.y - 30, window);
+        this.onDragRelease({ target: this, x: x, y: y, window: window });
     };
     /* Private stuff */
     AppWindow.prototype.restoreSize = function () {
@@ -209,17 +199,17 @@ var AppWindow = (function () {
         this.windowElement.style.boxShadow = null;
     };
     AppWindow.prototype.__onMouseMove = function (x, y) {
-        this.onMouseMove(new AppMouseEvent(x, y));
+        this.onMouseMove({ target: this, x: x, y: y });
     };
     AppWindow.prototype.__onDragOver = function (x, y, window) {
-        this.onDragOver(new AppMouseDragEvent(x, y, window));
+        this.onDragOver({ target: this, x: x, y: y, window: window });
     };
     AppWindow.prototype.__onDragRelease = function (x, y, window) {
         console.log("Release");
-        this.onDragRelease(new AppMouseDragEvent(x, y, window));
+        this.onDragRelease({ target: this, x: x, y: y, window: window });
     };
     AppWindow.prototype.close = function () {
-        this.onClose();
+        this.onClose(null);
         this.app.onWindowClose();
         this.winMan.closeWindow(this);
     };
@@ -290,7 +280,7 @@ var AppWindow = (function () {
             this.storeX = x;
             this.storeY = y;
         }
-        this.onMove();
+        this.onMove(null);
     };
     AppWindow.prototype.setSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
@@ -306,7 +296,7 @@ var AppWindow = (function () {
             this.storeWidth = width;
             this.storeHeight = height;
         }
-        this.onResize();
+        this.onResize(null);
     };
     AppWindow.prototype.changeWindowMode = function (mode) {
         switch (mode) {
@@ -315,17 +305,17 @@ var AppWindow = (function () {
                 this.removePos();
                 this.removeHeader();
                 this.recalculateSize();
-                this.onResize();
+                this.onResize(null);
                 break;
             case WindowMode.BORDERLESS:
                 this.removeHeader();
-                this.onResize();
+                this.onResize(null);
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
-                this.onResize();
+                this.onResize(null);
                 break;
         }
     };
@@ -351,7 +341,7 @@ var AppWindow = (function () {
             this.storeX = x + this.deltaX;
             this.storeY = y + this.deltaY;
         }
-        this.onMove();
+        this.onMove(null);
     };
     AppWindow.prototype.__setRelativeSize = function (width, height, storeSize) {
         if (storeSize === void 0) { storeSize = true; }
@@ -371,26 +361,27 @@ var AppWindow = (function () {
             this.storeWidth = newWidth;
             this.storeHeight = newHeight;
         }
-        this.onResize();
+        this.onResize(null);
     };
     return AppWindow;
 }());
-var AppMouseEvent = (function () {
-    function AppMouseEvent(x, y) {
+/*class AppMouseEvent implements EventData {
+    public x: number;
+    public y: number;
+
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
-    return AppMouseEvent;
-}());
-var AppMouseDragEvent = (function (_super) {
-    __extends(AppMouseDragEvent, _super);
-    function AppMouseDragEvent(x, y, window) {
-        var _this = _super.call(this, x, y) || this;
-        _this.window = window;
-        return _this;
+}*/
+/*class AppMouseDragEvent extends AppMouseEvent {
+    public window: AppWindow;
+
+    constructor(x: number, y: number, window: AppWindow) {
+        super(x, y);
+        this.window = window;
     }
-    return AppMouseDragEvent;
-}(AppMouseEvent));
+}*/
 var WindowMode;
 (function (WindowMode) {
     WindowMode[WindowMode["WINDOWED"] = 0] = "WINDOWED";

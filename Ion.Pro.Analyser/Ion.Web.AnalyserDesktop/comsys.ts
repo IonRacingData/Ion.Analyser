@@ -49,14 +49,14 @@ class NetworkManager {
             this.connectionOpen = false;
             this.socket = null;
             this.tryReconnect();
-            this.onLostConnection();
+            this.onLostConnection(null);
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         }
 
         socket.onopen = (ev: Event) => {
             this.connectionOpen = true;
             console.log("Connection established");
-            this.onGotConnection();
+            this.onGotConnection(null);
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
 

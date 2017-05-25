@@ -74,7 +74,7 @@ var WindowManager = (function () {
             else if (x > window.innerWidth - tileZone) {
                 this.activeWindow.tile(TileState.RIGHT);
             }
-            this.onGlobalDrag({ window: this.activeWindow, mouse: e });
+            this.onGlobalDrag({ target: this, window: this.activeWindow, mouse: e });
             //this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
             var appWindow = this.getWindowAt(x, y, true);
             if (appWindow) {
@@ -113,7 +113,7 @@ var WindowManager = (function () {
         }
         this.dragging = false;
         this.resizing = false;
-        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ target: this, window: this.activeWindow, mouse: e });
         //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.touchEnd = function (e) {
@@ -125,7 +125,7 @@ var WindowManager = (function () {
         }
         this.dragging = false;
         this.resizing = false;
-        this.onGlobalUp({ window: this.activeWindow, mouse: e });
+        this.onGlobalUp({ target: this, window: this.activeWindow, mouse: e });
         //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.createWindow = function (app, title) {
@@ -142,7 +142,7 @@ var WindowManager = (function () {
         var extra = this.windows.length % 10 * 50;
         tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
         tempWindow.onUpdate.addEventListener(function () {
-            _this.onWindowUpdate();
+            _this.onWindowUpdate(null);
             //this.eventManager.raiseEvent(WindowManager.event_windowUpdate, null);
         });
         return tempWindow;
@@ -155,7 +155,7 @@ var WindowManager = (function () {
         this.windows.push(app);
         this.order.push(app);
         this.reorderWindows();
-        this.onWindowOpen();
+        this.onWindowOpen(null);
         //this.raiseEvent(WindowManager.event_windowOpen, null);
         this.selectWindow(app);
     };
@@ -173,7 +173,7 @@ var WindowManager = (function () {
             style.onload = function () {
                 console.log("hello");
                 _this.modifyCurrentStylesheet();
-                _this.onThemeChange();
+                _this.onThemeChange(null);
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             };
         }
@@ -181,7 +181,7 @@ var WindowManager = (function () {
             setTimeout(function () {
                 console.log("hello");
                 _this.modifyCurrentStylesheet();
-                _this.onThemeChange();
+                _this.onThemeChange(null);
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
@@ -198,7 +198,7 @@ var WindowManager = (function () {
         this.activeWindow = appWindow;
         this.makeTopMost(appWindow);
         appWindow.show();
-        this.onWindowSelect();
+        this.onWindowSelect(null);
         //this.raiseEvent(WindowManager.event_windowSelect, null);
     };
     WindowManager.prototype.makeTopMost = function (appWindow) {
@@ -212,7 +212,7 @@ var WindowManager = (function () {
         this.windows.splice(this.windows.indexOf(appWindow), 1);
         this.order.splice(this.order.indexOf(appWindow), 1);
         appWindow.app.windows.splice(appWindow.app.windows.indexOf(appWindow), 1);
-        this.onWindowClose();
+        this.onWindowClose(null);
         //this.raiseEvent(WindowManager.event_windowClose, null);
     };
     WindowManager.prototype.reorderWindows = function () {
