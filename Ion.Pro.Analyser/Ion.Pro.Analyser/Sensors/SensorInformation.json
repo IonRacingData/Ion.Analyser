@@ -410,7 +410,7 @@
   },
   {
     "Key": "MC_VSI_CURRENT_D",
-    "Name": "MC VSI Current Q Axis"
+    "Name": "MC VSI Current D Axis"
   },
   {
     "Key": "MC_VSI_VOLTAGE_Q",
@@ -418,7 +418,7 @@
   },
   {
     "Key": "MC_VSI_VOLTAGE_D",
-    "Name": "MC VSI Voltage Q Axis"
+    "Name": "MC VSI Voltage D Axis"
   },
   {
     "Key": "MC_MOTOR_POWER",
