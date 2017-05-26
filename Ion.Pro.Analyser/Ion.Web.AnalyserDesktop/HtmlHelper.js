@@ -87,6 +87,9 @@ var HtmlTableGen = (function () {
                     var span_1 = document.createElement("span");
                     span_1.className = "table-resize";
                     span_1.addEventListener("mousedown", function (e) {
+                        if (span_1.parentElement === null) {
+                            throw "Parent null exception";
+                        }
                         span_1.deltaX = span_1.parentElement.offsetWidth - e.pageX;
                         selectedSpan = span_1;
                     });

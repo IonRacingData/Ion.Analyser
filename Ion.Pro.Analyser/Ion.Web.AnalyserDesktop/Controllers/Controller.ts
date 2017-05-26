@@ -17,11 +17,11 @@
 abstract class SingleValueController extends Controller {
     protected percent: number = 0;
     protected value: number = 0;
-    protected data: IDataSource<Point>;
+    protected data: IDataSource<Point> | null;
     protected lastID: string = "";
     protected lastSensorInfo: sensys.ISensorInformation;
 
-    public setData(d: IDataSource<Point>) {
+    public setData(d: IDataSource<Point> | null) {
         this.data = d;
 
         if (this.data) {
@@ -119,12 +119,12 @@ abstract class MultiValueCanvasController extends CanvasController {
 abstract class SingleValueCanvasController extends CanvasController {
     protected percent: number = 0;
     protected value: number = 0;
-    protected data: IDataSource<Point>;
+    protected data: IDataSource<Point> | null;
     protected lastID: string = "";
     protected lastSensorInfo: sensys.ISensorInformation;
 
     
-    public setData(d: IDataSource<Point>) {
+    public setData(d: IDataSource<Point> | null) {
         this.data = d;
 
         if (this.data) {

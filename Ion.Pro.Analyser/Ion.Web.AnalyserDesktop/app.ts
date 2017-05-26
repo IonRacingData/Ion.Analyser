@@ -93,7 +93,7 @@ interface IViewerBase<T> extends ITypeDef<T> {
 }
 
 interface IViewer<T> extends IViewerBase<T> {
-    dataSource: IDataSource<T>;
+    dataSource: IDataSource<T> | null;
 }
 
 interface ICollectionViewer<T> extends IViewerBase<T>{

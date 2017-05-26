@@ -4,9 +4,9 @@
     y: number;
     items: MenuItem[] = [];
     categories: (MenuItem[])[] = [];
-    content: HTMLElement;
+    content: HTMLElement | null;
     visible: boolean;
-    selectedMenu: MenuItem;
+    selectedMenu: MenuItem | null;
 
     constructor(container: HTMLElement, x: number = 0, y: number = 0) {
         this.container = container;
@@ -109,7 +109,7 @@
     }
 
     hide(): void {
-        if (this.visible) {
+        if (this.visible && this.content) {
             this.container.removeChild(this.content);
             this.content = null;
         }

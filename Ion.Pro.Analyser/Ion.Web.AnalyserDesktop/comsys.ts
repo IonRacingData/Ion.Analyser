@@ -1,11 +1,13 @@
-﻿function requestAction(action: string, callback: (data: any) => void): void {
+﻿function requestAction(action: string, callback: ((data: any) => void) | null): void {
     var request = new XMLHttpRequest();
 
     request.responseType = "json";
 
     request.onreadystatechange = () => {
         if (request.readyState === 4 && request.status === 200) {
-            callback(request.response);
+            if (callback) {
+                callback(request.response);
+            }
         }
     };
     request.open("GET", "/test/" + action, true);
@@ -49,14 +51,14 @@ class NetworkManager {
             this.connectionOpen = false;
             this.socket = null;
             this.tryReconnect();
-            this.onLostConnection();
+            this.onLostConnection({ target: this });
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         }
 
         socket.onopen = (ev: Event) => {
             this.connectionOpen = true;
             console.log("Connection established");
-            this.onGotConnection();
+            this.onGotConnection({ target: this });
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
 

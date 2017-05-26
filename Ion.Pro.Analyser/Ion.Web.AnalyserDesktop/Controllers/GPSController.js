@@ -63,17 +63,19 @@ var GPSController = (function (_super) {
         }
     };
     GPSController.prototype.findMinMax = function () {
-        var posDataLength = this.data.length();
-        if (posDataLength > 0) {
-            var firstPoint = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
-            this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
-        }
-        for (var i = 0; i < posDataLength; i++) {
-            var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
-            this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
-            this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
-            this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
-            this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
+        if (this.data) {
+            var posDataLength = this.data.length();
+            if (posDataLength > 0) {
+                var firstPoint = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+                this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
+            }
+            for (var i = 0; i < posDataLength; i++) {
+                var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+                this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
+                this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
+                this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
+                this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
+            }
         }
     };
     GPSController.prototype.rescale = function () {

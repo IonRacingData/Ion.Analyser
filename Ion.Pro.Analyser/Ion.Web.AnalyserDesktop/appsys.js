@@ -21,7 +21,7 @@ var ApplicationManager = (function () {
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
         appTemp.start.apply(appTemp, args);
-        this.onAppLaunch();
+        this.onAppLaunch({ target: this });
         //this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
         return appTemp;
     };
@@ -50,7 +50,7 @@ var ApplicationManager = (function () {
     };
     ApplicationManager.prototype.closeApplication = function (app) {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.onAppClose();
+        this.onAppClose({ target: this });
         //this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     };
     return ApplicationManager;

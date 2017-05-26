@@ -1,5 +1,6 @@
 var Color = (function () {
     function Color(r, g, b, a) {
+        if (a === void 0) { a = null; }
         this.a = null;
         this.r = r;
         this.g = g;

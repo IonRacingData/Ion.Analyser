@@ -1,32 +1,35 @@
 ﻿class EventData {
-
+    public target: any;
 }
 
-interface INewEvent {
-    (...params: any[]): void;
+interface IEventData {
+    target: any;
+}
+
+interface INewEvent<T extends IEventData> {
+    (event: T): void;
     info: string;
-    addEventListener(...params: any[]): void;
-    removeEventListener(...params: any[]): void;
+    addEventListener(listener: (event: T) => void): void;
+    removeEventListener(listener: (event: T) => void): void;
 }
 
-function newEvent(info: string): INewEvent {
-    let callbacks: ((...params: any[]) => void)[] = [];
-
-    let handler = <any>function EventHandler(...params: any[]) {
+function newEvent<T extends IEventData>(info: string): INewEvent<T> {
+    let callbacks: ((event: T) => void)[] = [];
+    let handler = <any>function EventHandler(event: T) {
         // console.log("running events");
         // console.log(callbacks);
         for (let i = 0; i < callbacks.length; i++) {
-            callbacks[i](...params);
+            callbacks[i](event);
         }
     }
 
     handler.info = info;
 
-    handler.addEventListener = function addEventListener(callback: (...params: any[]) => void) {
+    handler.addEventListener = function addEventListener(callback: (event: T) => void) {
         callbacks.push(callback);
     }
 
-    handler.removeEventListener = function removeEventListener(callback: (...params: any[]) => void) {
+    handler.removeEventListener = function removeEventListener(callback: (event: T) => void) {
         let a = callbacks.indexOf(callback);
         callbacks.splice(a, 1);
     }
@@ -34,9 +37,9 @@ function newEvent(info: string): INewEvent {
     return handler;
 }
 
-interface IWindowEvent {
+interface IWindowEvent extends IEventData {
     window: AppWindow;
-    mouse: MouseEvent;
+    mouse: MouseEvent | TouchEvent;
 }
 
 type EventMethod = (type: string, listener: any) => void;
@@ -53,7 +56,7 @@ interface IEventHandlerWrapper {
 }
 
 interface INewEventHandlerWrapper {
-    event: INewEvent;
+    event: INewEvent<any>;
     info: string;
     handler: any;
 }
@@ -62,9 +65,9 @@ class EventHandler {
     localEvents: IEventHandlerWrapper[] = [];
     localNewEvent: INewEventHandlerWrapper[] = [];
 
-    public on(event: INewEvent, handler: any): void;
+    public on(event: INewEvent<any>, handler: any): void;
     public on(manager: IEventManager, type: string, handeler: any): void;
-    public on(first: INewEvent | IEventManager, sec: any, handler: any = null): void {
+    public on(first: INewEvent<any> | IEventManager, sec: any, handler: any = null): void {
         if (typeof (first) === "function") {
             this.localNewEvent.push({ event: first, info: first.info, handler: sec });
             first.addEventListener(sec);

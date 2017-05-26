@@ -41,7 +41,7 @@ class SVGEditor implements IApplication {
         
     }
 
-    curLine: SVGLineElement = null;
+    curLine: SVGLineElement | null = null;
 
     mouseDown(e: MouseEvent) {
         this.curLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -307,7 +307,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
     plotType: string = "Gauge";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> = null;
+    dataSource: IDataSource<Point> | null = null;
 
     app: Application;
     window: AppWindow;
@@ -358,7 +358,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     plotType: string = "GPS";
     plotWindow: AppWindow;
     type: IClassType<Point3D> = Point3D;
-    dataSource: IDataSource<Point3D> = null;
+    dataSource: IDataSource<Point3D> | null = null;
 
     app: Application;
     window: AppWindow;
@@ -405,7 +405,7 @@ class LabelTester implements IApplication, IViewer<Point> {
     plotType: string = "Label";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> = null;
+    dataSource: IDataSource<Point> | null = null;
 
     app: Application;
     window: AppWindow;
@@ -453,7 +453,7 @@ class BarTester implements IApplication, IViewer<Point> {
     plotType: string = "Bar Chart";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> = null;
+    dataSource: IDataSource<Point> | null = null;
 
     app: Application;
     window: AppWindow;
@@ -540,7 +540,7 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
     wheel: SteeringWheelController;
     val: number = 0.5;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> = null;
+    dataSource: IDataSource<Point> | null = null;
     plotType: string = "Bar";
     plotWindow: AppWindow;
 

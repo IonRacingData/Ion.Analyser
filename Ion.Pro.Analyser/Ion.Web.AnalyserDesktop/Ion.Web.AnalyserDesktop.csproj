@@ -38,7 +38,9 @@
     <Content Include="steeringWheel.png" />
     <Content Include="index.html" />
     <Content Include="IonLogo.png" />
-    <Content Include="web.config" />
+    <Content Include="web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="window.css" />
   </ItemGroup>
   <ItemGroup>

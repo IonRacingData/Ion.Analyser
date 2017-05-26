@@ -3,7 +3,9 @@ function requestAction(action, callback) {
     request.responseType = "json";
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
-            callback(request.response);
+            if (callback) {
+                callback(request.response);
+            }
         }
     };
     request.open("GET", "/test/" + action, true);
@@ -36,13 +38,13 @@ var NetworkManager = (function () {
             _this.connectionOpen = false;
             _this.socket = null;
             _this.tryReconnect();
-            _this.onLostConnection();
+            _this.onLostConnection({ target: _this });
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         };
         socket.onopen = function (ev) {
             _this.connectionOpen = true;
             console.log("Connection established");
-            _this.onGotConnection();
+            _this.onGotConnection({ target: _this });
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
         return socket;

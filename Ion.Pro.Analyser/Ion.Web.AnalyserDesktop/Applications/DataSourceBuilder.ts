@@ -100,7 +100,7 @@
     }
 
     private findTableRow(element: HTMLElement): HTMLElement {
-        let curElement: HTMLElement = element;
+        let curElement: HTMLElement | null = element;
 
         while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;

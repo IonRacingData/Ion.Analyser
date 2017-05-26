@@ -6,7 +6,6 @@ var Kernel;
             //static readonly event_registerViewer = "registerViewer";
             //static readonly event_unregisterViewer = "unregisterViewer";
             function SensorManager() {
-                var _this = this;
                 this.eventManager = new EventManager();
                 this.sensorInformation = [];
                 this.loadedDataSet = [];
@@ -17,9 +16,12 @@ var Kernel;
                 this.onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
                 this.onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
                 this.callbackStack = [];
-                kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
                 //this.loadSensorInformation();
             }
+            SensorManager.prototype.lateInit = function () {
+                var _this = this;
+                kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
+            };
             SensorManager.prototype.handleService = function (data) {
                 //console.log("recived data!");
                 if (this.telemetryDataSet) {
@@ -118,8 +120,14 @@ var Kernel;
                         _this.loadedDataSet.push(dataSet);
                         _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {
-                            _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] }));
-                            _this.dataSources.push(_this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+                            var temp1 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] });
+                            var temp2 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                            if (temp1) {
+                                _this.dataSources.push(temp1);
+                            }
+                            if (temp2) {
+                                _this.dataSources.push(temp2);
+                            }
                             //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                         }
                     }
@@ -132,7 +140,7 @@ var Kernel;
             SensorManager.prototype.register = function (viewer) {
                 this.viewers.push(viewer);
                 console.log("New register view");
-                this.onRegisterViewer();
+                this.onRegisterViewer({ target: this });
                 //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
             };
             SensorManager.prototype.registerGroup = function (group) {
@@ -141,7 +149,7 @@ var Kernel;
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);
                 this.viewers.splice(index, 1);
-                this.onUnRegisterViewer();
+                this.onUnRegisterViewer({ target: this });
                 //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
             };
             SensorManager.prototype.getInfos = function () {
@@ -168,7 +176,7 @@ var Kernel;
                     console.log(this.dataSources);
                     return temp;
                 }
-                return null;
+                throw "Empty dataset exception";
             };
             SensorManager.prototype.loadData = function (info, callback) {
                 var _this = this;
@@ -245,10 +253,23 @@ var Kernel;
                 var sources = [];
                 for (var _i = 0, _a = template.sources; _i < _a.length; _i++) {
                     var v = _a[_i];
-                    sources.push(this.getSensorDataContainer(v));
+                    var temp = this.getSensorDataContainer(v);
+                    if (temp) {
+                        sources.push(temp);
+                    }
+                    else {
+                        console.log("Got empty dataset");
+                    }
                 }
                 var group = this.getGroup(template.grouptype);
-                return new group(sources);
+                if (group) {
+                    return new group(sources);
+                }
+                else {
+                    console.log("Failed to create dataset");
+                    console.log(template);
+                    return null;
+                }
             };
             SensorManager.isDatasource = function (source, type) {
                 return source.type === type;
@@ -288,13 +309,7 @@ var Kernel;
                             Key: a,
                             SensorSet: this,
                             Name: a,
-                            MaxDisplay: null,
-                            MaxValue: null,
-                            MinDisplay: null,
-                            MinValue: null,
-                            Resolution: 0,
-                            Signed: false,
-                            Unit: null
+                            Resolution: 0
                         };
                     }
                     temp.info = sensInfo;

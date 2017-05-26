@@ -1,4 +1,4 @@
-﻿var selectedSpan: HTMLSpanElement = null;
+﻿var selectedSpan: HTMLSpanElement | null = null;
 
 interface IEventTag {
     event: string;
@@ -13,11 +13,11 @@ interface HTMLSpanElement {
 /* tslint:enable:interface-name */
 
 class HtmlHelper {
-    tag(tag: string, className: any = "", events: IEventTag[] = null, innerHTML: string = ""): HTMLElement {
+    tag(tag: string, className: any = "", events: IEventTag[] | null = null, innerHTML: string = ""): HTMLElement {
         return HtmlHelper.tag(tag, className, events, innerHTML);
     }
 
-    static tag(tag: string, className: any = "", events: IEventTag[] = null, innerHTML: string = ""): HTMLElement {
+    static tag(tag: string, className: any = "", events: IEventTag[] | null = null, innerHTML: string = ""): HTMLElement {
         let temp: HTMLElement = document.createElement(tag);
         temp.className = className;
         temp.innerHTML = innerHTML;
@@ -53,7 +53,7 @@ class HtmlTableGen {
         this.rows.push(row);
     }
 
-    addArray<T>(data: T[], keys: string[] = null, check: (value: T) => boolean = null): void {
+    addArray<T>(data: T[], keys: string[] | null = null, check: ((value: T) => boolean) | null = null): void {
         if (check == null) {
             check = (value: T) => { return true; };
         }
@@ -88,6 +88,9 @@ class HtmlTableGen {
                     let span: HTMLSpanElement = document.createElement("span");
                     span.className = "table-resize";
                     span.addEventListener("mousedown", (e: MouseEvent) => {
+                        if (span.parentElement === null) {
+                            throw "Parent null exception";
+                        }
                         span.deltaX = span.parentElement.offsetWidth - e.pageX;
                         selectedSpan = span;
                     });

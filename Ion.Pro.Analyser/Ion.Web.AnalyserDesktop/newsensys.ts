@@ -8,14 +8,18 @@
         private dataSources: IDataSource<any>[] = [];
         public groups: (new (containers: SensorDataContainer[]) => SensorGroup<any>)[] = [];
 
-        private telemetryDataSet: SensorDataSet = null;
+        private telemetryDataSet: SensorDataSet | null = null;
 
         //static readonly event_registerViewer = "registerViewer";
         //static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
-            kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
+            
             //this.loadSensorInformation();
+        }
+
+        public lateInit(): void {
+            kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
         }
 
         private handleService(data: ISensorPackage[]) {
@@ -127,8 +131,14 @@
                     this.loadedDataSet.push(dataSet);
                     this.loadedDataSet.push(this.telemetryDataSet);
                     for (let v in dataSet.SensorData) {
-                        this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] }));
-                        this.dataSources.push(this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] }));
+                        let temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
+                        let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                        if (temp1) {
+                            this.dataSources.push(temp1);
+                        }
+                        if (temp2) {
+                            this.dataSources.push(temp2);
+                        }
 
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                     }
@@ -147,7 +157,7 @@
         public register<T>(viewer: IViewerBase<T>): void {
             this.viewers.push(viewer);
             console.log("New register view");
-            this.onRegisterViewer();
+            this.onRegisterViewer({ target: this });
             //this.eventManager.raiseEvent(SensorManager.event_registerViewer, null);
         }
 
@@ -158,7 +168,7 @@
         public unregister<T>(viewer: IViewerBase<T>): void {
             let index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);
-            this.onUnRegisterViewer();
+            this.onUnRegisterViewer({ target: this });
             //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
         }
 
@@ -189,7 +199,7 @@
                 console.log(this.dataSources);
                 return temp;
             }
-            return null;
+            throw "Empty dataset exception";
 
         }
 
@@ -237,7 +247,7 @@
 
         }
 
-        public getDataSet(name: string): SensorDataSet {
+        public getDataSet(name: string): SensorDataSet | null {
             for (let v of this.loadedDataSet) {
                 if (v.Name === name) {
                     return v;
@@ -247,8 +257,8 @@
             return null;
         }
 
-        public getSensorDataContainer(info: ISensorDataContainerTemplate): SensorDataContainer {
-            let set: SensorDataSet = this.getDataSet(info.name);
+        public getSensorDataContainer(info: ISensorDataContainerTemplate): SensorDataContainer | null {
+            let set: SensorDataSet | null = this.getDataSet(info.name);
             if (set) {
                 let container: SensorDataContainer = set.SensorData[info.key];
                 return container;
@@ -257,7 +267,7 @@
             return null;
         }
 
-        public getGroup(name: string): new (containers: SensorDataContainer[]) => SensorGroup<any> {
+        public getGroup(name: string): (new (containers: SensorDataContainer[]) => SensorGroup<any>) | null {
             for (let v of this.groups) {
                 if ((<any>v).name === name) {
                     return v;
@@ -267,13 +277,26 @@
             return null;
         }
 
-        public createDataSource<T>(template: DataSourceTemplate): IDataSource<T> {
+        public createDataSource<T>(template: DataSourceTemplate): IDataSource<T> | null {
             let sources: SensorDataContainer[] = [];
             for (let v of template.sources) {
-                sources.push(this.getSensorDataContainer(v));
+                let temp = this.getSensorDataContainer(v);
+                if (temp) {
+                    sources.push(temp);
+                }
+                else {
+                    console.log("Got empty dataset");
+                }
             }
             let group = this.getGroup(template.grouptype);
-            return new group(sources);
+            if (group) {
+                return new group(sources);
+            }
+            else {
+                console.log("Failed to create dataset");
+                console.log(template);
+                return null;
+            }
         }
 
         public static isDatasource<T>(source: IDataSource<T>, type: IClassType<T>): source is IDataSource<T> {
@@ -317,13 +340,7 @@
                         Key: a,
                         SensorSet: this,
                         Name: a,
-                        MaxDisplay: null,
-                        MaxValue: null,
-                        MinDisplay: null,
-                        MinValue: null,
-                        Resolution: 0,
-                        Signed: false,
-                        Unit: null
+                        Resolution: 0
                     }
                 }
                 temp.info = sensInfo;
@@ -338,20 +355,21 @@
         LoadedKeys: string[];
     }
 
+
     export interface ISensorInformation {
         Key: string;
 
         ID: number;
 
         Name: string;
-        Unit: string;
+        Unit?: string;
 
         Resolution: number;
-        Signed: boolean;
-        MinValue: number;
-        MaxValue: number;
-        MinDisplay: number;
-        MaxDisplay: number;
+        Signed?: boolean;
+        MinValue?: number;
+        MaxValue?: number;
+        MinDisplay?: number;
+        MaxDisplay?: number;
 
         SensorSet: SensorDataSet;
     }

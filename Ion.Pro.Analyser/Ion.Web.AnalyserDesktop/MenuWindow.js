@@ -102,7 +102,7 @@ var MenuWindow = (function () {
         return ul;
     };
     MenuWindow.prototype.hide = function () {
-        if (this.visible) {
+        if (this.visible && this.content) {
             this.container.removeChild(this.content);
             this.content = null;
         }

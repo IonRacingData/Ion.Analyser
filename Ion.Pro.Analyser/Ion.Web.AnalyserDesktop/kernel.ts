@@ -16,7 +16,10 @@ class Button extends Component {
     private textNode: Text;
 
     get text(): string {
-        return this.textNode.nodeValue;
+        if (this.textNode.nodeValue)
+            return this.textNode.nodeValue;
+        else
+            throw "textNode.nodeValue is null";
     }
     set text(value: string) {
         this.textNode.nodeValue = value;
@@ -37,7 +40,7 @@ class Button extends Component {
 class ListBox extends Component {
 
     private __data: any[];
-    public selector: <T>(obj: T) => string = null;
+    public selector: (<T>(obj: T) => string) | null = null;
 
     get data(): any[] {
         return this.__data;
@@ -54,7 +57,7 @@ class ListBox extends Component {
         this.generateList();
     }
 
-    onItemClick = newEvent("ListBox.onItemClick");
+    onItemClick = newEvent<IDataEvent<any>>("ListBox.onItemClick");
 
     constructor() {
         super();
@@ -74,12 +77,12 @@ class ListBox extends Component {
             row.onclick = () => {
                 this.onItemClick(v);
             }
-            let txt = null;
+            let txt: string | null = null;
             if (this.selector) {
                 txt = this.selector(v);
             }
             else {
-                txt = v.toString();
+                txt = (<object>v).toString();
             }
 
             row.appendChild(document.createTextNode(txt));
@@ -88,26 +91,23 @@ class ListBox extends Component {
     }
 }
 
+interface IDataEvent<T> extends IEventData {
+    data: T;
+}
+
 class TableList extends Component {
     private __data: any[];
     private __header: string[] = [];
 
-    public selector: <T>(obj: T) => string[] = null;
+    public selector: (<T>(obj: T) => string[]) | null = null;
 
-    onItemClick = newEvent("TabelList.onItemClick");
+    onItemClick = newEvent<IDataEvent<any>>("TabelList.onItemClick");
 
     get data(): any[] {
         return this.__data;
     }
     set data(data: any[]) {
         this.__data = data;
-        /*let oldPush = data.push;
-        let box = this;
-        data.push = function push(...items: any[]): number {
-            let num = oldPush.apply(data, items);
-            box.generateList();
-            return num;
-        }*/
         this.generateList();
     }
 
@@ -154,14 +154,14 @@ class TableList extends Component {
             
 
             row.onclick = () => {
-                this.onItemClick(v);
+                this.onItemClick({ target: this, data: v });
             }
-            let txt = [];
+            let txt: string[] = [];
             if (this.selector) {
                 txt = this.selector(v);
             }
             else {
-                txt = [v.toString()];
+                txt = [(<object>v).toString()];
             }
             for (let d of txt) {
                 let cell = document.createElement("td");
@@ -184,6 +184,7 @@ interface IPerson {
 function tester() {
     window.document.body.innerHTML = "";
 
+    let newT = newEvent<IEventData>("tester.test");
 
     let b = new Button();
     let b2 = new Button();
@@ -220,8 +221,8 @@ function tester() {
         return [item.first, item.last];
     }
 
-    table.onItemClick.addEventListener((item: IPerson) => {
-        alert("You clicked on: " + item.last + ", " + item.first);
+    table.onItemClick.addEventListener((item: IDataEvent<IPerson>) => {
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     })
 
 
@@ -232,11 +233,13 @@ function tester() {
         return item.first + " " + item.last;
     };
 
-    lst.onItemClick.addEventListener((item: IPerson) => {
-        alert("You clicked on: " + item.last + ", " + item.first);
+    lst.onItemClick.addEventListener((item: IDataEvent<IPerson>) => {
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     })
 
     lst.data = arr;
+
+
 }
 
 
@@ -250,10 +253,11 @@ function startUp() {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: null
+        senMan: new sensys.SensorManager()
     };
 
-    kernel.senMan = new sensys.SensorManager();  // Late init because it needs netMan
+    kernel.senMan.lateInit(); // Late init because it needs netMan
+
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
