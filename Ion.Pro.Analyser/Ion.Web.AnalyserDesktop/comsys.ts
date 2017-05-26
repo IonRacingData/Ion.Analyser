@@ -13,7 +13,7 @@
 }
 
 class NetworkManager {
-    private socket: WebSocket;
+    private socket: WebSocket | null;
     public connectionOpen: boolean;
     public curId: number = 0;
 
@@ -21,7 +21,7 @@ class NetworkManager {
     private serviceCallback: ((data: any) => void)[] = [];
     private callback: ((data: any) => void)[] = [];
 
-    private reconnecter: number = null;
+    private reconnecter: number | null = null;
 
     public manager: EventManager = new EventManager();
 
@@ -67,12 +67,14 @@ class NetworkManager {
         let reconnectInterval = 2000;
         console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval)
         this.reconnecter = this.reconnecter = setInterval(() => {
-            if (this.connectionOpen) {
+            if (this.connectionOpen && this.reconnecter) {
                 clearInterval(this.reconnecter);
             }
             requestAction("ping", (data: any) => {
                 console.log(data);
-                clearInterval(this.reconnecter);
+                if (this.reconnecter) {
+                    clearInterval(this.reconnecter);
+                }
                 if (!this.socket) {
                     this.socket = this.createWebSocket();
                 }
@@ -103,7 +105,12 @@ class NetworkManager {
 
     private sendRawMessage(message: IComMessage) {
         let str: string = JSON.stringify(message);
-        this.socket.send(str);
+        if (this.socket) {
+            this.socket.send(str);
+        }
+        else {
+            throw "Tried sending message over non existring socket";
+        }
     }
 
     receiveMessage(ev: MessageEvent) {

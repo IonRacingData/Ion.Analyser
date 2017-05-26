@@ -6,7 +6,7 @@
     private dsbOpen: boolean = false;
     private dsb: DSBController;
 
-    private lastRow: HTMLElement = null;
+    private lastRow: HTMLElement | null = null;
 
     private innerWrapper: HTMLElement;
     private wrapper: HTMLElement;
@@ -102,7 +102,7 @@
     private findTableRow(element: HTMLElement): HTMLElement {
         let curElement: HTMLElement = element;
 
-        while (curElement !== null && curElement.tagName !== "TR") {
+        while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;
         }
         return curElement;

@@ -34,8 +34,15 @@ abstract class SingleValueController extends Controller {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
-                    this.value = this.data.getValue(this.data.length() - 1).y;
+                    let lastIndex = this.data.length() - 1;
+                    if (lastIndex < 0) {
+                        console.log("Empty dataset in SingleValueController");
+                    }
+                    else {
+                        let lastValue = this.data.getValue(lastIndex);
+                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+                        this.value = lastValue.y;
+                    }
                 }
                 this.onDataChange();
             }
@@ -130,8 +137,15 @@ abstract class SingleValueCanvasController extends CanvasController {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
-                    this.value = this.data.getValue(this.data.length() - 1).y;
+                    let lastIndex = this.data.length() - 1;
+                    if (lastIndex < 0) {
+                        console.log("Empty dataset in SingleValueCanvasController");
+                    }
+                    else {
+                        let lastValue = this.data.getValue(lastIndex);
+                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+                        this.value = lastValue.y;
+                    }
                 }
                 this.onDataChange();
             }

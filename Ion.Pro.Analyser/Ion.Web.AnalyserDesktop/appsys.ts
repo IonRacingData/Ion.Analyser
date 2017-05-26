@@ -29,6 +29,7 @@
         if (this.allApps[appName]) {
             return this.launchApplication(this.allApps[appName], ...args);
         }
+        throw "Application does not exist";
     }
 
     registerApplication(category: string, launcher: Launcher): void {

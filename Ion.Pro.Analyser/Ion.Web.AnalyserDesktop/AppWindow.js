@@ -164,11 +164,17 @@ var AppWindow = (function () {
     /* Private stuff */
     AppWindow.prototype.restoreSize = function () {
         this.setSize(this.width, this.height, false);
+        if (this.sizeHandle.parentElement === null || this.sizeHandle.parentElement.parentElement === null) {
+            throw "Parent element is null exception, is the window body out of window container?";
+        }
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
         var curHandle = this.sizeHandle.parentElement;
         for (var i = 0; i < 3; i++) {
             curHandle.style.width = null;
             curHandle.style.height = null;
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
+            }
             curHandle = curHandle.parentElement;
         }
     };
@@ -183,6 +189,9 @@ var AppWindow = (function () {
             curHandle.style.height = "100%";
             if (i === 3) {
                 break;
+            }
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
             }
             curHandle = curHandle.parentElement;
         }

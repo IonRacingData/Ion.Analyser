@@ -52,12 +52,14 @@ var NetworkManager = (function () {
         var reconnectInterval = 2000;
         console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval);
         this.reconnecter = this.reconnecter = setInterval(function () {
-            if (_this.connectionOpen) {
+            if (_this.connectionOpen && _this.reconnecter) {
                 clearInterval(_this.reconnecter);
             }
             requestAction("ping", function (data) {
                 console.log(data);
-                clearInterval(_this.reconnecter);
+                if (_this.reconnecter) {
+                    clearInterval(_this.reconnecter);
+                }
                 if (!_this.socket) {
                     _this.socket = _this.createWebSocket();
                 }
@@ -84,7 +86,12 @@ var NetworkManager = (function () {
     };
     NetworkManager.prototype.sendRawMessage = function (message) {
         var str = JSON.stringify(message);
-        this.socket.send(str);
+        if (this.socket) {
+            this.socket.send(str);
+        }
+        else {
+            throw "Tried sending message over non existring socket";
+        }
     };
     NetworkManager.prototype.receiveMessage = function (ev) {
         var message = JSON.parse(ev.data);

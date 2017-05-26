@@ -58,7 +58,7 @@
     }
 
     handle_release(dir: string) {
-        let box: GridBox = null;
+        let box: GridBox | null = null;
         if (this.selectedContainer.gridBoxes.length === 1 && this.selectedContainer.gridBoxes[0].content.innerHTML.length === 0) {
             box = this.selectedContainer.gridBoxes[0];
         }
@@ -116,12 +116,16 @@
                 }
             }
         }
+        if (box === null) {
+            throw "Gridbox not set to an actual value";
+        }
         var windowBody = <HTMLElement>kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
         window.showTaskbar = false;
         window.changeWindowMode(WindowMode.BORDERLESSFULL);
 
         this.childWindows.push(window);
+        
         box.content.appendChild(windowBody);
 
         window.recalculateSize();
@@ -132,7 +136,7 @@
     applyTemplate(gridTemplate: IGridLanchTemplate) {
         console.log(gridTemplate);
         this.window.title = gridTemplate.name;
-        let dataSets: { [key: string]: IDataSource<any>} = { };
+        let dataSets: { [key: string]: IDataSource<any> } = {};
         for (let a of gridTemplate.sensorsets) {
             dataSets[a.key] = kernel.senMan.createDataSource(a);
         }
@@ -162,7 +166,7 @@
     ) {
         console.log("Con");
         console.log(this);
-        let lastBox: GridBox = null;// = a.gridBoxes[0];
+        let lastBox: GridBox | null = null;// = a.gridBoxes[0];
 
         for (let temp of template.data) {
             if (lastBox == null) {
@@ -307,7 +311,7 @@
             }
 
             var gridBoxes = this.window.handle.getElementsByClassName("grid-box");
-            var foundGridWindow: HTMLElement = null;
+            var foundGridWindow: HTMLElement | null = null;
             for (let i = gridBoxes.length - 1; i >= 0; i--) {
                 let cur = <HTMLElement>gridBoxes[i];
 
@@ -364,7 +368,7 @@
 
 let test: IGridLanchTemplate = {
     name: "some Grid",
-    sensorsets: null,
+    sensorsets: [ ],
     grid: {
         data: [
             { name: "LineChartTester", data: null },
@@ -385,7 +389,7 @@ interface IGridTemplate
 
 interface IGridLaucher {
     name: string;
-    data: string[];
+    data: string[] | null;
 }
 
 interface IGridLanchTemplate {
@@ -433,7 +437,7 @@ class GridContainer {
     }
 
     createSeperator(): HTMLElement {
-        return null;
+        throw "Not implmeneted exception"
     }
 
     insertChildBefore(box: GridBox): GridBox {
@@ -452,7 +456,7 @@ class GridContainer {
             let newVal = cur * (newTotal - 1) / newTotal;
             this.gridBoxes[i][this.set](newVal, 6);
         }
-        let child = null;
+        let child: HTMLElement | null = null;
         let insertString = "";
         if (dir === "before") {
             child = this.createChildBefore(box);

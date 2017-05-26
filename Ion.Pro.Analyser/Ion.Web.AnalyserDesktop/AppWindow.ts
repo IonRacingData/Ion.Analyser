@@ -206,12 +206,18 @@
     /* Private stuff */
     private restoreSize(): void {
         this.setSize(this.width, this.height, false);
+        if (this.sizeHandle.parentElement === null || this.sizeHandle.parentElement.parentElement === null) {
+            throw "Parent element is null exception, is the window body out of window container?";
+        }
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
         let curHandle = this.sizeHandle.parentElement;
         for (let i = 0; i < 3; i++) {
             curHandle.style.width = null;
             curHandle.style.height = null;
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
+            }
             curHandle = curHandle.parentElement;
         }
     }
@@ -228,6 +234,9 @@
             curHandle.style.height = "100%";
             if (i === 3) {
                 break;
+            }
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
             }
             curHandle = curHandle.parentElement;
         }

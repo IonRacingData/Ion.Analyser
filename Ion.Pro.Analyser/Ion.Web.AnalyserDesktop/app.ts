@@ -44,7 +44,7 @@ class SensorGroup<T> implements IDataSource<T> {
     }
 
     public getValue(index: number, subplot: number = 0): T {
-        return null;
+        throw "Not implmeneted exception";
     }
 
     public length(subplot: number = 0): number {
@@ -74,7 +74,7 @@ class PointSensorGroup extends SensorGroup<Point>{
         if (index < this.length() && index >= 0) {
             return this.data.points[index].getPoint();
         }
-        return null;
+        throw "Index out of bounds exception";
     }
 
     public length(): number {

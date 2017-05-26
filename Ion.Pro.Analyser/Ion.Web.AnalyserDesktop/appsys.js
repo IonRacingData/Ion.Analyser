@@ -33,6 +33,7 @@ var ApplicationManager = (function () {
         if (this.allApps[appName]) {
             return this.launchApplication.apply(this, [this.allApps[appName]].concat(args));
         }
+        throw "Application does not exist";
     };
     ApplicationManager.prototype.registerApplication = function (category, launcher) {
         if (!this.launchers[category]) {
