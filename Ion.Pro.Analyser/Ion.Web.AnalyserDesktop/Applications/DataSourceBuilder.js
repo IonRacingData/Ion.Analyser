@@ -1,123 +1,18 @@
 var DataSourceBuilder = (function () {
     function DataSourceBuilder() {
         this.mk = new HtmlHelper();
-        this.dsbOpen = false;
-        this.lastRow = null;
     }
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-        this.wrapper = this.mk.tag("div");
-        this.wrapper.style.display = "flex";
-        this.wrapper.style.flexDirection = "column";
-        this.wrapper.style.height = "100%";
-        this.wrapper.style.justifyContent = "space-between";
-        this.innerWrapper = this.mk.tag("div");
-        this.innerWrapper.style.display = "flex";
-        this.innerWrapper.style.flexDirection = "row";
-        this.bottomDiv = this.mk.tag("div");
-        this.wrapper.appendChild(this.innerWrapper);
-        this.wrapper.appendChild(this.bottomDiv);
-        this.window.content.appendChild(this.wrapper);
+        this.dsb = new DSBController();
+        this.window.content.appendChild(this.dsb.generate());
         this.app.events.on(kernel.senMan.onRegisterViewer, function () {
-            if (!_this.dsbOpen) {
-                _this.drawLeft();
-            }
+            _this.dsb.updateViewers();
         });
         this.app.events.on(kernel.senMan.onUnRegisterViewer, function () {
-            if (!_this.dsbOpen) {
-                _this.drawLeft();
-            }
+            _this.dsb.updateViewers();
         });
-        this.drawInner();
-    };
-    DataSourceBuilder.prototype.drawInner = function () {
-        this.innerWrapper.innerHTML = "";
-        var mk = this.mk;
-        this.divLeft = mk.tag("div");
-        this.divRight = mk.tag("div");
-        this.drawLeft();
-        this.divRight.style.flexGrow = "1";
-        this.divRight.style.flexBasis = "0";
-        this.innerWrapper.appendChild(this.divLeft);
-        this.innerWrapper.appendChild(this.divRight);
-    };
-    DataSourceBuilder.prototype.drawLeft = function () {
-        this.divLeft.innerHTML = "";
-        var tableGen = new HtmlTableGen("table selectable");
-        var senMan = kernel.senMan;
-        tableGen.addHeader("Plot name");
-        for (var i = 0; i < senMan.viewers.length; i++) {
-            var curPlot = senMan.viewers[i];
-            this.drawRow(curPlot, tableGen);
-        }
-        this.divLeft.appendChild(tableGen.generate());
-        this.divLeft.style.flexGrow = "1";
-        this.divLeft.style.flexBasis = "0";
-    };
-    DataSourceBuilder.prototype.drawRow = function (curPlot, tableGen) {
-        var _this = this;
-        tableGen.addRow([
-            {
-                event: "click", func: function (e) {
-                    if (_this.lastRow !== null) {
-                        _this.lastRow.classList.remove("selectedrow");
-                    }
-                    _this.lastRow = _this.findTableRow(e.target);
-                    _this.lastRow.classList.add("selectedrow");
-                    _this.displaySources(curPlot);
-                }
-            },
-            {
-                event: "mouseenter", func: function (e) {
-                    curPlot.plotWindow.highlight(true);
-                }
-            },
-            {
-                event: "mouseleave", func: function (e) {
-                    curPlot.plotWindow.highlight(false);
-                }
-            }
-        ], curPlot.plotType);
-    };
-    DataSourceBuilder.prototype.findTableRow = function (element) {
-        var curElement = element;
-        while (curElement !== null && curElement.tagName !== "TR") {
-            curElement = curElement.parentElement;
-        }
-        return curElement;
-    };
-    DataSourceBuilder.prototype.displaySources = function (curPlot) {
-        var _this = this;
-        this.divRight.innerHTML = "";
-        var add = this.mk.tag("p", "", [
-            {
-                event: "click", func: function (e) {
-                    _this.openDSB(curPlot);
-                }
-            }
-        ], "ADD SOURCE");
-        add.style.cursor = "pointer";
-        this.divRight.appendChild(add);
-    };
-    DataSourceBuilder.prototype.openDSB = function (curPlot) {
-        var _this = this;
-        this.dsbOpen = true;
-        this.innerWrapper.innerHTML = "";
-        this.dsb = new DSBController(curPlot);
-        this.innerWrapper.appendChild(this.dsb.wrapper);
-        var back = this.mk.tag("p", "", [
-            {
-                event: "click", func: function (e) {
-                    _this.dsbOpen = false;
-                    _this.drawInner();
-                    _this.bottomDiv.innerHTML = "";
-                    _this.displaySources(curPlot);
-                }
-            }
-        ], "BACK");
-        back.style.cursor = "pointer";
-        this.bottomDiv.appendChild(back);
     };
     return DataSourceBuilder;
 }());

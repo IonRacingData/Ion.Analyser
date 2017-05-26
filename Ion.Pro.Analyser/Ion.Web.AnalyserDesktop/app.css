@@ -284,12 +284,22 @@ span.table-resize{
 }
 
 .dsb-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dsb-contentwrapper {
+    flex-grow: 1
+}
+
+.dsb-p2-wrapper {
     display: flex;
     flex-direction: row;
     height: 100%;
 }
 
-.dsb-subdiv {
+.dsb-p2-section {
     flex-grow: 1;
 }
 
