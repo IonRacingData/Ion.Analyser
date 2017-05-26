@@ -28,7 +28,10 @@ var Button = (function (_super) {
     }
     Object.defineProperty(Button.prototype, "text", {
         get: function () {
-            return this.textNode.nodeValue;
+            if (this.textNode.nodeValue)
+                return this.textNode.nodeValue;
+            else
+                throw "textNode.nodeValue is null";
         },
         set: function (value) {
             this.textNode.nodeValue = value;
@@ -116,13 +119,6 @@ var TableList = (function (_super) {
         },
         set: function (data) {
             this.__data = data;
-            /*let oldPush = data.push;
-            let box = this;
-            data.push = function push(...items: any[]): number {
-                let num = oldPush.apply(data, items);
-                box.generateList();
-                return num;
-            }*/
             this.generateList();
         },
         enumerable: true,
@@ -159,7 +155,7 @@ var TableList = (function (_super) {
         var _loop_2 = function (v) {
             var row = document.createElement("tr");
             row.onclick = function () {
-                _this.onItemClick(v);
+                _this.onItemClick({ target: _this, data: v });
             };
             var txt = [];
             if (this_2.selector) {
@@ -187,6 +183,7 @@ var TableList = (function (_super) {
 var testing = false;
 function tester() {
     window.document.body.innerHTML = "";
+    var newT = newEvent("tester.test");
     var b = new Button();
     var b2 = new Button();
     var lst = new ListBox();
@@ -214,14 +211,14 @@ function tester() {
         return [item.first, item.last];
     };
     table.onItemClick.addEventListener(function (item) {
-        alert("You clicked on: " + item.last + ", " + item.first);
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     table.data = arr;
     lst.selector = function (item) {
         return item.first + " " + item.last;
     };
     lst.onItemClick.addEventListener(function (item) {
-        alert("You clicked on: " + item.last + ", " + item.first);
+        alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     lst.data = arr;
 }
@@ -234,9 +231,9 @@ function startUp() {
         winMan: new WindowManager(document.getElementsByTagName("body")[0]),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: null
+        senMan: new sensys.SensorManager()
     };
-    kernel.senMan = new sensys.SensorManager(); // Late init because it needs netMan
+    kernel.senMan.lateInit(); // Late init because it needs netMan
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     kernel.senMan.load("../../Data/Sets/195_usart_data.log16");

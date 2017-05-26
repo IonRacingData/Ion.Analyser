@@ -40,8 +40,15 @@ var SingleValueController = (function (_super) {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
-                    this.value = this.data.getValue(this.data.length() - 1).y;
+                    var lastIndex = this.data.length() - 1;
+                    if (lastIndex < 0) {
+                        console.log("Empty dataset in SingleValueController");
+                    }
+                    else {
+                        var lastValue = this.data.getValue(lastIndex);
+                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+                        this.value = lastValue.y;
+                    }
                 }
                 this.onDataChange();
             }
@@ -132,8 +139,15 @@ var SingleValueCanvasController = (function (_super) {
             }
             else {
                 if (this.lastSensorInfo) {
-                    this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, this.data.getValue(this.data.length() - 1)).y;
-                    this.value = this.data.getValue(this.data.length() - 1).y;
+                    var lastIndex = this.data.length() - 1;
+                    if (lastIndex < 0) {
+                        console.log("Empty dataset in SingleValueCanvasController");
+                    }
+                    else {
+                        var lastValue = this.data.getValue(lastIndex);
+                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+                        this.value = lastValue.y;
+                    }
                 }
                 this.onDataChange();
             }

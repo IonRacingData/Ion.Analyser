@@ -94,7 +94,7 @@ var DSBController = (function () {
     };
     DSBController.prototype.findTableRow = function (element) {
         var curElement = element;
-        while (curElement !== null && curElement.tagName !== "TR") {
+        while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;
         }
         return curElement;

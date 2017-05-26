@@ -1,5 +1,5 @@
 ﻿class GPSController extends CanvasController {
-    private data: IDataSource<Point3D>;
+    private data: IDataSource<Point3D> | null;
     private lastID: string = "";
     private lastSensorInfo: sensys.ISensorInformation;   
 
@@ -77,20 +77,22 @@
     }
 
     private findMinMax(): void {
-        let posDataLength: number = this.data.length();
+        if (this.data) {
+            let posDataLength: number = this.data.length();
 
-        if (posDataLength > 0) {
-            let firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
-            this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
-        }
+            if (posDataLength > 0) {
+                let firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+                this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
+            }
 
-        for (let i = 0; i < posDataLength; i++) {
-            let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+            for (let i = 0; i < posDataLength; i++) {
+                let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
 
-            this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
-            this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
-            this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
-            this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
+                this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
+                this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
+                this.relSize.max.x = Math.max(relPoint.x, this.relSize.max.x);
+                this.relSize.max.y = Math.max(relPoint.y, this.relSize.max.y);
+            }
         }
     }
 
@@ -122,7 +124,7 @@
         this.draw();
     }
 
-    public setData(d: IDataSource<Point3D>) {
+    public setData(d: IDataSource<Point3D> | null) {
         this.data = d;
 
         if (this.data) {

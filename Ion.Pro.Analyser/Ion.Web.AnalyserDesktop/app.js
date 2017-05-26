@@ -30,7 +30,7 @@ var SensorGroup = (function () {
     }
     SensorGroup.prototype.getValue = function (index, subplot) {
         if (subplot === void 0) { subplot = 0; }
-        return null;
+        throw "Not implmeneted exception";
     };
     SensorGroup.prototype.length = function (subplot) {
         if (subplot === void 0) { subplot = 0; }
@@ -55,7 +55,7 @@ var PointSensorGroup = (function (_super) {
         if (index < this.length() && index >= 0) {
             return this.data.points[index].getPoint();
         }
-        return null;
+        throw "Index out of bounds exception";
     };
     PointSensorGroup.prototype.length = function () {
         return this.data.points.length;

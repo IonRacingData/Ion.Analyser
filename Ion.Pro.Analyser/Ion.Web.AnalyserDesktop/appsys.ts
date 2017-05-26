@@ -19,7 +19,7 @@
         this.appList.push(appTemp);
 
         appTemp.start(...args);
-        this.onAppLaunch();
+        this.onAppLaunch({ target: this });
         //this.eventManager.raiseEvent(ApplicationManager.event_appLaunch, null);
 
         return appTemp;
@@ -29,6 +29,7 @@
         if (this.allApps[appName]) {
             return this.launchApplication(this.allApps[appName], ...args);
         }
+        throw "Application does not exist";
     }
 
     registerApplication(category: string, launcher: Launcher): void {
@@ -50,7 +51,7 @@
 
     closeApplication(app: Application): void {
         this.appList.splice(this.appList.indexOf(app), 1);
-        this.onAppClose();
+        this.onAppClose({ target: this });
         //this.eventManager.raiseEvent(ApplicationManager.event_appClose, null);
     }
 }

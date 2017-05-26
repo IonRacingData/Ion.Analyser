@@ -5,7 +5,7 @@
     private mouseDown: boolean;
     private isDragging = false;
     private zoomSpeed: number = 1.1;
-    private selectedPoint: Point = null;
+    private selectedPoint: Point | null = null;
     private isMarking = false;
     private marking: IMarking;
     private displayGrid: boolean = true;
@@ -120,7 +120,7 @@
         if (this.data) {
             // var mp: Point = this.getMousePoint(e);
             var mp = e;
-            var p: Point = null;
+            var p: Point | null = null;
             for (let i: number = 0; i < this.data.length; i++) {
                 // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
                 var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
@@ -615,7 +615,11 @@ class ContextFixer {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        this.ctx = this.canvas.getContext("2d");
+        let temp = this.canvas.getContext("2d");
+        if (temp === null) {
+            throw "Context undefined exception, context 2D not supported";
+        }
+        this.ctx = temp;
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }

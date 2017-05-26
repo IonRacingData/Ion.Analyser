@@ -3,7 +3,9 @@ function requestAction(action, callback) {
     request.responseType = "json";
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
-            callback(request.response);
+            if (callback) {
+                callback(request.response);
+            }
         }
     };
     request.open("GET", "/test/" + action, true);
@@ -36,13 +38,13 @@ var NetworkManager = (function () {
             _this.connectionOpen = false;
             _this.socket = null;
             _this.tryReconnect();
-            _this.onLostConnection();
+            _this.onLostConnection({ target: _this });
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         };
         socket.onopen = function (ev) {
             _this.connectionOpen = true;
             console.log("Connection established");
-            _this.onGotConnection();
+            _this.onGotConnection({ target: _this });
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
         return socket;
@@ -52,12 +54,14 @@ var NetworkManager = (function () {
         var reconnectInterval = 2000;
         console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval);
         this.reconnecter = this.reconnecter = setInterval(function () {
-            if (_this.connectionOpen) {
+            if (_this.connectionOpen && _this.reconnecter) {
                 clearInterval(_this.reconnecter);
             }
             requestAction("ping", function (data) {
                 console.log(data);
-                clearInterval(_this.reconnecter);
+                if (_this.reconnecter) {
+                    clearInterval(_this.reconnecter);
+                }
                 if (!_this.socket) {
                     _this.socket = _this.createWebSocket();
                 }
@@ -84,7 +88,12 @@ var NetworkManager = (function () {
     };
     NetworkManager.prototype.sendRawMessage = function (message) {
         var str = JSON.stringify(message);
-        this.socket.send(str);
+        if (this.socket) {
+            this.socket.send(str);
+        }
+        else {
+            throw "Tried sending message over non existring socket";
+        }
     };
     NetworkManager.prototype.receiveMessage = function (ev) {
         var message = JSON.parse(ev.data);

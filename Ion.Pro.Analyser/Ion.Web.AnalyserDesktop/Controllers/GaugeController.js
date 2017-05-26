@@ -15,31 +15,35 @@ var GaugeController = (function (_super) {
         _this.padding = 5;
         _this.totalAngle = (3 * Math.PI) / 2;
         _this.startAngle = -(3 * Math.PI) / 4;
+        _this.color = "black";
+        _this.needleColor = "black";
+        _this.centerColor = "black";
         _this.size = Math.min(width, height);
         var labels = [];
         for (var i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
         _this.labels = labels;
+        return _this;
         // temp stylesheet thingy
-        var ss;
-        var all = document.styleSheets;
-        for (var i = 0; i < all.length; i++) {
+        /*let ss: CSSStyleSheet;
+        let all: StyleSheetList = document.styleSheets;
+        for (let i = 0; i < all.length; i++) {
             if (all[i].title === "app-style") {
-                ss = all[i];
-                var rules = ss.cssRules;
-                for (var j = 0; j < rules.length; j++) {
-                    var rule = rules[j];
+                ss = <CSSStyleSheet>all[i];
+                let rules = ss.cssRules;
+
+                for (let j = 0; j < rules.length; j++) {
+                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];
                     if (rule.selectorText === ".gauge-plot") {
-                        _this.color = rule.style.color;
-                        _this.needleColor = rule.style.borderColor;
+                        this.color = rule.style.color;
+                        this.needleColor = rule.style.borderColor;
                         break;
                     }
                 }
                 break;
             }
-        }
-        return _this;
+        }*/
     }
     GaugeController.prototype.generate = function () {
         this.wrapper = this.mk.tag("div", "plot-wrapper");
@@ -116,9 +120,9 @@ var GaugeController = (function (_super) {
         this.drawNeedle();
     };
     GaugeController.prototype.setColor = function () {
-        this.color = kernel.winMan.getRule(".gauge").style.color;
-        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor;
-        this.color = kernel.winMan.getRule(".gauge").style.backgroundColor;
+        this.color = kernel.winMan.getRule(".gauge").style.color || this.color;
+        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor || this.needleColor;
+        this.centerColor = kernel.winMan.getRule(".gauge").style.backgroundColor || this.centerColor;
     };
     GaugeController.prototype.updateColors = function () {
         this.setColor();

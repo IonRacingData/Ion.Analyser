@@ -14,7 +14,7 @@
     private divLeft: HTMLElement;
     private divRight: HTMLElement;
 
-    private lastRow: HTMLElement = null;
+    private lastRow: HTMLElement | null = null;
 
 
     /* page 2 */
@@ -133,7 +133,7 @@
     private findTableRow(element: HTMLElement): HTMLElement {
         let curElement: HTMLElement = element;
 
-        while (curElement !== null && curElement.tagName !== "TR") {
+        while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;
         }
         return curElement;

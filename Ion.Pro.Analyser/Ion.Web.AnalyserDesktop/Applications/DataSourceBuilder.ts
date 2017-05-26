@@ -17,9 +17,7 @@
         this.app.events.on(kernel.senMan.onUnRegisterViewer, () => {
             this.dsb.updateViewers();
         });
-
-    }    
-
+    }
 }
 
 class Carousel {

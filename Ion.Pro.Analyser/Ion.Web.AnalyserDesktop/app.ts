@@ -44,7 +44,7 @@ class SensorGroup<T> implements IDataSource<T> {
     }
 
     public getValue(index: number, subplot: number = 0): T {
-        return null;
+        throw "Not implmeneted exception";
     }
 
     public length(subplot: number = 0): number {
@@ -74,7 +74,7 @@ class PointSensorGroup extends SensorGroup<Point>{
         if (index < this.length() && index >= 0) {
             return this.data.points[index].getPoint();
         }
-        return null;
+        throw "Index out of bounds exception";
     }
 
     public length(): number {
@@ -93,7 +93,7 @@ interface IViewerBase<T> extends ITypeDef<T> {
 }
 
 interface IViewer<T> extends IViewerBase<T> {
-    dataSource: IDataSource<T>;
+    dataSource: IDataSource<T> | null;
 }
 
 interface ICollectionViewer<T> extends IViewerBase<T>{

@@ -1,7 +1,7 @@
 var TaskManager = (function () {
     function TaskManager() {
         this.infoWindows = [];
-        this.appTable = null;
+        this.appTable = new TableList();
     }
     TaskManager.prototype.main = function () {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Task Manager");
@@ -18,12 +18,12 @@ var TaskManager = (function () {
     };
     TaskManager.prototype.initializeComponents = function () {
         var _this = this;
-        var ta = this.appTable = new TableList();
+        var ta = this.appTable;
         ta.header = ["PID", "Application", "# Windows", "# Events"];
         ta.selector = function (app) {
             return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
         };
-        ta.onItemClick.addEventListener(function (app) { return _this.onAppClick(app); });
+        ta.onItemClick.addEventListener(function (e) { return _this.onAppClick(e.data); });
         ta.data = kernel.appMan.appList;
         this.mainWindow.content.appendChild(ta.wrapper);
     };

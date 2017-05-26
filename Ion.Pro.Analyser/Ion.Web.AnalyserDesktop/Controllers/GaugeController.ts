@@ -11,9 +11,9 @@
 
     private labels: string[];
 
-    private color: string;
-    private needleColor: string;
-    private centerColor: string;
+    private color: string = "black";
+    private needleColor: string = "black";
+    private centerColor: string = "black";
 
     constructor(width: number, height: number, min: number, max: number, step: number) {
         super();
@@ -26,7 +26,7 @@
 
         // temp stylesheet thingy
 
-        let ss: CSSStyleSheet;
+        /*let ss: CSSStyleSheet;
         let all: StyleSheetList = document.styleSheets;
         for (let i = 0; i < all.length; i++) {
             if (all[i].title === "app-style") {
@@ -43,7 +43,7 @@
                 }
                 break;
             }
-        }
+        }*/
     }
 
     generate(): HTMLElement {
@@ -142,9 +142,9 @@
     }
 
     private setColor(): void {
-        this.color = kernel.winMan.getRule(".gauge").style.color;
-        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor;
-        this.color = kernel.winMan.getRule(".gauge").style.backgroundColor;
+        this.color = kernel.winMan.getRule(".gauge").style.color || this.color;
+        this.needleColor = kernel.winMan.getRule(".gauge").style.borderBottomColor || this.needleColor;
+        this.centerColor = kernel.winMan.getRule(".gauge").style.backgroundColor || this.centerColor;
     }
 
     public updateColors(): void {

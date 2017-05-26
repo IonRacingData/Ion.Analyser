@@ -23,7 +23,7 @@
         let divRight = this.sensorTable = mk.tag("div");
         let tableGen = new HtmlTableGen("table selectable");
         let senMan: sensys.SensorManager = kernel.senMan;
-        let last: { item: HTMLElement } = { item: null };
+        let last: { item: HTMLElement | null } = { item: null };
         // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.viewers.length; i++) {
@@ -53,7 +53,7 @@
     }
 
 
-    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: { item: HTMLElement }, preSelect: boolean): void {
+    private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: { item: HTMLElement | null }, preSelect: boolean): void {
         let name = "Single Plot";
         if (isMulti) {
             name = "Multi Plot";
@@ -99,7 +99,7 @@
     findTableRow(element: HTMLElement): HTMLElement {
         let curElement: HTMLElement = element;
 
-        while (curElement !== null && curElement.tagName !== "TR") {
+        while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;
         }
         return curElement;

@@ -1,11 +1,13 @@
-﻿function requestAction(action: string, callback: (data: any) => void): void {
+﻿function requestAction(action: string, callback: ((data: any) => void) | null): void {
     var request = new XMLHttpRequest();
 
     request.responseType = "json";
 
     request.onreadystatechange = () => {
         if (request.readyState === 4 && request.status === 200) {
-            callback(request.response);
+            if (callback) {
+                callback(request.response);
+            }
         }
     };
     request.open("GET", "/test/" + action, true);
@@ -13,7 +15,7 @@
 }
 
 class NetworkManager {
-    private socket: WebSocket;
+    private socket: WebSocket | null;
     public connectionOpen: boolean;
     public curId: number = 0;
 
@@ -21,7 +23,7 @@ class NetworkManager {
     private serviceCallback: ((data: any) => void)[] = [];
     private callback: ((data: any) => void)[] = [];
 
-    private reconnecter: number = null;
+    private reconnecter: number | null = null;
 
     public manager: EventManager = new EventManager();
 
@@ -49,14 +51,14 @@ class NetworkManager {
             this.connectionOpen = false;
             this.socket = null;
             this.tryReconnect();
-            this.onLostConnection();
+            this.onLostConnection({ target: this });
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
         }
 
         socket.onopen = (ev: Event) => {
             this.connectionOpen = true;
             console.log("Connection established");
-            this.onGotConnection();
+            this.onGotConnection({ target: this });
             //this.manager.raiseEvent(NetworkManager.event_gotConnection, null);
         };
 
@@ -67,12 +69,14 @@ class NetworkManager {
         let reconnectInterval = 2000;
         console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval)
         this.reconnecter = this.reconnecter = setInterval(() => {
-            if (this.connectionOpen) {
+            if (this.connectionOpen && this.reconnecter) {
                 clearInterval(this.reconnecter);
             }
             requestAction("ping", (data: any) => {
                 console.log(data);
-                clearInterval(this.reconnecter);
+                if (this.reconnecter) {
+                    clearInterval(this.reconnecter);
+                }
                 if (!this.socket) {
                     this.socket = this.createWebSocket();
                 }
@@ -103,7 +107,12 @@ class NetworkManager {
 
     private sendRawMessage(message: IComMessage) {
         let str: string = JSON.stringify(message);
-        this.socket.send(str);
+        if (this.socket) {
+            this.socket.send(str);
+        }
+        else {
+            throw "Tried sending message over non existring socket";
+        }
     }
 
     receiveMessage(ev: MessageEvent) {

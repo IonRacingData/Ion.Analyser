@@ -504,7 +504,11 @@ var LineChartController = (function (_super) {
 var ContextFixer = (function () {
     function ContextFixer(canvas) {
         this.canvas = canvas;
-        this.ctx = this.canvas.getContext("2d");
+        var temp = this.canvas.getContext("2d");
+        if (temp === null) {
+            throw "Context undefined exception, context 2D not supported";
+        }
+        this.ctx = temp;
         this.fillStyle = "black";
         this.strokeStyle = "black";
     }

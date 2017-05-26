@@ -7,7 +7,7 @@
     set title(value: string) {
         this._title = value;
         this.handle.getElementsByClassName("window-title")[0].innerHTML = value;
-        this.onUpdate();
+        this.onUpdate({ target: this });
     }
 
     get totalWidth(): number {
@@ -24,7 +24,7 @@
     }
     set showTaskbar(value: boolean) {
         this._showTaskbar = value;
-        this.onUpdate();
+        this.onUpdate({ target: this });
     }
 
     handle: HTMLElement;
@@ -118,7 +118,7 @@
     }
 
     private content_mouseMove(e: MouseEvent): void {
-        this.onMouseMove(e.layerX, e.layerY);
+        this.onMouseMove({ target: this, x: e.layerX, y: e.layerY });
     }
 
     /* Event handlers */
@@ -195,23 +195,29 @@
     }
 
     public handleGlobalDrag(x: number, y: number, window: AppWindow): void {
-        this.onDragOver(x - this.x, y - this.y - 30, window);
+        this.onDragOver({ target: this, x: x, y: y, window: window });
     }
 
     public handleGlobalRelease(x: number, y: number, window: AppWindow): void {
-        this.onDragRelease(x - this.x, y - this.y - 30, window);
+        this.onDragRelease({ target: this, x: x, y: y, window: window });
     }
 
 
     /* Private stuff */
     private restoreSize(): void {
         this.setSize(this.width, this.height, false);
+        if (this.sizeHandle.parentElement === null || this.sizeHandle.parentElement.parentElement === null) {
+            throw "Parent element is null exception, is the window body out of window container?";
+        }
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
         let curHandle = this.sizeHandle.parentElement;
         for (let i = 0; i < 3; i++) {
             curHandle.style.width = null;
             curHandle.style.height = null;
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
+            }
             curHandle = curHandle.parentElement;
         }
     }
@@ -228,6 +234,9 @@
             curHandle.style.height = "100%";
             if (i === 3) {
                 break;
+            }
+            if (curHandle.parentElement === null) {
+                throw "Parent element is null exception, is the window body out of window container?";
             }
             curHandle = curHandle.parentElement;
         }
@@ -266,29 +275,29 @@
     onMove = newEvent("AppWindow.onMove");
     onClose = newEvent("AppWindow.onClose");
 
-    onMouseMove = newEvent("AppWindow.onMouseMove");
-    onDragOver = newEvent("AppWindow.onDragOver");
-    onDragRelease = newEvent("AppWindow.onDragRelease");
+    onMouseMove = newEvent<IAppMouseEvent>("AppWindow.onMouseMove");
+    onDragOver = newEvent<IAppMouseDragEvent>("AppWindow.onDragOver");
+    onDragRelease = newEvent<IAppMouseDragEvent>("AppWindow.onDragRelease");
 
     onUpdate = newEvent("AppWindow.onUpdate");
 
     private __onMouseMove(x: number, y: number): void {
-        this.onMouseMove(new AppMouseEvent(x, y));
+        this.onMouseMove({ target: this, x: x, y: y });
     }
 
     private __onDragOver(x: number, y: number, window: AppWindow): void {
-        this.onDragOver(new AppMouseDragEvent(x, y, window));
+        this.onDragOver({ target: this, x: x, y: y, window: window });
     }
 
     private __onDragRelease(x: number, y: number, window: AppWindow): void {
         console.log("Release");
-        this.onDragRelease(new AppMouseDragEvent(x, y, window));
+        this.onDragRelease({ target: this, x: x, y: y, window: window });
     }
 
     
 
     close() {
-        this.onClose();
+        this.onClose({ target: this });
         this.app.onWindowClose();
         this.winMan.closeWindow(this);
     }
@@ -367,7 +376,7 @@
             this.storeX = x;
             this.storeY = y;
         }
-        this.onMove();
+        this.onMove({ target: this });
     }
 
     setSize(width: number, height: number, storeSize: boolean = true): void {
@@ -383,7 +392,7 @@
             this.storeWidth = width;
             this.storeHeight = height;
         }
-        this.onResize();
+        this.onResize({ target: this });
     }
 
     changeWindowMode(mode: WindowMode): void {
@@ -393,17 +402,17 @@
                 this.removePos();
                 this.removeHeader();
                 this.recalculateSize();
-                this.onResize();
+                this.onResize({ target: this });
                 break;
             case WindowMode.BORDERLESS:
                 this.removeHeader();
-                this.onResize();
+                this.onResize({ target: this });
                 break;
             case WindowMode.WINDOWED:
                 this.restoreSize();
                 this.restorePos();
                 this.restoreHeader();
-                this.onResize();
+                this.onResize({ target: this });
                 break;
         }
     }
@@ -433,7 +442,7 @@
             this.storeX = x + this.deltaX;
             this.storeY = y + this.deltaY;
         }
-        this.onMove();
+        this.onMove({ target: this });
     }
 
     __setRelativeSize(width: number, height: number, storeSize: boolean = true): void {
@@ -454,11 +463,20 @@
             this.storeWidth = newWidth;
             this.storeHeight = newHeight;
         }
-        this.onResize();
+        this.onResize({ target: this });
     }
 }
 
-class AppMouseEvent implements EventData {
+interface IAppMouseEvent extends IEventData {
+    x: number;
+    y: number;
+}
+
+interface IAppMouseDragEvent extends IAppMouseEvent {
+    window: AppWindow;
+}
+
+/*class AppMouseEvent implements EventData {
     public x: number;
     public y: number;
 
@@ -466,16 +484,16 @@ class AppMouseEvent implements EventData {
         this.x = x;
         this.y = y;
     }
-}
+}*/
 
-class AppMouseDragEvent extends AppMouseEvent {
+/*class AppMouseDragEvent extends AppMouseEvent {
     public window: AppWindow;
 
     constructor(x: number, y: number, window: AppWindow) {
         super(x, y);
         this.window = window;
     }
-}
+}*/
 
 enum WindowMode {
     WINDOWED = 0,
