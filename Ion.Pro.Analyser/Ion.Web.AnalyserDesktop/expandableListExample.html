@@ -1,0 +1,84 @@
+<!doctype html>
+<meta charset="UTF-8"> 
+<html>
+
+<style>
+    .coll {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height .2s ease;
+    }
+    .show {
+        max-height: 500px; /* set to height of content */
+    }
+    ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+
+    }
+    .clicker {
+        cursor: pointer;
+        
+    }
+    * {
+        -moz-user-select: none;
+        user-select: none;        
+    }
+    ul {
+        margin-left: 20px;    
+    }
+
+    
+</style>
+
+<script>
+    function show(el) {
+        var next = el.nextElementSibling;
+        for (var l of next.classList) {
+            if (l === "coll") {
+                next.classList.toggle("show");
+            }
+        }
+        
+        
+    }
+</script>
+
+<div class="item-wrapper"  style="background-color: blue"> 
+    <div class="clicker" onclick="show(this)">Hello</div>
+    <div class="coll">
+        <ul>
+            <li>item</li>
+            <li>
+                <div class="clicker" onclick="show(this)">Hello</div>
+                <div class="coll">
+                    <ul>
+                        <li>item</li>
+                        <li>item</li>
+                        <li>item</li>
+                        <li>item</li>
+                    </ul>
+                </div>
+            </li>
+            
+            <li>item</li>
+            <li>item</li>
+        </ul>
+    </div>
+</div>
+
+<div class="item-wrapper" style="background-color: red">
+    <div class="clicker" onclick="show(this)">Hello</div>
+    <div class="coll">
+        <ul>
+            <li>item</li>
+            <li>item</li>
+            <li>item</li>
+            <li>item</li>
+        </ul>
+    </div>
+</div>
+
+
+</html>

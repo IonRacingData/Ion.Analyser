@@ -1,10 +1,10 @@
-﻿class DSBController {
+﻿class DataSourceAssignmentController {
 
     private wrapper: HTMLElement;
     private contentWrapper: HTMLElement;
     private navWrapper: HTMLElement;
 
-    private plot: IViewerBase<any>;
+    private plot: IViewerBase<any> | null = null;
     private template: DataSourceTemplate;
 
     private page: number = 1;
@@ -42,6 +42,7 @@
     private displayPage2(): void {
         this.wrapper_p1.style.display = "none";
         this.wrapper_p2.style.display = "flex";
+        this.listsensors();
         this.drawBackButton();
         this.page = 2;
     }
@@ -81,7 +82,7 @@
 
         /* page 2 */
         this.wrapper_p2 = mk.tag("div", "dsb-p2-wrapper");
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
             let div: HTMLElement = mk.tag("div", "dsb-p2-section")
             this.subDivs.push(div);
             this.wrapper_p2.appendChild(div);
@@ -153,8 +154,6 @@
         this.divRight.appendChild(add);
     }
 
-
-
     private drawBackButton(): void {
         let back: HTMLElement = this.mk.tag("p", "", [
             {
@@ -167,6 +166,17 @@
         back.style.cursor = "pointer";
         this.navWrapper.appendChild(back);        
     }  
+
+    private listsensors(): void {
+        if (this.plot) {           
+            //console.log(kernel.senMan.getInfos());
+            let infos: sensys.ISensorInformation[] = kernel.senMan.getInfos();
+            for (let i of infos) {
+                console.log(i.Name);
+            }
+        }
+    }
+
 
 
     public updateViewers(): void {

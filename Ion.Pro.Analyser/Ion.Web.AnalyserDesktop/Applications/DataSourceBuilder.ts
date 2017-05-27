@@ -3,12 +3,12 @@
     window: AppWindow;
     mk: HtmlHelper = new HtmlHelper();
 
-    private dsb: DSBController;
+    private dsb: DataSourceAssignmentController;
 
     public main(): void {
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-
-        this.dsb = new DSBController();
+        this.window.setSize(700, this.window.height);
+        this.dsb = new DataSourceAssignmentController();
         this.window.content.appendChild(this.dsb.generate());
         
         this.app.events.on(kernel.senMan.onRegisterViewer, () => {

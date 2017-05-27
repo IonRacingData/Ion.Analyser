@@ -1,30 +1,32 @@
-var DSBController = (function () {
-    function DSBController() {
+var DataSourceAssignmentController = (function () {
+    function DataSourceAssignmentController() {
+        this.plot = null;
         this.page = 1;
         this.lastRow = null;
         /* page 2 */
         this.mk = new HtmlHelper();
         this.subDivs = [];
     }
-    DSBController.prototype.generate = function () {
+    DataSourceAssignmentController.prototype.generate = function () {
         this.initContent();
         this.displayPage1();
         this.updateViewers();
         return this.wrapper;
     };
-    DSBController.prototype.displayPage1 = function () {
+    DataSourceAssignmentController.prototype.displayPage1 = function () {
         //this.displayViewers();
         this.wrapper_p1.style.display = "flex";
         this.wrapper_p2.style.display = "none";
         this.page = 1;
     };
-    DSBController.prototype.displayPage2 = function () {
+    DataSourceAssignmentController.prototype.displayPage2 = function () {
         this.wrapper_p1.style.display = "none";
         this.wrapper_p2.style.display = "flex";
+        this.listsensors();
         this.drawBackButton();
         this.page = 2;
     };
-    DSBController.prototype.initContent = function () {
+    DataSourceAssignmentController.prototype.initContent = function () {
         var mk = this.mk;
         /* dsb wrapper */
         this.wrapper = mk.tag("div", "dsb-wrapper");
@@ -48,14 +50,14 @@ var DSBController = (function () {
         this.contentWrapper.appendChild(this.wrapper_p1);
         /* page 2 */
         this.wrapper_p2 = mk.tag("div", "dsb-p2-wrapper");
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < 4; i++) {
             var div = mk.tag("div", "dsb-p2-section");
             this.subDivs.push(div);
             this.wrapper_p2.appendChild(div);
         }
         this.contentWrapper.appendChild(this.wrapper_p2);
     };
-    DSBController.prototype.displayViewers = function () {
+    DataSourceAssignmentController.prototype.displayViewers = function () {
         this.divLeft.innerHTML = "";
         var tableGen = new HtmlTableGen("table selectable");
         var senMan = kernel.senMan;
@@ -66,7 +68,7 @@ var DSBController = (function () {
         }
         this.divLeft.appendChild(tableGen.generate());
     };
-    DSBController.prototype.drawRow = function (curPlot, tableGen) {
+    DataSourceAssignmentController.prototype.drawRow = function (curPlot, tableGen) {
         var _this = this;
         tableGen.addRow([
             {
@@ -92,14 +94,14 @@ var DSBController = (function () {
             }
         ], curPlot.plotType);
     };
-    DSBController.prototype.findTableRow = function (element) {
+    DataSourceAssignmentController.prototype.findTableRow = function (element) {
         var curElement = element;
         while (curElement.parentElement !== null && curElement.tagName !== "TR") {
             curElement = curElement.parentElement;
         }
         return curElement;
     };
-    DSBController.prototype.displaySources = function (curPlot) {
+    DataSourceAssignmentController.prototype.displaySources = function (curPlot) {
         var _this = this;
         // TODO: add list of pre-made sources
         this.divRight.innerHTML = "";
@@ -113,7 +115,7 @@ var DSBController = (function () {
         add.style.cursor = "pointer";
         this.divRight.appendChild(add);
     };
-    DSBController.prototype.drawBackButton = function () {
+    DataSourceAssignmentController.prototype.drawBackButton = function () {
         var _this = this;
         var back = this.mk.tag("p", "", [
             {
@@ -126,9 +128,19 @@ var DSBController = (function () {
         back.style.cursor = "pointer";
         this.navWrapper.appendChild(back);
     };
-    DSBController.prototype.updateViewers = function () {
+    DataSourceAssignmentController.prototype.listsensors = function () {
+        if (this.plot) {
+            //console.log(kernel.senMan.getInfos());
+            var infos = kernel.senMan.getInfos();
+            for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
+                var i = infos_1[_i];
+                console.log(i.Name);
+            }
+        }
+    };
+    DataSourceAssignmentController.prototype.updateViewers = function () {
         this.displayViewers();
     };
-    return DSBController;
+    return DataSourceAssignmentController;
 }());
-//# sourceMappingURL=DSBController.js.map
+//# sourceMappingURL=DataSourceAssignmentController.js.map
