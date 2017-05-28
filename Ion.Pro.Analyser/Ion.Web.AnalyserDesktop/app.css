@@ -356,3 +356,31 @@ table.table.selectable tbody tr:hover {
         .comp-listBox li:hover {
             background-color: #222;
         }
+
+
+.comp-expList {
+    color: white;
+    width: 200px;
+}
+.comp-expList-section {
+
+}
+.comp-expList-clicker {
+    cursor: pointer;
+    background-color: #444;
+    padding: 5px;
+}
+.comp-expList-clicker:hover {
+    background-color: #222;
+}
+.comp-expList-collapsible {
+    overflow: hidden;
+    /*max-height: 0px;*/
+    transition: max-height .2s ease;
+}
+.comp-expList ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    background-color: #999;
+}

@@ -173,6 +173,77 @@ class TableList extends Component {
     }
 }
 
+interface IExpandableListSection {
+    title: string;    
+    items: string[];
+}
+
+class ExpandableList extends Component {
+    private __data: any[];
+    private mk: HtmlHelper = new HtmlHelper();
+
+    public selector: (<T>(obj: T) => IExpandableListSection) | null = null;
+
+    onItemClick = newEvent<IDataEvent<any>>("ExpandableList.onItemClick");
+
+    get data(): any[] {
+        return this.__data;
+    }
+    set data(data: any[]) {
+        this.__data = data;        
+        this.generateList();
+    } 
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("div");
+        this.wrapper.className = "comp-expList";
+    }
+
+    public update() {
+        this.generateList();
+    }
+
+    private generateList() {
+        let mk = this.mk;
+        this.wrapper.innerHTML = "";
+        for (let d of this.__data) {
+            let section: HTMLElement = mk.tag("div", "comp-expList-section");
+            let clicker: HTMLElement = mk.tag("div", "comp-expList-clicker");
+            let collapsible: HTMLElement = mk.tag("div", "comp-expList-collapsible");
+            collapsible.style.maxHeight = "0px";
+            let list: HTMLElement = document.createElement("ul");
+            
+            this.wrapper.appendChild(section);
+            section.appendChild(clicker);
+            section.appendChild(collapsible);
+            collapsible.appendChild(list);
+
+            let title: string;
+            let items: string[] = [];
+            if (this.selector) {
+                title = this.selector(d).title;
+                items = this.selector(d).items;
+            }
+            else {
+                title = (<object>d).toString();                
+            }
+
+            clicker.appendChild(document.createTextNode(title));
+            for (let i of items) {
+                let li: HTMLElement = document.createElement("li");
+                li.appendChild(document.createTextNode(i));
+                list.appendChild(li);
+            }
+
+            clicker.onclick = () => {
+                let contentHeight: number = collapsible.scrollHeight;
+                collapsible.style.maxHeight = collapsible.style.maxHeight === "0px" ? contentHeight + "px" : "0px";
+            }
+        }
+    }
+}
+
 let testing = false;
 
 interface IPerson {
@@ -180,25 +251,34 @@ interface IPerson {
     last: string;
 }
 
+interface IWork {
+    name: string;
+    employee: IPerson;
+}
 
 function tester() {
     window.document.body.innerHTML = "";
 
     let newT = newEvent<IEventData>("tester.test");
-
+    
     let b = new Button();
     let b2 = new Button();
+    let b3 = new Button();
     let lst = new ListBox();
     let table = new TableList();
+    let ex: ExpandableList = new ExpandableList();
 
+    document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
     document.body.appendChild(b2.wrapper);
+    document.body.appendChild(b3.wrapper);
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
 
     b.text = "Click Me!";
     b2.text = "Add Fourth";
+    b3.text = "Add expList item";
 
     b.onclick.addEventListener(() => { alert("Yeay") });
 
@@ -207,13 +287,34 @@ function tester() {
         { first: "Per", last: "Pettersen" },
         { first: "Truls", last: "Trulsen" },
         { first: "Bob", last: "Bobsen" }
+    ];    
+
+    let exArr: IWork[] = [
+        {
+            name: "work",
+            employee: { first: "hey", last: "bye" }
+        },
+        {
+            name: "work",
+            employee: { first: "hey", last: "bye" }
+        }
     ];
+
+    ex.selector = (section: IWork) => {
+        return <IExpandableListSection>{ title: section.name, items: [section.employee.first, section.employee.last] }
+    }
+    ex.data = exArr;
 
     b2.onclick.addEventListener(() => {
         arr.push({ first: "Fourth", last: "Tester" })
         lst.update();
         table.update();
     });
+
+    b3.onclick.addEventListener(() => {
+        exArr.push({ name: "new", employee: { first: "hans", last: "bobsen" } });
+        ex.update();
+    })
 
     table.header = ["Firstname", "Lastname"];
 
@@ -238,7 +339,7 @@ function tester() {
     })
 
     lst.data = arr;
-
+    
 
 }
 
