@@ -130,6 +130,8 @@ class TableList extends Component {
         this.tableBody = document.createElement("tbody");
         this.wrapper.appendChild(this.tableHeader);
         this.wrapper.appendChild(this.tableBody);
+
+        
     }
 
     public update() {

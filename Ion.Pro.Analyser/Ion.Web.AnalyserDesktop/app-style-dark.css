@@ -50,6 +50,10 @@
     border-bottom: none;
 }
 
+.info-color {
+    stroke: white;
+}
+
 .window-control{
     font-family: 'Global Monospace';
     font-size: 18px;
