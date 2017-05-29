@@ -174,8 +174,13 @@ class TableList extends Component {
 }
 
 interface IExpandableListSection {
-    title: string;    
-    items: string[];
+    title: string;
+    items: IExpandableListItem[];
+}
+
+interface IExpandableListItem {
+    text: string;
+    object: any;
 }
 
 class ExpandableList extends Component {
@@ -220,7 +225,7 @@ class ExpandableList extends Component {
             collapsible.appendChild(list);
 
             let title: string;
-            let items: string[] = [];
+            let items: IExpandableListItem[] = [];
             if (this.selector) {
                 title = this.selector(d).title;
                 items = this.selector(d).items;
@@ -232,8 +237,12 @@ class ExpandableList extends Component {
             clicker.appendChild(document.createTextNode(title));
             for (let i of items) {
                 let li: HTMLElement = document.createElement("li");
-                li.appendChild(document.createTextNode(i));
+                li.appendChild(document.createTextNode(i.text));
                 list.appendChild(li);
+
+                li.onclick = () => {
+                    this.onItemClick({ target: this, data: i.object });                    
+                }
             }
 
             clicker.onclick = () => {
@@ -295,15 +304,25 @@ function tester() {
             employee: { first: "hey", last: "bye" }
         },
         {
-            name: "work",
-            employee: { first: "hey", last: "bye" }
+            name: "work2",
+            employee: { first: "hey2", last: "bye2" }
         }
     ];
 
-    ex.selector = (section: IWork) => {
-        return <IExpandableListSection>{ title: section.name, items: [section.employee.first, section.employee.last] }
+    ex.selector = (item: IWork) => {
+        return <IExpandableListSection>{
+            title: item.name,
+            items: [
+                { text: item.employee.first, object: item.employee.first },
+                { text: item.employee.last, object: item.employee.last }
+            ]
+        }
     }
     ex.data = exArr;
+
+    ex.onItemClick.addEventListener((item: IDataEvent<IWork>) => {
+        console.log(item.data);
+    });
 
     b2.onclick.addEventListener(() => {
         arr.push({ first: "Fourth", last: "Tester" })
@@ -360,7 +379,7 @@ function startUp() {
     kernel.senMan.lateInit(); // Late init because it needs netMan
 
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
-    //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     // kernel.senMan.setGlobal(841);
 

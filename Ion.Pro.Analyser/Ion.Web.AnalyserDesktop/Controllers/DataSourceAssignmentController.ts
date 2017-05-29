@@ -1,95 +1,67 @@
-﻿class DataSourceAssignmentController {
+﻿class DataSourceAssignmentController extends Component {
 
-    private wrapper: HTMLElement;
-    private contentWrapper: HTMLElement;
-    private navWrapper: HTMLElement;
-
-    private plot: IViewerBase<any> | null = null;
-    private template: DataSourceTemplate;
-
+    private builder: DataSourceBuildController;
     private page: number = 1;
 
-    /* page 1 */
-    private wrapper_p1: HTMLElement;
+    private contentWrapper: HTMLElement;
+    private navWrapper: HTMLElement;
+    private content: HTMLElement;
     private divLeft: HTMLElement;
     private divRight: HTMLElement;
+    private btnBack: Button;
 
     private lastRow: HTMLElement | null = null;
 
-
-    /* page 2 */
     private mk: HtmlHelper = new HtmlHelper();
-    private wrapper_p2: HTMLElement;
-    private subDivs: HTMLElement[] = [];
 
-
-    constructor() {}
-
-    public generate(): HTMLElement {
-        this.initContent();
-        this.displayPage1();
-        this.updateViewers();
-        return this.wrapper;
-    }
-
-    private displayPage1(): void {
-        //this.displayViewers();
-        this.wrapper_p1.style.display = "flex";
-        this.wrapper_p2.style.display = "none";
-        this.page = 1;
-    }
-
-    private displayPage2(): void {
-        this.wrapper_p1.style.display = "none";
-        this.wrapper_p2.style.display = "flex";
-        this.listsensors();
-        this.drawBackButton();
-        this.page = 2;
-    }
-
-    private initContent(): void {
+    constructor() {
+        super();
         let mk = this.mk;
-
-        /* dsb wrapper */
-        this.wrapper = mk.tag("div", "dsb-wrapper");
-
-        this.contentWrapper = mk.tag("div", "dsb-contentwrapper");
-
-        this.navWrapper = mk.tag("div", "dsb-navwrapper");        
+        this.wrapper = mk.tag("div", "dsaController-wrapper");
+        this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
+        this.navWrapper = mk.tag("div", "dsaController-navwrapper");
 
         this.wrapper.appendChild(this.contentWrapper);
         this.wrapper.appendChild(this.navWrapper);
 
-        /* page 1 */
-        this.wrapper_p1 = mk.tag("div", "dsb-p1-wrapper");
-        this.wrapper_p1.style.display = "flex";
-        this.wrapper_p1.style.flexDirection = "row";
-        this.wrapper_p1.style.justifyContent = "space-between";
+        this.btnBack = new Button();
+        this.btnBack.text = "BACK";
+        this.btnBack.onclick.addEventListener(() => {
+            this.displayPage1();
+            this.btnBack.wrapper.style.display = "none";
+        });
+        this.btnBack.wrapper.style.display = "none";
+        this.navWrapper.appendChild(this.btnBack.wrapper);
 
-        this.divLeft = mk.tag("div");
-        this.divLeft.style.flexGrow = "1";
-        this.divLeft.style.flexBasis = "0";
+        this.displayPage1();
+    }
 
-        this.divRight = mk.tag("div");
-        this.divRight.style.flexGrow = "1";
-        this.divRight.style.flexBasis = "0";
+    private displayPage1(): void {
+        let mk = this.mk;
+        this.contentWrapper.innerHTML = "";
 
-        this.wrapper_p1.appendChild(this.divLeft);
-        this.wrapper_p1.appendChild(this.divRight);
+        this.content = mk.tag("div", "dsaController-content");
+        this.divLeft = mk.tag("div", "dsaController-left");
+        this.divRight = mk.tag("div", "dsaController-right");
+        
+        this.content.appendChild(this.divLeft);
+        this.content.appendChild(this.divRight);
+        this.contentWrapper.appendChild(this.content);
 
-        this.contentWrapper.appendChild(this.wrapper_p1);
+        this.displayViewers();
 
+        this.page = 1;
+    }
 
-        /* page 2 */
-        this.wrapper_p2 = mk.tag("div", "dsb-p2-wrapper");
-        for (let i = 0; i < 4; i++) {
-            let div: HTMLElement = mk.tag("div", "dsb-p2-section")
-            this.subDivs.push(div);
-            this.wrapper_p2.appendChild(div);
-        }
+    private displayPage2(plot: IViewerBase<any>): void {
+        this.contentWrapper.innerHTML = "";
 
-        this.contentWrapper.appendChild(this.wrapper_p2);
+        this.builder = new DataSourceBuildController(plot);
+        this.contentWrapper.appendChild(this.builder.wrapper);
 
+        this.btnBack.wrapper.style.display = "inline-block";
+
+        this.page = 2;
     }
 
 
@@ -114,7 +86,6 @@
                     }
                     this.lastRow = this.findTableRow(<HTMLElement>e.target);
                     this.lastRow.classList.add("selectedrow");
-                    this.plot = curPlot;
                     this.displaySources(curPlot);
                 }
             },
@@ -146,38 +117,13 @@
         let add: HTMLElement = this.mk.tag("p", "", [
             {
                 event: "click", func: (e: Event) => {
-                    this.displayPage2();
+                    this.displayPage2(curPlot);
                 }
             }
         ], "ADD SOURCE");
         add.style.cursor = "pointer";
         this.divRight.appendChild(add);
     }
-
-    private drawBackButton(): void {
-        let back: HTMLElement = this.mk.tag("p", "", [
-            {
-                event: "click", func: (e: Event) => {
-                    this.navWrapper.innerHTML = "";
-                    this.displayPage1();
-                }
-            }
-        ], "BACK");
-        back.style.cursor = "pointer";
-        this.navWrapper.appendChild(back);        
-    }  
-
-    private listsensors(): void {
-        if (this.plot) {           
-            //console.log(kernel.senMan.getInfos());
-            let infos: sensys.ISensorInformation[] = kernel.senMan.getInfos();
-            for (let i of infos) {
-                console.log(i.Name);
-            }
-        }
-    }
-
-
 
     public updateViewers(): void {
         this.displayViewers();

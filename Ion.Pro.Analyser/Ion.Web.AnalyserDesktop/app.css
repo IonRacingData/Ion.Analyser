@@ -283,25 +283,51 @@ span.table-resize{
     width: auto;
 }
 
-.dsb-wrapper {
+/* DataSourceAssignmentController */
+
+.dsaController-wrapper {
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.dsb-contentwrapper {
-    flex-grow: 1
+.dsaController-contentwrapper {
+    flex-grow: 1;
+    overflow: auto;
 }
 
-.dsb-p2-wrapper {
+.dsaController-navwrapper {
+
+}
+
+.dsaController-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.dsaController-left {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.dsaController-right {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+/* DataSourceBuildController */
+.dsbController-wrapper {
     display: flex;
     flex-direction: row;
     height: 100%;
 }
 
-.dsb-p2-section {
+.dsbController-section {
     flex-grow: 1;
+    flex-basis: 0;
+    overflow: auto;
 }
+
 
 /*Lists*/
 .listitem {
@@ -360,7 +386,7 @@ table.table.selectable tbody tr:hover {
 
 .comp-expList {
     color: white;
-    width: 200px;
+    font-size: 1em;
 }
 .comp-expList-section {
 

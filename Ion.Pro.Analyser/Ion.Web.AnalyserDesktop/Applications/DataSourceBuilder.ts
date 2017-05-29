@@ -9,7 +9,7 @@
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
         this.window.setSize(700, this.window.height);
         this.dsb = new DataSourceAssignmentController();
-        this.window.content.appendChild(this.dsb.generate());
+        this.window.content.appendChild(this.dsb.wrapper);
         
         this.app.events.on(kernel.senMan.onRegisterViewer, () => {
             this.dsb.updateViewers();

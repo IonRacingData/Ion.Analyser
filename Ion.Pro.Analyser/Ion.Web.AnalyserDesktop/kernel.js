@@ -206,6 +206,7 @@ var ExpandableList = (function (_super) {
         this.generateList();
     };
     ExpandableList.prototype.generateList = function () {
+        var _this = this;
         var mk = this.mk;
         this.wrapper.innerHTML = "";
         var _loop_3 = function (d) {
@@ -228,11 +229,17 @@ var ExpandableList = (function (_super) {
                 title = d.toString();
             }
             clicker.appendChild(document.createTextNode(title));
+            var _loop_4 = function (i) {
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(i.text));
+                list.appendChild(li);
+                li.onclick = function () {
+                    _this.onItemClick({ target: _this, data: i.object });
+                };
+            };
             for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
                 var i = items_1[_i];
-                var li = document.createElement("li");
-                li.appendChild(document.createTextNode(i));
-                list.appendChild(li);
+                _loop_4(i);
             }
             clicker.onclick = function () {
                 var contentHeight = collapsible.scrollHeight;
@@ -279,14 +286,23 @@ function tester() {
             employee: { first: "hey", last: "bye" }
         },
         {
-            name: "work",
-            employee: { first: "hey", last: "bye" }
+            name: "work2",
+            employee: { first: "hey2", last: "bye2" }
         }
     ];
-    ex.selector = function (section) {
-        return { title: section.name, items: [section.employee.first, section.employee.last] };
+    ex.selector = function (item) {
+        return {
+            title: item.name,
+            items: [
+                { text: item.employee.first, object: item.employee.first },
+                { text: item.employee.last, object: item.employee.last }
+            ]
+        };
     };
     ex.data = exArr;
+    ex.onItemClick.addEventListener(function (item) {
+        console.log(item.data);
+    });
     b2.onclick.addEventListener(function () {
         arr.push({ first: "Fourth", last: "Tester" });
         lst.update();
@@ -325,7 +341,7 @@ function startUp() {
     };
     kernel.senMan.lateInit(); // Late init because it needs netMan
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
-    //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     // kernel.senMan.setGlobal(841);
     registerLaunchers();

@@ -1,61 +1,55 @@
-var DataSourceAssignmentController = (function () {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var DataSourceAssignmentController = (function (_super) {
+    __extends(DataSourceAssignmentController, _super);
     function DataSourceAssignmentController() {
-        this.plot = null;
-        this.page = 1;
-        this.lastRow = null;
-        /* page 2 */
-        this.mk = new HtmlHelper();
-        this.subDivs = [];
+        var _this = _super.call(this) || this;
+        _this.page = 1;
+        _this.lastRow = null;
+        _this.mk = new HtmlHelper();
+        var mk = _this.mk;
+        _this.wrapper = mk.tag("div", "dsaController-wrapper");
+        _this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
+        _this.navWrapper = mk.tag("div", "dsaController-navwrapper");
+        _this.wrapper.appendChild(_this.contentWrapper);
+        _this.wrapper.appendChild(_this.navWrapper);
+        _this.btnBack = new Button();
+        _this.btnBack.text = "BACK";
+        _this.btnBack.onclick.addEventListener(function () {
+            _this.displayPage1();
+            _this.btnBack.wrapper.style.display = "none";
+        });
+        _this.btnBack.wrapper.style.display = "none";
+        _this.navWrapper.appendChild(_this.btnBack.wrapper);
+        _this.displayPage1();
+        return _this;
     }
-    DataSourceAssignmentController.prototype.generate = function () {
-        this.initContent();
-        this.displayPage1();
-        this.updateViewers();
-        return this.wrapper;
-    };
     DataSourceAssignmentController.prototype.displayPage1 = function () {
-        //this.displayViewers();
-        this.wrapper_p1.style.display = "flex";
-        this.wrapper_p2.style.display = "none";
+        var mk = this.mk;
+        this.contentWrapper.innerHTML = "";
+        this.content = mk.tag("div", "dsaController-content");
+        this.divLeft = mk.tag("div", "dsaController-left");
+        this.divRight = mk.tag("div", "dsaController-right");
+        this.content.appendChild(this.divLeft);
+        this.content.appendChild(this.divRight);
+        this.contentWrapper.appendChild(this.content);
+        this.displayViewers();
         this.page = 1;
     };
-    DataSourceAssignmentController.prototype.displayPage2 = function () {
-        this.wrapper_p1.style.display = "none";
-        this.wrapper_p2.style.display = "flex";
-        this.listsensors();
-        this.drawBackButton();
+    DataSourceAssignmentController.prototype.displayPage2 = function (plot) {
+        this.contentWrapper.innerHTML = "";
+        this.builder = new DataSourceBuildController(plot);
+        this.contentWrapper.appendChild(this.builder.wrapper);
+        this.btnBack.wrapper.style.display = "inline-block";
         this.page = 2;
-    };
-    DataSourceAssignmentController.prototype.initContent = function () {
-        var mk = this.mk;
-        /* dsb wrapper */
-        this.wrapper = mk.tag("div", "dsb-wrapper");
-        this.contentWrapper = mk.tag("div", "dsb-contentwrapper");
-        this.navWrapper = mk.tag("div", "dsb-navwrapper");
-        this.wrapper.appendChild(this.contentWrapper);
-        this.wrapper.appendChild(this.navWrapper);
-        /* page 1 */
-        this.wrapper_p1 = mk.tag("div", "dsb-p1-wrapper");
-        this.wrapper_p1.style.display = "flex";
-        this.wrapper_p1.style.flexDirection = "row";
-        this.wrapper_p1.style.justifyContent = "space-between";
-        this.divLeft = mk.tag("div");
-        this.divLeft.style.flexGrow = "1";
-        this.divLeft.style.flexBasis = "0";
-        this.divRight = mk.tag("div");
-        this.divRight.style.flexGrow = "1";
-        this.divRight.style.flexBasis = "0";
-        this.wrapper_p1.appendChild(this.divLeft);
-        this.wrapper_p1.appendChild(this.divRight);
-        this.contentWrapper.appendChild(this.wrapper_p1);
-        /* page 2 */
-        this.wrapper_p2 = mk.tag("div", "dsb-p2-wrapper");
-        for (var i = 0; i < 4; i++) {
-            var div = mk.tag("div", "dsb-p2-section");
-            this.subDivs.push(div);
-            this.wrapper_p2.appendChild(div);
-        }
-        this.contentWrapper.appendChild(this.wrapper_p2);
     };
     DataSourceAssignmentController.prototype.displayViewers = function () {
         this.divLeft.innerHTML = "";
@@ -78,7 +72,6 @@ var DataSourceAssignmentController = (function () {
                     }
                     _this.lastRow = _this.findTableRow(e.target);
                     _this.lastRow.classList.add("selectedrow");
-                    _this.plot = curPlot;
                     _this.displaySources(curPlot);
                 }
             },
@@ -108,39 +101,16 @@ var DataSourceAssignmentController = (function () {
         var add = this.mk.tag("p", "", [
             {
                 event: "click", func: function (e) {
-                    _this.displayPage2();
+                    _this.displayPage2(curPlot);
                 }
             }
         ], "ADD SOURCE");
         add.style.cursor = "pointer";
         this.divRight.appendChild(add);
     };
-    DataSourceAssignmentController.prototype.drawBackButton = function () {
-        var _this = this;
-        var back = this.mk.tag("p", "", [
-            {
-                event: "click", func: function (e) {
-                    _this.navWrapper.innerHTML = "";
-                    _this.displayPage1();
-                }
-            }
-        ], "BACK");
-        back.style.cursor = "pointer";
-        this.navWrapper.appendChild(back);
-    };
-    DataSourceAssignmentController.prototype.listsensors = function () {
-        if (this.plot) {
-            //console.log(kernel.senMan.getInfos());
-            var infos = kernel.senMan.getInfos();
-            for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
-                var i = infos_1[_i];
-                console.log(i.Name);
-            }
-        }
-    };
     DataSourceAssignmentController.prototype.updateViewers = function () {
         this.displayViewers();
     };
     return DataSourceAssignmentController;
-}());
+}(Component));
 //# sourceMappingURL=DataSourceAssignmentController.js.map
