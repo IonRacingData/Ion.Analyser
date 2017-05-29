@@ -28,9 +28,11 @@ class Button extends Component {
     constructor() {
         super();
         this.wrapper = document.createElement("div");
+        let span = document.createElement("span");
         this.wrapper.className = "comp-button";
         this.textNode = document.createTextNode("button");
-        this.wrapper.appendChild(this.textNode);
+        span.appendChild(this.textNode);
+        this.wrapper.appendChild(span);
         this.wrapper.onclick = this.onclick;
     }
 

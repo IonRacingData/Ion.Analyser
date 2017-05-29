@@ -7,7 +7,7 @@
 
     public main(): void {
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-        this.window.setSize(700, this.window.height);
+        this.window.setSize(900, this.window.height);
         this.dsb = new DataSourceAssignmentController();
         this.window.content.appendChild(this.dsb.wrapper);
         

@@ -20,9 +20,11 @@ var Button = (function (_super) {
         var _this = _super.call(this) || this;
         _this.onclick = newEvent("Button.onclick");
         _this.wrapper = document.createElement("div");
+        var span = document.createElement("span");
         _this.wrapper.className = "comp-button";
         _this.textNode = document.createTextNode("button");
-        _this.wrapper.appendChild(_this.textNode);
+        span.appendChild(_this.textNode);
+        _this.wrapper.appendChild(span);
         _this.wrapper.onclick = _this.onclick;
         return _this;
     }

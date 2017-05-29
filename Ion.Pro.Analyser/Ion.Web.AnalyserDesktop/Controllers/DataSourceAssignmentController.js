@@ -25,9 +25,7 @@ var DataSourceAssignmentController = (function (_super) {
         _this.btnBack.text = "BACK";
         _this.btnBack.onclick.addEventListener(function () {
             _this.displayPage1();
-            _this.btnBack.wrapper.style.display = "none";
         });
-        _this.btnBack.wrapper.style.display = "none";
         _this.navWrapper.appendChild(_this.btnBack.wrapper);
         _this.displayPage1();
         return _this;
@@ -42,13 +40,14 @@ var DataSourceAssignmentController = (function (_super) {
         this.content.appendChild(this.divRight);
         this.contentWrapper.appendChild(this.content);
         this.displayViewers();
+        this.navWrapper.style.display = "none";
         this.page = 1;
     };
     DataSourceAssignmentController.prototype.displayPage2 = function (plot) {
         this.contentWrapper.innerHTML = "";
         this.builder = new DataSourceBuildController(plot);
         this.contentWrapper.appendChild(this.builder.wrapper);
-        this.btnBack.wrapper.style.display = "inline-block";
+        this.navWrapper.style.display = "block";
         this.page = 2;
     };
     DataSourceAssignmentController.prototype.displayViewers = function () {

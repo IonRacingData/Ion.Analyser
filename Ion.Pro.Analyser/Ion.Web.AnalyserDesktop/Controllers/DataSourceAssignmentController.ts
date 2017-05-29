@@ -28,9 +28,7 @@
         this.btnBack.text = "BACK";
         this.btnBack.onclick.addEventListener(() => {
             this.displayPage1();
-            this.btnBack.wrapper.style.display = "none";
         });
-        this.btnBack.wrapper.style.display = "none";
         this.navWrapper.appendChild(this.btnBack.wrapper);
 
         this.displayPage1();
@@ -49,6 +47,7 @@
         this.contentWrapper.appendChild(this.content);
 
         this.displayViewers();
+        this.navWrapper.style.display = "none";
 
         this.page = 1;
     }
@@ -59,7 +58,7 @@
         this.builder = new DataSourceBuildController(plot);
         this.contentWrapper.appendChild(this.builder.wrapper);
 
-        this.btnBack.wrapper.style.display = "inline-block";
+        this.navWrapper.style.display = "block";
 
         this.page = 2;
     }

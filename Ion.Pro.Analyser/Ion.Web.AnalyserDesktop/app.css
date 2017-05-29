@@ -289,15 +289,17 @@ span.table-resize{
     height: 100%;
     display: flex;
     flex-direction: column;
+    font-size: .8em;
+    /*font-weight: lighter;*/
 }
 
 .dsaController-contentwrapper {
     flex-grow: 1;
-    overflow: auto;
+    position: relative;
 }
 
 .dsaController-navwrapper {
-
+    padding: 10px;
 }
 
 .dsaController-content {
@@ -320,12 +322,15 @@ span.table-resize{
     display: flex;
     flex-direction: row;
     height: 100%;
+    width: 100%;
+    position: absolute;
 }
 
 .dsbController-section {
     flex-grow: 1;
     flex-basis: 0;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 
@@ -357,6 +362,10 @@ table.table.selectable tbody tr:hover {
     color: white;
 }
 
+.comp-button span {
+    vertical-align: middle;
+}
+
 .comp-button:hover {
     padding: 1px 3px;
     border: 2px solid darkgray;
@@ -385,19 +394,13 @@ table.table.selectable tbody tr:hover {
 
 
 .comp-expList {
-    color: white;
-    font-size: 1em;
 }
 .comp-expList-section {
 
 }
 .comp-expList-clicker {
     cursor: pointer;
-    background-color: #444;
-    padding: 5px;
-}
-.comp-expList-clicker:hover {
-    background-color: #222;
+    padding: 7px;
 }
 .comp-expList-collapsible {
     overflow: hidden;
@@ -408,5 +411,9 @@ table.table.selectable tbody tr:hover {
     list-style: none;
     margin: 0px;
     padding: 0px;
-    background-color: #999;
+}
+
+.comp-expList li {
+    padding: 10px;
+    margin-left: 5px;
 }
