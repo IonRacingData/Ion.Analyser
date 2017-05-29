@@ -255,6 +255,138 @@ class ExpandableList extends Component {
     }
 }
 
+interface IListBoxRearrangableItem {
+    mainText: string,
+    infoText: string | null;
+}
+
+class ListBoxRearrangable extends Component {
+
+    private __data: any[];
+    private __rowInfoMarkers: string[] |null;
+    public selector: (<T>(obj: T) => IListBoxRearrangableItem) | null = null;
+
+    get data(): any[] {
+        return this.__data;
+    }
+    set data(data: any[]) {
+        this.__data = data;
+        this.generateList();
+    }
+
+    get rowInfoMarkers(): string[] | null {
+        return this.__rowInfoMarkers || null;
+    }
+    set rowInfoMarkers(rims: string[] | null) {
+        this.__rowInfoMarkers = rims;
+        this.generateList();
+    }
+
+    onItemClick = newEvent<IDataEvent<any>>("ListBoxRearrangable.onItemClick");
+    onItemRemove = newEvent<IDataEvent<any>>("ListBoxRearrangable.onItemRemove");
+    onItemRearrange = newEvent<IDataEvent<any>>("ListBoxRearrangable.onItemRearrange");
+
+    private mk: HtmlHelper = new HtmlHelper();
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("ul");
+        this.wrapper.className = "comp-listBoxRearr";
+    }
+
+    public update() {
+        this.generateList();
+    }
+
+    private generateList() {
+        let mk = this.mk;
+        this.wrapper.innerHTML = "";
+        for (let i: number = 0; i < this.__data.length; i++) {            
+            let row = document.createElement("li");
+
+            let marker = mk.tag("div", "comp-listBoxRearr-marker");
+
+            let textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
+            let mainSpan = mk.tag("span");
+            let infoSpan = mk.tag("span");
+
+            let iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
+            let arrUp = mk.tag("span", "comp-listBoxRearr-icon");
+            let arrDown = mk.tag("span", "comp-listBoxRearr-icon");
+            let remove = mk.tag("span", "comp-listBoxRearr-icon");
+
+            arrUp.innerHTML = "&#8593;";
+            arrDown.innerHTML = "&#8595;";
+            remove.innerHTML = "&#10005;";
+
+            textWrapper.appendChild(mainSpan);
+            textWrapper.appendChild(infoSpan);
+            
+            iconWrapper.appendChild(arrUp);
+            iconWrapper.appendChild(arrDown);
+            iconWrapper.appendChild(remove);
+
+            row.appendChild(marker);
+            row.appendChild(textWrapper);
+            row.appendChild(iconWrapper);
+
+            if (this.__rowInfoMarkers) {
+                marker.appendChild(document.createTextNode(this.__rowInfoMarkers[i]));
+            }
+
+            let mainTxt: string;
+            let infoTxt: string | null = null;
+            if (this.selector) {
+                let item = this.selector(this.__data[i]);
+                mainTxt = item.mainText;
+                infoTxt = item.infoText || null;
+            }
+            else {
+                mainTxt = (<object>this.__data[i]).toString();
+            }
+
+            mainSpan.appendChild(document.createTextNode(mainTxt));
+            if (infoTxt) infoSpan.appendChild(document.createTextNode(infoTxt));
+
+            this.wrapper.appendChild(row);
+
+            remove.onclick = () => {
+                let temp = this.__data[i];
+                this.__data.splice(i, 1);
+
+                this.onItemRemove({ target: this, data: temp });
+
+                this.generateList();
+            }
+
+            arrUp.onclick = () => {
+                if (i > 0) {
+                    let temp = this.__data[i];
+                    this.__data[i] = this.__data[i - 1];
+                    this.__data[i - 1] = temp;
+
+                    this.onItemRearrange({ target: this, data: temp });
+
+                    this.generateList();
+                }                
+            }
+
+            arrDown.onclick = () => {
+                if (i < this.__data.length - 1) {
+                    let temp = this.__data[i];
+                    this.__data[i] = this.__data[i + 1];
+                    this.__data[i + 1] = temp;
+
+                    this.onItemRearrange({ target: this, data: temp });
+
+                    this.generateList();
+                }
+            }
+        }
+    }
+}
+
+
 let testing = false;
 
 interface IPerson {
@@ -268,6 +400,7 @@ interface IWork {
 }
 
 function tester() {
+    window.document.body.style.color = "white";
     window.document.body.innerHTML = "";
 
     let newT = newEvent<IEventData>("tester.test");
@@ -278,6 +411,7 @@ function tester() {
     let lst = new ListBox();
     let table = new TableList();
     let ex: ExpandableList = new ExpandableList();
+    let listArr: ListBoxRearrangable = new ListBoxRearrangable();
 
     document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
@@ -286,6 +420,7 @@ function tester() {
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
+    document.body.appendChild(listArr.wrapper);
 
     b.text = "Click Me!";
     b2.text = "Add Fourth";
@@ -325,6 +460,16 @@ function tester() {
     ex.onItemClick.addEventListener((item: IDataEvent<IWork>) => {
         console.log(item.data);
     });
+
+    listArr.selector = (item: IPerson) => {
+        return <IListBoxRearrangableItem>{ mainText: item.first, infoText: item.last }
+    }
+
+    listArr.data = arr;
+
+    let markers: string[] = ["X", "Y", "Z"];
+
+    listArr.rowInfoMarkers = markers;
 
     b2.onclick.addEventListener(() => {
         arr.push({ first: "Fourth", last: "Tester" })

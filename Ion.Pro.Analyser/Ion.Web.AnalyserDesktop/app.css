@@ -417,3 +417,62 @@ table.table.selectable tbody tr:hover {
     padding: 10px;
     margin-left: 5px;
 }
+
+.comp-listBoxRearr {
+    list-style: none;
+    max-width: 300px;
+    padding: 0;
+    margin: 0;
+}
+
+.comp-listBoxRearr li {
+    display: flex;
+    padding: 5px;
+}
+
+.comp-listBoxRearr li:hover {
+    background-color: #4a4a4a;
+}
+
+.comp-listBoxRearr-textWrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.comp-listBoxRearr-textWrapper span:nth-child(2) {
+    font-size: 0.6em;
+    padding-left: 15px;
+}
+
+.comp-listBoxRearr-icons {
+    display: flex;
+    align-items: center;
+    width: 70px;
+    margin-right: 10px;
+
+}
+
+.comp-listBoxRearr-icon {
+    font-size: 1.3em;
+    cursor: pointer;
+    margin-left: 2px;
+    margin-right: 2px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    flex-basis: 0;
+}
+
+.comp-listBoxRearr-icon:hover {
+    color: #119Ed9;
+}
+
+.comp-listBoxRearr-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #171717;
+    min-width: 40px;
+}
