@@ -301,85 +301,94 @@ class ListBoxRearrangable extends Component {
     private generateList() {
         let mk = this.mk;
         this.wrapper.innerHTML = "";
-        for (let i: number = 0; i < this.__data.length; i++) {            
-            let row = document.createElement("li");
+        if (this.__data) {
+            for (let i: number = 0; i < this.__data.length; i++) {
+                let row = document.createElement("li");
 
-            let marker = mk.tag("div", "comp-listBoxRearr-marker");
+                let marker: HTMLElement | null = null;
+                if (this.__rowInfoMarkers) {
+                    marker = mk.tag("div", "comp-listBoxRearr-marker");
+                }
 
-            let textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
-            let mainSpan = mk.tag("span");
-            let infoSpan = mk.tag("span");
+                let textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
+                let mainSpan = mk.tag("span");
+                let infoSpan = mk.tag("span");
 
-            let iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
-            let arrUp = mk.tag("span", "comp-listBoxRearr-icon");
-            let arrDown = mk.tag("span", "comp-listBoxRearr-icon");
-            let remove = mk.tag("span", "comp-listBoxRearr-icon");
+                let iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
+                let arrUp = mk.tag("span", "comp-listBoxRearr-icon");
+                let arrDown = mk.tag("span", "comp-listBoxRearr-icon");
+                let remove = mk.tag("span", "comp-listBoxRearr-icon");
 
-            arrUp.innerHTML = "&#8593;";
-            arrDown.innerHTML = "&#8595;";
-            remove.innerHTML = "&#10005;";
+                arrUp.innerHTML = "&#8593;";
+                arrDown.innerHTML = "&#8595;";
+                remove.innerHTML = "&#10005;";
 
-            textWrapper.appendChild(mainSpan);
-            textWrapper.appendChild(infoSpan);
-            
-            iconWrapper.appendChild(arrUp);
-            iconWrapper.appendChild(arrDown);
-            iconWrapper.appendChild(remove);
+                textWrapper.appendChild(mainSpan);
+                textWrapper.appendChild(infoSpan);
 
-            row.appendChild(marker);
-            row.appendChild(textWrapper);
-            row.appendChild(iconWrapper);
+                iconWrapper.appendChild(arrUp);
+                iconWrapper.appendChild(arrDown);
+                iconWrapper.appendChild(remove);
 
-            if (this.__rowInfoMarkers) {
-                marker.appendChild(document.createTextNode(this.__rowInfoMarkers[i]));
-            }
+                if (marker) {
+                    row.appendChild(marker);
+                }
+                row.appendChild(textWrapper);
+                row.appendChild(iconWrapper);
 
-            let mainTxt: string;
-            let infoTxt: string | null = null;
-            if (this.selector) {
-                let item = this.selector(this.__data[i]);
-                mainTxt = item.mainText;
-                infoTxt = item.infoText || null;
-            }
-            else {
-                mainTxt = (<object>this.__data[i]).toString();
-            }
+                if (this.__rowInfoMarkers) {
+                    if (i < this.__rowInfoMarkers.length && marker) {
+                        marker.appendChild(document.createTextNode(this.__rowInfoMarkers[i]));
+                    }
+                }
 
-            mainSpan.appendChild(document.createTextNode(mainTxt));
-            if (infoTxt) infoSpan.appendChild(document.createTextNode(infoTxt));
+                let mainTxt: string;
+                let infoTxt: string | null = null;
+                if (this.selector) {
+                    let item = this.selector(this.__data[i]);
+                    mainTxt = item.mainText;
+                    infoTxt = item.infoText || null;
+                }
+                else {
+                    mainTxt = (<object>this.__data[i]).toString();
+                }
 
-            this.wrapper.appendChild(row);
+                mainSpan.appendChild(document.createTextNode(mainTxt));
+                if (infoTxt) infoSpan.appendChild(document.createTextNode(infoTxt));
 
-            remove.onclick = () => {
-                let temp = this.__data[i];
-                this.__data.splice(i, 1);
+                this.wrapper.appendChild(row);
 
-                this.onItemRemove({ target: this, data: temp });
-
-                this.generateList();
-            }
-
-            arrUp.onclick = () => {
-                if (i > 0) {
+                remove.onclick = () => {
                     let temp = this.__data[i];
-                    this.__data[i] = this.__data[i - 1];
-                    this.__data[i - 1] = temp;
+                    this.__data.splice(i, 1);
 
-                    this.onItemRearrange({ target: this, data: temp });
+                    this.onItemRemove({ target: this, data: temp });
 
                     this.generateList();
-                }                
-            }
+                }
 
-            arrDown.onclick = () => {
-                if (i < this.__data.length - 1) {
-                    let temp = this.__data[i];
-                    this.__data[i] = this.__data[i + 1];
-                    this.__data[i + 1] = temp;
+                arrUp.onclick = () => {
+                    if (i > 0) {
+                        let temp = this.__data[i];
+                        this.__data[i] = this.__data[i - 1];
+                        this.__data[i - 1] = temp;
 
-                    this.onItemRearrange({ target: this, data: temp });
+                        this.onItemRearrange({ target: this, data: temp });
 
-                    this.generateList();
+                        this.generateList();
+                    }
+                }
+
+                arrDown.onclick = () => {
+                    if (i < this.__data.length - 1) {
+                        let temp = this.__data[i];
+                        this.__data[i] = this.__data[i + 1];
+                        this.__data[i + 1] = temp;
+
+                        this.onItemRearrange({ target: this, data: temp });
+
+                        this.generateList();
+                    }
                 }
             }
         }

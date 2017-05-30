@@ -6,6 +6,9 @@
     private mk: HtmlHelper = new HtmlHelper();    
     private subDivs: HTMLElement[] = [];
 
+    private chosenData: sensys.ISensorInformation[] = [];
+    private chosenList: ListBoxRearrangable;
+
     constructor(plot: IViewerBase<any>) {
         super();
         this.plot = plot;
@@ -18,6 +21,7 @@
         }
 
         this.listSensors();
+        this.initChosenList();
     }
 
     private listSensors() {
@@ -34,7 +38,35 @@
         }
 
         expList.data = infos;
-        expList.onItemClick.addEventListener((item) => {console.log(item.data)})
+        expList.onItemClick.addEventListener((e) => {
+            this.chosenData.push(e.data);
+            this.updateChosenList();
+        });
+    }
+
+    updateChosenList(): void {
+        this.chosenList.data = this.chosenData;
+        this.chosenList.update;
+    }
+
+    private initChosenList(): void {
+        this.chosenList = new ListBoxRearrangable();
+        this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        this.chosenList.selector = (item: sensys.ISensorInformation) => {
+            return <IListBoxRearrangableItem>{ mainText: item.Name, infoText: item.SensorSet.Name };
+        }
+
+        this.subDivs[1].appendChild(this.chosenList.wrapper);
+
+        this.chosenList.onItemRemove.addEventListener((e) => {
+            this.chosenData = this.chosenList.data;
+            console.log(this.chosenData);
+        });
+
+        this.chosenList.onItemRearrange.addEventListener((e) => {
+            this.chosenData = this.chosenList.data;
+        })
+      
     }
 
 }

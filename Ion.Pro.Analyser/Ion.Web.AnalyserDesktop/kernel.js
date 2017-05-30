@@ -298,72 +298,81 @@ var ListBoxRearrangable = (function (_super) {
         var _this = this;
         var mk = this.mk;
         this.wrapper.innerHTML = "";
-        var _loop_5 = function (i) {
-            var row = document.createElement("li");
-            var marker = mk.tag("div", "comp-listBoxRearr-marker");
-            var textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
-            var mainSpan = mk.tag("span");
-            var infoSpan = mk.tag("span");
-            var iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
-            var arrUp = mk.tag("span", "comp-listBoxRearr-icon");
-            var arrDown = mk.tag("span", "comp-listBoxRearr-icon");
-            var remove = mk.tag("span", "comp-listBoxRearr-icon");
-            arrUp.innerHTML = "&#8593;";
-            arrDown.innerHTML = "&#8595;";
-            remove.innerHTML = "&#10005;";
-            textWrapper.appendChild(mainSpan);
-            textWrapper.appendChild(infoSpan);
-            iconWrapper.appendChild(arrUp);
-            iconWrapper.appendChild(arrDown);
-            iconWrapper.appendChild(remove);
-            row.appendChild(marker);
-            row.appendChild(textWrapper);
-            row.appendChild(iconWrapper);
-            if (this_4.__rowInfoMarkers) {
-                marker.appendChild(document.createTextNode(this_4.__rowInfoMarkers[i]));
-            }
-            var mainTxt = void 0;
-            var infoTxt = null;
-            if (this_4.selector) {
-                var item = this_4.selector(this_4.__data[i]);
-                mainTxt = item.mainText;
-                infoTxt = item.infoText || null;
-            }
-            else {
-                mainTxt = this_4.__data[i].toString();
-            }
-            mainSpan.appendChild(document.createTextNode(mainTxt));
-            if (infoTxt)
-                infoSpan.appendChild(document.createTextNode(infoTxt));
-            this_4.wrapper.appendChild(row);
-            remove.onclick = function () {
-                var temp = _this.__data[i];
-                _this.__data.splice(i, 1);
-                _this.onItemRemove({ target: _this, data: temp });
-                _this.generateList();
-            };
-            arrUp.onclick = function () {
-                if (i > 0) {
-                    var temp = _this.__data[i];
-                    _this.__data[i] = _this.__data[i - 1];
-                    _this.__data[i - 1] = temp;
-                    _this.onItemRearrange({ target: _this, data: temp });
-                    _this.generateList();
+        if (this.__data) {
+            var _loop_5 = function (i) {
+                var row = document.createElement("li");
+                var marker = null;
+                if (this_4.__rowInfoMarkers) {
+                    marker = mk.tag("div", "comp-listBoxRearr-marker");
                 }
-            };
-            arrDown.onclick = function () {
-                if (i < _this.__data.length - 1) {
-                    var temp = _this.__data[i];
-                    _this.__data[i] = _this.__data[i + 1];
-                    _this.__data[i + 1] = temp;
-                    _this.onItemRearrange({ target: _this, data: temp });
-                    _this.generateList();
+                var textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
+                var mainSpan = mk.tag("span");
+                var infoSpan = mk.tag("span");
+                var iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
+                var arrUp = mk.tag("span", "comp-listBoxRearr-icon");
+                var arrDown = mk.tag("span", "comp-listBoxRearr-icon");
+                var remove = mk.tag("span", "comp-listBoxRearr-icon");
+                arrUp.innerHTML = "&#8593;";
+                arrDown.innerHTML = "&#8595;";
+                remove.innerHTML = "&#10005;";
+                textWrapper.appendChild(mainSpan);
+                textWrapper.appendChild(infoSpan);
+                iconWrapper.appendChild(arrUp);
+                iconWrapper.appendChild(arrDown);
+                iconWrapper.appendChild(remove);
+                if (marker) {
+                    row.appendChild(marker);
                 }
+                row.appendChild(textWrapper);
+                row.appendChild(iconWrapper);
+                if (this_4.__rowInfoMarkers) {
+                    if (i < this_4.__rowInfoMarkers.length && marker) {
+                        marker.appendChild(document.createTextNode(this_4.__rowInfoMarkers[i]));
+                    }
+                }
+                var mainTxt = void 0;
+                var infoTxt = null;
+                if (this_4.selector) {
+                    var item = this_4.selector(this_4.__data[i]);
+                    mainTxt = item.mainText;
+                    infoTxt = item.infoText || null;
+                }
+                else {
+                    mainTxt = this_4.__data[i].toString();
+                }
+                mainSpan.appendChild(document.createTextNode(mainTxt));
+                if (infoTxt)
+                    infoSpan.appendChild(document.createTextNode(infoTxt));
+                this_4.wrapper.appendChild(row);
+                remove.onclick = function () {
+                    var temp = _this.__data[i];
+                    _this.__data.splice(i, 1);
+                    _this.onItemRemove({ target: _this, data: temp });
+                    _this.generateList();
+                };
+                arrUp.onclick = function () {
+                    if (i > 0) {
+                        var temp = _this.__data[i];
+                        _this.__data[i] = _this.__data[i - 1];
+                        _this.__data[i - 1] = temp;
+                        _this.onItemRearrange({ target: _this, data: temp });
+                        _this.generateList();
+                    }
+                };
+                arrDown.onclick = function () {
+                    if (i < _this.__data.length - 1) {
+                        var temp = _this.__data[i];
+                        _this.__data[i] = _this.__data[i + 1];
+                        _this.__data[i + 1] = temp;
+                        _this.onItemRearrange({ target: _this, data: temp });
+                        _this.generateList();
+                    }
+                };
             };
-        };
-        var this_4 = this;
-        for (var i = 0; i < this.__data.length; i++) {
-            _loop_5(i);
+            var this_4 = this;
+            for (var i = 0; i < this.__data.length; i++) {
+                _loop_5(i);
+            }
         }
     };
     return ListBoxRearrangable;

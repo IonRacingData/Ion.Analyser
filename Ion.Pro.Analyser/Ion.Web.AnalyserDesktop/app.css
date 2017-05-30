@@ -406,6 +406,7 @@ table.table.selectable tbody tr:hover {
     overflow: hidden;
     /*max-height: 0px;*/
     transition: max-height .2s ease;
+    background-color: #202020;
 }
 .comp-expList ul {
     list-style: none;
@@ -414,9 +415,15 @@ table.table.selectable tbody tr:hover {
 }
 
 .comp-expList li {
-    padding: 10px;
-    margin-left: 5px;
+    font-size: .9em;
+    margin: 10px 0 10px 15px;
+    font-size: .9em;
 }
+
+    .comp-expList li:hover {
+        color: #119Ed9;
+        cursor: pointer;
+    }
 
 .comp-listBoxRearr {
     list-style: none;
@@ -449,7 +456,7 @@ table.table.selectable tbody tr:hover {
 .comp-listBoxRearr-icons {
     display: flex;
     align-items: center;
-    width: 70px;
+    /*width: 70px;*/
     margin-right: 10px;
 
 }
@@ -463,6 +470,7 @@ table.table.selectable tbody tr:hover {
     display: flex;
     justify-content: center;
     flex-basis: 0;
+    width: 12px;
 }
 
 .comp-listBoxRearr-icon:hover {
