@@ -16,19 +16,51 @@ var LineChartController = (function (_super) {
         _this.zoomSpeed = 1.1;
         _this.selectedPoint = null;
         _this.isMarking = false;
-        _this.displayGrid = true;
-        _this.stickyAxes = true;
+        //private displayGrid: boolean = true;
+        //private stickyAxes: boolean = true;
         _this.scalePoint_start = new Point(0.05, 6);
         _this.movePoint_start = new Point(50, 50);
-        _this.autoScroll = false;
+        //private autoScroll: boolean = false;
         _this.autoScroll_plotMoved = false;
         _this.mainColor = "white";
         _this.defaultCursor = "default";
+        _this.showGrid = {
+            text: "Show grid",
+            longText: "Show or hide the grid",
+            type: "boolean",
+            value: true
+        };
+        _this.stickyAxes = {
+            text: "Sticky axes",
+            longText: "makes the axes stick to the side when scrolling of center",
+            type: "boolean",
+            value: true
+        };
+        _this.autoScroll = {
+            text: "Auto scroll",
+            longText: "Automaticly scolls to the last inserted value in the linechart",
+            type: "boolean",
+            value: false
+        };
+        _this.settings = {
+            showGrid: _this.showGrid,
+            stickyAxes: _this.stickyAxes,
+            autoScroll: _this.autoScroll,
+            reset: {
+                text: "Reset",
+                longText: "Resets the view of the grid",
+                type: "action",
+                value: function () { _this.reset(); }
+            }
+        };
         _this.darkTheme = true;
         _this.movePoint = _this.movePoint_start.copy();
         _this.scalePoint = _this.scalePoint_start.copy();
         return _this;
     }
+    LineChartController.prototype.settingsChanged = function (key, value) {
+        this.draw();
+    };
     LineChartController.prototype.generate = function () {
         var _this = this;
         this.wrapper = document.createElement("div");
@@ -79,7 +111,7 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.onDataChange = function () {
-        if (this.autoScroll && !this.mouseDown) {
+        if (this.autoScroll.value && !this.mouseDown) {
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
@@ -213,7 +245,7 @@ var LineChartController = (function (_super) {
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
         var y = origo.y;
-        if (!visible && this.stickyAxes) {
+        if (!visible && this.stickyAxes.value) {
             if (origo.y < 0) {
                 y = -1;
             }
@@ -251,7 +283,7 @@ var LineChartController = (function (_super) {
             this.ctxMain.fillText(num, absX - (numWidth / 2), numOffset);
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
-            if (this.displayGrid) {
+            if (this.showGrid.value) {
                 this.ctxMain.moveTo(absX, 0);
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
@@ -267,7 +299,7 @@ var LineChartController = (function (_super) {
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
         var x = origo.x;
-        if (!visible && this.stickyAxes) {
+        if (!visible && this.stickyAxes.value) {
             if (origo.x < 0) {
                 x = -1;
             }
@@ -304,7 +336,7 @@ var LineChartController = (function (_super) {
             this.ctxMain.fillText(number, numOffset, absY + 3);
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
-            if (this.displayGrid) {
+            if (this.showGrid.value) {
                 this.ctxMain.moveTo(0, absY);
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
@@ -380,20 +412,24 @@ var LineChartController = (function (_super) {
             this.draw();
         }
     };
+    LineChartController.prototype.reset = function () {
+        this.scalePoint = this.scalePoint_start.copy();
+        this.movePoint = this.movePoint_start.copy();
+    };
     LineChartController.prototype.wrapper_keyDown = function (e) {
         switch (e.key) {
             case "g":
-                this.displayGrid = this.displayGrid === true ? false : true;
+                //this.displayGrid = this.displayGrid === true ? false : true;
+                this.showGrid.value = !this.showGrid.value;
                 break;
             case "r":
-                this.scalePoint = this.scalePoint_start.copy();
-                this.movePoint = this.movePoint_start.copy();
+                this.reset();
                 break;
             case "a":
-                this.stickyAxes = this.stickyAxes === true ? false : true;
+                this.stickyAxes.value = !this.stickyAxes.value;
                 break;
             case "k":
-                this.autoScroll = this.autoScroll === true ? false : true;
+                this.autoScroll.value = !this.autoScroll.value;
                 break;
             case "Control":
                 this.wrapper.style.cursor = "w-resize";

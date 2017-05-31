@@ -44,22 +44,27 @@
         // this.addEventListener = this.eventManager.addEventListener;
         // this.addEventListener2 = this.eventManager.addEventListener;
         // addEventListener
-
-        this.modifyCurrentStylesheet();
+        onPreloadDone(() => {
+            this.modifyCurrentStylesheet();
+        });
     }
 
     private current: CSSStyleSheet;
     private avaiableRules: { [name: string]: CSSStyleRule } = {};
 
     private modifyCurrentStylesheet() {
-        for (let i = 0; i < document.styleSheets.length; i++) {
+        /*for (let i = 0; i < document.styleSheets.length; i++) {
             let a = document.styleSheets[i];
             if (a.title == "app-style")
             {
                 this.current = <CSSStyleSheet>a;
                 break;
             }
-        }
+        }*/
+        console.log(preloadStyle);
+        console.log(preloadStyle.sheet);
+        this.current = <CSSStyleSheet>preloadStyle.sheet;
+        console.log(this.current);
         this.avaiableRules = {};
         for (let i = 0; i < this.current.cssRules.length; i++) {
             let a = <CSSStyleRule>this.current.cssRules[i];
@@ -207,8 +212,15 @@
     }
 
     public changeTheme(theme: string): void {
-        let style = <HTMLLinkElement>document.getElementById("main-theme");
-        if (navigator.userAgent.match(/firefox/i)) {
+        let name = "/" + theme + ".css";
+        console.log(name);
+        if (preloaded[name]) {
+            preloadStyle.innerHTML = preloaded[name];
+            this.modifyCurrentStylesheet();
+            this.onThemeChange({ target: this });
+        }
+        //let style = <HTMLLinkElement>document.getElementById("main-theme");
+        /*if (navigator.userAgent.match(/firefox/i)) {
             style.onload = () => {
                 console.log("hello");
                 this.modifyCurrentStylesheet();
@@ -225,7 +237,7 @@
             }, 200);
         }
         
-        style.href = "/" + theme + ".css";
+        style.href = "/" + theme + ".css";*/
     }
 
     public makeWindowHandle(appWindow: AppWindow): HTMLElement {

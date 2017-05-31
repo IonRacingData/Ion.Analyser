@@ -21,6 +21,55 @@
     }
 }
 
+
+
+interface IConfigurable {
+    settings: IStorageList;
+    settingsChanged: (key: string, value: IStorageObject<keyof IStorageTypes>) => void;
+}
+
+class ConfigWindow implements IApplication {
+    app: Application;
+    mainWindow: AppWindow;
+    main(client: IConfigurable): void {
+        this.mainWindow = kernel.winMan.createWindow(this.app, "Configure window");
+        if (client.settings) {
+            for (let i in client.settings) {
+                let temp = client.settings[i];
+                let row = document.createElement("div");
+                let text = document.createElement("span");
+                text.appendChild(document.createTextNode(temp.text));
+                row.appendChild(text);
+                switch (temp.type) {
+                    case "boolean":
+                        let check = document.createElement("input");
+                        check.type = "checkbox";
+                        check.checked = <boolean>temp.value;
+                        check.oninput = () => {
+                            temp.value = check.checked;
+                            client.settingsChanged(i, temp);
+                        };
+                        row.appendChild(check);
+                        break;
+                    case "action":
+                        let but = new Button();
+                        but.text = temp.text;
+                        but.onclick.addEventListener(() => {
+                            (<() => void>temp.value)();
+                            client.settingsChanged(i, temp);
+                        });
+                        row.appendChild(but.wrapper);
+                        break;
+                }
+                this.mainWindow.content.appendChild(row);
+            }
+        }
+        else {
+            console.log("That's not a configurable item");
+        }
+    }
+}
+
 class SVGEditor implements IApplication {
     app: Application;
     window: AppWindow;
@@ -244,7 +293,6 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
     dataCollectionSource: IDataSource<Point>[] = [];
-    
 
     app: Application;
     window: AppWindow;
@@ -263,6 +311,11 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataAssigner", this);
+            }
+        });
+        this.testWindow.add({
+            name: "Configure", runner: () => {
+                kernel.appMan.start("ConfigWindow", this.lineChart);
             }
         });
 

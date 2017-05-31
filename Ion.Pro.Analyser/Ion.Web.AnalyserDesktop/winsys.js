@@ -25,16 +25,23 @@ var WindowManager = (function () {
         // this.addEventListener = this.eventManager.addEventListener;
         // this.addEventListener2 = this.eventManager.addEventListener;
         // addEventListener
-        this.modifyCurrentStylesheet();
+        onPreloadDone(function () {
+            _this.modifyCurrentStylesheet();
+        });
     }
     WindowManager.prototype.modifyCurrentStylesheet = function () {
-        for (var i = 0; i < document.styleSheets.length; i++) {
-            var a = document.styleSheets[i];
-            if (a.title == "app-style") {
-                this.current = a;
+        /*for (let i = 0; i < document.styleSheets.length; i++) {
+            let a = document.styleSheets[i];
+            if (a.title == "app-style")
+            {
+                this.current = <CSSStyleSheet>a;
                 break;
             }
-        }
+        }*/
+        console.log(preloadStyle);
+        console.log(preloadStyle.sheet);
+        this.current = preloadStyle.sheet;
+        console.log(this.current);
         this.avaiableRules = {};
         for (var i = 0; i < this.current.cssRules.length; i++) {
             var a = this.current.cssRules[i];
@@ -167,25 +174,32 @@ var WindowManager = (function () {
         throw "CSS rule not found exception";
     };
     WindowManager.prototype.changeTheme = function (theme) {
-        var _this = this;
-        var style = document.getElementById("main-theme");
-        if (navigator.userAgent.match(/firefox/i)) {
-            style.onload = function () {
+        var name = "/" + theme + ".css";
+        console.log(name);
+        if (preloaded[name]) {
+            preloadStyle.innerHTML = preloaded[name];
+            this.modifyCurrentStylesheet();
+            this.onThemeChange({ target: this });
+        }
+        //let style = <HTMLLinkElement>document.getElementById("main-theme");
+        /*if (navigator.userAgent.match(/firefox/i)) {
+            style.onload = () => {
                 console.log("hello");
-                _this.modifyCurrentStylesheet();
-                _this.onThemeChange({ target: _this });
+                this.modifyCurrentStylesheet();
+                this.onThemeChange({ target: this });
                 //this.raiseEvent(WindowManager.event_themeChange, null);
-            };
+            }
         }
         else {
-            setTimeout(function () {
+            setTimeout(() => {
                 console.log("hello");
-                _this.modifyCurrentStylesheet();
-                _this.onThemeChange({ target: _this });
+                this.modifyCurrentStylesheet();
+                this.onThemeChange({ target: this });
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
-        style.href = "/" + theme + ".css";
+        
+        style.href = "/" + theme + ".css";*/
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
         var div = document.createElement("div");

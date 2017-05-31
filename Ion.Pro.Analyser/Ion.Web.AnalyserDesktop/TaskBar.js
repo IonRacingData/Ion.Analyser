@@ -85,6 +85,8 @@ var MainMenu = (function (_super) {
         var all = kernel.appMan.launchers;
         var keys = Object.keys(all);
         for (var i = 0; i < keys.length; i++) {
+            if (keys[i] === "hidden")
+                continue;
             var cur = all[keys[i]];
             for (var j = 0; j < cur.length; j++) {
                 this.menuHandle.add(cur[j], keys[i]);

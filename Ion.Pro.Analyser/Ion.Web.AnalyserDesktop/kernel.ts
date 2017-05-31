@@ -184,6 +184,7 @@ interface IPerson {
 
 
 function tester() {
+    
     window.document.body.innerHTML = "";
 
     let newT = newEvent<IEventData>("tester.test");
@@ -295,6 +296,49 @@ function startUp() {
     
 }
 
+function storageTest() {
+    let storageList: IStorageList = {
+        bob: {
+            longText: "This is a long text",
+            text: "bob",
+            type: "string",
+            value: "Hello World"
+        },
+        test: {
+            longText: "AnotherTest",
+            text: "hello",
+            type: "number",
+            value: 3
+        },
+        anotherTest: {
+            longText: "dsadsa",
+            text: "test",
+            type: "boolean",
+            value: false
+        }
+    }
+
+    
+}
+
+interface IStorageList {
+    [key: string]: IStorageObject<keyof IStorageTypes>;
+}
+
+interface IStorageTypes {
+    "number": number;
+    "string": string;
+    "boolean": boolean;
+    "action": (() => void);
+}
+
+interface IStorageObject<K extends keyof IStorageTypes> {
+    text: string;
+    longText: string;
+    type: K;
+    value: IStorageTypes[K];
+}
+
 
 
 
@@ -336,6 +380,8 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Tools", new Launcher(SVGEditor, "SVG Editor"));
 
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+
+    kernel.appMan.registerApplication("hidden", new Launcher(ConfigWindow, "Config Window"));
 
     registerGridPresets();
 }

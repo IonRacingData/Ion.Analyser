@@ -79,6 +79,8 @@ class MainMenu extends Applet {
         let all: { [category: string]: Launcher[] } = kernel.appMan.launchers;
         let keys: string[] = Object.keys(all);
         for (let i: number = 0; i < keys.length; i++) {
+            if (keys[i] === "hidden")
+                continue;
             let cur: Launcher[] = all[keys[i]];
             for (let j: number = 0; j < cur.length; j++) {
                 this.menuHandle.add(cur[j], keys[i]);

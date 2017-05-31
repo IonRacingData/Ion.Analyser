@@ -258,6 +258,28 @@ function startUp() {
         e.preventDefault();
     });
 }
+function storageTest() {
+    var storageList = {
+        bob: {
+            longText: "This is a long text",
+            text: "bob",
+            type: "string",
+            value: "Hello World"
+        },
+        test: {
+            longText: "AnotherTest",
+            text: "hello",
+            type: "number",
+            value: 3
+        },
+        anotherTest: {
+            longText: "dsadsa",
+            text: "test",
+            type: "boolean",
+            value: false
+        }
+    };
+}
 function registerSensorGroups() {
     kernel.senMan.registerGroup(PointSensorGroup);
 }
@@ -280,6 +302,7 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Admin", new Launcher(TaskManager, "Task Manager"));
     kernel.appMan.registerApplication("Tools", new Launcher(SVGEditor, "SVG Editor"));
     kernel.appMan.registerApplication("Grid", new Launcher(GridViewer, "Grid Window"));
+    kernel.appMan.registerApplication("hidden", new Launcher(ConfigWindow, "Config Window"));
     registerGridPresets();
 }
 function registerGridPresets() {

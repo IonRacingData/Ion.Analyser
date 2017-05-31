@@ -1,7 +1,7 @@
 ﻿body {
     background-color: #262626;
     font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle, #202020 40%, #000000 90%);
+    /*background: radial-gradient(circle, #202020 40%, #000000 90%);*/
 }
 
 
@@ -48,6 +48,7 @@
     color: white;
     border-radius: 1px 1px 0 0;
     border-bottom: none;
+    border-bottom: 1px solid #1A1A1A;
 }
 
 .info-color {

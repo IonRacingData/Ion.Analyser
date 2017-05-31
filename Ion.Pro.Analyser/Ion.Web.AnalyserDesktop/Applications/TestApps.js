@@ -16,6 +16,52 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
+var ConfigWindow = (function () {
+    function ConfigWindow() {
+    }
+    ConfigWindow.prototype.main = function (client) {
+        this.mainWindow = kernel.winMan.createWindow(this.app, "Configure window");
+        if (client.settings) {
+            var _loop_1 = function (i) {
+                var temp = client.settings[i];
+                var row = document.createElement("div");
+                var text = document.createElement("span");
+                text.appendChild(document.createTextNode(temp.text));
+                row.appendChild(text);
+                switch (temp.type) {
+                    case "boolean":
+                        var check_1 = document.createElement("input");
+                        check_1.type = "checkbox";
+                        check_1.checked = temp.value;
+                        check_1.oninput = function () {
+                            temp.value = check_1.checked;
+                            client.settingsChanged(i, temp);
+                        };
+                        row.appendChild(check_1);
+                        break;
+                    case "action":
+                        var but = new Button();
+                        but.text = temp.text;
+                        but.onclick.addEventListener(function () {
+                            temp.value();
+                            client.settingsChanged(i, temp);
+                        });
+                        row.appendChild(but.wrapper);
+                        break;
+                }
+                this_1.mainWindow.content.appendChild(row);
+            };
+            var this_1 = this;
+            for (var i in client.settings) {
+                _loop_1(i);
+            }
+        }
+        else {
+            console.log("That's not a configurable item");
+        }
+    };
+    return ConfigWindow;
+}());
 var SVGEditor = (function () {
     function SVGEditor() {
         this.mk = new HtmlHelper();
@@ -203,6 +249,11 @@ var LineChartTester = (function () {
         this.testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataAssigner", _this);
+            }
+        });
+        this.testWindow.add({
+            name: "Configure", runner: function () {
+                kernel.appMan.start("ConfigWindow", _this.lineChart);
             }
         });
         this.window.content.style.overflow = "hidden";

@@ -74,6 +74,7 @@
     <TypeScriptCompile Include="newsensys.ts" />
     <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Controllers\LineChartController.ts" />
+    <TypeScriptCompile Include="preload.ts" />
     <TypeScriptCompile Include="sensys.ts" />
     <TypeScriptCompile Include="TaskBar.ts" />
     <TypeScriptCompile Include="AppWindow.ts" />

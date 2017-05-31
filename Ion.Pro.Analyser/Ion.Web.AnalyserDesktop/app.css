@@ -15,26 +15,41 @@ html {
 }
 
 body {
-    
     width: 100%;
     height: 100%;
     margin: 0;
     overflow: hidden;
 
-
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
     /*background-color: #262626;
     font-family: 'Segoe UI', sans-serif;
     background: radial-gradient(circle, #202020 40%, #000000 90%);*/
 }
 
-.background{
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.background {
     text-align: center;
     padding: 0;
     margin: 0;
     width: 100%;
     height: 100%;
+    /*animation: rotate 120s linear infinite;*/
 
-
+    -moz-transition: filter 0.3s;
+    -o-transition: filter 0.3s;
+    -webkit-transition: filter 0.3s;
+    transition: filter 0.3s;
     /*background: url(IonLogo.png);
     background-repeat: no-repeat;
     background-position: center;
@@ -64,19 +79,45 @@ body {
 
 .window-header {
     cursor: default;
-
-
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
+    -moz-transition: border 0.3s;
+    -o-transition: border 0.3s;
+    -webkit-transition: border 0.3s;
+    transition: border 0.3s;
     /*background-color: #1A1A1A;
     color: white;
     border-radius: 1px 1px 0 0;*/
 }
 
-.window-body{
+@keyframes minimize {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1,1);
+    }
+    99% {
+        opacity: 0;
+        transform: translateY(-150px) scale(0.8,0.8);
+    }
+    100% {
+        opacity: 0;
+        display:none;
+    }
+}
+/*animation: minimize 0.3s linear forwards;*/
+
+.window-body {
     overflow: auto;
     /*-moz-user-select: initial;
     -ms-user-select: initial;
     -webkit-user-select: initial;
     user-select: initial;*/
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
     cursor: default;
 }
 

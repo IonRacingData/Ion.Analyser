@@ -25,7 +25,12 @@ var NetworkManager = (function () {
     }
     NetworkManager.prototype.createWebSocket = function () {
         var _this = this;
-        var socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+        var site = window.location.toString();
+        if (site.match("file://")) {
+            console.log("Detected from local machine, prevents websocket");
+            return null;
+        }
+        var socket = new WebSocket(site.replace("http", "ws") + "socket/connect");
         socket.onmessage = function (ev) {
             _this.receiveMessage(ev);
             // console.log(ev);

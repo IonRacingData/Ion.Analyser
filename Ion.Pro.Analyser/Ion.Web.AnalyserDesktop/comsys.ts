@@ -34,8 +34,14 @@ class NetworkManager {
         this.socket = this.createWebSocket();
     }
 
-    createWebSocket(): WebSocket {
-        let socket = new WebSocket(window.location.toString().replace("http", "ws") + "socket/connect");
+    createWebSocket(): WebSocket | null {
+        let site = window.location.toString();
+        if (site.match("file://")) {
+            console.log("Detected from local machine, prevents websocket");
+            return null;
+        }
+
+        let socket = new WebSocket(site.replace("http", "ws") + "socket/connect");
 
         socket.onmessage = (ev: MessageEvent) => {
             this.receiveMessage(ev);

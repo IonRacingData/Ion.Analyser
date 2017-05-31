@@ -174,7 +174,7 @@ namespace Ion.Pro.Analyser
             if (inMemoryFile)
             {
                 context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(forceDownload ? "binary" : fi.Extension);
-                context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "Content-Disposition: attachment; filename=\"" + fi.Name + "\"");
+                context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "attachment; filename=\"" + fi.Name + "\"");
                 context.HttpContext.Response.Data = await Task.FromResult(data);
             }
             else
@@ -182,7 +182,7 @@ namespace Ion.Pro.Analyser
                 if (fi.Exists)
                 {
                     context.HttpContext.Response.ContentType = MimeTypes.GetMimeType(forceDownload ? "binary" : fi.Extension);
-                    context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "Content-Disposition: attachment; filename=\"" + fi.Name + "\"");
+                    context.HttpContext.Response.HttpHeaderFields.Add("Content-Disposition", "attachment; filename=\"" + fi.Name + "\"");
                     context.HttpContext.Response.Data = await Task.FromResult(ServiceManager.GetFileService().ReadAllBytes(fi.FullName));
                 }
                 else

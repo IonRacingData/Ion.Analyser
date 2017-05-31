@@ -1,4 +1,4 @@
-﻿class LineChartController extends MultiValueCanvasController {
+﻿class LineChartController extends MultiValueCanvasController implements IConfigurable {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
     private mouseMod: Point;
@@ -8,11 +8,11 @@
     private selectedPoint: Point | null = null;
     private isMarking = false;
     private marking: IMarking;
-    private displayGrid: boolean = true;
-    private stickyAxes: boolean = true;
+    //private displayGrid: boolean = true;
+    //private stickyAxes: boolean = true;
     private scalePoint_start: Point = new Point(0.05, 6);
     private movePoint_start: Point = new Point(50, 50);
-    private autoScroll: boolean = false;
+    //private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
 
     private gridColor;
@@ -21,6 +21,41 @@
     private markingColor;
 
     private defaultCursor: string = "default";
+
+    private showGrid: IStorageObject<"boolean"> = {
+        text: "Show grid",
+        longText: "Show or hide the grid",
+        type: "boolean",
+        value: true
+    };
+    private stickyAxes: IStorageObject<"boolean"> = {
+        text: "Sticky axes",
+        longText: "makes the axes stick to the side when scrolling of center",
+        type: "boolean",
+        value: true
+    };
+    private autoScroll: IStorageObject<"boolean"> = {
+        text: "Auto scroll",
+        longText: "Automaticly scolls to the last inserted value in the linechart",
+        type: "boolean",
+        value: false
+    }
+
+    public settings: IStorageList = {
+        showGrid: this.showGrid,
+        stickyAxes: this.stickyAxes,
+        autoScroll: this.autoScroll,
+        reset: {
+            text: "Reset",
+            longText: "Resets the view of the grid",
+            type: "action",
+            value: () => { this.reset(); }
+        }
+    };
+    public settingsChanged(key: string, value: IStorageObject<keyof IStorageTypes>) {
+        this.draw();
+    }
+    
 
     constructor() {
         super();
@@ -90,7 +125,7 @@
     }
 
     protected onDataChange(): void {
-        if (this.autoScroll && !this.mouseDown) {
+        if (this.autoScroll.value && !this.mouseDown) {
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
@@ -248,7 +283,7 @@
         var visible: boolean = origo.y >= 0 && origo.y <= this.height ? true : false;
 
         var y: number = origo.y;
-        if (!visible && this.stickyAxes) {
+        if (!visible && this.stickyAxes.value) {
             if (origo.y < 0) {
                 y = -1;
             }
@@ -294,7 +329,7 @@
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
 
-            if (this.displayGrid) {
+            if (this.showGrid.value) {
                 this.ctxMain.moveTo(absX, 0);
                 this.ctxMain.lineTo(absX, this.height);
                 this.ctxMain.strokeStyle = this.gridColor;
@@ -314,7 +349,7 @@
         var visible: boolean = origo.x >= 0 && origo.x <= this.width ? true : false;
 
         var x: number = origo.x;
-        if (!visible && this.stickyAxes) {
+        if (!visible && this.stickyAxes.value) {
             if (origo.x < 0) {
                 x = -1;
             }
@@ -358,7 +393,7 @@
             this.ctxMain.stroke();
             this.ctxMain.beginPath();
 
-            if (this.displayGrid) {
+            if (this.showGrid.value) {
                 this.ctxMain.moveTo(0, absY);
                 this.ctxMain.lineTo(this.width, absY);
                 this.ctxMain.strokeStyle = this.gridColor;
@@ -461,20 +496,25 @@
 
     }
 
+    private reset(): void {
+        this.scalePoint = this.scalePoint_start.copy();
+        this.movePoint = this.movePoint_start.copy();
+    }
+
     private wrapper_keyDown(e: KeyboardEvent): void {
         switch (e.key) {
             case "g":
-                this.displayGrid = this.displayGrid === true ? false : true;
+                //this.displayGrid = this.displayGrid === true ? false : true;
+                this.showGrid.value = !this.showGrid.value;
                 break;
             case "r":
-                this.scalePoint = this.scalePoint_start.copy();
-                this.movePoint = this.movePoint_start.copy();
+                this.reset();
                 break;
             case "a":
-                this.stickyAxes = this.stickyAxes === true ? false : true;
+                this.stickyAxes.value = !this.stickyAxes.value;
                 break;
             case "k":
-                this.autoScroll = this.autoScroll === true ? false : true;
+                this.autoScroll.value = !this.autoScroll.value;
                 break;
             case "Control":
                 this.wrapper.style.cursor = "w-resize";
