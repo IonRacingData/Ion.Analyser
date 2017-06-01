@@ -57,11 +57,15 @@ var DataSourceBuildController = (function (_super) {
         this.subDivs[1].appendChild(this.chosenList.wrapper);
         this.chosenList.onItemRemove.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
-            console.log(_this.chosenData);
         });
         this.chosenList.onItemRearrange.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
         });
+    };
+    DataSourceBuildController.prototype.fillLayerSection = function () {
+        // TODO: implement this
+    };
+    DataSourceBuildController.prototype.listDataSources = function () {
     };
     return DataSourceBuildController;
 }(Component));

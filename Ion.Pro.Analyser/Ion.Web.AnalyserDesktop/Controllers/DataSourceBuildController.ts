@@ -3,7 +3,7 @@
     private plot: IViewerBase<any>;
     private template: DataSourceTemplate;
 
-    private mk: HtmlHelper = new HtmlHelper();    
+    private mk: HtmlHelper = new HtmlHelper();
     private subDivs: HTMLElement[] = [];
 
     private chosenData: sensys.ISensorInformation[] = [];
@@ -44,7 +44,7 @@
         });
     }
 
-    updateChosenList(): void {
+    private updateChosenList(): void {
         this.chosenList.data = this.chosenData;
         this.chosenList.update;
     }
@@ -60,13 +60,18 @@
 
         this.chosenList.onItemRemove.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
-            console.log(this.chosenData);
         });
 
         this.chosenList.onItemRearrange.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
-        })
-      
+        });      
+    }
+
+    private fillLayerSection(): void {
+        // TODO: implement this
+    }
+
+    private listDataSources(): void {
     }
 
 }
