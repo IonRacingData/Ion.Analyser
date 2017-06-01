@@ -78,6 +78,7 @@
     <TypeScriptCompile Include="OSComponents\TaskBar.ts" />
     <TypeScriptCompile Include="Systems\AppWindow.ts" />
     <TypeScriptCompile Include="Systems\winsys.ts" />
+    <TypeScriptCompile Include="testground.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">

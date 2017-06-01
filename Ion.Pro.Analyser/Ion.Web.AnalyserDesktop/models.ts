@@ -412,3 +412,21 @@ class SensorInfoHelper {
         return new Point(p.x, newVal);
     }
 }
+
+interface IStorageList {
+    [key: string]: IStorageObject<keyof IStorageTypes>;
+}
+
+interface IStorageTypes {
+    "number": number;
+    "string": string;
+    "boolean": boolean;
+    "action": (() => void);
+}
+
+interface IStorageObject<K extends keyof IStorageTypes> {
+    text: string;
+    longText: string;
+    type: K;
+    value: IStorageTypes[K];
+}
