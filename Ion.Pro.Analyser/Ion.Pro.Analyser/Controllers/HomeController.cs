@@ -10,8 +10,12 @@ namespace Ion.Pro.Analyser.Controllers
     {
         public IActionResult Index()
         {
-
             return View("index");
+        }
+
+        public IActionResult Test()
+        {
+            return View("test");
         }
 
         public IActionResult Help(string arg, string firstname)

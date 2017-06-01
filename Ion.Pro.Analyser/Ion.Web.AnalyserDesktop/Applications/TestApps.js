@@ -113,33 +113,43 @@ var SVGEditor = (function () {
     };
     return SVGEditor;
 }());
-var DataViewer = (function () {
-    function DataViewer() {
-    }
-    DataViewer.prototype.main = function () {
+/*class DataViewer implements IApplication {
+    app: Application;
+    window: AppWindow;
+    data: ISensorPackage[];
+
+    innerTable: HTMLElement;
+    main(): void {
         this.window = kernel.winMan.createWindow(this.app, "Data Viewer");
         //kernel.senMan.getLoadedInfos((ids: SensorInformation[]) => this.draw(ids));
-    };
-    DataViewer.prototype.draw = function (data) {
+    }
+
+    draw(data: SensorInformation[]): void {
         var mk = new HtmlHelper();
+
         var table = new HtmlTableGen("table");
         table.addHeader("ID", "Name", "Unit");
+
         for (var i = 0; i < data.length; i++) {
-            var curValue = data[i];
+            let curValue = data[i];
             table.addRow([
                 {
-                    event: "click", func: function () {
+                    event: "click", func: () => {
                     }
                 },
                 (!curValue.Key ? { field: "className", data: "error" } : {})
-            ], curValue.ID, curValue.Name, curValue.Unit ? curValue.Unit : "");
+            ],
+                curValue.ID, curValue.Name, curValue.Unit ? curValue.Unit : "");
         }
         this.window.content.appendChild(table.generate());
+
+
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
         //kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
-    };
-    DataViewer.prototype.drawInner = function (data) {
+    }
+
+    drawInner(data: ISensorPackage[]): void {
         this.innerTable.innerHTML = "";
         var gen = new HtmlTableGen("table");
         gen.addHeader("ID", "Value", "Timestamp");
@@ -147,10 +157,10 @@ var DataViewer = (function () {
         for (var i = 0; i < 10; i++) {
             gen.addRow(data[i].ID, data[i].Value, data[i].TimeStamp);
         }
+
         this.innerTable.appendChild(gen.generate());
-    };
-    return DataViewer;
-}());
+    }
+}*/
 var CsvGenerator = (function () {
     function CsvGenerator() {
         this.mk = new HtmlHelper();

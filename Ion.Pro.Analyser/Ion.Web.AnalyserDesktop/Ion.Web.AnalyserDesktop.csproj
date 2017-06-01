@@ -22,30 +22,29 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app-style-dark.css" />
-    <Content Include="app-style.css" />
-    <Content Include="app.css" />
-    <Content Include="arrow.png" />
-    <Content Include="Grid\grid.js" />
-    <Content Include="Grid\index.html" />
-    <Content Include="Grid\grid-style.css" />
-    <Content Include="Grid\grid.css" />
-    <Content Include="icons\close.svg" />
-    <Content Include="icons\connected.png" />
-    <Content Include="icons\disconnected.png" />
-    <Content Include="icons\max.svg" />
-    <Content Include="icons\min.svg" />
-    <Content Include="steeringWheel.png" />
+    <Content Include="Style\app-style-dark.css" />
+    <Content Include="Style\app-style.css" />
+    <Content Include="Style\app.css" />
+    <Content Include="Icons\arrow.png" />
+    <Content Include="Style\grid-style.css" />
+    <Content Include="Style\grid.css" />
+    <Content Include="Icons\close.svg" />
+    <Content Include="Icons\connected.png" />
+    <Content Include="Icons\disconnected.png" />
+    <Content Include="Icons\max.svg" />
+    <Content Include="Icons\min.svg" />
+    <Content Include="Icons\steeringWheel.png" />
     <Content Include="index.html" />
-    <Content Include="IonLogo.png" />
+    <Content Include="Icons\IonLogo.png" />
+    <Content Include="test.html" />
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="window.css" />
+    <Content Include="Style\window.css" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="application.ts" />
+    <TypeScriptCompile Include="Systems\application.ts" />
     <TypeScriptCompile Include="Applications\CanDataViewer.ts" />
     <TypeScriptCompile Include="Applications\DataSourceBuilder.ts" />
     <TypeScriptCompile Include="Applications\DataViewer.ts" />
@@ -56,8 +55,9 @@
     <TypeScriptCompile Include="Applications\TestApps.ts" />
     <TypeScriptCompile Include="Applications\TestDataViewer.ts" />
     <TypeScriptCompile Include="Applications\WebServerSessions.ts" />
-    <TypeScriptCompile Include="appsys.ts" />
-    <TypeScriptCompile Include="comsys.ts" />
+    <TypeScriptCompile Include="Systems\appsys.ts" />
+    <TypeScriptCompile Include="Components\components.ts" />
+    <TypeScriptCompile Include="Systems\comsys.ts" />
     <TypeScriptCompile Include="Controllers\BarController.ts" />
     <TypeScriptCompile Include="Controllers\Controller.ts" />
     <TypeScriptCompile Include="Controllers\DataSourceAssignmentController.ts" />
@@ -66,20 +66,18 @@
     <TypeScriptCompile Include="event.ts" />
     <TypeScriptCompile Include="Controllers\GPSController.ts" />
     <TypeScriptCompile Include="Grid\gridsystem.ts" />
-    <TypeScriptCompile Include="HtmlHelper.ts" />
+    <TypeScriptCompile Include="htmlhelper.ts" />
     <TypeScriptCompile Include="kernel.ts" />
     <TypeScriptCompile Include="Controllers\LabelController.ts" />
-    <TypeScriptCompile Include="MenuWindow.ts" />
+    <TypeScriptCompile Include="OSComponents\menuwindow.ts" />
     <TypeScriptCompile Include="Controllers\GaugeController.ts" />
+    <TypeScriptCompile Include="Systems\sensys.ts" />
     <TypeScriptCompile Include="models.ts" />
-    <TypeScriptCompile Include="newsensys.ts" />
-    <TypeScriptCompile Include="PlotData.ts" />
     <TypeScriptCompile Include="Controllers\LineChartController.ts" />
     <TypeScriptCompile Include="preload.ts" />
-    <TypeScriptCompile Include="sensys.ts" />
-    <TypeScriptCompile Include="TaskBar.ts" />
-    <TypeScriptCompile Include="AppWindow.ts" />
-    <TypeScriptCompile Include="winsys.ts" />
+    <TypeScriptCompile Include="OSComponents\TaskBar.ts" />
+    <TypeScriptCompile Include="Systems\AppWindow.ts" />
+    <TypeScriptCompile Include="Systems\winsys.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
@@ -89,6 +87,7 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

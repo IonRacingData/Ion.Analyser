@@ -132,4 +132,4 @@ var HtmlTableGen = (function () {
     };
     return HtmlTableGen;
 }());
-//# sourceMappingURL=HtmlHelper.js.map
+//# sourceMappingURL=htmlhelper.js.map

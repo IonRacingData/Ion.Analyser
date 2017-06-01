@@ -1,4 +1,4 @@
-﻿abstract class Controller {
+﻿abstract class Controller { 
     protected wrapper: HTMLElement;
     protected height: number;
     protected width: number;

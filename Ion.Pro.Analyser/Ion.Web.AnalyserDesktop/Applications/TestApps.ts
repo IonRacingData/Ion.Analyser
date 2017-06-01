@@ -129,7 +129,7 @@ class SVGEditor implements IApplication {
     }
 }
 
-class DataViewer implements IApplication {
+/*class DataViewer implements IApplication {
     app: Application;
     window: AppWindow;
     data: ISensorPackage[];
@@ -176,7 +176,7 @@ class DataViewer implements IApplication {
 
         this.innerTable.appendChild(gen.generate());
     }
-}
+}*/
 
 class CsvGenerator implements IApplication {
     public app: Application;

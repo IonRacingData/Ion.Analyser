@@ -43,7 +43,7 @@ function preloadFile(file, callback) {
     request.open("GET", file, true);
     request.send();
 }
-preloadFile("/app-style-dark.css", function (data) {
+preloadFile("/Style/app-style-dark.css", function (data) {
     preloadStyle.innerHTML = data;
     document.head.appendChild(preloadStyle);
     console.log(preloadStyle);
@@ -55,6 +55,6 @@ preloadFile("/app-style-dark.css", function (data) {
         a();
     }
 });
-preloadFile("/app-style.css", function () {
+preloadFile("/Style/app-style.css", function () {
 });
 //# sourceMappingURL=preload.js.map

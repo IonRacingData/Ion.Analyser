@@ -58,7 +58,7 @@ function preloadFile(file: string, callback: (data: string) => void) {
 
 
 
-preloadFile("/app-style-dark.css", (data: string) => {
+preloadFile("/Style/app-style-dark.css", (data: string) => {
     preloadStyle.innerHTML = data;
 
     document.head.appendChild(preloadStyle);
@@ -73,5 +73,5 @@ preloadFile("/app-style-dark.css", (data: string) => {
     }
 });
 
-preloadFile("/app-style.css", () => {
+preloadFile("/Style/app-style.css", () => {
 });

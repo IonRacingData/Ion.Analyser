@@ -21,7 +21,7 @@ var SteeringWheelController = (function (_super) {
     SteeringWheelController.prototype.generate = function () {
         this.wrapper = this.mk.tag("div", "steeringWheel-wrapper");
         this.steeringWheel = this.mk.tag("img");
-        this.steeringWheel.src = "steeringWheel.png";
+        this.steeringWheel.src = "/Icons/steeringWheel.png";
         this.setSWSize();
         this.steeringWheel.style.height = "100%";
         this.wrapper.appendChild(this.steeringWheel);

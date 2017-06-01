@@ -1,23 +1,26 @@
 ﻿body {
-    background-color: #262626;
+    background-color: rgb(240, 240, 240);
     font-family: 'Segoe UI', sans-serif;
-    /*background: radial-gradient(circle, #202020 40%, #000000 90%);*/
 }
 
-
-.background{
-    background: url(IonLogo.png);
+.background {
+    /*background: none;*/
+    background: url(/Icons/IonLogo.png);
     background-repeat: no-repeat;
     background-position: center;
     background-size: auto 75%;
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%) brightness(150%);
 }
 
+/*  Window  */
+
 .window {
-    /*background-color: white;*/
+    
     /*background-color: #262626;
     color: white;*/
     border-radius: 4px 4px 0 0;
-    box-shadow: 0 0 8px 2px #111111;
+    box-shadow: 0 0 8px 2px rgba(17, 17, 17, 0.3);
 }
 
 .window-body-wrapper {
@@ -25,8 +28,8 @@
 }
 
 .window-body {
-    background-color: #2d2d2d;
-    color: white;
+    background-color: rgb(245, 245, 245);
+    color: #202020;
 }
 
 .window-overlay {
@@ -36,23 +39,22 @@
     width: 100%;
     height: 100%;
     display: none;
-    background: rgba(0,0,180,0.1);
+    background: rgba(160, 164, 184, 0.3);
 }
 
 .window-title {
-    color: #009F99;
+    color: black;
 }
 
 .window-header {
-    background-color: #1A1A1A;
-    color: white;
+    background-color: #119ed9;
+    color: black;
     border-radius: 1px 1px 0 0;
-    border-bottom: none;
-    border-bottom: 1px solid #1A1A1A;
+    border-bottom: 1px solid rgb(107, 107, 107);
 }
 
 .info-color {
-    stroke: white;
+    stroke: black;
 }
 
 .window-control{
@@ -61,12 +63,14 @@
 }
 
 .window-control span:hover {
-    background-color: #101010;
+    background-color: rgba(102, 102, 102, 0.35);
 }
 
 .window-control .window-control-exit:hover {
-    background-color: #DD0000;
+    background-color: rgb(220, 25, 25);
 }
+
+/*  Taskbar  */
 
 .taskbar {
     color: white;
@@ -81,26 +85,22 @@
     background-color: #313C53;
 
 }
-.table {
-    color: white;
+
+/*   Table   */
+
+
+table.table {
+    background-color: #e7e7e7;
 }
 
 .table tr:nth-child(2n) {
-    background-color: #3c3c3c;
-}
-
-.table tr {
-    /*background-color: black;*/
+    background-color: #f9f9f9;
 }
 
 .table thead {
-    background-color: #111215;
-    color: white;
+    background-color: #d9d9d9;
+    color: #3e3e3e;
     border: none;
-}
-
-.table tr.error {
-    background-color: rgb(104, 34, 34);
 }
 
 table.table.selectable tr.selectedrow {
@@ -111,6 +111,8 @@ table.table.selectable tr.selectedrow {
 span.table-resize{
     background-color: #23262f;
 }
+
+/*  Menu Window  */
 
 .menu-window{
     background-color: white;
@@ -129,16 +131,12 @@ span.table-resize{
     background-color: #29292D;
 }
 
-.disabled {
-    color: darkgray;
-}
-
 /*  Controllers  */
 
 .gauge {
     /*  ring and labels  */
     color: darkgray;
-    /* needle color */
+    /* needle color */    
     border-color: red;
     /*  center  */
     background-color: darkgray;
@@ -146,7 +144,7 @@ span.table-resize{
 
 .line-chart {
     /*axes and labels*/
-    border-color: white;
+    border-color: rgb(60, 60, 60);
     /*grid*/
     color: rgba(100,100,100,0.3);
     /*marking fill*/
@@ -161,20 +159,19 @@ span.table-resize{
     background-color: red;
 }
 
-
 /* DataSourceAssignmentController */
 
 .dsaController-navwrapper {
-    border-top: solid 1px #555;
+    border-top: solid 1px #ddd;
 }
 
 
 /* lists */
 
 .comp-expList-clicker:hover {
-    background-color: #4a4a4a;
+    background-color: #dbdbdb;
 }
 
 .comp-expList ul {
-    background-color: #202020;
+    background-color: #e6e6e6;
 }
