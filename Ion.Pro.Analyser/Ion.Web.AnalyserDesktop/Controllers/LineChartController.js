@@ -197,6 +197,10 @@ var LineChartController = (function (_super) {
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
+                if (firstVisibleIdx < 0) {
+                    console.log("Empty dataset detected");
+                    continue;
+                }
                 var lastPoint = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength = this.data[d].length();
                 var checkPoint = lastPoint;

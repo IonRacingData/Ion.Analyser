@@ -160,3 +160,21 @@ span.table-resize{
 .bar-controller-bar2 {
     background-color: red;
 }
+
+
+/* DataSourceAssignmentController */
+
+.dsaController-navwrapper {
+    border-top: solid 1px #555;
+}
+
+
+/* lists */
+
+.comp-expList-clicker:hover {
+    background-color: #4a4a4a;
+}
+
+.comp-expList ul {
+    background-color: #202020;
+}

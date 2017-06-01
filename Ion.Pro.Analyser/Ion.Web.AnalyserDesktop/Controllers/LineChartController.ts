@@ -224,6 +224,11 @@
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
+
+                if (firstVisibleIdx < 0) {
+                    console.log("Empty dataset detected");
+                    continue;
+                }
                 
                 var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength: number = this.data[d].length();

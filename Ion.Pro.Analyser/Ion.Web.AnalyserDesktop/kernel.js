@@ -20,9 +20,11 @@ var Button = (function (_super) {
         var _this = _super.call(this) || this;
         _this.onclick = newEvent("Button.onclick");
         _this.wrapper = document.createElement("div");
+        var span = document.createElement("span");
         _this.wrapper.className = "comp-button";
         _this.textNode = document.createTextNode("button");
-        _this.wrapper.appendChild(_this.textNode);
+        span.appendChild(_this.textNode);
+        _this.wrapper.appendChild(span);
         _this.wrapper.onclick = _this.onclick;
         return _this;
     }
@@ -180,31 +182,267 @@ var TableList = (function (_super) {
     };
     return TableList;
 }(Component));
+var ExpandableList = (function (_super) {
+    __extends(ExpandableList, _super);
+    function ExpandableList() {
+        var _this = _super.call(this) || this;
+        _this.mk = new HtmlHelper();
+        _this.selector = null;
+        _this.onItemClick = newEvent("ExpandableList.onItemClick");
+        _this.wrapper = document.createElement("div");
+        _this.wrapper.className = "comp-expList";
+        return _this;
+    }
+    Object.defineProperty(ExpandableList.prototype, "data", {
+        get: function () {
+            return this.__data;
+        },
+        set: function (data) {
+            this.__data = data;
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ExpandableList.prototype.update = function () {
+        this.generateList();
+    };
+    ExpandableList.prototype.generateList = function () {
+        var _this = this;
+        var mk = this.mk;
+        this.wrapper.innerHTML = "";
+        var _loop_3 = function (d) {
+            var section = mk.tag("div", "comp-expList-section");
+            var clicker = mk.tag("div", "comp-expList-clicker");
+            var collapsible = mk.tag("div", "comp-expList-collapsible");
+            collapsible.style.maxHeight = "0px";
+            var list = document.createElement("ul");
+            this_3.wrapper.appendChild(section);
+            section.appendChild(clicker);
+            section.appendChild(collapsible);
+            collapsible.appendChild(list);
+            var title = void 0;
+            var items = [];
+            if (this_3.selector) {
+                title = this_3.selector(d).title;
+                items = this_3.selector(d).items;
+            }
+            else {
+                title = d.toString();
+            }
+            clicker.appendChild(document.createTextNode(title));
+            var _loop_4 = function (i) {
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(i.text));
+                list.appendChild(li);
+                li.onclick = function () {
+                    _this.onItemClick({ target: _this, data: i.object });
+                };
+            };
+            for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
+                var i = items_1[_i];
+                _loop_4(i);
+            }
+            clicker.onclick = function () {
+                var contentHeight = collapsible.scrollHeight;
+                collapsible.style.maxHeight = collapsible.style.maxHeight === "0px" ? contentHeight + "px" : "0px";
+            };
+        };
+        var this_3 = this;
+        for (var _i = 0, _a = this.__data; _i < _a.length; _i++) {
+            var d = _a[_i];
+            _loop_3(d);
+        }
+    };
+    return ExpandableList;
+}(Component));
+var ListBoxRearrangable = (function (_super) {
+    __extends(ListBoxRearrangable, _super);
+    function ListBoxRearrangable() {
+        var _this = _super.call(this) || this;
+        _this.selector = null;
+        _this.onItemClick = newEvent("ListBoxRearrangable.onItemClick");
+        _this.onItemRemove = newEvent("ListBoxRearrangable.onItemRemove");
+        _this.onItemRearrange = newEvent("ListBoxRearrangable.onItemRearrange");
+        _this.mk = new HtmlHelper();
+        _this.wrapper = document.createElement("ul");
+        _this.wrapper.className = "comp-listBoxRearr";
+        return _this;
+    }
+    Object.defineProperty(ListBoxRearrangable.prototype, "data", {
+        get: function () {
+            return this.__data;
+        },
+        set: function (data) {
+            this.__data = data;
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ListBoxRearrangable.prototype, "rowInfoMarkers", {
+        get: function () {
+            return this.__rowInfoMarkers || null;
+        },
+        set: function (rims) {
+            this.__rowInfoMarkers = rims;
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ListBoxRearrangable.prototype.update = function () {
+        this.generateList();
+    };
+    ListBoxRearrangable.prototype.generateList = function () {
+        var _this = this;
+        var mk = this.mk;
+        this.wrapper.innerHTML = "";
+        if (this.__data) {
+            var _loop_5 = function (i) {
+                var row = document.createElement("li");
+                var marker = null;
+                if (this_4.__rowInfoMarkers) {
+                    marker = mk.tag("div", "comp-listBoxRearr-marker");
+                }
+                var textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
+                var mainSpan = mk.tag("span");
+                var infoSpan = mk.tag("span");
+                var iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
+                var arrUp = mk.tag("span", "comp-listBoxRearr-icon");
+                var arrDown = mk.tag("span", "comp-listBoxRearr-icon");
+                var remove = mk.tag("span", "comp-listBoxRearr-icon");
+                arrUp.innerHTML = "&#8593;";
+                arrDown.innerHTML = "&#8595;";
+                remove.innerHTML = "&#10005;";
+                textWrapper.appendChild(mainSpan);
+                textWrapper.appendChild(infoSpan);
+                iconWrapper.appendChild(arrUp);
+                iconWrapper.appendChild(arrDown);
+                iconWrapper.appendChild(remove);
+                if (marker) {
+                    row.appendChild(marker);
+                }
+                row.appendChild(textWrapper);
+                row.appendChild(iconWrapper);
+                if (this_4.__rowInfoMarkers) {
+                    if (i < this_4.__rowInfoMarkers.length && marker) {
+                        marker.appendChild(document.createTextNode(this_4.__rowInfoMarkers[i]));
+                    }
+                }
+                var mainTxt = void 0;
+                var infoTxt = null;
+                if (this_4.selector) {
+                    var item = this_4.selector(this_4.__data[i]);
+                    mainTxt = item.mainText;
+                    infoTxt = item.infoText || null;
+                }
+                else {
+                    mainTxt = this_4.__data[i].toString();
+                }
+                mainSpan.appendChild(document.createTextNode(mainTxt));
+                if (infoTxt)
+                    infoSpan.appendChild(document.createTextNode(infoTxt));
+                this_4.wrapper.appendChild(row);
+                remove.onclick = function () {
+                    var temp = _this.__data[i];
+                    _this.__data.splice(i, 1);
+                    _this.onItemRemove({ target: _this, data: temp });
+                    _this.generateList();
+                };
+                arrUp.onclick = function () {
+                    if (i > 0) {
+                        var temp = _this.__data[i];
+                        _this.__data[i] = _this.__data[i - 1];
+                        _this.__data[i - 1] = temp;
+                        _this.onItemRearrange({ target: _this, data: temp });
+                        _this.generateList();
+                    }
+                };
+                arrDown.onclick = function () {
+                    if (i < _this.__data.length - 1) {
+                        var temp = _this.__data[i];
+                        _this.__data[i] = _this.__data[i + 1];
+                        _this.__data[i + 1] = temp;
+                        _this.onItemRearrange({ target: _this, data: temp });
+                        _this.generateList();
+                    }
+                };
+            };
+            var this_4 = this;
+            for (var i = 0; i < this.__data.length; i++) {
+                _loop_5(i);
+            }
+        }
+    };
+    return ListBoxRearrangable;
+}(Component));
 var testing = false;
 function tester() {
+    window.document.body.style.color = "white";
     window.document.body.innerHTML = "";
     var newT = newEvent("tester.test");
     var b = new Button();
     var b2 = new Button();
+    var b3 = new Button();
     var lst = new ListBox();
     var table = new TableList();
+    var ex = new ExpandableList();
+    var listArr = new ListBoxRearrangable();
+    document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
     document.body.appendChild(b2.wrapper);
+    document.body.appendChild(b3.wrapper);
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
+    document.body.appendChild(listArr.wrapper);
     b.text = "Click Me!";
     b2.text = "Add Fourth";
+    b3.text = "Add expList item";
     b.onclick.addEventListener(function () { alert("Yeay"); });
     var arr = [
         { first: "Per", last: "Pettersen" },
         { first: "Truls", last: "Trulsen" },
         { first: "Bob", last: "Bobsen" }
     ];
+    var exArr = [
+        {
+            name: "work",
+            employee: { first: "hey", last: "bye" }
+        },
+        {
+            name: "work2",
+            employee: { first: "hey2", last: "bye2" }
+        }
+    ];
+    ex.selector = function (item) {
+        return {
+            title: item.name,
+            items: [
+                { text: item.employee.first, object: item.employee.first },
+                { text: item.employee.last, object: item.employee.last }
+            ]
+        };
+    };
+    ex.data = exArr;
+    ex.onItemClick.addEventListener(function (item) {
+        console.log(item.data);
+    });
+    listArr.selector = function (item) {
+        return { mainText: item.first, infoText: item.last };
+    };
+    listArr.data = arr;
+    var markers = ["X", "Y", "Z"];
+    listArr.rowInfoMarkers = markers;
     b2.onclick.addEventListener(function () {
         arr.push({ first: "Fourth", last: "Tester" });
         lst.update();
         table.update();
+    });
+    b3.onclick.addEventListener(function () {
+        exArr.push({ name: "new", employee: { first: "hans", last: "bobsen" } });
+        ex.update();
     });
     table.header = ["Firstname", "Lastname"];
     table.selector = function (item) {

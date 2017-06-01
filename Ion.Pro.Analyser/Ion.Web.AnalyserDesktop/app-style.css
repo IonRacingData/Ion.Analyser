@@ -29,6 +29,7 @@
 
 .window-body {
     background-color: rgb(245, 245, 245);
+    color: #202020;
 }
 
 .window-overlay {
@@ -66,7 +67,7 @@
 }
 
 .window-control .window-control-exit:hover {
-    background-color: rgb(204, 98, 98);
+    background-color: rgb(220, 25, 25);
 }
 
 /*  Taskbar  */
@@ -156,4 +157,21 @@ span.table-resize{
 
 .bar-controller-bar2 {
     background-color: red;
+}
+
+/* DataSourceAssignmentController */
+
+.dsaController-navwrapper {
+    border-top: solid 1px #ddd;
+}
+
+
+/* lists */
+
+.comp-expList-clicker:hover {
+    background-color: #dbdbdb;
+}
+
+.comp-expList ul {
+    background-color: #e6e6e6;
 }

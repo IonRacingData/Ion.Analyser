@@ -5,8 +5,9 @@ var DataSourceBuilder = (function () {
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-        this.dsb = new DSBController();
-        this.window.content.appendChild(this.dsb.generate());
+        this.window.setSize(1050, this.window.height);
+        this.dsb = new DataSourceAssignmentController();
+        this.window.content.appendChild(this.dsb.wrapper);
         this.app.events.on(kernel.senMan.onRegisterViewer, function () {
             _this.dsb.updateViewers();
         });

@@ -324,25 +324,56 @@ span.table-resize{
     width: auto;
 }
 
-.dsb-wrapper {
+/* DataSourceAssignmentController */
+
+.dsaController-wrapper {
     height: 100%;
     display: flex;
     flex-direction: column;
+    font-size: .8em;
+    /*font-weight: lighter;*/
 }
 
-.dsb-contentwrapper {
-    flex-grow: 1
+.dsaController-contentwrapper {
+    flex-grow: 1;
+    position: relative;
 }
 
-.dsb-p2-wrapper {
+.dsaController-navwrapper {
+    padding: 10px;
+}
+
+.dsaController-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.dsaController-left {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.dsaController-right {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+/* DataSourceBuildController */
+.dsbController-wrapper {
     display: flex;
     flex-direction: row;
     height: 100%;
+    width: 100%;
+    position: absolute;
 }
 
-.dsb-p2-section {
+.dsbController-section {
     flex-grow: 1;
+    flex-basis: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
 
 /*Lists*/
 .listitem {
@@ -372,6 +403,10 @@ table.table.selectable tbody tr:hover {
     color: white;
 }
 
+.comp-button span {
+    vertical-align: middle;
+}
+
 .comp-button:hover {
     padding: 1px 3px;
     border: 2px solid darkgray;
@@ -397,3 +432,96 @@ table.table.selectable tbody tr:hover {
         .comp-listBox li:hover {
             background-color: #222;
         }
+
+
+.comp-expList {
+}
+.comp-expList-section {
+
+}
+.comp-expList-clicker {
+    cursor: pointer;
+    padding: 7px;
+}
+.comp-expList-collapsible {
+    overflow: hidden;
+    /*max-height: 0px;*/
+    transition: max-height .2s ease;
+    background-color: #202020;
+}
+.comp-expList ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.comp-expList li {
+    font-size: .9em;
+    margin: 10px 0 10px 15px;
+    font-size: .9em;
+}
+
+    .comp-expList li:hover {
+        color: #119Ed9;
+        cursor: pointer;
+    }
+
+.comp-listBoxRearr {
+    list-style: none;
+    max-width: 300px;
+    padding: 0;
+    margin: 0;
+}
+
+.comp-listBoxRearr li {
+    display: flex;
+    padding: 5px;
+}
+
+.comp-listBoxRearr li:hover {
+    background-color: #4a4a4a;
+}
+
+.comp-listBoxRearr-textWrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.comp-listBoxRearr-textWrapper span:nth-child(2) {
+    font-size: 0.6em;
+    padding-left: 15px;
+}
+
+.comp-listBoxRearr-icons {
+    display: flex;
+    align-items: center;
+    /*width: 70px;*/
+    margin-right: 10px;
+
+}
+
+.comp-listBoxRearr-icon {
+    font-size: 1.3em;
+    cursor: pointer;
+    margin-left: 2px;
+    margin-right: 2px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    flex-basis: 0;
+    width: 12px;
+}
+
+.comp-listBoxRearr-icon:hover {
+    color: #119Ed9;
+}
+
+.comp-listBoxRearr-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #171717;
+    min-width: 40px;
+}
