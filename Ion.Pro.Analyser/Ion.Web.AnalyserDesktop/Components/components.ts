@@ -106,6 +106,56 @@ class ListBox extends Component {
     }
 }
 
+interface ISwitchEvent extends IEventData {
+    newValue: boolean;
+}
+
+class Switch extends Component {
+    private __checked: boolean = false;
+    private slider: HTMLElement;
+    private text: Text;
+
+    public onCheckedChange = newEvent<ISwitchEvent>("Switch.onCheckedChange");
+
+    public get checked(): boolean {
+        return this.__checked;
+    }
+
+    public set checked(value: boolean) {
+        this.__checked = value;
+        this.onCheckedChange({ target: this, newValue: value });
+        this.handleCheck();
+    }
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("div");
+        this.wrapper.className = "comp-style";
+
+        this.slider = document.createElement("div");
+        this.wrapper.appendChild(this.slider);
+        this.slider.className = "comp-style-slider";
+        this.text = document.createTextNode("OFF");
+        this.slider.appendChild(this.text);
+
+        this.wrapper.addEventListener("click", () => {
+            this.checked = !this.checked;
+        });
+    }
+
+    private handleCheck() {
+        if (this.__checked) {
+            this.slider.classList.add("comp-style-slider-active");
+            this.text.nodeValue = "ON";
+        }
+        else {
+            this.slider.classList.remove("comp-style-slider-active");
+            this.text.nodeValue = "OFF";
+        }
+    }
+}
+
+
 class TableList extends Component {
     private __data: any[];
     private __header: string[] = [];

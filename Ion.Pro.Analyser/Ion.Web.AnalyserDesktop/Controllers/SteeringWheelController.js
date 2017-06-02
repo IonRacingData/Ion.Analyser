@@ -52,4 +52,3 @@ var SteeringWheelController = (function (_super) {
     };
     return SteeringWheelController;
 }(SingleValueController));
-//# sourceMappingURL=SteeringWheelController.js.map

@@ -65,4 +65,3 @@ var Carousel = (function () {
     };
     return Carousel;
 }());
-//# sourceMappingURL=DataSourceBuilder.js.map

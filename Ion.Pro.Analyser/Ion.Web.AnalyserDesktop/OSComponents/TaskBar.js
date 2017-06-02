@@ -163,4 +163,3 @@ var StatusBar = (function (_super) {
     }
     return StatusBar;
 }(Applet));
-//# sourceMappingURL=TaskBar.js.map

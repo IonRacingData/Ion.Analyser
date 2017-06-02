@@ -99,6 +99,48 @@ var ListBox = (function (_super) {
     };
     return ListBox;
 }(Component));
+var Switch = (function (_super) {
+    __extends(Switch, _super);
+    function Switch() {
+        var _this = _super.call(this) || this;
+        _this.__checked = false;
+        _this.onCheckedChange = newEvent("Switch.onCheckedChange");
+        _this.wrapper = document.createElement("div");
+        _this.wrapper.className = "comp-style";
+        _this.slider = document.createElement("div");
+        _this.wrapper.appendChild(_this.slider);
+        _this.slider.className = "comp-style-slider";
+        _this.text = document.createTextNode("OFF");
+        _this.slider.appendChild(_this.text);
+        _this.wrapper.addEventListener("click", function () {
+            _this.checked = !_this.checked;
+        });
+        return _this;
+    }
+    Object.defineProperty(Switch.prototype, "checked", {
+        get: function () {
+            return this.__checked;
+        },
+        set: function (value) {
+            this.__checked = value;
+            this.onCheckedChange({ target: this, newValue: value });
+            this.handleCheck();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Switch.prototype.handleCheck = function () {
+        if (this.__checked) {
+            this.slider.classList.add("comp-style-slider-active");
+            this.text.nodeValue = "ON";
+        }
+        else {
+            this.slider.classList.remove("comp-style-slider-active");
+            this.text.nodeValue = "OFF";
+        }
+    };
+    return Switch;
+}(Component));
 var TableList = (function (_super) {
     __extends(TableList, _super);
     function TableList() {
@@ -376,4 +418,3 @@ var ListBoxRearrangable = (function (_super) {
     };
     return ListBoxRearrangable;
 }(Component));
-//# sourceMappingURL=components.js.map

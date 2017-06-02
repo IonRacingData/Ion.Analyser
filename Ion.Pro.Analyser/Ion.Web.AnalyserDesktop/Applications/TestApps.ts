@@ -37,19 +37,20 @@ class ConfigWindow implements IApplication {
             for (let i in client.settings) {
                 let temp = client.settings[i];
                 let row = document.createElement("div");
+                row.style.margin = "10px";
                 let text = document.createElement("span");
                 text.appendChild(document.createTextNode(temp.text));
                 row.appendChild(text);
                 switch (temp.type) {
                     case "boolean":
-                        let check = document.createElement("input");
-                        check.type = "checkbox";
-                        check.checked = <boolean>temp.value;
-                        check.oninput = () => {
-                            temp.value = check.checked;
+                        let sw = new Switch();
+                        sw.checked = <boolean>temp.value;
+                        sw.onCheckedChange.addEventListener((e: ISwitchEvent) => {
+                            temp.value = e.newValue;
                             client.settingsChanged(i, temp);
-                        };
-                        row.appendChild(check);
+                        });
+                        sw.wrapper.style.cssFloat = "right";
+                        row.appendChild(sw.wrapper);
                         break;
                     case "action":
                         let but = new Button();
@@ -58,6 +59,7 @@ class ConfigWindow implements IApplication {
                             (<() => void>temp.value)();
                             client.settingsChanged(i, temp);
                         });
+                        but.wrapper.style.cssFloat = "right";
                         row.appendChild(but.wrapper);
                         break;
                 }

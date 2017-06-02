@@ -130,4 +130,3 @@ var GaugeController = (function (_super) {
     };
     return GaugeController;
 }(SingleValueCanvasController));
-//# sourceMappingURL=GaugeController.js.map

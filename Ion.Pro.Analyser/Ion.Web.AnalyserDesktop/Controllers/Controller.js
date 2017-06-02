@@ -276,4 +276,3 @@ var Rectangle = (function () {
     };
     return Rectangle;
 }());
-//# sourceMappingURL=Controller.js.map

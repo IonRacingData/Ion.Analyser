@@ -126,11 +126,18 @@ var Kernel;
                         var data2 = JSON.parse(JSON.stringify(data));
                         var dataSet = new SensorDataSet(data);
                         data2.Name = "telemetry";
-                        _this.telemetryDataSet = new SensorDataSet(data2);
+                        var tele = false;
+                        if (!_this.telemetryDataSet) {
+                            _this.telemetryDataSet = new SensorDataSet(data2);
+                            _this.loadedDataSet.push(_this.telemetryDataSet);
+                            tele = true;
+                        }
                         _this.loadedDataSet.push(dataSet);
-                        _this.loadedDataSet.push(_this.telemetryDataSet);
                         for (var v in dataSet.SensorData) {
-                            var temp1 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] });
+                            var temp1 = void 0;
+                            if (tele) {
+                                temp1 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] });
+                            }
                             var temp2 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
                             if (temp1) {
                                 _this.dataSources.push(temp1);
@@ -268,6 +275,7 @@ var Kernel;
                         sources.push(temp);
                     }
                     else {
+                        console.log(template);
                         console.log("Got empty dataset");
                     }
                 }
@@ -353,6 +361,10 @@ var PointSensorGroup = (function (_super) {
     __extends(PointSensorGroup, _super);
     function PointSensorGroup(data) {
         var _this = _super.call(this, Point) || this;
+        if (!data || data.length < 1) {
+            console.log(data);
+            throw new Error("Empty array argument detected");
+        }
         _this.data = data[0];
         _this.infos.Keys[0] = data[0].ID;
         _this.infos.SensorInfos[0] = data[0].info;
@@ -383,4 +395,3 @@ var DataSourceTemplate = (function () {
     }
     return DataSourceTemplate;
 }());
-//# sourceMappingURL=sensys.js.map

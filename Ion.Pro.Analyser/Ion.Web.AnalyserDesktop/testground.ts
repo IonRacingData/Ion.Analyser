@@ -1,7 +1,7 @@
 ﻿testing = true;
+console.log("Activating testing");
 
-alert("testing");
-document.addEventListener("load", () => {
+window.addEventListener("load", () => {
     tester();
 });
 
@@ -20,15 +20,17 @@ function tester() {
     let table = new TableList();
     let ex: ExpandableList = new ExpandableList();
     let listArr: ListBoxRearrangable = new ListBoxRearrangable();
+    let sw = new Switch();
 
-    document.body.appendChild(ex.wrapper);
+    /*document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
     document.body.appendChild(b2.wrapper);
     document.body.appendChild(b3.wrapper);
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
-    document.body.appendChild(listArr.wrapper);
+    document.body.appendChild(listArr.wrapper);*/
+    document.body.appendChild(sw.wrapper);
 
     b.text = "Click Me!";
     b2.text = "Add Fourth";

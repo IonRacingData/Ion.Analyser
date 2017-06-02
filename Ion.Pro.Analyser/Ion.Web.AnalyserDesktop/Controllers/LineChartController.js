@@ -641,4 +641,3 @@ var LayeredCanvas = (function () {
     };
     return LayeredCanvas;
 }());
-//# sourceMappingURL=LineChartController.js.map
