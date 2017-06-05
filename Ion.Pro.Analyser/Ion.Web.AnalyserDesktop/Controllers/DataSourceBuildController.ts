@@ -1,10 +1,11 @@
 ﻿class DataSourceBuildController extends Component{
 
     private plot: IViewerBase<any>;
-    private template: DataSourceTemplate;
+    private sensorGroup: SensorGroup<any>;
 
     private mk: HtmlHelper = new HtmlHelper();
     private subDivs: HTMLElement[] = [];
+    private btnMakeSource: Button;
 
     private chosenData: sensys.ISensorInformation[] = [];
     private chosenList: ListBoxRearrangable;
@@ -15,13 +16,40 @@
 
         this.wrapper = this.mk.tag("div", "dsbController-wrapper");
         for (let i = 0; i < 4; i++) {
-            let div: HTMLElement = this.mk.tag("div", "dsbController-section")
+            let div: HTMLElement = this.mk.tag("div", "dsbController-section");
             this.subDivs.push(div);
             this.wrapper.appendChild(div);
         }
 
+        this.btnMakeSource = new Button();
+        this.btnMakeSource.text = "Generate";
+        this.btnMakeSource.onclick.addEventListener((e) => {
+            this.generateSource();
+            console.log("hey");
+        })
+        this.toggleGenBtn();
+        this.subDivs[2].appendChild(this.btnMakeSource.wrapper);
+
+        console.log(this.plot);
+        this.determineGroup();
         this.listSensors();
         this.initChosenList();
+    }
+
+    private generateSource(): void {
+        let sources: ISensorDataContainerTemplate[] = [];
+        for (let s of this.chosenData) {            
+            sources.push({ name: s.Name, key: s.Key });
+        }
+
+        let template: DataSourceTemplate = {
+            key: "",
+            grouptype: (<any>this.sensorGroup).name,
+            layers: [],
+            sources: sources          
+        }
+
+        console.log(kernel.senMan.createDataSource(template));
     }
 
     private listSensors() {
@@ -39,9 +67,24 @@
 
         expList.data = infos;
         expList.onItemClick.addEventListener((e) => {
-            this.chosenData.push(e.data);
-            this.updateChosenList();
+            let numGroups: number = (<any>this.sensorGroup).numGroups;
+            if (this.chosenData.length < numGroups) {
+                this.chosenData.push(e.data);
+                this.updateChosenList();
+            }
+            if (this.chosenData.length === numGroups) {
+                this.toggleGenBtn();
+            }
         });
+    }
+
+    private toggleGenBtn(): void {
+        if (this.btnMakeSource.wrapper.style.display === "none") {
+            this.btnMakeSource.wrapper.style.display = "inline-block";
+        }
+        else {
+            this.btnMakeSource.wrapper.style.display = "none";
+        }
     }
 
     private updateChosenList(): void {
@@ -60,6 +103,9 @@
 
         this.chosenList.onItemRemove.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
+            if (this.chosenData.length < (<any>this.sensorGroup).numGroups) {
+                this.toggleGenBtn();
+            }
         });
 
         this.chosenList.onItemRearrange.addEventListener((e) => {
@@ -72,6 +118,19 @@
     }
 
     private listDataSources(): void {
+
+    }
+
+    private determineGroup(): void {
+        let p: number = this.plot.type.length - 1;
+        for (let v of kernel.senMan.groups) {
+            if ((<any>v).numGroups === p) {
+                this.sensorGroup = <any>v;
+                return;
+            }
+        }
+
+        throw "Group not found exception";
     }
 
 }

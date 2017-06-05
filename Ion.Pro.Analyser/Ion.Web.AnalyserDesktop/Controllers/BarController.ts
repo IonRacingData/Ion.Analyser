@@ -7,6 +7,10 @@
     private horizontal: boolean = false;
     private double: boolean = false;
 
+    private silhouette: string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
+    private silhouetteContainer: HTMLElement;
+    private barContainer: HTMLElement;
+
     constructor(width: number, height: number, direction: Direction) {
         super();
         this.direction = direction;
@@ -18,13 +22,17 @@
         this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
         this.wrapper.setAttribute("tabindex", "0");
 
+        this.barContainer = this.mk.tag("div");
+        this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
+        this.silhouetteContainer.innerHTML = this.silhouette;
+
         this.barWrapper1 = this.mk.tag("div", "bar-controller-barWrapper1");
-        this.wrapper.appendChild(this.barWrapper1);
+        this.barContainer.appendChild(this.barWrapper1);
         this.bar1 = this.mk.tag("div", "bar-controller-bar1");
         this.barWrapper1.appendChild(this.bar1);
 
         this.barWrapper2 = this.mk.tag("div", "bar-controller-barWrapper2");
-        this.wrapper.appendChild(this.barWrapper2);
+        this.barContainer.appendChild(this.barWrapper2);
         this.bar2 = this.mk.tag("div", "bar-controller-bar2");
         this.barWrapper2.appendChild(this.bar2);
 
@@ -45,6 +53,9 @@
             }
         });
 
+        this.barContainer.style.display = "none";
+        this.wrapper.appendChild(this.silhouetteContainer);
+        this.wrapper.appendChild(this.barContainer);
         return this.wrapper;
     }
 
@@ -72,6 +83,16 @@
     }
 
     protected onDataChange(): void {
+
+        if (this.data) {
+            this.silhouetteContainer.style.display = "none";
+            this.barContainer.style.display = "flex";
+        }
+        else {
+            this.barContainer.style.display = "none";
+            this.silhouetteContainer.style.display = "flex";
+            return;
+        }
 
         let min = SensorInfoHelper.minValue(this.lastSensorInfo);
 

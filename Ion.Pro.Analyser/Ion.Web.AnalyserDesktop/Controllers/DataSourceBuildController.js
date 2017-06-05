@@ -22,10 +22,34 @@ var DataSourceBuildController = (function (_super) {
             _this.subDivs.push(div);
             _this.wrapper.appendChild(div);
         }
+        _this.btnMakeSource = new Button();
+        _this.btnMakeSource.text = "Generate";
+        _this.btnMakeSource.onclick.addEventListener(function (e) {
+            _this.generateSource();
+            console.log("hey");
+        });
+        _this.toggleGenBtn();
+        _this.subDivs[2].appendChild(_this.btnMakeSource.wrapper);
+        console.log(_this.plot);
+        _this.determineGroup();
         _this.listSensors();
         _this.initChosenList();
         return _this;
     }
+    DataSourceBuildController.prototype.generateSource = function () {
+        var sources = [];
+        for (var _i = 0, _a = this.chosenData; _i < _a.length; _i++) {
+            var s = _a[_i];
+            sources.push({ name: s.Name, key: s.Key });
+        }
+        var template = {
+            key: "",
+            grouptype: this.sensorGroup.name,
+            layers: [],
+            sources: sources
+        };
+        console.log(kernel.senMan.createDataSource(template));
+    };
     DataSourceBuildController.prototype.listSensors = function () {
         var _this = this;
         var expList = new ExpandableList();
@@ -39,9 +63,23 @@ var DataSourceBuildController = (function (_super) {
         };
         expList.data = infos;
         expList.onItemClick.addEventListener(function (e) {
-            _this.chosenData.push(e.data);
-            _this.updateChosenList();
+            var numGroups = _this.sensorGroup.numGroups;
+            if (_this.chosenData.length < numGroups) {
+                _this.chosenData.push(e.data);
+                _this.updateChosenList();
+            }
+            if (_this.chosenData.length === numGroups) {
+                _this.toggleGenBtn();
+            }
         });
+    };
+    DataSourceBuildController.prototype.toggleGenBtn = function () {
+        if (this.btnMakeSource.wrapper.style.display === "none") {
+            this.btnMakeSource.wrapper.style.display = "inline-block";
+        }
+        else {
+            this.btnMakeSource.wrapper.style.display = "none";
+        }
     };
     DataSourceBuildController.prototype.updateChosenList = function () {
         this.chosenList.data = this.chosenData;
@@ -57,6 +95,9 @@ var DataSourceBuildController = (function (_super) {
         this.subDivs[1].appendChild(this.chosenList.wrapper);
         this.chosenList.onItemRemove.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
+            if (_this.chosenData.length < _this.sensorGroup.numGroups) {
+                _this.toggleGenBtn();
+            }
         });
         this.chosenList.onItemRearrange.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
@@ -66,6 +107,17 @@ var DataSourceBuildController = (function (_super) {
         // TODO: implement this
     };
     DataSourceBuildController.prototype.listDataSources = function () {
+    };
+    DataSourceBuildController.prototype.determineGroup = function () {
+        var p = this.plot.type.length - 1;
+        for (var _i = 0, _a = kernel.senMan.groups; _i < _a.length; _i++) {
+            var v = _a[_i];
+            if (v.numGroups === p) {
+                this.sensorGroup = v;
+                return;
+            }
+        }
+        throw "Group not found exception";
     };
     return DataSourceBuildController;
 }(Component));

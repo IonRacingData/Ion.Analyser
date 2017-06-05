@@ -53,6 +53,9 @@ var SingleValueController = (function (_super) {
                 this.onDataChange();
             }
         }
+        else {
+            this.onDataChange();
+        }
     };
     SingleValueController.prototype.setValue = function (value) { };
     return SingleValueController;
