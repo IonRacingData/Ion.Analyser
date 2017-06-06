@@ -127,11 +127,19 @@
 
                     let dataSet = new SensorDataSet(data);
                     data2.Name = "telemetry";
-                    this.telemetryDataSet = new SensorDataSet(data2);
+                    let tele = false;
+                    if (!this.telemetryDataSet) {
+                        this.telemetryDataSet = new SensorDataSet(data2);
+                        this.loadedDataSet.push(this.telemetryDataSet);
+                        tele = true;
+                    }
                     this.loadedDataSet.push(dataSet);
-                    this.loadedDataSet.push(this.telemetryDataSet);
+                    
                     for (let v in dataSet.SensorData) {
-                        let temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
+                        let temp1;
+                        if (tele) {
+                            temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
+                        }
                         let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
                         if (temp1) {
                             this.dataSources.push(temp1);
@@ -285,6 +293,7 @@
                     sources.push(temp);
                 }
                 else {
+                    console.log(template);
                     console.log("Got empty dataset");
                 }
             }
@@ -421,6 +430,10 @@ class PointSensorGroup extends SensorGroup<Point>{
 
     constructor(data: SensorDataContainer[]) {
         super(Point);
+        if (!data || data.length < 1) {
+            console.log(data);
+            throw new Error("Empty array argument detected");
+        }
         this.data = data[0];
 
         this.infos.Keys[0] = data[0].ID;

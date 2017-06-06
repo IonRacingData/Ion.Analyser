@@ -25,19 +25,20 @@ var ConfigWindow = (function () {
             var _loop_1 = function (i) {
                 var temp = client.settings[i];
                 var row = document.createElement("div");
+                row.style.margin = "10px";
                 var text = document.createElement("span");
                 text.appendChild(document.createTextNode(temp.text));
                 row.appendChild(text);
                 switch (temp.type) {
                     case "boolean":
-                        var check_1 = document.createElement("input");
-                        check_1.type = "checkbox";
-                        check_1.checked = temp.value;
-                        check_1.oninput = function () {
-                            temp.value = check_1.checked;
+                        var sw = new Switch();
+                        sw.checked = temp.value;
+                        sw.onCheckedChange.addEventListener(function (e) {
+                            temp.value = e.newValue;
                             client.settingsChanged(i, temp);
-                        };
-                        row.appendChild(check_1);
+                        });
+                        sw.wrapper.style.cssFloat = "right";
+                        row.appendChild(sw.wrapper);
                         break;
                     case "action":
                         var but = new Button();
@@ -46,6 +47,7 @@ var ConfigWindow = (function () {
                             temp.value();
                             client.settingsChanged(i, temp);
                         });
+                        but.wrapper.style.cssFloat = "right";
                         row.appendChild(but.wrapper);
                         break;
                 }
@@ -520,4 +522,3 @@ var SteeringWheelTester = (function () {
     };
     return SteeringWheelTester;
 }());
-//# sourceMappingURL=TestApps.js.map

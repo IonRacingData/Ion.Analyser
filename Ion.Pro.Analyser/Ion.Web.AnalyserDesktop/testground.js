@@ -1,6 +1,6 @@
 testing = true;
-alert("testing");
-document.addEventListener("load", function () {
+console.log("Activating testing");
+window.addEventListener("load", function () {
     tester();
 });
 function tester() {
@@ -14,14 +14,16 @@ function tester() {
     var table = new TableList();
     var ex = new ExpandableList();
     var listArr = new ListBoxRearrangable();
-    document.body.appendChild(ex.wrapper);
+    var sw = new Switch();
+    /*document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
     document.body.appendChild(b2.wrapper);
     document.body.appendChild(b3.wrapper);
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
-    document.body.appendChild(listArr.wrapper);
+    document.body.appendChild(listArr.wrapper);*/
+    document.body.appendChild(sw.wrapper);
     b.text = "Click Me!";
     b2.text = "Add Fourth";
     b3.text = "Add expList item";
@@ -107,4 +109,3 @@ function storageTest() {
         }
     };
 }
-//# sourceMappingURL=testground.js.map

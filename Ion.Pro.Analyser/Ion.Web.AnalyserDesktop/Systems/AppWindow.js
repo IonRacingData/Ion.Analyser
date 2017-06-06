@@ -413,4 +413,3 @@ var WindowState;
     WindowState[WindowState["MAXIMIZED"] = 2] = "MAXIMIZED";
     WindowState[WindowState["TILED"] = 3] = "TILED";
 })(WindowState || (WindowState = {}));
-//# sourceMappingURL=AppWindow.js.map

@@ -13,4 +13,3 @@ window.onbeforeunload = function (e) {
     // For Safari
     return 'Sure?';*/
 };
-//# sourceMappingURL=app.js.map

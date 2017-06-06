@@ -50,4 +50,3 @@ var LabelController = (function (_super) {
     };
     return LabelController;
 }(SingleValueController));
-//# sourceMappingURL=LabelController.js.map

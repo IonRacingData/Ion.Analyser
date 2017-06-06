@@ -117,4 +117,3 @@ var GPSController = (function (_super) {
     };
     return GPSController;
 }(CanvasController));
-//# sourceMappingURL=GPSController.js.map

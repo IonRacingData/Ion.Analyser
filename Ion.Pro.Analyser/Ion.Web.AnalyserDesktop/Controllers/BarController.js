@@ -121,4 +121,3 @@ var Direction;
     Direction[Direction["Horizontal"] = 1] = "Horizontal";
     Direction[Direction["Vertical"] = 2] = "Vertical";
 })(Direction || (Direction = {}));
-//# sourceMappingURL=BarController.js.map

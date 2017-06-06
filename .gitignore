@@ -244,4 +244,7 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
+
+# Other files
 freq.log16
+*.js.map
