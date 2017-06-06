@@ -179,6 +179,9 @@ span.table-resize{
 .comp-expList-clicker:hover {
     background-color: #4a4a4a;
 }
+.comp-expList-clicker:active {
+    background-color: #424242;
+}
 
 .comp-expList ul {
     background-color: #202020;
