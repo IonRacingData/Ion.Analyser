@@ -40,7 +40,7 @@ var DataSourceBuildController = (function (_super) {
         var sources = [];
         for (var _i = 0, _a = this.chosenData; _i < _a.length; _i++) {
             var s = _a[_i];
-            sources.push({ name: s.Name, key: s.Key });
+            sources.push({ name: s.Name, key: s.SensorSet.Name });
         }
         var template = {
             key: "",
@@ -107,17 +107,18 @@ var DataSourceBuildController = (function (_super) {
         // TODO: implement this
     };
     DataSourceBuildController.prototype.listDataSources = function () {
+        if (sensys.SensorManager.isCollectionViewer(this.plot)) {
+            // multiple stuffs
+        }
+        else if (sensys.SensorManager.isViewer(this.plot)) {
+            // one stuff
+        }
+        else {
+            throw new Error("Viewer is somehow neither single nor multiple exception");
+        }
     };
     DataSourceBuildController.prototype.determineGroup = function () {
-        var p = this.plot.type.length - 1;
-        for (var _i = 0, _a = kernel.senMan.groups; _i < _a.length; _i++) {
-            var v = _a[_i];
-            if (v.numGroups === p) {
-                this.sensorGroup = v;
-                return;
-            }
-        }
-        throw "Group not found exception";
+        throw new Error("Group not found exception");
     };
     return DataSourceBuildController;
 }(Component));

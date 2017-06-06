@@ -10,6 +10,8 @@
     private chosenData: sensys.ISensorInformation[] = [];
     private chosenList: ListBoxRearrangable;
 
+    private availableSources: IDataSource<any>[];
+
     constructor(plot: IViewerBase<any>) {
         super();
         this.plot = plot;
@@ -38,8 +40,8 @@
 
     private generateSource(): void {
         let sources: ISensorDataContainerTemplate[] = [];
-        for (let s of this.chosenData) {            
-            sources.push({ name: s.Name, key: s.Key });
+        for (let s of this.chosenData) {
+            sources.push({ name: s.Name, key: s.SensorSet.Name });
         }
 
         let template: DataSourceTemplate = {
@@ -118,19 +120,21 @@
     }
 
     private listDataSources(): void {
-
+        if (sensys.SensorManager.isCollectionViewer(this.plot)) {
+            // multiple stuffs
+        }
+        else if (sensys.SensorManager.isViewer(this.plot)) {
+            // one stuff
+        }
+        else {
+            throw new Error("Viewer is somehow neither single nor multiple exception");
+        }
     }
 
     private determineGroup(): void {
-        let p: number = this.plot.type.length - 1;
-        for (let v of kernel.senMan.groups) {
-            if ((<any>v).numGroups === p) {
-                this.sensorGroup = <any>v;
-                return;
-            }
-        }
+        
 
-        throw "Group not found exception";
+        throw new Error("Group not found exception");
     }
 
 }
