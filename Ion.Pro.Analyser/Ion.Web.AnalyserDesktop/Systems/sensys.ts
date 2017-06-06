@@ -135,21 +135,21 @@
                     }
                     this.loadedDataSet.push(dataSet);
 
-                    for (let v in dataSet.SensorData) {
-                        let temp1;
-                        if (tele) {
-                            temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
-                        }
-                        let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
-                        if (temp1) {
-                            this.dataSources.push(temp1);
-                        }
-                        if (temp2) {
-                            this.dataSources.push(temp2);
-                        }
+                    //for (let v in dataSet.SensorData) {
+                    //    let temp1;
+                    //    if (tele) {
+                    //        temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
+                    //    }
+                    //    let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                    //    if (temp1) {
+                    //        this.dataSources.push(temp1);
+                    //    }
+                    //    if (temp2) {
+                    //        this.dataSources.push(temp2);
+                    //    }
 
-                        //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
-                    }
+                    //    //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
+                    //}
 
                 }
                 console.log(data);

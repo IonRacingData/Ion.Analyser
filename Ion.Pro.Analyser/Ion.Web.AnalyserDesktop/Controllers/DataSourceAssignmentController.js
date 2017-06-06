@@ -95,7 +95,6 @@ var DataSourceAssignmentController = (function (_super) {
     };
     DataSourceAssignmentController.prototype.displaySources = function (curPlot) {
         var _this = this;
-        // TODO: add list of pre-made sources
         this.divRight.innerHTML = "";
         var add = this.mk.tag("p", "", [
             {
@@ -106,6 +105,8 @@ var DataSourceAssignmentController = (function (_super) {
         ], "ADD SOURCE");
         add.style.cursor = "pointer";
         this.divRight.appendChild(add);
+        var list = new TempDataSourceList(curPlot);
+        this.divRight.appendChild(list.wrapper);
     };
     DataSourceAssignmentController.prototype.updateViewers = function () {
         this.displayViewers();

@@ -12,6 +12,8 @@
 
     private lastRow: HTMLElement | null = null;
 
+    private sourceList: TempDataSourceList;
+
     private mk: HtmlHelper = new HtmlHelper();
 
     constructor() {
@@ -110,8 +112,7 @@
         return curElement;
     }
 
-    private displaySources(curPlot: IViewerBase<any>): void {
-        // TODO: add list of pre-made sources
+    private displaySources(curPlot: IViewerBase<any>): void {        
         this.divRight.innerHTML = "";
         let add: HTMLElement = this.mk.tag("p", "", [
             {
@@ -122,6 +123,9 @@
         ], "ADD SOURCE");
         add.style.cursor = "pointer";
         this.divRight.appendChild(add);
+
+        let list: TempDataSourceList = new TempDataSourceList(curPlot);
+        this.divRight.appendChild(list.wrapper);
     }
 
     public updateViewers(): void {

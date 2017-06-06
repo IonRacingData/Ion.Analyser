@@ -133,20 +133,20 @@ var Kernel;
                             tele = true;
                         }
                         _this.loadedDataSet.push(dataSet);
-                        for (var v in dataSet.SensorData) {
-                            var temp1 = void 0;
-                            if (tele) {
-                                temp1 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] });
-                            }
-                            var temp2 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
-                            if (temp1) {
-                                _this.dataSources.push(temp1);
-                            }
-                            if (temp2) {
-                                _this.dataSources.push(temp2);
-                            }
-                            //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
-                        }
+                        //for (let v in dataSet.SensorData) {
+                        //    let temp1;
+                        //    if (tele) {
+                        //        temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
+                        //    }
+                        //    let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                        //    if (temp1) {
+                        //        this.dataSources.push(temp1);
+                        //    }
+                        //    if (temp2) {
+                        //        this.dataSources.push(temp2);
+                        //    }
+                        //    //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
+                        //}
                     }
                     console.log(data);
                     if (callback) {

@@ -26,13 +26,13 @@ var DataSourceBuildController = (function (_super) {
         _this.btnMakeSource.text = "Generate";
         _this.btnMakeSource.onclick.addEventListener(function (e) {
             _this.generateSource();
-            console.log("hey");
         });
         _this.toggleGenBtn();
         _this.subDivs[2].appendChild(_this.btnMakeSource.wrapper);
         console.log(_this.plot);
         _this.determineGroup();
         _this.listSensors();
+        _this.listDataSources();
         _this.initChosenList();
         return _this;
     }
@@ -44,31 +44,38 @@ var DataSourceBuildController = (function (_super) {
         }
         var template = {
             key: "",
-            grouptype: this.sensorGroup.name,
+            grouptype: this.sensorGroup,
             layers: [],
             sources: sources
         };
-        console.log(kernel.senMan.createDataSource(template));
+        kernel.senMan.createDataSource(template);
+        this.sourcesList.update();
     };
     DataSourceBuildController.prototype.listSensors = function () {
         var _this = this;
         var expList = new ExpandableList();
         this.subDivs[0].appendChild(expList.wrapper);
-        var infos = kernel.senMan.getInfos();
+        var sensorsets = kernel.senMan.getLoadedDatasets();
+        var allInfos = [];
+        for (var _i = 0, sensorsets_1 = sensorsets; _i < sensorsets_1.length; _i++) {
+            var set = sensorsets_1[_i];
+            if (set.Name !== "telemetry") {
+                allInfos = allInfos.concat(set.AllInfos);
+            }
+        }
         expList.selector = function (item) {
             return {
                 title: item.Name,
                 items: [{ text: item.SensorSet.Name, object: item }]
             };
         };
-        expList.data = infos;
+        expList.data = allInfos;
         expList.onItemClick.addEventListener(function (e) {
-            var numGroups = _this.sensorGroup.numGroups;
-            if (_this.chosenData.length < numGroups) {
+            if (_this.chosenData.length < _this.groupArgs) {
                 _this.chosenData.push(e.data);
                 _this.updateChosenList();
             }
-            if (_this.chosenData.length === numGroups) {
+            if (_this.chosenData.length === _this.groupArgs) {
                 _this.toggleGenBtn();
             }
         });
@@ -107,17 +114,18 @@ var DataSourceBuildController = (function (_super) {
         // TODO: implement this
     };
     DataSourceBuildController.prototype.listDataSources = function () {
-        if (sensys.SensorManager.isCollectionViewer(this.plot)) {
-            // multiple stuffs
-        }
-        else if (sensys.SensorManager.isViewer(this.plot)) {
-            // one stuff
-        }
-        else {
-            throw new Error("Viewer is somehow neither single nor multiple exception");
-        }
+        this.sourcesList = new TempDataSourceList(this.plot);
+        this.subDivs[3].appendChild(this.sourcesList.wrapper);
     };
     DataSourceBuildController.prototype.determineGroup = function () {
+        var s = kernel.senMan.getGroupByType(this.plot.type);
+        if (s) {
+            console.log(s);
+            this.sensorGroup = s.name;
+            this.groupArgs = s.numGroups;
+            console.log(this.sensorGroup);
+            return;
+        }
         throw new Error("Group not found exception");
     };
     return DataSourceBuildController;

@@ -1,7 +1,8 @@
 ﻿class DataSourceBuildController extends Component{
 
     private plot: IViewerBase<any>;
-    private sensorGroup: SensorGroup<any>;
+    private sensorGroup: string;
+    private groupArgs: number;
 
     private mk: HtmlHelper = new HtmlHelper();
     private subDivs: HTMLElement[] = [];
@@ -9,6 +10,8 @@
 
     private chosenData: sensys.ISensorInformation[] = [];
     private chosenList: ListBoxRearrangable;
+
+    private sourcesList: TempDataSourceList;
 
     private availableSources: IDataSource<any>[];
 
@@ -26,8 +29,7 @@
         this.btnMakeSource = new Button();
         this.btnMakeSource.text = "Generate";
         this.btnMakeSource.onclick.addEventListener((e) => {
-            this.generateSource();
-            console.log("hey");
+            this.generateSource();            
         })
         this.toggleGenBtn();
         this.subDivs[2].appendChild(this.btnMakeSource.wrapper);
@@ -35,6 +37,7 @@
         console.log(this.plot);
         this.determineGroup();
         this.listSensors();
+        this.listDataSources();
         this.initChosenList();
     }
 
@@ -46,19 +49,28 @@
 
         let template: DataSourceTemplate = {
             key: "",
-            grouptype: (<any>this.sensorGroup).name,
+            grouptype: this.sensorGroup,
             layers: [],
-            sources: sources          
+            sources: sources
         }
 
-        console.log(kernel.senMan.createDataSource(template));
+        kernel.senMan.createDataSource(template);
+
+        this.sourcesList.update();
     }
 
-    private listSensors() {
+    private listSensors(): void {
         let expList: ExpandableList = new ExpandableList();
         this.subDivs[0].appendChild(expList.wrapper);
 
-        let infos: sensys.ISensorInformation[] = kernel.senMan.getInfos();
+        let sensorsets: sensys.SensorDataSet[] = kernel.senMan.getLoadedDatasets();
+        let allInfos: sensys.ISensorInformation[] = [];        
+        
+        for (let set of sensorsets) {
+            if (set.Name !== "telemetry") {
+                allInfos = allInfos.concat(set.AllInfos);
+            }
+        }
 
         expList.selector = (item: sensys.ISensorInformation) => {
             return <IExpandableListSection>{
@@ -67,14 +79,13 @@
             }
         }
 
-        expList.data = infos;
+        expList.data = allInfos;
         expList.onItemClick.addEventListener((e) => {
-            let numGroups: number = (<any>this.sensorGroup).numGroups;
-            if (this.chosenData.length < numGroups) {
+            if (this.chosenData.length < this.groupArgs) {
                 this.chosenData.push(e.data);
                 this.updateChosenList();
             }
-            if (this.chosenData.length === numGroups) {
+            if (this.chosenData.length === this.groupArgs) {
                 this.toggleGenBtn();
             }
         });
@@ -120,19 +131,19 @@
     }
 
     private listDataSources(): void {
-        if (sensys.SensorManager.isCollectionViewer(this.plot)) {
-            // multiple stuffs
-        }
-        else if (sensys.SensorManager.isViewer(this.plot)) {
-            // one stuff
-        }
-        else {
-            throw new Error("Viewer is somehow neither single nor multiple exception");
-        }
+        this.sourcesList = new TempDataSourceList(this.plot);
+        this.subDivs[3].appendChild(this.sourcesList.wrapper);
     }
 
     private determineGroup(): void {
-        
+        let s = kernel.senMan.getGroupByType(this.plot.type);
+        if (s) {
+            console.log(s);
+            this.sensorGroup = (<any>s).name;
+            this.groupArgs = (<any>s).numGroups;
+            console.log(this.sensorGroup);
+            return;
+        }
 
         throw new Error("Group not found exception");
     }
