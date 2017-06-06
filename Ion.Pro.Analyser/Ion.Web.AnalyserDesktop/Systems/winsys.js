@@ -38,8 +38,8 @@ var WindowManager = (function () {
                 break;
             }
         }*/
-        console.log(preloadStyle);
-        console.log(preloadStyle.sheet);
+        //console.log(preloadStyle);
+        //console.log(preloadStyle.sheet);
         this.current = preloadStyle.sheet;
         console.log(this.current);
         this.avaiableRules = {};

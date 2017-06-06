@@ -14,7 +14,7 @@
         //static readonly event_unregisterViewer = "unregisterViewer";
 
         public constructor() {
-            
+
             //this.loadSensorInformation();
         }
 
@@ -134,7 +134,7 @@
                         tele = true;
                     }
                     this.loadedDataSet.push(dataSet);
-                    
+
                     for (let v in dataSet.SensorData) {
                         let temp1;
                         if (tele) {
@@ -150,7 +150,7 @@
 
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                     }
-                    
+
                 }
                 console.log(data);
                 if (callback) {
@@ -285,6 +285,15 @@
             return null;
         }
 
+        public getGroupByType(type: IClassType<any>): (new (container: SensorDataContainer[]) => SensorGroup<any>) | null {
+            for (let v of this.groups) {
+                if ((<any>v).type === type) {
+                    return v;
+                }
+            }
+            return null;
+        }
+
         public createDataSource<T>(template: DataSourceTemplate): IDataSource<T> | null {
             let sources: SensorDataContainer[] = [];
             for (let v of template.sources) {
@@ -402,6 +411,7 @@ interface IDataSource<T> extends ITypeDef<T> {
 
 class SensorGroup<T> implements IDataSource<T> {
     type: IClassType<T>;
+    static type: IClassType<any>;
 
     infos: SensorPlotInfo = new SensorPlotInfo();
     color: Color;
@@ -427,6 +437,7 @@ class SensorGroup<T> implements IDataSource<T> {
 class PointSensorGroup extends SensorGroup<Point>{
     private data: SensorDataContainer;
     static numGroups: number = 1;
+    static type: IClassType<Point> = Point;
 
     constructor(data: SensorDataContainer[]) {
         super(Point);

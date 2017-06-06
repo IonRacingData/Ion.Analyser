@@ -266,6 +266,15 @@ var Kernel;
                 console.log("Could not find group: " + name);
                 return null;
             };
+            SensorManager.prototype.getGroupByType = function (type) {
+                for (var _i = 0, _a = this.groups; _i < _a.length; _i++) {
+                    var v = _a[_i];
+                    if (v.type === type) {
+                        return v;
+                    }
+                }
+                return null;
+            };
             SensorManager.prototype.createDataSource = function (template) {
                 var sources = [];
                 for (var _i = 0, _a = template.sources; _i < _a.length; _i++) {
@@ -383,6 +392,7 @@ var PointSensorGroup = (function (_super) {
     return PointSensorGroup;
 }(SensorGroup));
 PointSensorGroup.numGroups = 1;
+PointSensorGroup.type = Point;
 var DataSourceInfo = (function () {
     function DataSourceInfo() {
     }
