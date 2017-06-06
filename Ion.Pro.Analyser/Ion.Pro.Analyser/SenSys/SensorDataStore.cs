@@ -189,6 +189,8 @@ namespace Ion.Pro.Analyser.SenSys
 
         public event EventHandler<SensorEventArgs> DataReceived;
 
+        public bool TelemetryAvailable { get; private set; } = false;
+
         public SensorManager()
         {
             LoadSensorInformation();
@@ -232,6 +234,11 @@ namespace Ion.Pro.Analyser.SenSys
 
         public void AddLive(string dataSet, SensorPackage package)
         {
+            if (!TelemetryAvailable)
+            {
+                if (dataSet == "telemetry")
+                    TelemetryAvailable = true;
+            }
             OnDataReceived(this.Add(dataSet, package));
         }
 

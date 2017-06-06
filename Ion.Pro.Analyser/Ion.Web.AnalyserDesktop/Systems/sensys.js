@@ -22,15 +22,28 @@ var Kernel;
                 this.viewers = [];
                 this.dataSources = [];
                 this.groups = [];
+                this.__telemetryAvailable = false;
                 this.telemetryDataSet = null;
                 this.onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
                 this.onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
                 this.callbackStack = [];
                 //this.loadSensorInformation();
             }
+            Object.defineProperty(SensorManager.prototype, "telemetryAvailable", {
+                get: function () {
+                    return this.__telemetryAvailable;
+                },
+                enumerable: true,
+                configurable: true
+            });
             SensorManager.prototype.lateInit = function () {
                 var _this = this;
                 kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
+                requestAction("GetInfo", function (data) {
+                    if (data.telemetry) {
+                        _this.load("telemetry");
+                    }
+                });
             };
             SensorManager.prototype.handleService = function (data) {
                 //console.log("recived data!");
@@ -185,13 +198,14 @@ var Kernel;
                 }
                 return returnArray;
             };
-            SensorManager.prototype.pushToCache = function (data) {
+            SensorManager.prototype.pushToCache = function (data, info) {
                 if (data.length > 0) {
-                    var key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                    var id = data[0].ID;
+                    var key = info.SensorSet.IdKeyMap[id]; //  this.loadedDataSet[0].IdKeyMap[data[0].ID];
                     if (!key) {
-                        key = data[0].ID.toString();
+                        key = id.toString();
                     }
-                    var temp = this.loadedDataSet[0].SensorData[key];
+                    var temp = info.SensorSet.SensorData[key];
                     temp.insertSensorPackage(data);
                     console.log(this.dataSources);
                     return temp;
@@ -212,7 +226,7 @@ var Kernel;
                 var all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
                 this.callbackStack.push(all);
                 kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, function (data) {
-                    var dataContainer = _this.pushToCache(_this.convertToSensorPackage(data.Sensors));
+                    var dataContainer = _this.pushToCache(_this.convertToSensorPackage(data.Sensors), info);
                     console.log(all);
                     for (var i = 0; i < all.callbacks.length; i++) {
                         all.callbacks[i](dataContainer);
