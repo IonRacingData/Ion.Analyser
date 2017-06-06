@@ -72,7 +72,11 @@ namespace Ion.Pro.Analyser.Controllers
             return Json(new { Data = "pong" });
         }
 
-
+        public IActionResult GetInfo()
+        {
+            SensorManager senman = SensorManager.GetDefault();
+            return Json(new { telemetry = senman.TelemetryAvailable, version = "0.0.1" });
+        }
 
         public IActionResult Csv(string encoding, string values, string title)
         {

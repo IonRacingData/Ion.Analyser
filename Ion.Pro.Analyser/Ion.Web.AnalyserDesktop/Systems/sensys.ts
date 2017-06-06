@@ -1,5 +1,4 @@
 ﻿namespace Kernel.SenSys {
-
     export class SensorManager implements IEventManager {
         private eventManager: EventManager = new EventManager();
         private sensorInformation: ISensorInformation[] = [];
@@ -7,6 +6,11 @@
         public viewers: IViewerBase<any>[] = [];
         private dataSources: IDataSource<any>[] = [];
         public groups: (new (containers: SensorDataContainer[]) => SensorGroup<any>)[] = [];
+
+        private __telemetryAvailable = false;
+        get telemetryAvailable() {
+            return this.__telemetryAvailable;
+        }
 
         private telemetryDataSet: SensorDataSet | null = null;
 
@@ -20,6 +24,11 @@
 
         public lateInit(): void {
             kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
+            requestAction("GetInfo", (data: { telemetry: boolean, version: string }) => {
+                if (data.telemetry) {
+                    this.load("telemetry");
+                }
+            });
         }
 
         private handleService(data: ISensorPackage[]) {
@@ -200,13 +209,14 @@
             return returnArray;
         }
 
-        private pushToCache(data: ISensorPackage[]): SensorDataContainer {
+        private pushToCache(data: ISensorPackage[], info: ISensorInformation): SensorDataContainer {
             if (data.length > 0) {
-                let key = this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                let id = data[0].ID;
+                let key = info.SensorSet.IdKeyMap[id];//  this.loadedDataSet[0].IdKeyMap[data[0].ID];
                 if (!key) {
-                    key = data[0].ID.toString();
+                    key = id.toString();
                 }
-                let temp = this.loadedDataSet[0].SensorData[key];
+                let temp = info.SensorSet.SensorData[key];
 
                 temp.insertSensorPackage(data);
 
@@ -231,7 +241,7 @@
             let all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
             this.callbackStack.push(all);
             kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, (data: any) => {
-                let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors));
+                let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors), info);
                 console.log(all);
                 for (let i = 0; i < all.callbacks.length; i++) {
                     all.callbacks[i](dataContainer);
