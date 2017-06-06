@@ -40,7 +40,7 @@ var DataSourceBuildController = (function (_super) {
         var sources = [];
         for (var _i = 0, _a = this.chosenData; _i < _a.length; _i++) {
             var s = _a[_i];
-            sources.push({ name: s.Name, key: s.SensorSet.Name });
+            sources.push({ name: s.SensorSet.Name, key: s.Key });
         }
         var template = {
             key: "",
@@ -48,7 +48,13 @@ var DataSourceBuildController = (function (_super) {
             layers: [],
             sources: sources
         };
-        kernel.senMan.createDataSource(template);
+        var ds = kernel.senMan.createDataSource(template);
+        if (ds) {
+            kernel.senMan.registerDataSource(ds);
+        }
+        else {
+            throw new Error("Data Source not created exception");
+        }
         this.sourcesList.update();
     };
     DataSourceBuildController.prototype.listSensors = function () {
@@ -120,10 +126,8 @@ var DataSourceBuildController = (function (_super) {
     DataSourceBuildController.prototype.determineGroup = function () {
         var s = kernel.senMan.getGroupByType(this.plot.type);
         if (s) {
-            console.log(s);
             this.sensorGroup = s.name;
             this.groupArgs = s.numGroups;
-            console.log(this.sensorGroup);
             return;
         }
         throw new Error("Group not found exception");

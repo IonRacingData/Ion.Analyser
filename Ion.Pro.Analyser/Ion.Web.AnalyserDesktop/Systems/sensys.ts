@@ -182,6 +182,10 @@
             this.groups.push(group);
         }
 
+        public registerDataSource(source: IDataSource<any>): void {
+            this.dataSources.push(source);
+        }
+
         public unregister<T>(viewer: IViewerBase<T>): void {
             let index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);

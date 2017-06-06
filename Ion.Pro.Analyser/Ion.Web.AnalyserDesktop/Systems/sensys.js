@@ -176,6 +176,9 @@ var Kernel;
             SensorManager.prototype.registerGroup = function (group) {
                 this.groups.push(group);
             };
+            SensorManager.prototype.registerDataSource = function (source) {
+                this.dataSources.push(source);
+            };
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);
                 this.viewers.splice(index, 1);

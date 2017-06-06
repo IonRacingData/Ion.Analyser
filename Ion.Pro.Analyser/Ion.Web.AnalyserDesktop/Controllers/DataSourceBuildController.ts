@@ -44,7 +44,7 @@
     private generateSource(): void {
         let sources: ISensorDataContainerTemplate[] = [];
         for (let s of this.chosenData) {
-            sources.push({ name: s.Name, key: s.SensorSet.Name });
+            sources.push({ name: s.SensorSet.Name, key: s.Key });
         }
 
         let template: DataSourceTemplate = {
@@ -54,8 +54,13 @@
             sources: sources
         }
 
-        kernel.senMan.createDataSource(template);
-
+        let ds = kernel.senMan.createDataSource(template);
+        if (ds) {
+            kernel.senMan.registerDataSource(ds);
+        }
+        else {
+            throw new Error("Data Source not created exception");
+        }
         this.sourcesList.update();
     }
 
@@ -138,10 +143,8 @@
     private determineGroup(): void {
         let s = kernel.senMan.getGroupByType(this.plot.type);
         if (s) {
-            console.log(s);
             this.sensorGroup = (<any>s).name;
             this.groupArgs = (<any>s).numGroups;
-            console.log(this.sensorGroup);
             return;
         }
 
