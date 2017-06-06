@@ -172,6 +172,9 @@ var Kernel;
             SensorManager.prototype.getInfos = function () {
                 return this.loadedDataSet[0].AllInfos;
             };
+            SensorManager.prototype.getLoadedDatasets = function () {
+                return this.loadedDataSet;
+            };
             SensorManager.prototype.getDataSources = function (type) {
                 var returnArray = [];
                 for (var _i = 0, _a = this.dataSources; _i < _a.length; _i++) {

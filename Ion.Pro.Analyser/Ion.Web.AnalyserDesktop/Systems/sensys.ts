@@ -184,6 +184,12 @@
             return this.loadedDataSet[0].AllInfos;
         }
 
+        public getLoadedDatasets(): SensorDataSet[] {
+            return this.loadedDataSet;
+
+        }
+
+
         public getDataSources<T>(type: IClassType<T>): IDataSource<T>[] {
             let returnArray: IDataSource<T>[] = [];
             for (let cur of this.dataSources) {
