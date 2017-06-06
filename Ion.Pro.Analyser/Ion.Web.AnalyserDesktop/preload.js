@@ -46,9 +46,9 @@ function preloadFile(file, callback) {
 preloadFile("/Style/app-style-dark.css", function (data) {
     preloadStyle.innerHTML = data;
     document.head.appendChild(preloadStyle);
-    console.log(preloadStyle);
-    console.log(preloadStyle.sheet);
-    console.log("requested: stylesheet");
+    //console.log(preloadStyle);
+    //console.log(preloadStyle.sheet);
+    //console.log("requested: stylesheet");
     preLoadDone = true;
     for (var _i = 0, waitingCallbacks_1 = waitingCallbacks; _i < waitingCallbacks_1.length; _i++) {
         var a = waitingCallbacks_1[_i];

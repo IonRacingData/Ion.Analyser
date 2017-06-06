@@ -63,10 +63,10 @@ preloadFile("/Style/app-style-dark.css", (data: string) => {
 
     document.head.appendChild(preloadStyle);
 
-    console.log(preloadStyle);
-    console.log(preloadStyle.sheet);
+    //console.log(preloadStyle);
+    //console.log(preloadStyle.sheet);
 
-    console.log("requested: stylesheet");
+    //console.log("requested: stylesheet");
     preLoadDone = true;
     for (let a of waitingCallbacks) {
         a();
