@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Diagnostics;
 using System.Threading;
 using Ion.Pro.Analyser.Web;
+using Ion.Pro.Analyser.Controllers;
 
 namespace Ion.Pro.Analyser
 {
@@ -29,7 +30,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        public static bool liveSim = false;
+        public static bool liveSim = true;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
@@ -218,6 +219,7 @@ namespace Ion.Pro.Analyser
 
         static void DataInserter(string file)
         {
+            System.Threading.Thread.Sleep(2000);
             DateTime begin = DateTime.Now;
             ISensorReader reader = Store.GetSensorReader(file);
             //ISensorReader reader = new LegacySensorReader("../../Data/freq.iondata");
@@ -415,6 +417,19 @@ namespace Ion.Pro.Analyser
         {
             this.manager = manager;
             this.manager.DataReceived += SensorManager_DataReceived;
+            this.manager.TelemetryStart += Manager_TelemetryStart;
+        }
+
+        private void Manager_TelemetryStart(object sender, DataSetEventArgs e)
+        {
+            ComBus.SendMessage(new ComMessage()
+            {
+                MessageId = 10,
+                Status = (int)ComMessageStatus.Request110,
+                Path = "/sensor/start",
+                NodeId = this.Id,
+                Data = JSONObject.Create(SensorDataSetInformation.FromSensorDataSet(e.DataSet)).ToJsonString()
+            });
         }
 
         private void SensorManager_DataReceived(object sender, SensorEventArgs e)

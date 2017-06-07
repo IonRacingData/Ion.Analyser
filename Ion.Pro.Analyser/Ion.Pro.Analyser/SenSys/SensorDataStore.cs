@@ -15,6 +15,11 @@ namespace Ion.Pro.Analyser.SenSys
         public RealSensorPackage Package { get; set; }
     }
 
+    public class DataSetEventArgs : EventArgs
+    {
+        public SensorDataSet DataSet { get; set; }
+    }
+
     public interface ISensorReader
     {
         SensorPackage[] ReadPackages();
@@ -188,6 +193,7 @@ namespace Ion.Pro.Analyser.SenSys
         public Dictionary<string, SensorDataSet> LoadedDataSets { get; } = new Dictionary<string, SensorDataSet>();
 
         public event EventHandler<SensorEventArgs> DataReceived;
+        public event EventHandler<DataSetEventArgs> TelemetryStart;
 
         public bool TelemetryAvailable { get; private set; } = false;
 
@@ -227,6 +233,7 @@ namespace Ion.Pro.Analyser.SenSys
             {
                 this.LoadedDataSets[dataSet] = new SensorDataSet(dataSet, new LegacySensorProvider());
                 this.LoadedDataSets[dataSet].Load(false);
+                this.LoadedDataSets[dataSet].SetNames(this);
             }
             RealSensorPackage temp = this.LoadedDataSets[dataSet].Add(data);
             return temp;
@@ -237,9 +244,16 @@ namespace Ion.Pro.Analyser.SenSys
             if (!TelemetryAvailable)
             {
                 if (dataSet == "telemetry")
+                {
                     TelemetryAvailable = true;
+                    RealSensorPackage rsp = this.Add(dataSet, package);
+                    OnTelemetryBegin(this.LoadedDataSets["telemetry"]);
+                }
             }
-            OnDataReceived(this.Add(dataSet, package));
+            else
+            {
+                OnDataReceived(this.Add(dataSet, package));
+            }
         }
 
         public void RegisterFileProvider(string fileExtension, ISensorReaderProvider provider)
@@ -277,6 +291,11 @@ namespace Ion.Pro.Analyser.SenSys
         public void OnDataReceived(RealSensorPackage package)
         {
             DataReceived?.Invoke(this, new SensorEventArgs() { Package = package });
+        }
+
+        public void OnTelemetryBegin(SensorDataSet sensorDataSet)
+        {
+            TelemetryStart?.Invoke(this, new DataSetEventArgs() { DataSet = sensorDataSet });
         }
 
         public byte[] GetBinaryData(string dataset, int id)

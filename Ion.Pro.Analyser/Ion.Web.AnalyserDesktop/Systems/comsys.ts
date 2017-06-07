@@ -20,7 +20,7 @@ class NetworkManager {
     public curId: number = 0;
 
     private backlog: IComMessage[] = [];
-    private serviceCallback: ((data: any) => void)[] = [];
+    private serviceCallback: ((path: string, data: any) => void)[] = [];
     private callback: ((data: any) => void)[] = [];
 
     private reconnecter: number | null = null;
@@ -91,7 +91,7 @@ class NetworkManager {
     }
 
 
-    registerService(callbackId: number, callback: (data: any) => void) {
+    registerService(callbackId: number, callback: (path: string, data: any) => void) {
         this.serviceCallback[callbackId] = callback;
     }
 
@@ -126,7 +126,7 @@ class NetworkManager {
 
         if (message.Status === ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
-                this.serviceCallback[message.MessageId](JSON.parse(message.Data));
+                this.serviceCallback[message.MessageId](message.Path, JSON.parse(message.Data));
             }
             else {
                 console.log("Ohh no, no service callback registerd for that id :( here is the object: ");

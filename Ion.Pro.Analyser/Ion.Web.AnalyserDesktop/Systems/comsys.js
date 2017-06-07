@@ -104,7 +104,7 @@ var NetworkManager = (function () {
         var message = JSON.parse(ev.data);
         if (message.Status === ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {
-                this.serviceCallback[message.MessageId](JSON.parse(message.Data));
+                this.serviceCallback[message.MessageId](message.Path, JSON.parse(message.Data));
             }
             else {
                 console.log("Ohh no, no service callback registerd for that id :( here is the object: ");

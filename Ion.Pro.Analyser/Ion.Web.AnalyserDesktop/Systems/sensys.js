@@ -38,29 +38,33 @@ var Kernel;
             });
             SensorManager.prototype.lateInit = function () {
                 var _this = this;
-                kernel.netMan.registerService(10, function (data) { return _this.handleService(_this.convertToSensorPackage(data.Sensors)); });
+                kernel.netMan.registerService(10, function (path, data) {
+                    switch (path) {
+                        case "/sensor/start":
+                            _this.registerTelemetry(data);
+                            break;
+                        case "/sensor/update":
+                            _this.handleService(_this.convertToSensorPackage(data.Sensors));
+                            break;
+                    }
+                });
                 requestAction("GetInfo", function (data) {
                     if (data.telemetry) {
                         _this.load("telemetry");
                     }
                 });
             };
+            SensorManager.prototype.registerTelemetry = function (data) {
+                console.log(data);
+                var dataSet = new SensorDataSet(data);
+                this.telemetryDataSet = dataSet;
+                this.loadedDataSet.push(dataSet);
+            };
             SensorManager.prototype.handleService = function (data) {
                 //console.log("recived data!");
                 if (this.telemetryDataSet) {
                     for (var j = 0; j < data.length; j++) {
-                        var realData = data[j];
-                        //console.log(realData);
-                        var sensId = realData.ID;
-                        var realKey = this.telemetryDataSet.IdKeyMap[sensId];
-                        if (!realKey) {
-                            realKey = sensId.toString();
-                        }
-                        this.telemetryDataSet.SensorData[realKey].points.push(new SensorValue(realData.Value, realData.TimeStamp));
-                        /*if (!this.telemetryDataSet.dataCache[sensId]) {
-                            this.dataCache[sensId] = new SensorDataContainer(sensId);
-                        }
-                        this.dataCache[sensId].insertSensorPackage([realData]);*/
+                        this.telemetryDataSet.insertData(data[j]);
                     }
                     this.refreshViewers();
                 }
@@ -136,27 +140,12 @@ var Kernel;
                 var _this = this;
                 requestAction("LoadNewDataSet?file=" + file, function (data) {
                     if (!data.data) {
-                        var data2 = JSON.parse(JSON.stringify(data));
                         var dataSet = new SensorDataSet(data);
-                        data2.Name = "telemetry";
-                        var tele = false;
-                        if (!_this.telemetryDataSet) {
-                            _this.telemetryDataSet = new SensorDataSet(data2);
-                            _this.loadedDataSet.push(_this.telemetryDataSet);
-                            tele = true;
-                        }
                         _this.loadedDataSet.push(dataSet);
                         for (var v in dataSet.SensorData) {
-                            var temp1 = void 0;
-                            if (tele) {
-                                temp1 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: _this.telemetryDataSet.SensorData[v].ID, name: _this.telemetryDataSet.Name }] });
-                            }
-                            var temp2 = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
-                            if (temp1) {
-                                _this.dataSources.push(temp1);
-                            }
-                            if (temp2) {
-                                _this.dataSources.push(temp2);
+                            var temp = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                            if (temp) {
+                                _this.dataSources.push(temp);
                             }
                             //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                         }
@@ -329,10 +318,15 @@ var Kernel;
         SenSys.SensorManager = SensorManager;
         var SensorDataSet = (function () {
             function SensorDataSet(data) {
+                // List of all information
                 this.AllInfos = [];
+                // Mapping from key to information
                 this.KeyInfoMap = {};
+                // All loaded keys on the web server
                 this.LoadedKeys = [];
+                // ID to Key Mapping
                 this.IdKeyMap = [];
+                // The actual sensordata
                 this.SensorData = {};
                 this.Name = data.Name;
                 this.LoadedKeys = data.LoadedKeys;
@@ -345,21 +339,35 @@ var Kernel;
                 }
                 for (var _b = 0, _c = this.LoadedKeys; _b < _c.length; _b++) {
                     var a = _c[_b];
-                    var temp = new SensorDataContainer(a);
-                    var sensInfo = this.KeyInfoMap[a];
-                    if (!sensInfo) {
-                        sensInfo = {
-                            ID: parseInt(a),
-                            Key: a,
-                            SensorSet: this,
-                            Name: a,
-                            Resolution: 0
-                        };
-                    }
-                    temp.info = sensInfo;
-                    this.SensorData[temp.ID] = temp;
+                    this.createLoadedKey(a);
                 }
             }
+            SensorDataSet.prototype.createLoadedKey = function (key) {
+                var temp = new SensorDataContainer(key);
+                var sensInfo = this.KeyInfoMap[key];
+                if (!sensInfo) {
+                    sensInfo = {
+                        ID: parseInt(key),
+                        Key: key,
+                        SensorSet: this,
+                        Name: key,
+                        Resolution: 0
+                    };
+                }
+                temp.info = sensInfo;
+                this.SensorData[temp.ID] = temp;
+            };
+            SensorDataSet.prototype.insertData = function (pack) {
+                var key = this.IdKeyMap[pack.ID];
+                if (!key)
+                    key = pack.ID.toString();
+                if (!this.LoadedKeys[key]) {
+                    this.LoadedKeys.push(key);
+                    this.createLoadedKey(key);
+                }
+                //TODO: Potential bug if the telemetry data restart, maybe use insertData
+                this.SensorData[key].points.push(new SensorValue(pack.Value, pack.TimeStamp));
+            };
             return SensorDataSet;
         }());
         SenSys.SensorDataSet = SensorDataSet;

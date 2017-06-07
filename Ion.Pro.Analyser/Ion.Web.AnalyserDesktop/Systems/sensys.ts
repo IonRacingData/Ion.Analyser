@@ -23,7 +23,18 @@
         }
 
         public lateInit(): void {
-            kernel.netMan.registerService(10, (data: any) => this.handleService(this.convertToSensorPackage(data.Sensors)));
+            kernel.netMan.registerService(10, (path: string, data: any) => {
+                switch (path) {
+                    case "/sensor/start":
+                        this.registerTelemetry(data);
+                        break;
+                    case "/sensor/update":
+                        this.handleService(this.convertToSensorPackage(data.Sensors));
+                        break;
+                }
+            });
+
+
             requestAction("GetInfo", (data: { telemetry: boolean, version: string }) => {
                 if (data.telemetry) {
                     this.load("telemetry");
@@ -31,22 +42,18 @@
             });
         }
 
+        private registerTelemetry(data: ISensorDataSet) {
+            console.log(data);
+            let dataSet = new SensorDataSet(data);
+            this.telemetryDataSet = dataSet;
+            this.loadedDataSet.push(dataSet);
+        }
+
         private handleService(data: ISensorPackage[]) {
             //console.log("recived data!");
             if (this.telemetryDataSet) {
                 for (let j = 0; j < data.length; j++) {
-                    let realData = data[j];
-                    //console.log(realData);
-                    let sensId = realData.ID;
-                    let realKey = this.telemetryDataSet.IdKeyMap[sensId];
-                    if (!realKey) {
-                        realKey = sensId.toString();
-                    }
-                    this.telemetryDataSet.SensorData[realKey].points.push(new SensorValue(realData.Value, realData.TimeStamp));
-                    /*if (!this.telemetryDataSet.dataCache[sensId]) {
-                        this.dataCache[sensId] = new SensorDataContainer(sensId);
-                    }
-                    this.dataCache[sensId].insertSensorPackage([realData]);*/
+                    this.telemetryDataSet.insertData(data[j]);
                 }
                 this.refreshViewers();
             }
@@ -132,29 +139,13 @@
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
-                    let data2: ISensorDataSet = JSON.parse(JSON.stringify(data));
-
                     let dataSet = new SensorDataSet(data);
-                    data2.Name = "telemetry";
-                    let tele = false;
-                    if (!this.telemetryDataSet) {
-                        this.telemetryDataSet = new SensorDataSet(data2);
-                        this.loadedDataSet.push(this.telemetryDataSet);
-                        tele = true;
-                    }
                     this.loadedDataSet.push(dataSet);
 
                     for (let v in dataSet.SensorData) {
-                        let temp1;
-                        if (tele) {
-                            temp1 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: this.telemetryDataSet.SensorData[v].ID, name: this.telemetryDataSet.Name }] });
-                        }
-                        let temp2 = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
-                        if (temp1) {
-                            this.dataSources.push(temp1);
-                        }
-                        if (temp2) {
-                            this.dataSources.push(temp2);
+                        let temp = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                        if (temp) {
+                            this.dataSources.push(temp);
                         }
 
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
@@ -350,10 +341,15 @@
 
     export class SensorDataSet {
         public Name: string;
+        // List of all information
         public AllInfos: ISensorInformation[] = [];
-        public KeyInfoMap: { [index: string]: ISensorInformation } = { };
+        // Mapping from key to information
+        public KeyInfoMap: { [index: string]: ISensorInformation } = {};
+        // All loaded keys on the web server
         public LoadedKeys: string[] = [];
+        // ID to Key Mapping
         public IdKeyMap: string[] = [];
+        // The actual sensordata
         public SensorData: { [index: string]: SensorDataContainer } = { };
 
         public constructor(data: ISensorDataSet) {
@@ -366,20 +362,36 @@
                 a.SensorSet = this;
             }
             for (let a of this.LoadedKeys) {
-                let temp = new SensorDataContainer(a);
-                let sensInfo = this.KeyInfoMap[a];
-                if (!sensInfo) {
-                    sensInfo = {
-                        ID: parseInt(a),
-                        Key: a,
-                        SensorSet: this,
-                        Name: a,
-                        Resolution: 0
-                    }
-                }
-                temp.info = sensInfo;
-                this.SensorData[temp.ID] = temp;
+                this.createLoadedKey(a);
             }
+        }
+
+        private createLoadedKey(key: string): void{
+            let temp = new SensorDataContainer(key);
+            let sensInfo = this.KeyInfoMap[key];
+            if (!sensInfo) {
+                sensInfo = {
+                    ID: parseInt(key),
+                    Key: key,
+                    SensorSet: this,
+                    Name: key,
+                    Resolution: 0
+                }
+            }
+            temp.info = sensInfo;
+            this.SensorData[temp.ID] = temp;
+        }
+
+        public insertData(pack: ISensorPackage) {
+            let key = this.IdKeyMap[pack.ID];
+            if (!key)
+                key = pack.ID.toString();
+            if (!this.LoadedKeys[key]) {
+                this.LoadedKeys.push(key);
+                this.createLoadedKey(key);
+            }
+            //TODO: Potential bug if the telemetry data restart, maybe use insertData
+            this.SensorData[key].points.push(new SensorValue(pack.Value, pack.TimeStamp));
         }
     }
 
