@@ -26,8 +26,11 @@ var DataSourceBuildController = (function (_super) {
         _this.btnMakeSource.text = "Generate";
         _this.btnMakeSource.onclick.addEventListener(function (e) {
             _this.generateSource();
+            _this.chosenData = [];
+            _this.updateChosenList();
+            _this.btnMakeSource.wrapper.style.display = "none";
         });
-        _this.toggleGenBtn();
+        _this.btnMakeSource.wrapper.style.display = "none";
         _this.subDivs[2].appendChild(_this.btnMakeSource.wrapper);
         console.log(_this.plot);
         _this.determineGroup();
@@ -36,6 +39,13 @@ var DataSourceBuildController = (function (_super) {
         _this.initChosenList();
         return _this;
     }
+    Object.defineProperty(DataSourceBuildController.prototype, "viewer", {
+        get: function () {
+            return this.plot;
+        },
+        enumerable: true,
+        configurable: true
+    });
     DataSourceBuildController.prototype.generateSource = function () {
         var sources = [];
         for (var _i = 0, _a = this.chosenData; _i < _a.length; _i++) {
@@ -62,37 +72,54 @@ var DataSourceBuildController = (function (_super) {
         var expList = new ExpandableList();
         this.subDivs[0].appendChild(expList.wrapper);
         var sensorsets = kernel.senMan.getLoadedDatasets();
-        var allInfos = [];
+        var infos = [];
         for (var _i = 0, sensorsets_1 = sensorsets; _i < sensorsets_1.length; _i++) {
             var set = sensorsets_1[_i];
             if (set.Name !== "telemetry") {
-                allInfos = allInfos.concat(set.AllInfos);
+                for (var _a = 0, _b = set.LoadedKeys; _a < _b.length; _a++) {
+                    var key = _b[_a];
+                    var info = set.KeyInfoMap[key];
+                    if (info) {
+                        infos.push(info);
+                    }
+                    else {
+                        console.log("Undefined SensorInfo: ", key);
+                    }
+                }
+            }
+        }
+        var data = [];
+        for (var _c = 0, infos_1 = infos; _c < infos_1.length; _c++) {
+            var info = infos_1[_c];
+            var found = false;
+            for (var _d = 0, data_1 = data; _d < data_1.length; _d++) {
+                var section = data_1[_d];
+                if (section.title === info.Name) {
+                    found = true;
+                    section.items.push({ text: info.SensorSet.Name, object: info });
+                    break;
+                }
+            }
+            if (!found) {
+                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info }] });
             }
         }
         expList.selector = function (item) {
             return {
-                title: item.Name,
-                items: [{ text: item.SensorSet.Name, object: item }]
+                title: item.title,
+                items: item.items
             };
         };
-        expList.data = allInfos;
+        expList.data = data;
         expList.onItemClick.addEventListener(function (e) {
             if (_this.chosenData.length < _this.groupArgs) {
                 _this.chosenData.push(e.data);
                 _this.updateChosenList();
             }
             if (_this.chosenData.length === _this.groupArgs) {
-                _this.toggleGenBtn();
+                _this.btnMakeSource.wrapper.style.display = "inline-block";
             }
         });
-    };
-    DataSourceBuildController.prototype.toggleGenBtn = function () {
-        if (this.btnMakeSource.wrapper.style.display === "none") {
-            this.btnMakeSource.wrapper.style.display = "inline-block";
-        }
-        else {
-            this.btnMakeSource.wrapper.style.display = "none";
-        }
     };
     DataSourceBuildController.prototype.updateChosenList = function () {
         this.chosenList.data = this.chosenData;
@@ -108,9 +135,7 @@ var DataSourceBuildController = (function (_super) {
         this.subDivs[1].appendChild(this.chosenList.wrapper);
         this.chosenList.onItemRemove.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
-            if (_this.chosenData.length < _this.sensorGroup.numGroups) {
-                _this.toggleGenBtn();
-            }
+            _this.btnMakeSource.wrapper.style.display = "none";
         });
         this.chosenList.onItemRearrange.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;

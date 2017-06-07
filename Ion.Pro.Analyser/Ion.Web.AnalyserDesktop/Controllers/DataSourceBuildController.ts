@@ -15,6 +15,10 @@
 
     private availableSources: IDataSource<any>[];
 
+    get viewer() {
+        return this.plot;
+    }
+
     constructor(plot: IViewerBase<any>) {
         super();
         this.plot = plot;
@@ -29,9 +33,12 @@
         this.btnMakeSource = new Button();
         this.btnMakeSource.text = "Generate";
         this.btnMakeSource.onclick.addEventListener((e) => {
-            this.generateSource();            
-        })
-        this.toggleGenBtn();
+            this.generateSource();
+            this.chosenData = [];
+            this.updateChosenList();
+            this.btnMakeSource.wrapper.style.display = "none";
+        });
+        this.btnMakeSource.wrapper.style.display = "none";
         this.subDivs[2].appendChild(this.btnMakeSource.wrapper);
 
         console.log(this.plot);
@@ -69,40 +76,54 @@
         this.subDivs[0].appendChild(expList.wrapper);
 
         let sensorsets: sensys.SensorDataSet[] = kernel.senMan.getLoadedDatasets();
-        let allInfos: sensys.ISensorInformation[] = [];        
-        
+        let infos: sensys.ISensorInformation[] = [];
+
         for (let set of sensorsets) {
             if (set.Name !== "telemetry") {
-                allInfos = allInfos.concat(set.AllInfos);
+                for (let key of set.LoadedKeys) {
+                    let info: sensys.ISensorInformation = set.KeyInfoMap[key];
+                    if (info) {
+                        infos.push(info);
+                    }
+                    else {
+                        console.log("Undefined SensorInfo: ", key);
+                    }
+                }
             }
         }
 
-        expList.selector = (item: sensys.ISensorInformation) => {
+        let data: IExpandableListSection[] = [];
+        for (let info of infos) {
+            let found: boolean = false;
+            for (let section of data) {
+                if (section.title === info.Name) {
+                    found = true;
+                    section.items.push(<IExpandableListItem>{ text: info.SensorSet.Name, object: info });
+                    break;
+                }                
+            }
+            if (!found) {
+                data.push(<IExpandableListSection>{ title: info.Name, items: [<IExpandableListItem>{ text: info.SensorSet.Name, object: info }] });
+            }
+        }
+
+        expList.selector = (item: IExpandableListSection) => {
             return <IExpandableListSection>{
-                title: item.Name,
-                items: [<IExpandableListItem>{ text: item.SensorSet.Name, object: item }]
+                title: item.title,
+                items: item.items
             }
         }
 
-        expList.data = allInfos;
+        expList.data = data;
         expList.onItemClick.addEventListener((e) => {
             if (this.chosenData.length < this.groupArgs) {
                 this.chosenData.push(e.data);
                 this.updateChosenList();
             }
             if (this.chosenData.length === this.groupArgs) {
-                this.toggleGenBtn();
+                this.btnMakeSource.wrapper.style.display = "inline-block";
             }
         });
-    }
-
-    private toggleGenBtn(): void {
-        if (this.btnMakeSource.wrapper.style.display === "none") {
-            this.btnMakeSource.wrapper.style.display = "inline-block";
-        }
-        else {
-            this.btnMakeSource.wrapper.style.display = "none";
-        }
     }
 
     private updateChosenList(): void {
@@ -121,9 +142,7 @@
 
         this.chosenList.onItemRemove.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
-            if (this.chosenData.length < (<any>this.sensorGroup).numGroups) {
-                this.toggleGenBtn();
-            }
+            this.btnMakeSource.wrapper.style.display = "none";            
         });
 
         this.chosenList.onItemRearrange.addEventListener((e) => {
@@ -151,4 +170,9 @@
         throw new Error("Group not found exception");
     }
 
+}
+
+interface IExpListData {
+    title: string,
+    items: any[]
 }

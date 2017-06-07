@@ -1,6 +1,7 @@
 ﻿class DataSourceAssignmentController extends Component {
 
     private builder: DataSourceBuildController;
+    private viewer: IViewerBase<any> | null = null;
     private page: number = 1;
 
     private contentWrapper: HTMLElement;
@@ -54,12 +55,15 @@
         this.page = 1;
     }
 
-    private displayPage2(plot: IViewerBase<any>): void {
+    private displayPage2(): void {
         this.contentWrapper.innerHTML = "";
-
-        this.builder = new DataSourceBuildController(plot);
-        this.contentWrapper.appendChild(this.builder.wrapper);
-
+        if (this.viewer) {
+            this.builder = new DataSourceBuildController(this.viewer);
+            this.contentWrapper.appendChild(this.builder.wrapper);
+        }
+        else {
+            throw new Error("Undefined viewer exception");
+        }
         this.navWrapper.style.display = "block";
 
         this.page = 2;
@@ -87,7 +91,8 @@
                     }
                     this.lastRow = this.findTableRow(<HTMLElement>e.target);
                     this.lastRow.classList.add("selectedrow");
-                    this.displaySources(curPlot);
+                    this.viewer = curPlot;
+                    this.displaySources();
                 }
             },
             {
@@ -112,24 +117,36 @@
         return curElement;
     }
 
-    private displaySources(curPlot: IViewerBase<any>): void {        
+    private displaySources(): void {        
         this.divRight.innerHTML = "";
-        let add: HTMLElement = this.mk.tag("p", "", [
-            {
-                event: "click", func: (e: Event) => {
-                    this.displayPage2(curPlot);
+        if (this.viewer) {
+            let add: HTMLElement = this.mk.tag("p", "", [
+                {
+                    event: "click", func: (e: Event) => {
+                        this.displayPage2();
+                    }
                 }
-            }
-        ], "ADD SOURCE");
-        add.style.cursor = "pointer";
-        this.divRight.appendChild(add);
+            ], "ADD SOURCE");
+            add.style.cursor = "pointer";
+            this.divRight.appendChild(add);
 
-        let list: TempDataSourceList = new TempDataSourceList(curPlot);
-        this.divRight.appendChild(list.wrapper);
+            let list: TempDataSourceList = new TempDataSourceList(this.viewer);
+            this.divRight.appendChild(list.wrapper);
+        }
     }
 
     public updateViewers(): void {
         this.displayViewers();
+        this.displaySources();
+        let isRegistered: boolean = false;        
+        for (let v of kernel.senMan.viewers) {
+            if (v === this.viewer) {
+                isRegistered = true;
+            }
+        }
+        if (!isRegistered) {         
+            this.displayPage1();            
+        }
     }
 
 }

@@ -103,12 +103,16 @@ class ChangeTheme extends Applet {
     constructor(content: HTMLElement) {
         super();
         this.content = content;
+        this.content.style.cssFloat = "left";
         let mk: HtmlHelper = new HtmlHelper();
+
+        let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:#F0F0F0;}	.st1{fill:#2a2a2a;}</style><g id="XMLID_3_">	<circle id="XMLID_1_" class="st0" cx="8.2" cy="8.2" r="7.7"/>	<circle id="XMLID_2_" class="st1" cx="15.8" cy="15.8" r="7.7"/></g></svg>';
+
         this.content.appendChild(mk.tag(
             "div"
-            , "taskbar-button-text"
+            , "btn-themechange"
             , [{ event: "click", func: (e: Event): void => this.click_theme(<MouseEvent>e) }]
-            , "Theme"
+            , svg
         )); 
     }
     private isDark: boolean = true;
