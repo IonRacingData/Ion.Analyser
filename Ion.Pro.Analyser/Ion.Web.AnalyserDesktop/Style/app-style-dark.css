@@ -85,10 +85,6 @@
     color: white;
 }
 
-.table tr:nth-child(2n) {
-    background-color: #3c3c3c;
-}
-
 .table tr {
     /*background-color: black;*/
 }
@@ -106,6 +102,10 @@
 table.table.selectable tr.selectedrow {
     background-color: black;
     color: white;
+}
+
+table.table.selectable tbody tr:hover {
+    background-color: #202020;
 }
 
 span.table-resize{
@@ -187,3 +187,24 @@ span.table-resize{
     background-color: #202020;
 }
 
+.comp-expList-collapsible {
+    background-color: #202020;
+}
+
+
+.listitem:hover {
+    background-color: #202020;
+}
+
+
+.comp-listBoxRearr li:hover {
+    background-color: #4a4a4a;
+}
+
+.comp-listBoxRearr-icon:hover {
+    color: #119Ed9;
+}
+
+.comp-listBoxRearr-marker {
+    background-color: #171717;
+}

@@ -184,6 +184,19 @@ body {
 }*/
 
 
+.btn-themechange {
+    padding: 8px;
+}
+
+    .btn-themechange:hover {
+        background-color: #313C53;    
+    }
+
+    .btn-themechange:active {
+        background-color: #273044;
+    }
+
+
 table.table {
     width: 100%;
     border-collapse: collapse;
@@ -387,15 +400,8 @@ span.table-resize{
     padding: 2px 0;
 }
 
-.listitem:hover {
-    background-color: #202020;
-}
 .small {
     font-size: 0.6em;
-}
-
-table.table.selectable tbody tr:hover {
-    background-color: #202020;
 }
 
 .comp-button {
@@ -440,11 +446,6 @@ table.table.selectable tbody tr:hover {
         }
 
 
-.comp-expList {
-}
-.comp-expList-section {
-
-}
 .comp-expList-clicker {
     cursor: pointer;
     padding: 7px;
@@ -453,7 +454,6 @@ table.table.selectable tbody tr:hover {
     overflow: hidden;
     /*max-height: 0px;*/
     transition: max-height .2s ease;
-    background-color: #202020;
 }
 .comp-expList ul {
     list-style: none;
@@ -482,10 +482,6 @@ table.table.selectable tbody tr:hover {
 .comp-listBoxRearr li {
     display: flex;
     padding: 5px;
-}
-
-.comp-listBoxRearr li:hover {
-    background-color: #4a4a4a;
 }
 
 .comp-listBoxRearr-textWrapper {
@@ -520,15 +516,10 @@ table.table.selectable tbody tr:hover {
     width: 12px;
 }
 
-.comp-listBoxRearr-icon:hover {
-    color: #119Ed9;
-}
-
 .comp-listBoxRearr-marker {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #171717;
     min-width: 40px;
 }
 

@@ -90,11 +90,7 @@
 
 
 table.table {
-    background-color: #e7e7e7;
-}
-
-.table tr:nth-child(2n) {
-    background-color: #f9f9f9;
+    /*background-color: white;*/
 }
 
 .table thead {
@@ -104,8 +100,11 @@ table.table {
 }
 
 table.table.selectable tr.selectedrow {
-    background-color: black;
-    color: white;
+    background-color: #dbdbdb;
+}
+
+table.table.selectable tbody tr:hover {
+    background-color: #dbdbdb;
 }
 
 span.table-resize{
@@ -179,4 +178,26 @@ span.table-resize{
 
 .comp-expList ul {
     background-color: #e6e6e6;
+}
+
+.comp-expList-collapsible {
+    background-color: #e6e6e6;
+}
+
+
+.listitem:hover {
+    background-color: #eaeaea;
+}
+
+
+.comp-listBoxRearr li:hover {
+    background-color: #dbdbdb;
+}
+
+.comp-listBoxRearr-icon:hover {
+    color: #119Ed9;
+}
+
+.comp-listBoxRearr-marker {
+    background-color: #bebebe;
 }
