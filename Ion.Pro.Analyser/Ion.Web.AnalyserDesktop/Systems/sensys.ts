@@ -46,6 +46,7 @@
             console.log(data);
             let dataSet = new SensorDataSet(data);
             this.telemetryDataSet = dataSet;
+            this.__telemetryAvailable = true;
             this.loadedDataSet.push(dataSet);
         }
 
@@ -139,8 +140,14 @@
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
                 if (!(<any>data).data) {
+
                     let dataSet = new SensorDataSet(data);
                     this.loadedDataSet.push(dataSet);
+
+                    if (dataSet.Name == "telemetry") {
+                        this.__telemetryAvailable = true;
+                        this.telemetryDataSet = dataSet;
+                    }
 
                     /*for (let v in dataSet.SensorData) {
                         let temp = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
@@ -391,7 +398,7 @@
             let key = this.IdKeyMap[pack.ID];
             if (!key)
                 key = pack.ID.toString();
-            if (!this.LoadedKeys[key]) {
+            if (!this.SensorData[key]) {
                 this.LoadedKeys.push(key);
                 this.createLoadedKey(key);
             }

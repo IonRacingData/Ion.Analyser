@@ -58,6 +58,7 @@ var Kernel;
                 console.log(data);
                 var dataSet = new SensorDataSet(data);
                 this.telemetryDataSet = dataSet;
+                this.__telemetryAvailable = true;
                 this.loadedDataSet.push(dataSet);
             };
             SensorManager.prototype.handleService = function (data) {
@@ -142,6 +143,10 @@ var Kernel;
                     if (!data.data) {
                         var dataSet = new SensorDataSet(data);
                         _this.loadedDataSet.push(dataSet);
+                        if (dataSet.Name == "telemetry") {
+                            _this.__telemetryAvailable = true;
+                            _this.telemetryDataSet = dataSet;
+                        }
                         /*for (let v in dataSet.SensorData) {
                             let temp = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
                             if (temp) {
@@ -365,7 +370,7 @@ var Kernel;
                 var key = this.IdKeyMap[pack.ID];
                 if (!key)
                     key = pack.ID.toString();
-                if (!this.LoadedKeys[key]) {
+                if (!this.SensorData[key]) {
                     this.LoadedKeys.push(key);
                     this.createLoadedKey(key);
                 }

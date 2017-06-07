@@ -79,15 +79,13 @@
         let infos: sensys.ISensorInformation[] = [];
 
         for (let set of sensorsets) {
-            if (set.Name !== "telemetry") {
-                for (let key of set.LoadedKeys) {
-                    let info: sensys.ISensorInformation = set.KeyInfoMap[key];
-                    if (info) {
-                        infos.push(info);
-                    }
-                    else {
-                        console.log("Undefined SensorInfo: ", key);
-                    }
+            for (let key of set.LoadedKeys) {
+                let info: sensys.ISensorInformation = set.KeyInfoMap[key];
+                if (info) {
+                    infos.push(info);
+                }
+                else {
+                    console.log("Undefined SensorInfo: ", key);
                 }
             }
         }

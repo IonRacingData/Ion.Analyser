@@ -75,16 +75,14 @@ var DataSourceBuildController = (function (_super) {
         var infos = [];
         for (var _i = 0, sensorsets_1 = sensorsets; _i < sensorsets_1.length; _i++) {
             var set = sensorsets_1[_i];
-            if (set.Name !== "telemetry") {
-                for (var _a = 0, _b = set.LoadedKeys; _a < _b.length; _a++) {
-                    var key = _b[_a];
-                    var info = set.KeyInfoMap[key];
-                    if (info) {
-                        infos.push(info);
-                    }
-                    else {
-                        console.log("Undefined SensorInfo: ", key);
-                    }
+            for (var _a = 0, _b = set.LoadedKeys; _a < _b.length; _a++) {
+                var key = _b[_a];
+                var info = set.KeyInfoMap[key];
+                if (info) {
+                    infos.push(info);
+                }
+                else {
+                    console.log("Undefined SensorInfo: ", key);
                 }
             }
         }
