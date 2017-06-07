@@ -47,6 +47,9 @@ abstract class SingleValueController extends Controller {
                 this.onDataChange();
             }
         }
+        else {
+            this.onDataChange();
+        }
     }
 
     public setValue(value: number): void { }    

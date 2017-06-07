@@ -133,6 +133,11 @@ span.table-resize{
 
 /*  Controllers  */
 
+.silhouette {
+    fill: #eaeaea;
+    transition: fill 0.3s;
+}
+
 .gauge {
     /*  ring and labels  */
     color: darkgray;

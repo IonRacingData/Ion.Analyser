@@ -142,14 +142,15 @@
                     let dataSet = new SensorDataSet(data);
                     this.loadedDataSet.push(dataSet);
 
-                    for (let v in dataSet.SensorData) {
+                    /*for (let v in dataSet.SensorData) {
                         let temp = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
                         if (temp) {
                             this.dataSources.push(temp);
                         }
 
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
-                    }
+                    }*/
+
 
                 }
                 console.log(data);
@@ -171,6 +172,10 @@
 
         public registerGroup(group: new (containers: SensorDataContainer[]) => SensorGroup<any>): void {
             this.groups.push(group);
+        }
+
+        public registerDataSource(source: IDataSource<any>): void {
+            this.dataSources.push(source);
         }
 
         public unregister<T>(viewer: IViewerBase<T>): void {

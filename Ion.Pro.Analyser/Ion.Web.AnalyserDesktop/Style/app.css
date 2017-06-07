@@ -290,6 +290,12 @@ span.table-resize{
     display: flex;
 }
 
+.bar-controller-silhouette {
+    margin: auto;
+    width: 60%;
+    height: 60%;
+}
+
 .bar-controller-barWrapper1 {
     flex-grow: 1;
     display: flex;

@@ -142,13 +142,14 @@ var Kernel;
                     if (!data.data) {
                         var dataSet = new SensorDataSet(data);
                         _this.loadedDataSet.push(dataSet);
-                        for (var v in dataSet.SensorData) {
-                            var temp = _this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
+                        /*for (let v in dataSet.SensorData) {
+                            let temp = this.createDataSource({ grouptype: "PointSensorGroup", key: "", layers: [], sources: [{ key: dataSet.SensorData[v].ID, name: dataSet.Name }] });
                             if (temp) {
-                                _this.dataSources.push(temp);
+                                this.dataSources.push(temp);
                             }
+    
                             //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
-                        }
+                        }*/
                     }
                     console.log(data);
                     if (callback) {
@@ -164,6 +165,9 @@ var Kernel;
             };
             SensorManager.prototype.registerGroup = function (group) {
                 this.groups.push(group);
+            };
+            SensorManager.prototype.registerDataSource = function (source) {
+                this.dataSources.push(source);
             };
             SensorManager.prototype.unregister = function (viewer) {
                 var index = this.viewers.indexOf(viewer);

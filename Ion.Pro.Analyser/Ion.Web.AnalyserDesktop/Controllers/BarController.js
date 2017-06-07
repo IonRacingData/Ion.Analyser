@@ -14,6 +14,7 @@ var BarController = (function (_super) {
         var _this = _super.call(this) || this;
         _this.horizontal = false;
         _this.double = false;
+        _this.silhouette = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
         _this.direction = direction;
         _this.width = width;
         _this.height = height;
@@ -23,12 +24,15 @@ var BarController = (function (_super) {
         var _this = this;
         this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
         this.wrapper.setAttribute("tabindex", "0");
+        this.barContainer = this.mk.tag("div");
+        this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
+        this.silhouetteContainer.innerHTML = this.silhouette;
         this.barWrapper1 = this.mk.tag("div", "bar-controller-barWrapper1");
-        this.wrapper.appendChild(this.barWrapper1);
+        this.barContainer.appendChild(this.barWrapper1);
         this.bar1 = this.mk.tag("div", "bar-controller-bar1");
         this.barWrapper1.appendChild(this.bar1);
         this.barWrapper2 = this.mk.tag("div", "bar-controller-barWrapper2");
-        this.wrapper.appendChild(this.barWrapper2);
+        this.barContainer.appendChild(this.barWrapper2);
         this.bar2 = this.mk.tag("div", "bar-controller-bar2");
         this.barWrapper2.appendChild(this.bar2);
         this.wrapper.style.width = this.width + "px";
@@ -45,6 +49,9 @@ var BarController = (function (_super) {
                 _this.setDirection(dir);
             }
         });
+        this.barContainer.style.display = "none";
+        this.wrapper.appendChild(this.silhouetteContainer);
+        this.wrapper.appendChild(this.barContainer);
         return this.wrapper;
     };
     BarController.prototype.setDirection = function (dir) {
@@ -69,6 +76,15 @@ var BarController = (function (_super) {
         this.wrapper.style.height = this.height + "px";
     };
     BarController.prototype.onDataChange = function () {
+        if (this.data) {
+            this.silhouetteContainer.style.display = "none";
+            this.barContainer.style.display = "flex";
+        }
+        else {
+            this.barContainer.style.display = "none";
+            this.silhouetteContainer.style.display = "flex";
+            return;
+        }
         var min = SensorInfoHelper.minValue(this.lastSensorInfo);
         var val = this.percent * 100;
         if (this.direction === Direction.Horizontal) {

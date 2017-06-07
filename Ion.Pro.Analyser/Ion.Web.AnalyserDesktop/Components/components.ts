@@ -440,3 +440,148 @@ class ListBoxRearrangable extends Component {
         }
     }
 }
+
+
+
+class TempDataSourceList extends Component {
+
+    private mk: HtmlHelper = new HtmlHelper();
+    private sensorTable: HTMLElement;
+    private plot: IViewerBase<any>;
+
+
+    constructor(plot: IViewerBase<any>) {
+        super();
+
+        this.plot = plot;
+
+        let info: IDataSource<any>[] = kernel.senMan.getDataSources(plot.type);
+
+        this.sensorTable = this.mk.tag("div");
+        this.sensorTable.style.minWidth = "250px";
+        this.sensorTable.style.flexGrow = "1";
+        this.sensorTable.style.overflowY = "auto";
+
+        this.wrapper = this.mk.tag("div");
+        this.wrapper.appendChild(this.sensorTable);
+
+        if (sensys.SensorManager.isViewer(plot)) {
+            this.drawSingleSensors(<IViewer<any>>plot, info);
+        }
+        else if (sensys.SensorManager.isCollectionViewer(plot)) {
+            this.drawMultiSensors(<ICollectionViewer<any>>plot, info);
+        }
+    }
+
+    public update(): void {
+        let info: IDataSource<any>[] = kernel.senMan.getDataSources(this.plot.type);
+
+        if (sensys.SensorManager.isViewer(this.plot)) {
+            this.drawSingleSensors(<IViewer<any>>this.plot, info);
+        }
+        else if (sensys.SensorManager.isCollectionViewer(this.plot)) {
+            this.drawMultiSensors(<ICollectionViewer<any>>this.plot, info);
+        }
+    }
+
+    private drawSingleSensors(plot: IViewer<any>, info: IDataSource<any>[]) {
+        this.drawSensors<IViewer<any>>(plot, info, this.createSingleSensor);
+    }
+
+    private drawMultiSensors(plot: ICollectionViewer<any>, info: IDataSource<any>[]) {
+        this.drawSensors<ICollectionViewer<any>>(plot, info, this.createMultiSensor);
+    }
+
+
+    private createSingleSensor(plot: IViewer<any>, sensor: IDataSource<any>): HTMLElement {
+        let radio = <HTMLInputElement>this.mk.tag("input");
+        radio.type = "radio";
+        radio.name = "sensor";
+        if (plot.dataSource && plot.dataSource === sensor) {
+            radio.checked = true;
+        }
+        radio.addEventListener("change", (e: Event) => {
+            radio.disabled = true;
+            console.log("Single checkbox click");
+            plot.dataSource = sensor;
+            if (sensor.length() == 0) {
+                kernel.senMan.fillDataSource(sensor, () => {
+                    plot.dataUpdate();
+                    radio.disabled = false;
+                });
+            }
+            else {
+                plot.dataUpdate();
+                radio.disabled = false;
+            }
+
+        });
+        return radio;
+    }
+
+    private createMultiSensor(plot: ICollectionViewer<any>, sensor: IDataSource<any>): HTMLElement {
+        let checkBox = <HTMLInputElement>this.mk.tag("input");
+        checkBox.type = "checkbox";
+        for (let i = 0; i < plot.dataCollectionSource.length; i++) {
+            if (plot.dataCollectionSource[i] === sensor) {
+                checkBox.checked = true;
+                break;
+            }
+        }
+
+        checkBox.addEventListener("change", (e: Event) => {
+            checkBox.disabled = true;
+            console.log("Multi checkbox click");
+            if (checkBox.checked) {
+                plot.dataCollectionSource.push(sensor);
+                if (sensor.length() == 0) {
+                    kernel.senMan.fillDataSource(sensor, () => {
+                        plot.dataUpdate();
+                        checkBox.disabled = false;
+                    });
+                }
+                else {
+                    plot.dataUpdate();
+                    checkBox.disabled = false;
+                }
+            }
+            else {
+                for (let i = 0; i < plot.dataCollectionSource.length; i++) {
+                    if (plot.dataCollectionSource[i] === sensor) {
+                        plot.dataCollectionSource.splice(i, 1);
+                        plot.dataUpdate();
+                        checkBox.disabled = false;
+                        break;
+                    }
+                }
+            }
+        });
+        return checkBox;
+    }
+
+    drawSensors<T extends IViewerBase<any>>(plot: T, info: IDataSource<any>[], drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
+        this.sensorTable.innerHTML = "";
+        for (let i = 0; i < info.length; i++) {
+            let sensor = info[i];
+            let ctrl = drawMethod.call(this, plot, sensor);
+            let label = this.mk.tag("label", "listitem");
+            let firstInfo = sensor.infos.SensorInfos[0];
+            label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
+            if (firstInfo.ID.toString() === firstInfo.Key) {
+                label.style.color = "red";
+            }
+            label.appendChild(ctrl);
+            let innerBox = this.mk.tag("div");
+            innerBox.style.display = "inline-block";
+            innerBox.style.verticalAlign = "middle";
+            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            label.appendChild(innerBox);
+            //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
+            //label.appendChild(document.createTextNode(firstInfo.Name));
+            this.sensorTable.appendChild(label);
+            //this.sensorTable.appendChild(this.mk.tag("br"));
+        }
+    }
+
+}
