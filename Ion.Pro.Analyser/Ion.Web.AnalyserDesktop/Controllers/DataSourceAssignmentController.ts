@@ -130,6 +130,16 @@
 
     public updateViewers(): void {
         this.displayViewers();
+        if (this.builder) {
+            let isRegistered: boolean = false;
+            let viewer = this.builder.viewer;
+            for (let v of kernel.senMan.viewers) {
+                isRegistered = true;
+            }
+            if (!isRegistered) {
+                this.displayPage1();
+            }
+        }
     }
 
 }

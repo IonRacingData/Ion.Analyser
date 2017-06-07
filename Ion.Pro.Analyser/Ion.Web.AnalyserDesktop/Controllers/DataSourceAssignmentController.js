@@ -110,6 +110,17 @@ var DataSourceAssignmentController = (function (_super) {
     };
     DataSourceAssignmentController.prototype.updateViewers = function () {
         this.displayViewers();
+        if (this.builder) {
+            var isRegistered = false;
+            var viewer = this.builder.viewer;
+            for (var _i = 0, _a = kernel.senMan.viewers; _i < _a.length; _i++) {
+                var v = _a[_i];
+                isRegistered = true;
+            }
+            if (!isRegistered) {
+                this.displayPage1();
+            }
+        }
     };
     return DataSourceAssignmentController;
 }(Component));
