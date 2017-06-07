@@ -260,7 +260,7 @@ var LineChartTester = (function () {
         };
         this.testWindow.add({
             name: "Change data", runner: function () {
-                kernel.appMan.start("DataAssigner", _this);
+                kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
         this.testWindow.add({
@@ -315,7 +315,7 @@ var GaugeTester = (function () {
         };
         testWindow.add({
             name: "Change data", runner: function () {
-                kernel.appMan.start("DataAssigner", _this);
+                kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
         this.window.content.style.overflow = "hidden";
@@ -357,7 +357,7 @@ var GPSPlotTester = (function () {
         };
         testWindow.add({
             name: "Change data", runner: function () {
-                kernel.appMan.start("DataAssigner", _this);
+                kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
         this.window.content.style.overflow = "hidden";
@@ -398,7 +398,7 @@ var LabelTester = (function () {
         };
         testWindow.add({
             name: "Change data", runner: function () {
-                kernel.appMan.start("DataAssigner", _this);
+                kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
         this.window.content.style.overflow = "hidden";
@@ -438,7 +438,7 @@ var BarTester = (function () {
         };
         testWindow.add({
             name: "Change data", runner: function () {
-                kernel.appMan.start("DataAssigner", _this);
+                kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
         this.window.content.style.overflow = "hidden";

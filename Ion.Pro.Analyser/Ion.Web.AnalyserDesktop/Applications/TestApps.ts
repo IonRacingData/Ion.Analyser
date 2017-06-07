@@ -312,7 +312,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         };
         this.testWindow.add({
             name: "Change data", runner: () => {
-                kernel.appMan.start("DataAssigner", this);
+                kernel.appMan.start("DataSourceBuilder", this);
             }
         });
         this.testWindow.add({
@@ -380,7 +380,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
         };
         testWindow.add({
             name: "Change data", runner: () => {
-                kernel.appMan.start("DataAssigner", this);
+                kernel.appMan.start("DataSourceBuilder", this);
             }
         });
 
@@ -431,7 +431,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         };
         testWindow.add({
             name: "Change data", runner: () => {
-                kernel.appMan.start("DataAssigner", this);
+                kernel.appMan.start("DataSourceBuilder", this);
             }
         });
 
@@ -477,7 +477,7 @@ class LabelTester implements IApplication, IViewer<Point> {
         };
         testWindow.add({
             name: "Change data", runner: () => {
-                kernel.appMan.start("DataAssigner", this);
+                kernel.appMan.start("DataSourceBuilder", this);
             }
         });
 
@@ -526,7 +526,7 @@ class BarTester implements IApplication, IViewer<Point> {
         };
         testWindow.add({
             name: "Change data", runner: () => {
-                kernel.appMan.start("DataAssigner", this);
+                kernel.appMan.start("DataSourceBuilder", this);
             }
         });
 
