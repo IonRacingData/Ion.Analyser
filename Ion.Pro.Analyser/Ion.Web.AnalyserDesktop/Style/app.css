@@ -362,6 +362,20 @@ span.table-resize{
     padding: 10px;
 }
 
+.dsaController-navelement {
+    flex-basis: 0;
+    flex-grow: 1;
+    display: flex;
+}
+
+.dsaController-viewerInfo {
+    align-self: center;
+    margin: auto;
+    padding: 3px;
+    font-size: 1.2em;
+    color: #777;
+}
+
 .dsaController-content {
     display: flex;
     flex-direction: row;

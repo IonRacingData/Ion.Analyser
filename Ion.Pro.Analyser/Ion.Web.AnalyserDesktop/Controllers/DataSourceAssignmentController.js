@@ -12,14 +12,20 @@ var DataSourceAssignmentController = (function (_super) {
     __extends(DataSourceAssignmentController, _super);
     function DataSourceAssignmentController() {
         var _this = _super.call(this) || this;
-        _this.viewer = null;
+        _this.selectedViewer = null;
         _this.page = 1;
-        _this.lastRow = null;
+        _this.navElements = [];
+        _this.selectedRow = null;
         _this.mk = new HtmlHelper();
         var mk = _this.mk;
         _this.wrapper = mk.tag("div", "dsaController-wrapper");
         _this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
         _this.navWrapper = mk.tag("div", "dsaController-navwrapper");
+        for (var i = 0; i < 3; i++) {
+            var e = mk.tag("div", "dsaController-navelement");
+            _this.navElements.push(e);
+            _this.navWrapper.appendChild(e);
+        }
         _this.wrapper.appendChild(_this.contentWrapper);
         _this.wrapper.appendChild(_this.navWrapper);
         _this.btnBack = new Button();
@@ -27,7 +33,7 @@ var DataSourceAssignmentController = (function (_super) {
         _this.btnBack.onclick.addEventListener(function () {
             _this.displayPage1();
         });
-        _this.navWrapper.appendChild(_this.btnBack.wrapper);
+        _this.navElements[0].appendChild(_this.btnBack.wrapper);
         _this.displayPage1();
         return _this;
     }
@@ -45,15 +51,34 @@ var DataSourceAssignmentController = (function (_super) {
         this.page = 1;
     };
     DataSourceAssignmentController.prototype.displayPage2 = function () {
+        var _this = this;
         this.contentWrapper.innerHTML = "";
-        if (this.viewer) {
-            this.builder = new DataSourceBuildController(this.viewer);
+        this.navElements[1].innerHTML = "";
+        if (this.selectedViewer) {
+            this.builder = new DataSourceBuildController(this.selectedViewer);
             this.contentWrapper.appendChild(this.builder.wrapper);
+            var viewer = this.mk.tag("div", "dsaController-viewerInfo", [
+                {
+                    event: "mouseenter", func: function (e) {
+                        if (_this.selectedViewer) {
+                            _this.selectedViewer.plotWindow.highlight(true);
+                        }
+                    }
+                },
+                {
+                    event: "mouseleave", func: function (e) {
+                        if (_this.selectedViewer) {
+                            _this.selectedViewer.plotWindow.highlight(false);
+                        }
+                    }
+                }
+            ], this.selectedViewer.plotType);
+            this.navElements[1].appendChild(viewer);
         }
         else {
             throw new Error("Undefined viewer exception");
         }
-        this.navWrapper.style.display = "block";
+        this.navWrapper.style.display = "flex";
         this.page = 2;
     };
     DataSourceAssignmentController.prototype.displayViewers = function () {
@@ -72,12 +97,12 @@ var DataSourceAssignmentController = (function (_super) {
         tableGen.addRow([
             {
                 event: "click", func: function (e) {
-                    if (_this.lastRow !== null) {
-                        _this.lastRow.classList.remove("selectedrow");
+                    if (_this.selectedRow !== null) {
+                        _this.selectedRow.classList.remove("selectedrow");
                     }
-                    _this.lastRow = _this.findTableRow(e.target);
-                    _this.lastRow.classList.add("selectedrow");
-                    _this.viewer = curPlot;
+                    _this.selectedRow = _this.findTableRow(e.target);
+                    _this.selectedRow.classList.add("selectedrow");
+                    _this.selectedViewer = curPlot;
                     _this.displaySources();
                 }
             },
@@ -103,7 +128,7 @@ var DataSourceAssignmentController = (function (_super) {
     DataSourceAssignmentController.prototype.displaySources = function () {
         var _this = this;
         this.divRight.innerHTML = "";
-        if (this.viewer) {
+        if (this.selectedViewer) {
             var add = this.mk.tag("p", "", [
                 {
                     event: "click", func: function (e) {
@@ -113,17 +138,17 @@ var DataSourceAssignmentController = (function (_super) {
             ], "ADD SOURCE");
             add.style.cursor = "pointer";
             this.divRight.appendChild(add);
-            var list = new TempDataSourceList(this.viewer);
+            var list = new TempDataSourceList(this.selectedViewer);
             this.divRight.appendChild(list.wrapper);
         }
     };
-    DataSourceAssignmentController.prototype.updateViewers = function () {
+    DataSourceAssignmentController.prototype.onViewersChange = function () {
         this.displayViewers();
         this.displaySources();
         var isRegistered = false;
         for (var _i = 0, _a = kernel.senMan.viewers; _i < _a.length; _i++) {
             var v = _a[_i];
-            if (v === this.viewer) {
+            if (v === this.selectedViewer) {
                 isRegistered = true;
             }
         }

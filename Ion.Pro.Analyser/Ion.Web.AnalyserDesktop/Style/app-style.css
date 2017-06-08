@@ -166,7 +166,11 @@ span.table-resize{
 /* DataSourceAssignmentController */
 
 .dsaController-navwrapper {
-    border-top: solid 1px #ddd;
+    border-top: solid 1px #ccc;
+}
+
+.dsaController-viewerInfo {
+    color: #777;
 }
 
 

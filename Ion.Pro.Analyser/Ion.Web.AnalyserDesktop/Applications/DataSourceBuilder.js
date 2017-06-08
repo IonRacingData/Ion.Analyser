@@ -9,10 +9,10 @@ var DataSourceBuilder = (function () {
         this.dsb = new DataSourceAssignmentController();
         this.window.content.appendChild(this.dsb.wrapper);
         this.app.events.on(kernel.senMan.onRegisterViewer, function () {
-            _this.dsb.updateViewers();
+            _this.dsb.onViewersChange();
         });
         this.app.events.on(kernel.senMan.onUnRegisterViewer, function () {
-            _this.dsb.updateViewers();
+            _this.dsb.onViewersChange();
         });
     };
     return DataSourceBuilder;

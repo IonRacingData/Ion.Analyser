@@ -12,10 +12,10 @@
         this.window.content.appendChild(this.dsb.wrapper);
         
         this.app.events.on(kernel.senMan.onRegisterViewer, () => {
-            this.dsb.updateViewers();
+            this.dsb.onViewersChange();
         });
         this.app.events.on(kernel.senMan.onUnRegisterViewer, () => {
-            this.dsb.updateViewers();
+            this.dsb.onViewersChange();
         });
     }
 }
