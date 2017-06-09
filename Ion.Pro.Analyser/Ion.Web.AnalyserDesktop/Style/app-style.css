@@ -173,6 +173,16 @@ span.table-resize{
     color: #777;
 }
 
+/* DataSourceBuildController */
+
+.dsbController-section {
+    border-right: 1px solid #ccc;
+}
+
+    .dsbController-section:last-child {
+        border: none;
+    }
+
 
 /* lists */
 

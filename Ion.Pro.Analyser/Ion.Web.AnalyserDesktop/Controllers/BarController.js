@@ -50,6 +50,7 @@ var BarController = (function (_super) {
             }
         });
         this.barContainer.style.display = "none";
+        this.barContainer.style.flexGrow = "1";
         this.wrapper.appendChild(this.silhouetteContainer);
         this.wrapper.appendChild(this.barContainer);
         return this.wrapper;
