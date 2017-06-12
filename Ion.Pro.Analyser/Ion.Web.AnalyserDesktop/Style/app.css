@@ -544,3 +544,11 @@ span.table-resize{
 .comp-style-slider-active {
     transform: translate(66%);
 }
+
+.window-container {
+    width: 100%;
+    height: calc(100% - 40px);
+    position: absolute;
+    top: 40px;
+    left: 0;
+}

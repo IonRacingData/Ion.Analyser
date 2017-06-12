@@ -504,6 +504,54 @@ class PointSensorGroup extends SensorGroup<Point>{
     }
 }
 
+class Point3DSensorGroup extends SensorGroup<Point3D>{
+    private dataX: SensorDataContainer;
+    private dataY: SensorDataContainer;
+    static numGroups: number = 2;
+    static type: IClassType<Point3D> = Point3D;
+
+    constructor(data: SensorDataContainer[]) {
+        super(Point3D);
+        if (!data || data.length < 2) {
+            console.log(data);
+            throw new Error("Too few arguments given");
+        }
+
+        this.dataX = data[0];
+        this.dataY = data[1];
+
+        this.infos.Keys[0] = data[0].ID;
+        this.infos.SensorInfos[0] = data[0].info;
+
+        this.infos.Keys[1] = data[1].ID;
+        this.infos.SensorInfos[1] = data[1].info;
+
+        this.color = this.dataX.color;
+    }
+
+    public getValue(index: number): Point3D {
+        let max = this.length();
+        let percent = index / max;
+        let x = percent * this.dataX.points.length;
+        let y = percent * this.dataY.points.length;
+        let intX = x | 0;
+        let intY = y | 0;
+        let partX = x - intX;
+        let partY = y - intY;
+
+        let valX = this.dataX.points[intX];
+        let valY = this.dataY.points[intY];
+
+        return new Point3D(valX.value, valY.value, valX.timestamp);
+
+
+    }
+
+    public length(): number {
+        return Math.max(this.dataX.points.length, this.dataY.points.length);
+    }
+}
+
 class DataSourceInfo<T> {
 
 }

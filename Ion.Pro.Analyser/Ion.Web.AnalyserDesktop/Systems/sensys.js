@@ -427,6 +427,43 @@ var PointSensorGroup = (function (_super) {
 }(SensorGroup));
 PointSensorGroup.numGroups = 1;
 PointSensorGroup.type = Point;
+var Point3DSensorGroup = (function (_super) {
+    __extends(Point3DSensorGroup, _super);
+    function Point3DSensorGroup(data) {
+        var _this = _super.call(this, Point3D) || this;
+        if (!data || data.length < 2) {
+            console.log(data);
+            throw new Error("Too few arguments given");
+        }
+        _this.dataX = data[0];
+        _this.dataY = data[1];
+        _this.infos.Keys[0] = data[0].ID;
+        _this.infos.SensorInfos[0] = data[0].info;
+        _this.infos.Keys[1] = data[1].ID;
+        _this.infos.SensorInfos[1] = data[1].info;
+        _this.color = _this.dataX.color;
+        return _this;
+    }
+    Point3DSensorGroup.prototype.getValue = function (index) {
+        var max = this.length();
+        var percent = index / max;
+        var x = percent * this.dataX.points.length;
+        var y = percent * this.dataY.points.length;
+        var intX = x | 0;
+        var intY = y | 0;
+        var partX = x - intX;
+        var partY = y - intY;
+        var valX = this.dataX.points[intX];
+        var valY = this.dataY.points[intY];
+        return new Point3D(valX.value, valY.value, valX.timestamp);
+    };
+    Point3DSensorGroup.prototype.length = function () {
+        return Math.max(this.dataX.points.length, this.dataY.points.length);
+    };
+    return Point3DSensorGroup;
+}(SensorGroup));
+Point3DSensorGroup.numGroups = 2;
+Point3DSensorGroup.type = Point3D;
 var DataSourceInfo = (function () {
     function DataSourceInfo() {
     }

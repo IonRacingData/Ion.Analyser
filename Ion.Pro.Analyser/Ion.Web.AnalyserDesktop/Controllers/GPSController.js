@@ -110,9 +110,7 @@ var GPSController = (function (_super) {
                     this.onDataChange();
                 });*/
             }
-            else {
-                this.onDataChange();
-            }
+            this.onDataChange();
         }
     };
     return GPSController;

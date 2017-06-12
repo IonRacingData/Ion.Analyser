@@ -30,7 +30,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        public static bool liveSim = true;
+        public static bool liveSim = false;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
@@ -131,6 +131,7 @@ namespace Ion.Pro.Analyser
             SensorManager manager = SensorManager.GetDefault();
             manager.RegisterFileProvider("log16", new LegacySensorProvider());
             manager.RegisterFileProvider("log", new LegacySensorProvider());
+            manager.RegisterFileProvider("gpscsv", new GPSCSVSensorProvider());
             ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
         }
 

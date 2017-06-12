@@ -31,7 +31,7 @@ function startUp() {
     }
 
     kernel = {
-        winMan: new WindowManager(document.getElementsByTagName("body")[0]),
+        winMan: new WindowManager(document.body),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
         senMan: new sensys.SensorManager()
@@ -42,6 +42,7 @@ function startUp() {
     kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
+    kernel.senMan.load("../../Data/GPS_DataFile.gpscsv");
     // kernel.senMan.setGlobal(841);
 
     registerLaunchers();
@@ -76,6 +77,7 @@ function startUp() {
 
 function registerSensorGroups() {
     kernel.senMan.registerGroup(PointSensorGroup);
+    kernel.senMan.registerGroup(Point3DSensorGroup);
 }
 
 function registerLaunchers() {
