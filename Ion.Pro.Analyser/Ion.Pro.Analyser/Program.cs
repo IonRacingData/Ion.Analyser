@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using Ion.Pro.Analyser.Web;
 using Ion.Pro.Analyser.Controllers;
+using NicroWare.Pro.RPiSPITest;
 
 namespace Ion.Pro.Analyser
 {
@@ -64,7 +65,20 @@ namespace Ion.Pro.Analyser
         static void Main(string[] args)
         {
             //manager.Load("../../Data/Sets/126_usart_data.log16");
-
+            NRFRadio baseRadio = new NRFRadio();
+            baseRadio.Begin();
+            baseRadio.SetPALevel(RF24PaDbm.RF24_PA_HIGH);
+            baseRadio.SetDataRate(RF24Datarate.RF24_250KBPS);
+            baseRadio.SetRetries(0, 0);
+            baseRadio.SetAutoAck(false);
+            baseRadio.OpenReadingPipe(0, "00001");
+            baseRadio.OpenWritingPipe("00001");
+            while (true)
+            {
+                Console.WriteLine("Send");
+                baseRadio.Write(new byte[] { 0x01, 0x99, 00, 00, 10, 151, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 16);
+                System.Threading.Thread.Sleep(1000);
+            }
             //Console.Read();
             //return;
             try

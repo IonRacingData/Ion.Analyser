@@ -46,6 +46,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Data\SensorDataReader.cs" />
+    <Compile Include="NRF\NRFWrapper.cs" />
     <Compile Include="Web\CacheService.cs" />
     <Compile Include="Web\Http.cs" />
     <Compile Include="Web\HttpServer.cs" />
@@ -90,12 +91,14 @@
     <Content Include="Content\index.html" />
     <Content Include="Content\main.css" />
     <Content Include="Content\main.js" />
+    <Content Include="NRF\RF24.cpp" />
+    <Content Include="NRF\RF24.h" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" />
+      <UserProperties Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
