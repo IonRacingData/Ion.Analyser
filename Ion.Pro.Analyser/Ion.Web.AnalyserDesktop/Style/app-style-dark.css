@@ -155,7 +155,16 @@ span.table-resize{
     /*grid*/
     color: rgba(100,100,100,0.3);
     /*marking fill*/
-    background-color: rgba(0,184,220,0.2);
+    background-color: rgba(0,184,220,0.2);    
+}
+
+.line-chart-legend {
+    /* background */
+    background-color: rgba(25,25,25,0.7);
+    /* text */
+    color: white;
+    /* border */
+    border-color: #111;
 }
 
 .bar-controller-bar1 {

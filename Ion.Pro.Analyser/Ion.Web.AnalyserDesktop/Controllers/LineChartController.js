@@ -23,6 +23,7 @@ var LineChartController = (function (_super) {
         //private autoScroll: boolean = false;
         _this.autoScroll_plotMoved = false;
         _this.mainColor = "white";
+        _this.legend = new LineChartLegend(130, 50, true);
         _this.defaultCursor = "default";
         _this.showGrid = {
             text: "Show grid",
@@ -42,10 +43,17 @@ var LineChartController = (function (_super) {
             type: "boolean",
             value: false
         };
+        _this.toggleLegend = {
+            text: "Legend",
+            longText: "Toggles legend",
+            type: "boolean",
+            value: true
+        };
         _this.settings = {
             showGrid: _this.showGrid,
             stickyAxes: _this.stickyAxes,
             autoScroll: _this.autoScroll,
+            toggleLegend: _this.toggleLegend,
             reset: {
                 text: "Reset",
                 longText: "Resets the view of the grid",
@@ -70,6 +78,7 @@ var LineChartController = (function (_super) {
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.ctxLegend = new ContextFixer(this.canvas.addCanvas());
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
         this.ctxMain.strokeStyle = this.mainColor;
@@ -91,6 +100,9 @@ var LineChartController = (function (_super) {
         this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
         this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
+        this.legend.backgroundColor = kernel.winMan.getRule(".line-chart-legend").style.backgroundColor;
+        this.legend.textColor = kernel.winMan.getRule(".line-chart-legend").style.color;
+        this.legend.borderColor = kernel.winMan.getRule(".line-chart-legend").style.borderColor;
     };
     LineChartController.prototype.updateColors = function () {
         this.darkTheme = !this.darkTheme;
@@ -191,6 +203,7 @@ var LineChartController = (function (_super) {
         this.ctxMain.clear();
         this.drawXAxis();
         this.drawYAxis();
+        this.drawLegend();
         if (this.data) {
             for (var d = 0; d < this.data.length; d++) {
                 var firstVisibleIdx = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
@@ -237,10 +250,37 @@ var LineChartController = (function (_super) {
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
-                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);
+                this.ctxMain.textBaseline = "middle";
+                if (this.toggleLegend.value) {
+                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                }
+                else {
+                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                }
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;
+                this.ctxMain.textBaseline = "alphabetical";
             }
+        }
+    };
+    LineChartController.prototype.drawLegend = function () {
+        this.ctxLegend.clear();
+        this.legend.darkTheme = this.darkTheme;
+        if (this.toggleLegend.value) {
+            if (this.data) {
+                if (this.data.length > 0) {
+                    this.legend.dataSources = this.data;
+                }
+                else {
+                    this.legend.dataSources = null;
+                }
+            }
+            else {
+                this.legend.dataSources = null;
+            }
+            var legCan = this.legend.canvas;
+            var margin = 10;
+            this.ctxLegend.ctx.drawImage(legCan, this.width - legCan.width - margin, margin);
         }
     };
     LineChartController.prototype.drawXAxis = function () {
@@ -541,6 +581,128 @@ var LineChartController = (function (_super) {
     };
     return LineChartController;
 }(MultiValueCanvasController));
+var LineChartLegend = (function () {
+    function LineChartLegend(width, height, darkTheme) {
+        this.tempCanvas = document.createElement("canvas");
+        this.__backgroundColor = "black";
+        this.__textColor = "white";
+        this.__borderColor = "green";
+        this.defHeight = height;
+        this.height = height;
+        this.width = width;
+        this.__darkTheme = darkTheme;
+        this.tempCanvas.width = this.width;
+        this.tempCanvas.height = this.height;
+        this.ctx = new ContextFixer(this.tempCanvas);
+    }
+    Object.defineProperty(LineChartLegend.prototype, "canvas", {
+        get: function () {
+            return this.tempCanvas;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "backgroundColor", {
+        set: function (color) {
+            if (color) {
+                this.__backgroundColor = color;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "textColor", {
+        set: function (color) {
+            if (color) {
+                this.__textColor = color;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "borderColor", {
+        set: function (color) {
+            if (color) {
+                this.__borderColor = color;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "dataSources", {
+        set: function (data) {
+            this.__dataSources = data;
+            this.resize(this.defHeight);
+            this.draw();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "darkTheme", {
+        set: function (bool) {
+            this.__darkTheme = bool;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    LineChartLegend.prototype.draw = function () {
+        var ctx = this.ctx;
+        var data = this.__dataSources;
+        ctx.clear();
+        ctx.fillStyle = this.__backgroundColor;
+        ctx.strokeStyle = this.__borderColor;
+        ctx.ctx.rect(0, 0, this.width, this.height);
+        ctx.fill();
+        ctx.stroke();
+        if (data) {
+            var lineSpacing = 13;
+            var topBottompadding = 13;
+            var sidePadding = 10;
+            var lineWidth = 10;
+            var positionY = topBottompadding;
+            for (var i = 0; i < data.length; i++) {
+                if (positionY > this.height - topBottompadding) {
+                    this.resize(positionY + topBottompadding);
+                    this.draw();
+                    return;
+                }
+                var positionX = sidePadding;
+                var name_1 = data[i].infos.SensorInfos[0].Name;
+                ctx.beginPath();
+                if (this.__darkTheme) {
+                    ctx.strokeStyle = data[i].color.toString();
+                }
+                else {
+                    ctx.strokeStyle = data[i].color.toString(true);
+                }
+                ctx.ctx.lineCap = "round";
+                ctx.moveTo(positionX, positionY);
+                positionX += lineWidth;
+                ctx.lineTo(positionX, positionY);
+                ctx.stroke();
+                positionX += 10;
+                ctx.moveTo(positionX, positionY);
+                ctx.fillStyle = this.__textColor;
+                ctx.textAlign = "start";
+                ctx.textBaseline = "middle";
+                ctx.fillText(name_1, positionX, positionY, (this.width - positionX - sidePadding));
+                ctx.closePath();
+                positionY += lineSpacing;
+            }
+        }
+        else {
+            ctx.fillStyle = this.__textColor;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("No data", (this.width / 2), (this.height / 2));
+        }
+    };
+    LineChartLegend.prototype.resize = function (height) {
+        this.height = height;
+        this.tempCanvas.height = height;
+    };
+    return LineChartLegend;
+}());
 var ContextFixer = (function () {
     function ContextFixer(canvas) {
         this.canvas = canvas;
@@ -579,11 +741,16 @@ var ContextFixer = (function () {
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();
     };
-    ContextFixer.prototype.fillText = function (text, x, y) {
+    ContextFixer.prototype.fillText = function (text, x, y, maxWidth) {
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.textAlign = this.textAlign;
         this.ctx.textBaseline = this.textBaseline;
-        this.ctx.fillText(text, x, y);
+        if (maxWidth) {
+            this.ctx.fillText(text, x, y, maxWidth);
+        }
+        else {
+            this.ctx.fillText(text, x, y);
+        }
     };
     ContextFixer.prototype.fillRect = function (x, y, width, height) {
         this.ctx.fillStyle = this.fillStyle;

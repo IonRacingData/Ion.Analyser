@@ -1,6 +1,7 @@
 ﻿class LineChartController extends MultiValueCanvasController implements IConfigurable {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
+    private ctxLegend: ContextFixer;
     private mouseMod: Point;
     private mouseDown: boolean;
     private isDragging = false;
@@ -19,6 +20,8 @@
     private axisColor;
     private mainColor = "white";
     private markingColor;
+
+    private legend: LineChartLegend = new LineChartLegend(130, 50, true);
 
     private defaultCursor: string = "default";
 
@@ -41,10 +44,18 @@
         value: false
     }
 
+    private toggleLegend: IStorageObject<"boolean"> = {
+        text: "Legend",
+        longText: "Toggles legend",
+        type: "boolean",
+        value: true
+    }
+
     public settings: IStorageList = {
         showGrid: this.showGrid,
         stickyAxes: this.stickyAxes,
         autoScroll: this.autoScroll,
+        toggleLegend: this.toggleLegend,
         reset: {
             text: "Reset",
             longText: "Resets the view of the grid",
@@ -72,6 +83,7 @@
         this.canvas = new LayeredCanvas(this.wrapper);
         this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.ctxLegend = new ContextFixer(this.canvas.addCanvas());
 
         this.width = this.canvas.getWidth();
         this.height = this.canvas.getHeight();
@@ -101,6 +113,10 @@
         this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
         this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
+        this.legend.backgroundColor = kernel.winMan.getRule(".line-chart-legend").style.backgroundColor;
+        this.legend.textColor = kernel.winMan.getRule(".line-chart-legend").style.color;
+        this.legend.borderColor = kernel.winMan.getRule(".line-chart-legend").style.borderColor;
+
     }
 
     public updateColors(): void {
@@ -217,6 +233,7 @@
 
         this.drawXAxis();
         this.drawYAxis();
+        this.drawLegend();
 
         if (this.data) {
             for (var d: number = 0; d < this.data.length; d++) {
@@ -273,11 +290,42 @@
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
-                this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 13);                
+                this.ctxMain.textBaseline = "middle";
+                if (this.toggleLegend.value) {
+                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                }
+                else {
+                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                }               
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;
+                this.ctxMain.textBaseline = "alphabetical";
             }
         }
+    }    
+
+    private drawLegend(): void {
+        this.ctxLegend.clear();
+        this.legend.darkTheme = this.darkTheme;
+
+        if (this.toggleLegend.value) {
+            if (this.data) {
+                if (this.data.length > 0) {
+                    this.legend.dataSources = this.data;
+                }
+                else {
+                    this.legend.dataSources = null;
+                }
+            }
+            else {
+                this.legend.dataSources = null;
+            }
+
+            let legCan: HTMLCanvasElement = this.legend.canvas;
+            let margin: number = 10;
+
+            this.ctxLegend.ctx.drawImage(legCan, this.width - legCan.width - margin, margin);
+        }        
     }
 
     private drawXAxis(): void {
@@ -637,6 +685,132 @@
     }
 }
 
+class LineChartLegend {
+
+    private tempCanvas: HTMLCanvasElement = document.createElement("canvas");
+    private ctx: ContextFixer;
+    get canvas(): HTMLCanvasElement {
+        return this.tempCanvas;
+    }
+
+    private defHeight: number;
+    private height: number;
+    private width: number;
+
+    private __backgroundColor: string = "black";
+    private __textColor = "white";
+    private __borderColor = "green";    
+    set backgroundColor(color: string | null) {
+        if (color) {
+            this.__backgroundColor = color;
+        }
+    }
+    set textColor(color: string | null) {
+        if (color) {
+            this.__textColor = color;
+        }
+    }
+    set borderColor(color: string | null) {
+        if (color) {
+            this.__borderColor = color;
+        }
+    }
+
+    private __dataSources: IDataSource<Point>[] | null;
+    set dataSources(data: IDataSource<Point>[] | null) {
+        this.__dataSources = data;
+        this.resize(this.defHeight);
+        this.draw();
+        
+    }
+
+    private __darkTheme: boolean;
+    set darkTheme(bool: boolean) {
+        this.__darkTheme = bool;
+    }
+
+    constructor(width: number, height: number, darkTheme: boolean) {
+        this.defHeight = height;
+        this.height = height;
+        this.width = width;
+
+        this.__darkTheme = darkTheme;
+
+        this.tempCanvas.width = this.width;
+        this.tempCanvas.height = this.height;
+
+        this.ctx = new ContextFixer(this.tempCanvas);
+    }
+
+    private draw(): void {
+        let ctx = this.ctx;
+        let data = this.__dataSources;
+        ctx.clear();
+
+        ctx.fillStyle = this.__backgroundColor;
+        ctx.strokeStyle = this.__borderColor;
+        ctx.ctx.rect(0, 0, this.width, this.height);
+        ctx.fill();
+        ctx.stroke();
+
+        if (data) {
+
+            let lineSpacing: number = 13;
+            let topBottompadding: number = 13;
+            let sidePadding: number = 10;
+            let lineWidth: number = 10;
+            
+            let positionY: number = topBottompadding;
+            for (let i = 0; i < data.length; i++) {
+                if (positionY > this.height - topBottompadding) {
+                    this.resize(positionY + topBottompadding);
+                    this.draw();
+                    return;
+                }
+
+                let positionX: number = sidePadding;
+                let name: string = data[i].infos.SensorInfos[0].Name;
+                ctx.beginPath();
+
+                if (this.__darkTheme) {
+                    ctx.strokeStyle = data[i].color.toString();
+                }
+                else {
+                    ctx.strokeStyle = data[i].color.toString(true);
+                }
+                ctx.ctx.lineCap = "round";
+                ctx.moveTo(positionX, positionY);
+                positionX += lineWidth;
+                ctx.lineTo(positionX, positionY);
+                ctx.stroke();
+
+                positionX += 10;
+                ctx.moveTo(positionX, positionY);
+                ctx.fillStyle = this.__textColor;
+                ctx.textAlign = "start";
+                ctx.textBaseline = "middle";
+                ctx.fillText(name, positionX, positionY, (this.width - positionX - sidePadding));
+                
+                ctx.closePath();
+
+                positionY += lineSpacing;                
+            }
+        }
+        else {
+            ctx.fillStyle = this.__textColor;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("No data", (this.width / 2), (this.height / 2));
+        }
+    }
+
+    private resize(height: number): void {
+        this.height = height;
+        this.tempCanvas.height = height;
+    }
+    
+}
+
 interface IStepInfo {
     steps: number;
     decimalPlaces: number;
@@ -695,11 +869,16 @@ class ContextFixer {
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();
     }
-    fillText(text: string, x: number, y: number): void {
+    fillText(text: string, x: number, y: number, maxWidth?: number): void {
         this.ctx.fillStyle = this.fillStyle;
         this.ctx.textAlign = this.textAlign;
         this.ctx.textBaseline = this.textBaseline;
-        this.ctx.fillText(text, x, y);
+        if (maxWidth) {
+            this.ctx.fillText(text, x, y, maxWidth);
+        }
+        else {
+            this.ctx.fillText(text, x, y);
+        }
     }
     fillRect(x: number, y: number, width: number, height: number): void {
         this.ctx.fillStyle = this.fillStyle;

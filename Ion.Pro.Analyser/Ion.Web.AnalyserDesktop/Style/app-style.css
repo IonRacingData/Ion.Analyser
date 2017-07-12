@@ -155,6 +155,15 @@ span.table-resize{
     background-color: rgba(0,184,220,0.2);
 }
 
+.line-chart-legend {
+    /* background */
+    background-color: rgba(243, 243, 243, 0.75);
+    /* text */
+    color: black;
+    /* border */
+    border-color: #aaa;
+}
+
 .bar-controller-bar1 {
     background-color: blue;
 }
