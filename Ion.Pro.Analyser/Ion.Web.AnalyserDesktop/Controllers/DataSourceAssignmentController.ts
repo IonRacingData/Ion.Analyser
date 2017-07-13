@@ -10,11 +10,13 @@
     private content: HTMLElement;
     private divLeft: HTMLElement;
     private divRight: HTMLElement;
-    private btnBack: Button;
+    private btnBack: TextButton;
 
     private selectedRow: HTMLElement | null = null;
 
     private sourceList: TempDataSourceList;
+
+    onPageSwitch = newEvent<IDataEvent<any>>("DsaController.onPageSwitch");
 
     private mk: HtmlHelper = new HtmlHelper();
 
@@ -34,7 +36,7 @@
         this.wrapper.appendChild(this.contentWrapper);
         this.wrapper.appendChild(this.navWrapper);
 
-        this.btnBack = new Button();
+        this.btnBack = new TextButton();
         this.btnBack.text = "BACK";
         this.btnBack.onclick.addEventListener(() => {
             this.displayPage1();
@@ -44,22 +46,38 @@
         this.displayPage1();
     }
 
+    private displayEmptyPage(): void {
+        this.contentWrapper.innerHTML = "";
+        let text = document.createElement("p");
+        text.className = "dsaController-emptyPage";
+        text.innerText = "No open charts";
+
+        this.contentWrapper.appendChild(text);
+
+        this.page = 0;
+    }
+
     private displayPage1(): void {
         let mk = this.mk;
         this.contentWrapper.innerHTML = "";
+        this.navWrapper.style.display = "none";
 
         this.content = mk.tag("div", "dsaController-content");
         this.divLeft = mk.tag("div", "dsaController-left");
-        this.divRight = mk.tag("div", "dsaController-right");
+        this.divRight = mk.tag("div", "dsaController-right");        
         
         this.content.appendChild(this.divLeft);
         this.content.appendChild(this.divRight);
         this.contentWrapper.appendChild(this.content);
 
         this.displayViewers();
-        this.navWrapper.style.display = "none";
 
         this.page = 1;
+        this.onPageSwitch({ target: this, data: this.page });  
+
+        if (kernel.senMan.viewers.length === 0) {
+            this.displayEmptyPage();            
+        }
     }
 
     private displayPage2(): void {
@@ -91,13 +109,14 @@
         this.navWrapper.style.display = "flex";
 
         this.page = 2;
+        this.onPageSwitch({ target: this, data: this.page });
     }
 
     private displayViewers(): void {
         this.divLeft.innerHTML = "";
         let tableGen = new HtmlTableGen("table selectable");
         let senMan: sensys.SensorManager = kernel.senMan;
-        tableGen.addHeader("Plot name");
+        //tableGen.addHeader("Plot name");
         for (let i = 0; i < senMan.viewers.length; i++) {
             let curPlot = senMan.viewers[i];
             this.drawRow(curPlot, tableGen);
@@ -140,36 +159,49 @@
         return curElement;
     }
 
-    private displaySources(): void {        
+    private displaySources(): void {
         this.divRight.innerHTML = "";
         if (this.selectedViewer) {
-            let add: HTMLElement = this.mk.tag("p", "", [
-                {
-                    event: "click", func: (e: Event) => {
-                        this.displayPage2();
-                    }
-                }
-            ], "ADD SOURCE");
-            add.style.cursor = "pointer";
-            this.divRight.appendChild(add);
+            let btnNewSource: TextButton = new TextButton();
+            btnNewSource.text = "NEW SOURCE";
+            btnNewSource.onclick.addEventListener(() => {
+                this.displayPage2();
+            });
 
             let list: TempDataSourceList = new TempDataSourceList(this.selectedViewer);
-            this.divRight.appendChild(list.wrapper);
+            list.wrapper.style.overflowY = "auto";
+            this.divRight.appendChild(list.wrapper);            
+            this.divRight.appendChild(btnNewSource.wrapper);
         }
     }
 
     public onViewersChange(): void {
-        this.displayViewers();
-        this.displaySources();
-        let isRegistered: boolean = false;        
-        for (let v of kernel.senMan.viewers) {
-            if (v === this.selectedViewer) {
-                isRegistered = true;
-            }
+        switch (this.page) {
+            case 0:
+                this.displayPage1();
+                break;
+            case 1:
+                if (kernel.senMan.viewers.length === 0) {
+                    this.displayPage1();
+                }
+                else {
+                    this.displayViewers();
+                    this.displaySources();
+                }            
+                break;
+            case 2: 
+                let isRegistered: boolean = false;
+                for (let v of kernel.senMan.viewers) {
+                    if (v === this.selectedViewer) {
+                        isRegistered = true;
+                    }
+                }
+                if (!isRegistered) {
+                    this.displayPage1();
+                }
         }
-        if (!isRegistered) {         
-            this.displayPage1();            
-        }
+
+        
     }
 
 }

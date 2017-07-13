@@ -6,10 +6,11 @@
 
     private mk: HtmlHelper = new HtmlHelper();
     private subDivs: HTMLElement[] = [];
-    private btnMakeSource: Button;
+    private btnMakeSource: TextButton;
 
     private chosenData: sensys.ISensorInformation[] = [];
     private chosenList: ListBoxRearrangable;
+    private chosenListClickCounter: number = 0;
 
     private sourcesList: TempDataSourceList;
 
@@ -24,28 +25,37 @@
         this.plot = plot;
 
         this.wrapper = this.mk.tag("div", "dsbController-wrapper");
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             let div: HTMLElement = this.mk.tag("div", "dsbController-section");
             this.subDivs.push(div);
             this.wrapper.appendChild(div);
         }
 
-        this.btnMakeSource = new Button();
-        this.btnMakeSource.text = "Generate";
+        this.subDivs[1].style.display = "flex";
+        this.subDivs[1].style.flexDirection = "column";
+        this.subDivs[1].style.justifyContent = "space-between";
+
+        this.btnMakeSource = new TextButton();
+        this.btnMakeSource.text = "GENERATE";
+        this.btnMakeSource.disabled = true;
         this.btnMakeSource.onclick.addEventListener((e) => {
             this.generateSource();
             this.chosenData = [];
             this.updateChosenList();
-            this.btnMakeSource.wrapper.style.display = "none";
-        });
-        this.btnMakeSource.wrapper.style.display = "none";
-        this.subDivs[2].appendChild(this.btnMakeSource.wrapper);
-
-        console.log(this.plot);
+            this.btnMakeSource.disabled = true;
+        });        
+        
         this.determineGroup();
         this.listSensors();
         this.listDataSources();
         this.initChosenList();
+
+        let emptyDiv = document.createElement("div");
+        emptyDiv.style.height = "90px";
+        emptyDiv.style.textAlign = "center";
+        this.subDivs[1].appendChild(emptyDiv);
+        emptyDiv.appendChild(this.btnMakeSource.wrapper);
+
     }
 
     private generateSource(): void {
@@ -114,12 +124,20 @@
 
         expList.data = data;
         expList.onItemClick.addEventListener((e) => {
+            this.chosenListClickCounter++;
             if (this.chosenData.length < this.groupArgs) {
                 this.chosenData.push(e.data);
-                this.updateChosenList();
+                this.updateChosenList();                
             }
-            if (this.chosenData.length === this.groupArgs) {
-                this.btnMakeSource.wrapper.style.display = "inline-block";
+            if (this.chosenData.length === this.groupArgs) {                
+                
+                if (this.chosenListClickCounter > this.groupArgs) {
+                    this.chosenData.pop();
+                    this.chosenData.push(e.data);
+                    this.updateChosenList();
+                }
+                
+                this.btnMakeSource.disabled = false;                
             }
         });
     }
@@ -131,7 +149,7 @@
 
     private initChosenList(): void {
         this.chosenList = new ListBoxRearrangable();
-        this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        //this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
         this.chosenList.selector = (item: sensys.ISensorInformation) => {
             return <IListBoxRearrangableItem>{ mainText: item.Name, infoText: item.SensorSet.Name };
         }
@@ -140,7 +158,7 @@
 
         this.chosenList.onItemRemove.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
-            this.btnMakeSource.wrapper.style.display = "none";            
+            this.btnMakeSource.disabled = true;
         });
 
         this.chosenList.onItemRearrange.addEventListener((e) => {
@@ -154,7 +172,7 @@
 
     private listDataSources(): void {
         this.sourcesList = new TempDataSourceList(this.plot);
-        this.subDivs[3].appendChild(this.sourcesList.wrapper);
+        this.subDivs[2].appendChild(this.sourcesList.wrapper);
     }
 
     private determineGroup(): void {

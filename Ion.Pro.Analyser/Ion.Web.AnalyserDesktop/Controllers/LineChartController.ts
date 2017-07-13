@@ -11,7 +11,7 @@
     private marking: IMarking;
     //private displayGrid: boolean = true;
     //private stickyAxes: boolean = true;
-    private scalePoint_start: Point = new Point(0.05, 6);
+    private scalePoint_start: Point = new Point(0.005, 6);
     private movePoint_start: Point = new Point(50, 50);
     //private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
@@ -154,7 +154,7 @@
 
     protected onSensorChange(): void {
         if (this.data.length > 0) {
-            this.autoScaleY();            
+            //this.autoScaleY();            
         }
     }
     
@@ -687,10 +687,9 @@
 
 class LineChartLegend {
 
-    private tempCanvas: HTMLCanvasElement = document.createElement("canvas");
     private ctx: ContextFixer;
     get canvas(): HTMLCanvasElement {
-        return this.tempCanvas;
+        return this.ctx.canvas;
     }
 
     private defHeight: number;
@@ -736,10 +735,12 @@ class LineChartLegend {
 
         this.__darkTheme = darkTheme;
 
-        this.tempCanvas.width = this.width;
-        this.tempCanvas.height = this.height;
+        let canvas: HTMLCanvasElement = document.createElement("canvas");
 
-        this.ctx = new ContextFixer(this.tempCanvas);
+        canvas.width = this.width;
+        canvas.height = this.height;
+
+        this.ctx = new ContextFixer(canvas);
     }
 
     private draw(): void {
@@ -793,7 +794,7 @@ class LineChartLegend {
                 
                 ctx.closePath();
 
-                positionY += lineSpacing;                
+                positionY += lineSpacing;
             }
         }
         else {
@@ -806,7 +807,7 @@ class LineChartLegend {
 
     private resize(height: number): void {
         this.height = height;
-        this.tempCanvas.height = height;
+        this.ctx.canvas.height = height;
     }
     
 }

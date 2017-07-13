@@ -7,9 +7,9 @@ function tester() {
     window.document.body.style.color = "white";
     window.document.body.innerHTML = "";
     var newT = newEvent("tester.test");
-    var b = new Button();
-    var b2 = new Button();
-    var b3 = new Button();
+    var b = new TextButton();
+    var b2 = new TextButton();
+    var b3 = new TextButton();
     var lst = new ListBox();
     var table = new TableList();
     var ex = new ExpandableList();

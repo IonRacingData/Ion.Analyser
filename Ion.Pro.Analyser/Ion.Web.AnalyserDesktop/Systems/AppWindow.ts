@@ -397,7 +397,7 @@
 
     changeWindowMode(mode: WindowMode): void {
         switch (mode) {
-            case WindowMode.BORDERLESSFULL:
+            case WindowMode.BORDERLESSFULL: 
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();

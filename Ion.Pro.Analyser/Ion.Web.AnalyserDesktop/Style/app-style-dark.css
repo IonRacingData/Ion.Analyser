@@ -100,7 +100,7 @@
 }
 
 table.table.selectable tr.selectedrow {
-    background-color: black;
+    background-color: #202020;
     color: white;
 }
 
@@ -186,6 +186,10 @@ span.table-resize{
     color: #777;
 }
 
+.dsaController-right {
+    border-left: 1px solid #202020;
+}
+
 /* DataSourceBuildController */
 
 .dsbController-section {
@@ -195,6 +199,28 @@ span.table-resize{
     .dsbController-section:last-child {
         border: none;
     }
+
+
+/* Button */
+
+.comp-button {
+    background-color: #444;    
+    color: white;
+}
+
+.comp-button:hover {
+    padding: 1px 3px;
+    border: 2px solid #666;
+}
+
+.comp-button:active {
+    background-color: #3c3c3c;
+}
+
+.comp-button-disabled {
+    background-color: #3a3a3a;    
+    color: #6b6b6b;
+}
 
 /* lists */
 
@@ -215,7 +241,7 @@ span.table-resize{
 
 
 .listitem:hover {
-    background-color: #202020;
+    background-color: #4a4a4a;
 }
 
 

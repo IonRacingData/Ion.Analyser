@@ -53,7 +53,7 @@ class ConfigWindow implements IApplication {
                         row.appendChild(sw.wrapper);
                         break;
                     case "action":
-                        let but = new Button();
+                        let but = new TextButton();
                         but.text = temp.text;
                         but.onclick.addEventListener(() => {
                             (<() => void>temp.value)();
@@ -390,12 +390,23 @@ class GaugeTester implements IApplication, IViewer<Point> {
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
 
+        this.createEvents(this.app.events);
+    }
+
+    private createEvents(eh: EventHandler) {
         this.window.onResize.addEventListener(() => {
             this.gauge.setSize(this.window.width, this.window.height);
+        });
+        eh.on(this.plotWindow.onClose, () => {
+            this.window_close()
         });
         this.app.events.on(kernel.winMan.onThemeChange, () => {
             this.gauge.updateColors();
         });
+    }
+
+    private window_close() {        
+        kernel.senMan.unregister(this);
     }
 
     drawMeter() {
@@ -439,16 +450,21 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
-            for (let i = 0; i < d.length; i++) {
-                this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
-            }
-            this.testData = new GPSPlotData(this.points);
-            this.draw();
-        });*/
+
+        this.createEvents(this.app.events);
+    }
+
+    private createEvents(eh: EventHandler) {
         this.window.onResize.addEventListener(() => {
             this.plot.setSize(this.window.width, this.window.height);
         });
+        eh.on(this.plotWindow.onClose, () => {
+            this.window_close()
+        });
+    }
+
+    private window_close() {
+        kernel.senMan.unregister(this);
     }
 
     dataUpdate() {
@@ -488,15 +504,20 @@ class LabelTester implements IApplication, IViewer<Point> {
         let div = this.label.generate();
         this.window.content.appendChild(div);        
 
-        /*
-        div.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY;
-            this.label.setValue(this.val);
-        });*/
+        this.createEvents(this.app.events);
+    }
 
+    private createEvents(eh: EventHandler) {
         this.window.onResize.addEventListener(() => {
             this.label.setSize(this.window.width, this.window.height);
         });
+        eh.on(this.plotWindow.onClose, () => {
+            this.window_close()
+        });
+    }
+
+    private window_close() {
+        kernel.senMan.unregister(this);
     }
 
     dataUpdate() {
@@ -537,9 +558,20 @@ class BarTester implements IApplication, IViewer<Point> {
         let barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
 
+        this.createEvents(this.app.events);
+    }
+
+    private createEvents(eh: EventHandler) {
         this.window.onResize.addEventListener(() => {
             this.bar.setSize(this.window.width, this.window.height);
         });
+        eh.on(this.plotWindow.onClose, () => {
+            this.window_close()
+        });
+    }
+
+    private window_close() {
+        kernel.senMan.unregister(this);
     }
 
     dataUpdate(): void {
@@ -590,14 +622,15 @@ class LegacyRPIManager implements IApplication {
 }
 
 class SteeringWheelTester implements IApplication, IViewer<Point> {
+    plotType: string = "Bar";
+    plotWindow: AppWindow;
+    type: IClassType<Point> = Point;
+    dataSource: IDataSource<Point> | null = null;        
+
     app: Application;
     window: AppWindow;
     wheel: SteeringWheelController;
     val: number = 0.5;
-    type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> | null = null;
-    plotType: string = "Bar";
-    plotWindow: AppWindow;
 
     main() {
         this.window = kernel.winMan.createWindow(this.app, "Steering wheel");
@@ -609,16 +642,27 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
         this.window.content.appendChild(wheelWrapper);
         this.wheel.setPer(this.val);
 
-        wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY / 100;
-            this.val = this.val < 0 ? 0 : this.val;
-            this.val = this.val > 1 ? 1 : this.val;
-            this.wheel.setPer(this.val);
-        });
+        //wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
+        //    this.val -= e.deltaY / 100;
+        //    this.val = this.val < 0 ? 0 : this.val;
+        //    this.val = this.val > 1 ? 1 : this.val;
+        //    this.wheel.setPer(this.val);
+        //});
 
+        this.createEvents(this.app.events);
+    }
+
+    private createEvents(eh: EventHandler) {
         this.window.onResize.addEventListener(() => {
             this.wheel.setSize(this.window.width, this.window.height);
         });
+        eh.on(this.plotWindow.onClose, () => {
+            this.window_close()
+        });
+    }
+
+    private window_close() {
+        kernel.senMan.unregister(this);
     }
 
     dataUpdate(): void {

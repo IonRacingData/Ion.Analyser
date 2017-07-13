@@ -41,7 +41,7 @@ var ConfigWindow = (function () {
                         row.appendChild(sw.wrapper);
                         break;
                     case "action":
-                        var but = new Button();
+                        var but = new TextButton();
                         but.text = temp.text;
                         but.onclick.addEventListener(function () {
                             temp.value();
@@ -322,12 +322,22 @@ var GaugeTester = (function () {
         kernel.senMan.register(this);
         this.drawMeter();
         this.gauge.setSize(this.window.width, this.window.height);
+        this.createEvents(this.app.events);
+    };
+    GaugeTester.prototype.createEvents = function (eh) {
+        var _this = this;
         this.window.onResize.addEventListener(function () {
             _this.gauge.setSize(_this.window.width, _this.window.height);
+        });
+        eh.on(this.plotWindow.onClose, function () {
+            _this.window_close();
         });
         this.app.events.on(kernel.winMan.onThemeChange, function () {
             _this.gauge.updateColors();
         });
+    };
+    GaugeTester.prototype.window_close = function () {
+        kernel.senMan.unregister(this);
     };
     GaugeTester.prototype.drawMeter = function () {
         this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
@@ -364,16 +374,19 @@ var GPSPlotTester = (function () {
         this.plot = new GPSController(this.window.width, this.window.height);
         this.window.content.appendChild(this.plot.generate());
         kernel.senMan.register(this);
-        /*kernel.senMan.getData(252, (d: ISensorPackage[]) => {
-            for (let i = 0; i < d.length; i++) {
-                this.points.push(new Point3D(d[i].TimeStamp, d[i].Value, 1));
-            }
-            this.testData = new GPSPlotData(this.points);
-            this.draw();
-        });*/
+        this.createEvents(this.app.events);
+    };
+    GPSPlotTester.prototype.createEvents = function (eh) {
+        var _this = this;
         this.window.onResize.addEventListener(function () {
             _this.plot.setSize(_this.window.width, _this.window.height);
         });
+        eh.on(this.plotWindow.onClose, function () {
+            _this.window_close();
+        });
+    };
+    GPSPlotTester.prototype.window_close = function () {
+        kernel.senMan.unregister(this);
     };
     GPSPlotTester.prototype.dataUpdate = function () {
         this.plot.setData(this.dataSource);
@@ -406,14 +419,19 @@ var LabelTester = (function () {
         this.label = new LabelController(this.window.width, this.window.height);
         var div = this.label.generate();
         this.window.content.appendChild(div);
-        /*
-        div.addEventListener("wheel", (e: WheelEvent) => {
-            this.val -= e.deltaY;
-            this.label.setValue(this.val);
-        });*/
+        this.createEvents(this.app.events);
+    };
+    LabelTester.prototype.createEvents = function (eh) {
+        var _this = this;
         this.window.onResize.addEventListener(function () {
             _this.label.setSize(_this.window.width, _this.window.height);
         });
+        eh.on(this.plotWindow.onClose, function () {
+            _this.window_close();
+        });
+    };
+    LabelTester.prototype.window_close = function () {
+        kernel.senMan.unregister(this);
     };
     LabelTester.prototype.dataUpdate = function () {
         this.label.setData(this.dataSource);
@@ -446,9 +464,19 @@ var BarTester = (function () {
         this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
         var barWrapper = this.bar.generate();
         this.window.content.appendChild(barWrapper);
+        this.createEvents(this.app.events);
+    };
+    BarTester.prototype.createEvents = function (eh) {
+        var _this = this;
         this.window.onResize.addEventListener(function () {
             _this.bar.setSize(_this.window.width, _this.window.height);
         });
+        eh.on(this.plotWindow.onClose, function () {
+            _this.window_close();
+        });
+    };
+    BarTester.prototype.window_close = function () {
+        kernel.senMan.unregister(this);
     };
     BarTester.prototype.dataUpdate = function () {
         this.bar.setData(this.dataSource);
@@ -492,13 +520,12 @@ var LegacyRPIManager = (function () {
 }());
 var SteeringWheelTester = (function () {
     function SteeringWheelTester() {
-        this.val = 0.5;
+        this.plotType = "Bar";
         this.type = Point;
         this.dataSource = null;
-        this.plotType = "Bar";
+        this.val = 0.5;
     }
     SteeringWheelTester.prototype.main = function () {
-        var _this = this;
         this.window = kernel.winMan.createWindow(this.app, "Steering wheel");
         this.window.content.style.overflow = "hidden";
         this.plotWindow = this.window;
@@ -507,15 +534,25 @@ var SteeringWheelTester = (function () {
         var wheelWrapper = this.wheel.generate();
         this.window.content.appendChild(wheelWrapper);
         this.wheel.setPer(this.val);
-        wheelWrapper.addEventListener("wheel", function (e) {
-            _this.val -= e.deltaY / 100;
-            _this.val = _this.val < 0 ? 0 : _this.val;
-            _this.val = _this.val > 1 ? 1 : _this.val;
-            _this.wheel.setPer(_this.val);
-        });
+        //wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
+        //    this.val -= e.deltaY / 100;
+        //    this.val = this.val < 0 ? 0 : this.val;
+        //    this.val = this.val > 1 ? 1 : this.val;
+        //    this.wheel.setPer(this.val);
+        //});
+        this.createEvents(this.app.events);
+    };
+    SteeringWheelTester.prototype.createEvents = function (eh) {
+        var _this = this;
         this.window.onResize.addEventListener(function () {
             _this.wheel.setSize(_this.window.width, _this.window.height);
         });
+        eh.on(this.plotWindow.onClose, function () {
+            _this.window_close();
+        });
+    };
+    SteeringWheelTester.prototype.window_close = function () {
+        kernel.senMan.unregister(this);
     };
     SteeringWheelTester.prototype.dataUpdate = function () {
         this.wheel.setData(this.dataSource);

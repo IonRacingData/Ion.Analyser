@@ -1,11 +1,13 @@
 var DataSourceBuilder = (function () {
     function DataSourceBuilder() {
         this.mk = new HtmlHelper();
+        this.page1Width = 401.5;
+        this.page2Width = 800;
     }
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-        this.window.setSize(1050, this.window.height);
+        this.window.setSize(this.page1Width, 330);
         this.dsb = new DataSourceAssignmentController();
         this.window.content.appendChild(this.dsb.wrapper);
         this.app.events.on(kernel.senMan.onRegisterViewer, function () {
@@ -13,6 +15,19 @@ var DataSourceBuilder = (function () {
         });
         this.app.events.on(kernel.senMan.onUnRegisterViewer, function () {
             _this.dsb.onViewersChange();
+        });
+        this.dsb.onPageSwitch.addEventListener(function (e) {
+            var page = e.data;
+            if (!_this.window.state || _this.window.state === 0) {
+                switch (page) {
+                    case 1:
+                        _this.window.setSize(_this.page1Width, _this.window.height);
+                        break;
+                    case 2:
+                        _this.window.setSize(_this.page2Width, _this.window.height);
+                        break;
+                }
+            }
         });
     };
     return DataSourceBuilder;

@@ -18,7 +18,7 @@ var LineChartController = (function (_super) {
         _this.isMarking = false;
         //private displayGrid: boolean = true;
         //private stickyAxes: boolean = true;
-        _this.scalePoint_start = new Point(0.05, 6);
+        _this.scalePoint_start = new Point(0.005, 6);
         _this.movePoint_start = new Point(50, 50);
         //private autoScroll: boolean = false;
         _this.autoScroll_plotMoved = false;
@@ -134,7 +134,7 @@ var LineChartController = (function (_super) {
     };
     LineChartController.prototype.onSensorChange = function () {
         if (this.data.length > 0) {
-            this.autoScaleY();
+            //this.autoScaleY();            
         }
     };
     LineChartController.prototype.moveToLastPoint = function () {
@@ -583,7 +583,6 @@ var LineChartController = (function (_super) {
 }(MultiValueCanvasController));
 var LineChartLegend = (function () {
     function LineChartLegend(width, height, darkTheme) {
-        this.tempCanvas = document.createElement("canvas");
         this.__backgroundColor = "black";
         this.__textColor = "white";
         this.__borderColor = "green";
@@ -591,13 +590,14 @@ var LineChartLegend = (function () {
         this.height = height;
         this.width = width;
         this.__darkTheme = darkTheme;
-        this.tempCanvas.width = this.width;
-        this.tempCanvas.height = this.height;
-        this.ctx = new ContextFixer(this.tempCanvas);
+        var canvas = document.createElement("canvas");
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.ctx = new ContextFixer(canvas);
     }
     Object.defineProperty(LineChartLegend.prototype, "canvas", {
         get: function () {
-            return this.tempCanvas;
+            return this.ctx.canvas;
         },
         enumerable: true,
         configurable: true
@@ -699,7 +699,7 @@ var LineChartLegend = (function () {
     };
     LineChartLegend.prototype.resize = function (height) {
         this.height = height;
-        this.tempCanvas.height = height;
+        this.ctx.canvas.height = height;
     };
     return LineChartLegend;
 }());

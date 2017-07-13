@@ -17,17 +17,51 @@ var Button = (function (_super) {
     __extends(Button, _super);
     function Button() {
         var _this = _super.call(this) || this;
+        _this.__disabled = false;
         _this.onclick = newEvent("Button.onclick");
         _this.wrapper = document.createElement("div");
-        var span = document.createElement("span");
         _this.wrapper.className = "comp-button";
-        _this.textNode = document.createTextNode("button");
-        span.appendChild(_this.textNode);
-        _this.wrapper.appendChild(span);
         _this.wrapper.onclick = _this.onclick;
         return _this;
     }
-    Object.defineProperty(Button.prototype, "text", {
+    Object.defineProperty(Button.prototype, "disabled", {
+        set: function (bool) {
+            this.__disabled = bool;
+            this.toggleDisabled();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Button.prototype.toggleDisabled = function () {
+        if (this.__disabled) {
+            this.wrapper.className = "comp-button-disabled";
+            this.wrapper.onclick = function () { };
+        }
+        else {
+            this.wrapper.className = "comp-button";
+            this.wrapper.onclick = this.onclick;
+        }
+    };
+    return Button;
+}(Component));
+var IconButton = (function (_super) {
+    __extends(IconButton, _super);
+    function IconButton() {
+        return _super.call(this) || this;
+    }
+    return IconButton;
+}(Button));
+var TextButton = (function (_super) {
+    __extends(TextButton, _super);
+    function TextButton() {
+        var _this = _super.call(this) || this;
+        _this.textNode = document.createTextNode("button");
+        var span = document.createElement("span");
+        span.appendChild(_this.textNode);
+        _this.wrapper.appendChild(span);
+        return _this;
+    }
+    Object.defineProperty(TextButton.prototype, "text", {
         get: function () {
             if (this.textNode.nodeValue)
                 return this.textNode.nodeValue;
@@ -40,8 +74,8 @@ var Button = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    return Button;
-}(Component));
+    return TextButton;
+}(Button));
 var ListBox = (function (_super) {
     __extends(ListBox, _super);
     function ListBox() {
@@ -426,7 +460,7 @@ var TempDataSourceList = (function (_super) {
         _this.plot = plot;
         var info = kernel.senMan.getDataSources(plot.type);
         _this.sensorTable = _this.mk.tag("div");
-        _this.sensorTable.style.minWidth = "250px";
+        //this.sensorTable.style.minWidth = "200px";
         _this.sensorTable.style.flexGrow = "1";
         _this.sensorTable.style.overflowY = "auto";
         _this.wrapper = _this.mk.tag("div");

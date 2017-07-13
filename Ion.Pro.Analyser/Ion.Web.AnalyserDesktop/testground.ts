@@ -13,9 +13,9 @@ function tester() {
 
     let newT = newEvent<IEventData>("tester.test");
 
-    let b = new Button();
-    let b2 = new Button();
-    let b3 = new Button();
+    let b = new TextButton();
+    let b2 = new TextButton();
+    let b3 = new TextButton();
     let lst = new ListBox();
     let table = new TableList();
     let ex: ExpandableList = new ExpandableList();

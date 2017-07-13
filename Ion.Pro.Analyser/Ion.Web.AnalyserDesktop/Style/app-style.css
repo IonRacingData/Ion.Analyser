@@ -182,6 +182,10 @@ span.table-resize{
     color: #777;
 }
 
+.dsaController-right {
+    border-left: 1px solid #ccc;
+}
+
 /* DataSourceBuildController */
 
 .dsbController-section {
@@ -192,6 +196,26 @@ span.table-resize{
         border: none;
     }
 
+/* Button */
+
+.comp-button {
+    background-color: #dbdbdb;
+    color: #202020;
+}
+
+.comp-button:hover {
+    padding: 1px 3px;
+    border: 2px solid darkgray;
+}
+
+.comp-button:active {
+    background-color: #cacaca;
+}
+
+.comp-button-disabled {
+    background-color: #dbdbdb;
+    color: #9c9c9c;
+}
 
 /* lists */
 

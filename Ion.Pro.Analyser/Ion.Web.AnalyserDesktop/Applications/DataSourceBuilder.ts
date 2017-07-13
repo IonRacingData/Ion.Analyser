@@ -1,13 +1,15 @@
 ﻿class DataSourceBuilder implements IApplication {
     app: Application;
     window: AppWindow;
-    mk: HtmlHelper = new HtmlHelper();
+    mk: HtmlHelper = new HtmlHelper();    
 
     private dsb: DataSourceAssignmentController;
+    private page1Width: number = 401.5;
+    private page2Width: number = 800;
 
     public main(): void {
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
-        this.window.setSize(1050, this.window.height);
+        this.window.setSize(this.page1Width, 330);
         this.dsb = new DataSourceAssignmentController();
         this.window.content.appendChild(this.dsb.wrapper);
         
@@ -17,6 +19,19 @@
         this.app.events.on(kernel.senMan.onUnRegisterViewer, () => {
             this.dsb.onViewersChange();
         });
+        this.dsb.onPageSwitch.addEventListener((e) => {
+            let page: number = e.data;
+            if (!this.window.state || this.window.state === 0) {
+                switch (page) {
+                    case 1:
+                        this.window.setSize(this.page1Width, this.window.height);
+                        break;
+                    case 2:
+                        this.window.setSize(this.page2Width, this.window.height);
+                        break;
+                }                
+            }
+        });        
     }
 }
 

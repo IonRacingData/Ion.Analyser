@@ -15,28 +15,35 @@ var DataSourceBuildController = (function (_super) {
         _this.mk = new HtmlHelper();
         _this.subDivs = [];
         _this.chosenData = [];
+        _this.chosenListClickCounter = 0;
         _this.plot = plot;
         _this.wrapper = _this.mk.tag("div", "dsbController-wrapper");
-        for (var i = 0; i < 4; i++) {
+        for (var i = 0; i < 3; i++) {
             var div = _this.mk.tag("div", "dsbController-section");
             _this.subDivs.push(div);
             _this.wrapper.appendChild(div);
         }
-        _this.btnMakeSource = new Button();
-        _this.btnMakeSource.text = "Generate";
+        _this.subDivs[1].style.display = "flex";
+        _this.subDivs[1].style.flexDirection = "column";
+        _this.subDivs[1].style.justifyContent = "space-between";
+        _this.btnMakeSource = new TextButton();
+        _this.btnMakeSource.text = "GENERATE";
+        _this.btnMakeSource.disabled = true;
         _this.btnMakeSource.onclick.addEventListener(function (e) {
             _this.generateSource();
             _this.chosenData = [];
             _this.updateChosenList();
-            _this.btnMakeSource.wrapper.style.display = "none";
+            _this.btnMakeSource.disabled = true;
         });
-        _this.btnMakeSource.wrapper.style.display = "none";
-        _this.subDivs[2].appendChild(_this.btnMakeSource.wrapper);
-        console.log(_this.plot);
         _this.determineGroup();
         _this.listSensors();
         _this.listDataSources();
         _this.initChosenList();
+        var emptyDiv = document.createElement("div");
+        emptyDiv.style.height = "90px";
+        emptyDiv.style.textAlign = "center";
+        _this.subDivs[1].appendChild(emptyDiv);
+        emptyDiv.appendChild(_this.btnMakeSource.wrapper);
         return _this;
     }
     Object.defineProperty(DataSourceBuildController.prototype, "viewer", {
@@ -110,12 +117,18 @@ var DataSourceBuildController = (function (_super) {
         };
         expList.data = data;
         expList.onItemClick.addEventListener(function (e) {
+            _this.chosenListClickCounter++;
             if (_this.chosenData.length < _this.groupArgs) {
                 _this.chosenData.push(e.data);
                 _this.updateChosenList();
             }
             if (_this.chosenData.length === _this.groupArgs) {
-                _this.btnMakeSource.wrapper.style.display = "inline-block";
+                if (_this.chosenListClickCounter > _this.groupArgs) {
+                    _this.chosenData.pop();
+                    _this.chosenData.push(e.data);
+                    _this.updateChosenList();
+                }
+                _this.btnMakeSource.disabled = false;
             }
         });
     };
@@ -126,14 +139,14 @@ var DataSourceBuildController = (function (_super) {
     DataSourceBuildController.prototype.initChosenList = function () {
         var _this = this;
         this.chosenList = new ListBoxRearrangable();
-        this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        //this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
         this.chosenList.selector = function (item) {
             return { mainText: item.Name, infoText: item.SensorSet.Name };
         };
         this.subDivs[1].appendChild(this.chosenList.wrapper);
         this.chosenList.onItemRemove.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
-            _this.btnMakeSource.wrapper.style.display = "none";
+            _this.btnMakeSource.disabled = true;
         });
         this.chosenList.onItemRearrange.addEventListener(function (e) {
             _this.chosenData = _this.chosenList.data;
@@ -144,7 +157,7 @@ var DataSourceBuildController = (function (_super) {
     };
     DataSourceBuildController.prototype.listDataSources = function () {
         this.sourcesList = new TempDataSourceList(this.plot);
-        this.subDivs[3].appendChild(this.sourcesList.wrapper);
+        this.subDivs[2].appendChild(this.sourcesList.wrapper);
     };
     DataSourceBuildController.prototype.determineGroup = function () {
         var s = kernel.senMan.getGroupByType(this.plot.type);

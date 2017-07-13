@@ -24,8 +24,43 @@ class Component {
     public wrapper: HTMLElement;
 }
 
-class Button extends Component {
+abstract class Button extends Component {
 
+    private __disabled: boolean = false;
+    set disabled(bool: boolean) {
+        this.__disabled = bool;
+        this.toggleDisabled();
+    }
+
+    constructor() {
+        super();
+        this.wrapper = document.createElement("div");
+        this.wrapper.className = "comp-button";
+        this.wrapper.onclick = this.onclick;
+    }
+
+    private toggleDisabled(): void {
+        if (this.__disabled) {
+            this.wrapper.className = "comp-button-disabled";
+            this.wrapper.onclick = () => { };
+        }
+        else {
+            this.wrapper.className = "comp-button";
+            this.wrapper.onclick = this.onclick;
+        }
+    }
+    
+    onclick = newEvent("Button.onclick");
+}
+
+class IconButton extends Button {
+    constructor() {
+        super();
+
+    }
+}
+
+class TextButton extends Button {
     private textNode: Text;
 
     get text(): string {
@@ -40,16 +75,13 @@ class Button extends Component {
 
     constructor() {
         super();
-        this.wrapper = document.createElement("div");
-        let span = document.createElement("span");
-        this.wrapper.className = "comp-button";
         this.textNode = document.createTextNode("button");
+        let span = document.createElement("span");
         span.appendChild(this.textNode);
         this.wrapper.appendChild(span);
-        this.wrapper.onclick = this.onclick;
     }
 
-    onclick = newEvent("Button.onclick");
+
 }
 
 class ListBox extends Component {
@@ -458,7 +490,7 @@ class TempDataSourceList extends Component {
         let info: IDataSource<any>[] = kernel.senMan.getDataSources(plot.type);
 
         this.sensorTable = this.mk.tag("div");
-        this.sensorTable.style.minWidth = "250px";
+        //this.sensorTable.style.minWidth = "200px";
         this.sensorTable.style.flexGrow = "1";
         this.sensorTable.style.overflowY = "auto";
 
