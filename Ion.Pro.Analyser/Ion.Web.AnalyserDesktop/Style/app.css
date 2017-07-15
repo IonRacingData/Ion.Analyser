@@ -289,18 +289,45 @@ span.table-resize{
     /*border: 1px solid black;*/
 }
 .plot-wrapper {
-    position: relative;
+    /*position: relative;*/
+}
+
+.controller-legend {   
+    font-size: 0.7em;
+    padding: 1px 0;
+    text-align: center;
+}
+
+.gauge-controller-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%
 }
 
 .label-controller {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.label-controller-content {
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
 }
 
+.bar-controller-content {
+    display: flex;
+}
+
 .bar-controller-wrapper {
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .bar-controller-silhouette {
@@ -313,10 +340,12 @@ span.table-resize{
     flex-grow: 1;
     display: flex;
     align-items: flex-end;
+    flex-basis: 0;
 }
 
 .bar-controller-barWrapper2 {
-    flex-grow: 1;    
+    flex-grow: 1;
+    flex-basis: 0;
 }
 
 .steeringWheel-wrapper {

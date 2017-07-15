@@ -340,8 +340,8 @@ var GaugeTester = (function () {
         kernel.senMan.unregister(this);
     };
     GaugeTester.prototype.drawMeter = function () {
-        this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
-        var gaugeWrapper = this.gauge.generate();
+        this.gauge = new GaugeController(this.window.width, this.window.height);
+        var gaugeWrapper = this.gauge.wrapper;
         this.window.content.appendChild(gaugeWrapper);
     };
     GaugeTester.prototype.dataUpdate = function () {
@@ -403,6 +403,7 @@ var LabelTester = (function () {
     LabelTester.prototype.main = function () {
         var _this = this;
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Label");
+        this.window.setSize(350, 180);
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -417,7 +418,7 @@ var LabelTester = (function () {
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.label = new LabelController(this.window.width, this.window.height);
-        var div = this.label.generate();
+        var div = this.label.wrapper;
         this.window.content.appendChild(div);
         this.createEvents(this.app.events);
     };
@@ -448,6 +449,7 @@ var BarTester = (function () {
     BarTester.prototype.main = function () {
         var _this = this;
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Bar Chart");
+        this.window.setSize(300, this.window.height);
         var testWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = function (e) {
             testWindow.x = e.x;
@@ -461,10 +463,22 @@ var BarTester = (function () {
         });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
-        var barWrapper = this.bar.generate();
+        this.bar = new BarController(this.window.width, this.window.height, Direction.Vertical);
+        var barWrapper = this.bar.wrapper;
         this.window.content.appendChild(barWrapper);
         this.createEvents(this.app.events);
+        barWrapper.addEventListener("keydown", function (e) {
+            switch (e.key) {
+                case "j":
+                    _this.val += 0.1;
+                    break;
+                case "k":
+                    _this.val -= 0.1;
+            }
+            _this.val = _this.val < 0 ? 0 : _this.val;
+            _this.val = _this.val > 1 ? 1 : _this.val;
+            _this.bar.test_setValue(_this.val);
+        });
     };
     BarTester.prototype.createEvents = function (eh) {
         var _this = this;
@@ -520,7 +534,7 @@ var LegacyRPIManager = (function () {
 }());
 var SteeringWheelTester = (function () {
     function SteeringWheelTester() {
-        this.plotType = "Bar";
+        this.plotType = "Steering Wheel";
         this.type = Point;
         this.dataSource = null;
         this.val = 0.5;

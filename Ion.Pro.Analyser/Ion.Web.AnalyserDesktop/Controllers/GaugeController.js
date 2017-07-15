@@ -15,45 +15,44 @@ var GaugeController = (function (_super) {
         _this.padding = 5;
         _this.totalAngle = (3 * Math.PI) / 2;
         _this.startAngle = -(3 * Math.PI) / 4;
+        _this.defMin = 0;
+        _this.defMax = 100;
+        _this.defStep = 10;
+        _this.customLabels = false;
         _this.color = "black";
         _this.needleColor = "black";
         _this.centerColor = "black";
-        _this.size = Math.min(width, height);
+        _this.legendHeight = 18;
+        _this.wrapper = _this.mk.tag("div", "gauge-controller-wrapper");
+        _this.contentWrapper = _this.mk.tag("div", "gauge-controller-content");
+        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
+        _this.legendWrapper.style.height = _this.legendHeight + "px";
+        _this.legendWrapper.appendChild(document.createTextNode("No data"));
+        _this.canvas = new LayeredCanvas(_this.contentWrapper);
+        _this.ctxMain = new ContextFixer(_this.canvas.addCanvas());
+        _this.ctxNeedle = new ContextFixer(_this.canvas.addCanvas());
+        _this.ctxCenter = new ContextFixer(_this.canvas.addCanvas());
+        _this.wrapper.appendChild(_this.contentWrapper);
+        _this.wrapper.appendChild(_this.legendWrapper);
+        // following 'if' doesn't work, need fixing
+        if (min && max && step) {
+            console.log("all defined");
+            _this.labels = _this.generateLabels(min, max, step);
+            _this.customLabels = true;
+        }
+        else {
+            _this.labels = _this.generateLabels(_this.defMin, _this.defMax, _this.defStep);
+        }
+        _this.setColor();
+        _this.setSize(_this.size, _this.size);
+        return _this;
+    }
+    GaugeController.prototype.generateLabels = function (min, max, step) {
         var labels = [];
         for (var i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
-        _this.labels = labels;
-        return _this;
-        // temp stylesheet thingy
-        /*let ss: CSSStyleSheet;
-        let all: StyleSheetList = document.styleSheets;
-        for (let i = 0; i < all.length; i++) {
-            if (all[i].title === "app-style") {
-                ss = <CSSStyleSheet>all[i];
-                let rules = ss.cssRules;
-
-                for (let j = 0; j < rules.length; j++) {
-                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];
-                    if (rule.selectorText === ".gauge-plot") {
-                        this.color = rule.style.color;
-                        this.needleColor = rule.style.borderColor;
-                        break;
-                    }
-                }
-                break;
-            }
-        }*/
-    }
-    GaugeController.prototype.generate = function () {
-        this.wrapper = this.mk.tag("div", "plot-wrapper");
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
-        this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
-        this.setColor();
-        this.setSize(this.size, this.size);
-        return this.wrapper;
+        return labels;
     };
     GaugeController.prototype.draw = function () {
         this.ctxMain.clear();
@@ -94,6 +93,14 @@ var GaugeController = (function (_super) {
         this.drawNeedle();
     };
     GaugeController.prototype.drawNeedle = function () {
+        if (this.percent > 1) {
+            console.error("Percentage calculation malfunction");
+            this.percent = 1;
+        }
+        else if (this.percent < 0) {
+            console.error("Percentage calculation malfunction");
+            this.percent = 0;
+        }
         var val = this.percent * 100;
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
@@ -110,11 +117,32 @@ var GaugeController = (function (_super) {
         this.ctxNeedle.ctx.setTransform(1, 0, 0, 1, 0, 0);
     };
     GaugeController.prototype.onSizeChange = function () {
-        this.size = Math.min(this.width, this.height);
+        this.contentHeight = this.height - this.legendHeight;
+        this.size = Math.min(this.width, this.contentHeight);
         this.offsetX = (this.width - this.size) / 2;
-        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
-        this.canvas.setSize(this.width, this.height);
+        this.offsetY = (this.contentHeight - this.size) / 2 + (this.contentHeight * 0.05);
+        this.canvas.setSize(this.width, this.contentHeight);
         this.draw();
+    };
+    GaugeController.prototype.onSensorChange = function () {
+        if (!this.customLabels) {
+            var min = SensorInfoHelper.minValue(this.lastSensorInfo);
+            var max = SensorInfoHelper.maxValue(this.lastSensorInfo);
+            var step = ((max - min) / 10);
+            if (step < 1) {
+                step = 1;
+            }
+            console.log("New label values: ", min, max, step);
+            this.labels = this.generateLabels(min, max, step);
+            this.draw();
+        }
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
     };
     GaugeController.prototype.onDataChange = function () {
         this.drawNeedle();

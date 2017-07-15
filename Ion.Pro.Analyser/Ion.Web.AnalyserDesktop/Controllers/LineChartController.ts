@@ -9,11 +9,8 @@
     private selectedPoint: Point | null = null;
     private isMarking = false;
     private marking: IMarking;
-    //private displayGrid: boolean = true;
-    //private stickyAxes: boolean = true;
     private scalePoint_start: Point = new Point(0.005, 6);
     private movePoint_start: Point = new Point(50, 50);
-    //private autoScroll: boolean = false;
     private autoScroll_plotMoved: boolean = false;
 
     private gridColor;
@@ -145,7 +142,7 @@
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
-                this.autoScaleY();                
+                //this.autoScaleY();                
             }
         }
 

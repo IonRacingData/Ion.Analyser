@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var DataSourceAssignmentController = (function (_super) {
     __extends(DataSourceAssignmentController, _super);
-    function DataSourceAssignmentController() {
+    function DataSourceAssignmentController(viewer) {
         var _this = _super.call(this) || this;
         _this.selectedViewer = null;
         _this.page = 1;
@@ -22,6 +22,9 @@ var DataSourceAssignmentController = (function (_super) {
         _this.wrapper = mk.tag("div", "dsaController-wrapper");
         _this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
         _this.navWrapper = mk.tag("div", "dsaController-navwrapper");
+        if (viewer) {
+            _this.selectedViewer = viewer;
+        }
         for (var i = 0; i < 3; i++) {
             var e = mk.tag("div", "dsaController-navelement");
             _this.navElements.push(e);

@@ -16,11 +16,8 @@ var LineChartController = (function (_super) {
         _this.zoomSpeed = 1.1;
         _this.selectedPoint = null;
         _this.isMarking = false;
-        //private displayGrid: boolean = true;
-        //private stickyAxes: boolean = true;
         _this.scalePoint_start = new Point(0.005, 6);
         _this.movePoint_start = new Point(50, 50);
-        //private autoScroll: boolean = false;
         _this.autoScroll_plotMoved = false;
         _this.mainColor = "white";
         _this.legend = new LineChartLegend(130, 50, true);
@@ -127,7 +124,7 @@ var LineChartController = (function (_super) {
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
-                this.autoScaleY();
+                //this.autoScaleY();                
             }
         }
         this.draw();

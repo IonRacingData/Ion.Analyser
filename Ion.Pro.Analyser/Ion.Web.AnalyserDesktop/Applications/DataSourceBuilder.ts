@@ -5,12 +5,29 @@
 
     private dsb: DataSourceAssignmentController;
     private page1Width: number = 401.5;
-    private page2Width: number = 800;
+    private page2Width: number = 800;    
 
-    public main(): void {
+    public main(...args: any[]): void {
+        let viewer: IViewerBase<any> | null = null;
+        if (args) {
+            for (let arg of args) {
+                try {
+                    viewer = arg;
+                }
+                catch(e) {
+                    console.log(<Error>e.message);
+                }
+            }
+        }
+
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
         this.window.setSize(this.page1Width, 330);
-        this.dsb = new DataSourceAssignmentController();
+        if (viewer) {
+            this.dsb = new DataSourceAssignmentController(viewer);
+        }
+        else {
+            this.dsb = new DataSourceAssignmentController();
+        }
         this.window.content.appendChild(this.dsb.wrapper);
         
         this.app.events.on(kernel.senMan.onRegisterViewer, () => {

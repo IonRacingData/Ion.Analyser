@@ -4,25 +4,30 @@
     private barWrapper1: HTMLElement;
     private barWrapper2: HTMLElement;
     private direction: Direction;
-    private horizontal: boolean = false;
     private double: boolean = false;
 
     private silhouette: string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
     private silhouetteContainer: HTMLElement;
     private barContainer: HTMLElement;
 
+    private contentWrapper: HTMLElement;
+    private legendWrapper: HTMLElement;
+    private legendHeight: number = 18;
+
     constructor(width: number, height: number, direction: Direction) {
         super();
         this.direction = direction;
         this.width = width;
         this.height = height;
-    }
 
-    generate(): HTMLElement {
         this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
         this.wrapper.setAttribute("tabindex", "0");
+        this.contentWrapper = this.mk.tag("div", "bar-controller-content");
+        this.legendWrapper = this.mk.tag("div", "controller-legend");
+        this.legendWrapper.style.height = this.legendHeight + "px";
+        this.legendWrapper.appendChild(document.createTextNode("No data"));
 
-        this.barContainer = this.mk.tag("div");
+        this.barContainer = this.mk.tag("div", "bar-controller-barContainer");
         this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
         this.silhouetteContainer.innerHTML = this.silhouette;
 
@@ -36,15 +41,15 @@
         this.bar2 = this.mk.tag("div", "bar-controller-bar2");
         this.barWrapper2.appendChild(this.bar2);
 
-        this.wrapper.style.width = this.width + "px";
-        this.wrapper.style.height = this.height + "px";
+        this.contentWrapper.style.width = this.width + "px";
+        this.contentWrapper.style.height = this.height - this.legendHeight + "px";
 
         this.setDirection(this.direction);
 
         // listeners for testing direction switch
         this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
             this.wrapper.focus();
-        });   
+        });
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             if (e.key === "t") {
                 let dir = this.direction === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
@@ -55,18 +60,19 @@
 
         this.barContainer.style.display = "none";
         this.barContainer.style.flexGrow = "1";
-        this.wrapper.appendChild(this.silhouetteContainer);
-        this.wrapper.appendChild(this.barContainer);
-        return this.wrapper;
+        this.contentWrapper.appendChild(this.silhouetteContainer);
+        this.contentWrapper.appendChild(this.barContainer);
+        this.wrapper.appendChild(this.contentWrapper);
+        this.wrapper.appendChild(this.legendWrapper);
     }
-
+    
     private setDirection(dir: Direction): void {
         if (dir === Direction.Horizontal) {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
             this.bar1.style.height = "100%";
             this.bar2.style.height = "100%";
-            this.wrapper.style.flexDirection = "row";
+            this.barContainer.style.flexDirection = "row";
             this.barWrapper2.style.display = "flex";
         }
         else {
@@ -74,13 +80,35 @@
             this.bar2.style.height = "0";
             this.bar1.style.width = "100%";
             this.bar2.style.width = "100%";
-            this.wrapper.style.flexDirection = "column";
+            this.barContainer.style.flexDirection = "column";
         }
     }
 
     protected onSizeChange(): void {
-        this.wrapper.style.width = this.width + "px";
-        this.wrapper.style.height = this.height + "px";
+        this.contentWrapper.style.width = this.width + "px";
+        this.contentWrapper.style.height = this.height - this.legendHeight + "px";
+    }
+
+    protected onSensorChange(): void {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+    }
+
+    public test_setValue(val: number): void {
+        if (val > 1) {
+            val = 1;
+        }
+        else if (val < 0) {
+            val = 0;
+        }
+        this.percent = val;
+
+        this.onDataChange();
     }
 
     protected onDataChange(): void {

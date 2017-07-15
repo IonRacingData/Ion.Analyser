@@ -132,6 +132,11 @@ span.table-resize{
 
 /*  Controllers  */
 
+.controller-legend {
+    background-color: #dbdbdb;
+    color: black;
+}
+
 .silhouette {
     fill: #eaeaea;
     transition: fill 0.3s;
@@ -139,8 +144,8 @@ span.table-resize{
 
 .gauge {
     /*  ring and labels  */
-    color: darkgray;
-    /* needle color */    
+    color: #202020;
+    /* needle color */
     border-color: red;
     /*  center  */
     background-color: darkgray;
@@ -165,11 +170,11 @@ span.table-resize{
 }
 
 .bar-controller-bar1 {
-    background-color: blue;
+    background-color: #5eea52;
 }
 
 .bar-controller-bar2 {
-    background-color: red;
+    background-color: #5eea52;
 }
 
 /* DataSourceAssignmentController */

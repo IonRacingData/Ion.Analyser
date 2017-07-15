@@ -6,9 +6,30 @@ var DataSourceBuilder = (function () {
     }
     DataSourceBuilder.prototype.main = function () {
         var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var viewer = null;
+        if (args) {
+            for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
+                var arg = args_1[_a];
+                try {
+                    viewer = arg;
+                }
+                catch (e) {
+                    console.log(e.message);
+                }
+            }
+        }
         this.window = kernel.winMan.createWindow(this.app, "Data Source Builder");
         this.window.setSize(this.page1Width, 330);
-        this.dsb = new DataSourceAssignmentController();
+        if (viewer) {
+            this.dsb = new DataSourceAssignmentController(viewer);
+        }
+        else {
+            this.dsb = new DataSourceAssignmentController();
+        }
         this.window.content.appendChild(this.dsb.wrapper);
         this.app.events.on(kernel.senMan.onRegisterViewer, function () {
             _this.dsb.onViewersChange();

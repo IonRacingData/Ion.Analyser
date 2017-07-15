@@ -8,9 +8,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Controller = (function () {
+var Controller = (function (_super) {
+    __extends(Controller, _super);
     function Controller() {
-        this.mk = new HtmlHelper;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.mk = new HtmlHelper;
+        return _this;
+        //public abstract generate(): HTMLElement;
     }
     Controller.prototype.setSize = function (width, height) {
         this.width = width;
@@ -18,7 +22,7 @@ var Controller = (function () {
         this.onSizeChange();
     };
     return Controller;
-}());
+}(Component));
 var SingleValueController = (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
@@ -37,6 +41,7 @@ var SingleValueController = (function (_super) {
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
                 this.onDataChange();
+                this.onSensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -57,7 +62,7 @@ var SingleValueController = (function (_super) {
             this.onDataChange();
         }
     };
-    SingleValueController.prototype.setValue = function (value) { };
+    SingleValueController.prototype.onSensorChange = function () { };
     return SingleValueController;
 }(Controller));
 var CanvasController = (function (_super) {
@@ -139,6 +144,7 @@ var SingleValueCanvasController = (function (_super) {
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
+                this.onSensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -156,6 +162,7 @@ var SingleValueCanvasController = (function (_super) {
             }
         }
     };
+    SingleValueCanvasController.prototype.onSensorChange = function () { };
     return SingleValueCanvasController;
 }(CanvasController));
 var ScatterChartBase = (function (_super) {

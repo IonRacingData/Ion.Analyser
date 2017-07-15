@@ -10,53 +10,57 @@
     private offsetY: number;
 
     private labels: string[];
+    private defMin: number = 0;
+    private defMax: number = 100;
+    private defStep: number = 10;
+    private customLabels: boolean = false;    
 
     private color: string = "black";
     private needleColor: string = "black";
     private centerColor: string = "black";
 
-    constructor(width: number, height: number, min: number, max: number, step: number) {
+    private contentWrapper: HTMLElement;
+    private legendWrapper: HTMLElement;
+    private contentHeight: number;
+    private legendHeight: number = 18;
+
+    constructor(width: number, height: number, min?: number, max?: number, step?: number) {
         super();
-        this.size = Math.min(width, height);
-        let labels: string[] = [];
-        for (let i = min; i <= max; i += step) {
-            labels.push(i.toString());
-        }
-        this.labels = labels;
 
-        // temp stylesheet thingy
+        this.wrapper = this.mk.tag("div", "gauge-controller-wrapper");
+        this.contentWrapper = this.mk.tag("div", "gauge-controller-content");
+        this.legendWrapper = this.mk.tag("div", "controller-legend");
+        this.legendWrapper.style.height = this.legendHeight + "px";
+        this.legendWrapper.appendChild(document.createTextNode("No data"));
 
-        /*let ss: CSSStyleSheet;
-        let all: StyleSheetList = document.styleSheets;
-        for (let i = 0; i < all.length; i++) {
-            if (all[i].title === "app-style") {
-                ss = <CSSStyleSheet>all[i];
-                let rules = ss.cssRules;
-
-                for (let j = 0; j < rules.length; j++) {
-                    let rule: CSSStyleRule = <CSSStyleRule>rules[j];
-                    if (rule.selectorText === ".gauge-plot") {
-                        this.color = rule.style.color;
-                        this.needleColor = rule.style.borderColor;
-                        break;
-                    }
-                }
-                break;
-            }
-        }*/
-    }
-
-    generate(): HTMLElement {
-        this.wrapper = this.mk.tag("div", "plot-wrapper");
-        this.canvas = new LayeredCanvas(this.wrapper);
+        this.canvas = new LayeredCanvas(this.contentWrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.ctxNeedle = new ContextFixer(this.canvas.addCanvas());
         this.ctxCenter = new ContextFixer(this.canvas.addCanvas());
 
-        this.setColor();
-        this.setSize(this.size, this.size);
+        this.wrapper.appendChild(this.contentWrapper);
+        this.wrapper.appendChild(this.legendWrapper);
 
-        return this.wrapper;
+        // following 'if' doesn't work, need fixing
+        if (min && max && step) {
+            console.log("all defined");
+            this.labels = this.generateLabels(min, max, step);
+            this.customLabels = true;
+        }
+        else {
+            this.labels = this.generateLabels(this.defMin, this.defMax, this.defStep);
+        }
+
+        this.setColor();
+        this.setSize(this.size, this.size);        
+    }
+
+    private generateLabels(min: number, max: number, step: number): string[] {
+        let labels: string[] = [];
+        for (let i = min; i <= max; i += step) {
+            labels.push(i.toString());
+        }
+        return labels;
     }
 
     protected draw(): void {
@@ -108,7 +112,14 @@
     }
 
     private drawNeedle(): void {
-
+        if (this.percent > 1) {
+            console.error("Percentage calculation malfunction");
+            this.percent = 1;
+        }
+        else if (this.percent < 0) {
+            console.error("Percentage calculation malfunction");
+            this.percent = 0;
+        }
         let val = this.percent * 100;
 
         this.ctxNeedle.fillStyle = this.needleColor;
@@ -130,14 +141,40 @@
     }    
 
     protected onSizeChange(): void {
-        this.size = Math.min(this.width, this.height);
+        this.contentHeight = this.height - this.legendHeight;
+        this.size = Math.min(this.width, this.contentHeight);
         this.offsetX = (this.width - this.size) / 2;
-        this.offsetY = (this.height - this.size) / 2 + (this.height * 0.05);
-        this.canvas.setSize(this.width, this.height);
+        this.offsetY = (this.contentHeight - this.size) / 2 + (this.contentHeight * 0.05);
+        this.canvas.setSize(this.width, this.contentHeight);
         this.draw();
     }
 
-    protected onDataChange(): void {        
+    protected onSensorChange(): void {
+        if (!this.customLabels) {
+            let min: number = SensorInfoHelper.minValue(this.lastSensorInfo);
+            let max: number = SensorInfoHelper.maxValue(this.lastSensorInfo);
+            let step: number = ((max - min) / 10);
+            if (step < 1) {
+                step = 1;
+            }
+
+            console.log("New label values: ", min, max, step);
+
+            this.labels = this.generateLabels(min, max, step);
+
+            this.draw();
+        }
+
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+    }
+
+    protected onDataChange(): void {
         this.drawNeedle();
     }
 

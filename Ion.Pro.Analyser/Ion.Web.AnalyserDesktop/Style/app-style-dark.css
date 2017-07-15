@@ -135,6 +135,11 @@ span.table-resize{
 
 /*  Controllers  */
 
+.controller-legend {
+    background-color: #00b8c8; 
+    color: black;
+}
+
 .silhouette {
     fill: #272727;
     transition: fill 0.3s;
@@ -168,11 +173,11 @@ span.table-resize{
 }
 
 .bar-controller-bar1 {
-    background-color: blue;
+    background-color: #1d4c19;
 }
 
 .bar-controller-bar2 {
-    background-color: red;
+    background-color: #1d4c19;
 }
 
 

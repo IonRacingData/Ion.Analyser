@@ -382,11 +382,15 @@ class SensorInfoHelper {
         else if (info.MaxValue) {
             val = info.MaxValue;
         }
-        else {
+        else {            
             /* tslint:disable:no-bitwise */
             val = (1 << info.Resolution) - 1;
             /* tslint:enable:no-bitwise */
-        }
+            if (val === 0) {
+                console.log("fix this @Nicolas");
+                val++;
+            }
+        }        
         return val;
     }
 
@@ -400,7 +404,7 @@ class SensorInfoHelper {
         }
         else if (info.Signed) {
             val = -SensorInfoHelper.maxValue(info) - 1;
-        }
+        }        
         return val;
     }
 

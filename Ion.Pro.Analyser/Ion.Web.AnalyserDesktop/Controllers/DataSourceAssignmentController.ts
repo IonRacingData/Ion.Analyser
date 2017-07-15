@@ -20,12 +20,16 @@
 
     private mk: HtmlHelper = new HtmlHelper();
 
-    constructor() {
+    constructor(viewer?: IViewerBase<any>) {
         super();
         let mk = this.mk;
         this.wrapper = mk.tag("div", "dsaController-wrapper");
         this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
         this.navWrapper = mk.tag("div", "dsaController-navwrapper");
+
+        if (viewer) {
+            this.selectedViewer = viewer;
+        }
 
         for (let i = 0; i < 3; i++) {
             let e: HTMLElement = mk.tag("div", "dsaController-navelement")
@@ -147,7 +151,7 @@
                     curPlot.plotWindow.highlight(false);
                 }
             }
-        ], curPlot.plotType);
+        ], curPlot.plotType);        
     }
 
     private findTableRow(element: HTMLElement): HTMLElement {

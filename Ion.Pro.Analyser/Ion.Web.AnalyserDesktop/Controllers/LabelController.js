@@ -13,23 +13,27 @@ var LabelController = (function (_super) {
     function LabelController(width, height) {
         var _this = _super.call(this) || this;
         _this.fontSize = 10;
+        _this.contentHeight = 0;
+        _this.legendHeight = 18;
+        _this.initFontSizeCounter = 0;
         _this.wrapper = _this.mk.tag("div", "label-controller");
+        _this.contentWrapper = _this.mk.tag("div", "label-controller-content");
+        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
+        _this.legendWrapper.style.height = _this.legendHeight + "px";
+        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         _this.textWrapper = _this.mk.tag("span");
-        _this.wrapper.appendChild(_this.textWrapper);
         _this.textWrapper.style.fontSize = _this.fontSize + "px";
+        _this.textWrapper.innerHTML = "0";
+        _this.wrapper.appendChild(_this.contentWrapper);
+        _this.wrapper.appendChild(_this.legendWrapper);
+        _this.contentWrapper.appendChild(_this.textWrapper);
         _this.setSize(width, height);
         return _this;
     }
-    LabelController.prototype.generate = function () {
-        return this.wrapper;
-    };
-    LabelController.prototype.setValue = function (value) {
-        this.textWrapper.innerHTML = value.toString();
-        this.adjustFontSize();
-    };
     LabelController.prototype.onSizeChange = function () {
-        this.wrapper.style.width = this.width + "px";
-        this.wrapper.style.height = this.height * 0.87 + "px";
+        this.contentHeight = this.height - this.legendHeight;
+        this.contentWrapper.style.width = this.width + "px";
+        this.contentWrapper.style.height = this.contentHeight * 0.87 + "px";
         this.adjustFontSize();
     };
     LabelController.prototype.onDataChange = function () {
@@ -37,14 +41,33 @@ var LabelController = (function (_super) {
         this.textWrapper.innerHTML = val.toFixed(2);
         this.adjustFontSize();
     };
+    LabelController.prototype.onSensorChange = function () {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+    };
     LabelController.prototype.adjustFontSize = function () {
-        if (this.textWrapper.offsetWidth > 0) {
-            var height = this.height;
-            var width = this.width;
+        var _this = this;
+        if (this.textWrapper.offsetWidth === 0) {
+            if (this.initFontSizeCounter < 10) {
+                setTimeout(function () {
+                    _this.adjustFontSize();
+                }, 10);
+                this.initFontSizeCounter++;
+            }
+            else {
+                throw new Error("Initialize font size exception");
+            }
+        }
+        else if (this.textWrapper.offsetWidth > 0) {
             var textwidth = this.textWrapper.offsetWidth;
-            var ratio = width / textwidth;
+            var ratio = this.width / textwidth;
             this.fontSize *= ratio;
-            this.fontSize = this.fontSize > height ? height : this.fontSize;
+            this.fontSize = this.fontSize > this.contentHeight ? this.contentHeight : this.fontSize;
             this.textWrapper.style.fontSize = this.fontSize + "px";
         }
     };

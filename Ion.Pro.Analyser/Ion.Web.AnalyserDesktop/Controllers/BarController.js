@@ -12,56 +12,58 @@ var BarController = (function (_super) {
     __extends(BarController, _super);
     function BarController(width, height, direction) {
         var _this = _super.call(this) || this;
-        _this.horizontal = false;
         _this.double = false;
         _this.silhouette = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
+        _this.legendHeight = 18;
         _this.direction = direction;
         _this.width = width;
         _this.height = height;
-        return _this;
-    }
-    BarController.prototype.generate = function () {
-        var _this = this;
-        this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
-        this.wrapper.setAttribute("tabindex", "0");
-        this.barContainer = this.mk.tag("div");
-        this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
-        this.silhouetteContainer.innerHTML = this.silhouette;
-        this.barWrapper1 = this.mk.tag("div", "bar-controller-barWrapper1");
-        this.barContainer.appendChild(this.barWrapper1);
-        this.bar1 = this.mk.tag("div", "bar-controller-bar1");
-        this.barWrapper1.appendChild(this.bar1);
-        this.barWrapper2 = this.mk.tag("div", "bar-controller-barWrapper2");
-        this.barContainer.appendChild(this.barWrapper2);
-        this.bar2 = this.mk.tag("div", "bar-controller-bar2");
-        this.barWrapper2.appendChild(this.bar2);
-        this.wrapper.style.width = this.width + "px";
-        this.wrapper.style.height = this.height + "px";
-        this.setDirection(this.direction);
+        _this.wrapper = _this.mk.tag("div", "bar-controller-wrapper");
+        _this.wrapper.setAttribute("tabindex", "0");
+        _this.contentWrapper = _this.mk.tag("div", "bar-controller-content");
+        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
+        _this.legendWrapper.style.height = _this.legendHeight + "px";
+        _this.legendWrapper.appendChild(document.createTextNode("No data"));
+        _this.barContainer = _this.mk.tag("div", "bar-controller-barContainer");
+        _this.silhouetteContainer = _this.mk.tag("div", "bar-controller-silhouette");
+        _this.silhouetteContainer.innerHTML = _this.silhouette;
+        _this.barWrapper1 = _this.mk.tag("div", "bar-controller-barWrapper1");
+        _this.barContainer.appendChild(_this.barWrapper1);
+        _this.bar1 = _this.mk.tag("div", "bar-controller-bar1");
+        _this.barWrapper1.appendChild(_this.bar1);
+        _this.barWrapper2 = _this.mk.tag("div", "bar-controller-barWrapper2");
+        _this.barContainer.appendChild(_this.barWrapper2);
+        _this.bar2 = _this.mk.tag("div", "bar-controller-bar2");
+        _this.barWrapper2.appendChild(_this.bar2);
+        _this.contentWrapper.style.width = _this.width + "px";
+        _this.contentWrapper.style.height = _this.height - _this.legendHeight + "px";
+        _this.setDirection(_this.direction);
         // listeners for testing direction switch
-        this.wrapper.addEventListener("mousedown", function (e) {
+        _this.wrapper.addEventListener("mousedown", function (e) {
             _this.wrapper.focus();
         });
-        this.wrapper.addEventListener("keydown", function (e) {
+        _this.wrapper.addEventListener("keydown", function (e) {
             if (e.key === "t") {
                 var dir = _this.direction === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
                 _this.direction = dir;
                 _this.setDirection(dir);
             }
         });
-        this.barContainer.style.display = "none";
-        this.barContainer.style.flexGrow = "1";
-        this.wrapper.appendChild(this.silhouetteContainer);
-        this.wrapper.appendChild(this.barContainer);
-        return this.wrapper;
-    };
+        _this.barContainer.style.display = "none";
+        _this.barContainer.style.flexGrow = "1";
+        _this.contentWrapper.appendChild(_this.silhouetteContainer);
+        _this.contentWrapper.appendChild(_this.barContainer);
+        _this.wrapper.appendChild(_this.contentWrapper);
+        _this.wrapper.appendChild(_this.legendWrapper);
+        return _this;
+    }
     BarController.prototype.setDirection = function (dir) {
         if (dir === Direction.Horizontal) {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
             this.bar1.style.height = "100%";
             this.bar2.style.height = "100%";
-            this.wrapper.style.flexDirection = "row";
+            this.barContainer.style.flexDirection = "row";
             this.barWrapper2.style.display = "flex";
         }
         else {
@@ -69,12 +71,31 @@ var BarController = (function (_super) {
             this.bar2.style.height = "0";
             this.bar1.style.width = "100%";
             this.bar2.style.width = "100%";
-            this.wrapper.style.flexDirection = "column";
+            this.barContainer.style.flexDirection = "column";
         }
     };
     BarController.prototype.onSizeChange = function () {
-        this.wrapper.style.width = this.width + "px";
-        this.wrapper.style.height = this.height + "px";
+        this.contentWrapper.style.width = this.width + "px";
+        this.contentWrapper.style.height = this.height - this.legendHeight + "px";
+    };
+    BarController.prototype.onSensorChange = function () {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+    };
+    BarController.prototype.test_setValue = function (val) {
+        if (val > 1) {
+            val = 1;
+        }
+        else if (val < 0) {
+            val = 0;
+        }
+        this.percent = val;
+        this.onDataChange();
     };
     BarController.prototype.onDataChange = function () {
         if (this.data) {

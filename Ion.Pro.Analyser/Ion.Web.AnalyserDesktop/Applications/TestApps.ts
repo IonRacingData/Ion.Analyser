@@ -410,8 +410,8 @@ class GaugeTester implements IApplication, IViewer<Point> {
     }
 
     drawMeter() {
-        this.gauge = new GaugeController(this.window.width, this.window.height, 0, 200, 20);
-        let gaugeWrapper = this.gauge.generate();
+        this.gauge = new GaugeController(this.window.width, this.window.height);
+        let gaugeWrapper = this.gauge.wrapper;
         this.window.content.appendChild(gaugeWrapper);
     }
 
@@ -485,6 +485,7 @@ class LabelTester implements IApplication, IViewer<Point> {
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Label");
+        this.window.setSize(350, 180);
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
@@ -501,7 +502,7 @@ class LabelTester implements IApplication, IViewer<Point> {
         kernel.senMan.register(this);
 
         this.label = new LabelController(this.window.width, this.window.height);
-        let div = this.label.generate();
+        let div = this.label.wrapper;
         this.window.content.appendChild(div);        
 
         this.createEvents(this.app.events);
@@ -538,6 +539,7 @@ class BarTester implements IApplication, IViewer<Point> {
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Bar Chart");
+        this.window.setSize(300, this.window.height);
 
         let testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
@@ -554,11 +556,25 @@ class BarTester implements IApplication, IViewer<Point> {
         this.window.content.style.overflow = "hidden";
         
         kernel.senMan.register(this);
-        this.bar = new BarController(this.window.width, this.window.height, Direction.Horizontal);
-        let barWrapper = this.bar.generate();
+        this.bar = new BarController(this.window.width, this.window.height, Direction.Vertical);
+        let barWrapper = this.bar.wrapper;
         this.window.content.appendChild(barWrapper);
 
         this.createEvents(this.app.events);
+
+        barWrapper.addEventListener("keydown", (e: KeyboardEvent) => {
+            switch (e.key) {
+                case "j":                    
+                    this.val += 0.1;
+                    break;
+                case "k":
+                    this.val -= 0.1;
+            }
+            
+            this.val = this.val < 0 ? 0 : this.val;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.bar.test_setValue(this.val);
+        });
     }
 
     private createEvents(eh: EventHandler) {
@@ -567,7 +583,7 @@ class BarTester implements IApplication, IViewer<Point> {
         });
         eh.on(this.plotWindow.onClose, () => {
             this.window_close()
-        });
+        });        
     }
 
     private window_close() {
@@ -622,7 +638,7 @@ class LegacyRPIManager implements IApplication {
 }
 
 class SteeringWheelTester implements IApplication, IViewer<Point> {
-    plotType: string = "Bar";
+    plotType: string = "Steering Wheel";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
     dataSource: IDataSource<Point> | null = null;        

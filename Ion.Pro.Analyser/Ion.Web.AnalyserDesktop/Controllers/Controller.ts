@@ -1,5 +1,4 @@
-﻿abstract class Controller { 
-    protected wrapper: HTMLElement;
+﻿abstract class Controller extends Component {
     protected height: number;
     protected width: number;
     protected mk: HtmlHelper = new HtmlHelper;
@@ -11,7 +10,7 @@
     }
     protected abstract onSizeChange(): void;
     protected abstract onDataChange(): void;
-    public abstract generate(): HTMLElement;
+    //public abstract generate(): HTMLElement;
 }
 
 abstract class SingleValueController extends Controller {
@@ -31,6 +30,7 @@ abstract class SingleValueController extends Controller {
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
                 this.onDataChange();
+                this.onSensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -50,9 +50,9 @@ abstract class SingleValueController extends Controller {
         else {
             this.onDataChange();
         }
-    }
+    }    
 
-    public setValue(value: number): void { }    
+    protected onSensorChange(): void { }
 }
 
 abstract class CanvasController extends Controller {
@@ -125,7 +125,6 @@ abstract class SingleValueCanvasController extends CanvasController {
     protected data: IDataSource<Point> | null;
     protected lastID: string = "";
     protected lastSensorInfo: sensys.ISensorInformation;
-
     
     public setData(d: IDataSource<Point> | null) {
         this.data = d;
@@ -137,6 +136,7 @@ abstract class SingleValueCanvasController extends CanvasController {
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
+                this.onSensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -154,6 +154,8 @@ abstract class SingleValueCanvasController extends CanvasController {
             }
         }
     }
+
+    protected onSensorChange(): void { }
 }
 
 abstract class ScatterChartBase extends CanvasController {
