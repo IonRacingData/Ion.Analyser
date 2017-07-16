@@ -21,13 +21,20 @@ var ConfigWindow = (function () {
     }
     ConfigWindow.prototype.main = function (client) {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Configure window");
+        this.mainWindow.setSize(330, 230);
         if (client.settings) {
             var _loop_1 = function (i) {
                 var temp = client.settings[i];
                 var row = document.createElement("div");
                 row.style.margin = "10px";
                 var text = document.createElement("span");
-                text.appendChild(document.createTextNode(temp.text));
+                if (temp.shortCut) {
+                    text.appendChild(document.createTextNode(temp.text + " (" + temp.shortCut + ")"));
+                }
+                else {
+                    text.appendChild(document.createTextNode(temp.text));
+                }
+                text.title = temp.longText;
                 row.appendChild(text);
                 switch (temp.type) {
                     case "boolean":
@@ -49,6 +56,16 @@ var ConfigWindow = (function () {
                         });
                         but.wrapper.style.cssFloat = "right";
                         row.appendChild(but.wrapper);
+                        break;
+                    case "direction":
+                        var btn = new TextButton();
+                        btn.text = "Toggle";
+                        btn.onclick.addEventListener(function () {
+                            temp.value = temp.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+                            client.settingsChanged(i, temp);
+                        });
+                        btn.wrapper.style.cssFloat = "right";
+                        row.appendChild(btn.wrapper);
                         break;
                 }
                 this_1.mainWindow.content.appendChild(row);
@@ -461,24 +478,31 @@ var BarTester = (function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
             }
         });
+        testWindow.add({
+            name: "Configure", runner: function () {
+                kernel.appMan.start("ConfigWindow", _this.bar);
+            }
+        });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
         this.bar = new BarController(this.window.width, this.window.height, Direction.Vertical);
         var barWrapper = this.bar.wrapper;
         this.window.content.appendChild(barWrapper);
         this.createEvents(this.app.events);
-        barWrapper.addEventListener("keydown", function (e) {
+        /*
+        barWrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             switch (e.key) {
                 case "j":
-                    _this.val += 0.1;
+                    this.val += 0.1;
                     break;
                 case "k":
-                    _this.val -= 0.1;
+                    this.val -= 0.1;
             }
-            _this.val = _this.val < 0 ? 0 : _this.val;
-            _this.val = _this.val > 1 ? 1 : _this.val;
-            _this.bar.test_setValue(_this.val);
-        });
+            
+            this.val = this.val < 0 ? 0 : this.val;
+            this.val = this.val > 1 ? 1 : this.val;
+            this.bar.test_setValue(this.val);
+        });*/
     };
     BarTester.prototype.createEvents = function (eh) {
         var _this = this;

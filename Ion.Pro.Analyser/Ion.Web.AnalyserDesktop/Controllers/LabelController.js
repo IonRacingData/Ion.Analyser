@@ -14,13 +14,9 @@ var LabelController = (function (_super) {
         var _this = _super.call(this) || this;
         _this.fontSize = 10;
         _this.contentHeight = 0;
-        _this.legendHeight = 18;
         _this.initFontSizeCounter = 0;
         _this.wrapper = _this.mk.tag("div", "label-controller");
         _this.contentWrapper = _this.mk.tag("div", "label-controller-content");
-        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
-        _this.legendWrapper.style.height = _this.legendHeight + "px";
-        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         _this.textWrapper = _this.mk.tag("span");
         _this.textWrapper.style.fontSize = _this.fontSize + "px";
         _this.textWrapper.innerHTML = "0";
@@ -42,13 +38,6 @@ var LabelController = (function (_super) {
         this.adjustFontSize();
     };
     LabelController.prototype.onSensorChange = function () {
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
-        }
     };
     LabelController.prototype.adjustFontSize = function () {
         var _this = this;

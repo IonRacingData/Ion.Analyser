@@ -134,19 +134,19 @@ var StatusBar = (function (_super) {
         var _this = _super.call(this) || this;
         _this.content = content;
         _this.content.style.cssFloat = "right";
-        _this.content.style.padding = "8px";
+        _this.content.style.padding = "10px";
         var mk = new HtmlHelper();
         _this.discon = mk.tag("img");
         _this.discon.src = "/icons/disconnected.png";
-        _this.discon.style.width = "24px";
-        _this.discon.style.height = "24px";
-        _this.discon.title = "Not connected";
+        _this.discon.style.width = "20px";
+        _this.discon.style.height = "20px";
+        _this.content.title = "Not connected";
         _this.con = mk.tag("img");
         _this.con.src = "/icons/connected.png";
-        _this.con.style.width = "24px";
-        _this.con.style.height = "24px";
+        _this.con.style.width = "20px";
+        _this.con.style.height = "20px";
         _this.con.style.display = "none";
-        _this.con.title = "Connected";
+        _this.content.title = "Connected";
         _this.content.appendChild(_this.discon);
         _this.content.appendChild(_this.con);
         if (kernel.netMan.connectionOpen) {

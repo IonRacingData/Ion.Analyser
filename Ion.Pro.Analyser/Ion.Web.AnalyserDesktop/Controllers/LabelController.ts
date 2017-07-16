@@ -1,19 +1,14 @@
 ﻿class LabelController extends SingleValueController {
     private textWrapper: HTMLElement;
-    private contentWrapper: HTMLElement;
-    private legendWrapper: HTMLElement;
+    private contentWrapper: HTMLElement;    
     private fontSize: number = 10;
-    private contentHeight: number = 0;
-    private legendHeight: number = 18;
+    private contentHeight: number = 0;    
     private initFontSizeCounter: number = 0;
 
     constructor(width: number, height: number) {
         super();
         this.wrapper = this.mk.tag("div", "label-controller");
         this.contentWrapper = this.mk.tag("div", "label-controller-content");
-        this.legendWrapper = this.mk.tag("div", "controller-legend");
-        this.legendWrapper.style.height = this.legendHeight + "px";
-        this.legendWrapper.appendChild(document.createTextNode("No data"));
         this.textWrapper = this.mk.tag("span");
         this.textWrapper.style.fontSize = this.fontSize + "px";
         this.textWrapper.innerHTML = "0";
@@ -40,13 +35,7 @@
     }
 
     protected onSensorChange(): void {        
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
-        }
+        
     }
 
     private adjustFontSize() {

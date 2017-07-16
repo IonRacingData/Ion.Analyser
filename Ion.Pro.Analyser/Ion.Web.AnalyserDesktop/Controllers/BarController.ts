@@ -1,31 +1,42 @@
-﻿class BarController extends SingleValueController {
+﻿class BarController extends SingleValueController implements IConfigurable {
     private bar1: HTMLElement;
     private bar2: HTMLElement;
     private barWrapper1: HTMLElement;
     private barWrapper2: HTMLElement;
-    private direction: Direction;
+    //private direction: Direction;
     private double: boolean = false;
 
     private silhouette: string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
     private silhouetteContainer: HTMLElement;
-    private barContainer: HTMLElement;
+    private barContainer: HTMLElement;    
 
     private contentWrapper: HTMLElement;
-    private legendWrapper: HTMLElement;
-    private legendHeight: number = 18;
+
+    private direction: IStorageObject<"direction"> = {
+        longText: "Switches the bar chart's direction between horizontal and vertical",
+        text: "Toggle direction",
+        shortCut: "D",
+        type: "direction",
+        value: Direction.Vertical
+    }
+
+    public settings: IStorageList = {
+        toggleDirection: this.direction
+    }
+
+    public settingsChanged(key: string, value: IStorageObject<keyof IStorageTypes>) {
+        this.setDirection(this.direction.value);
+    }
 
     constructor(width: number, height: number, direction: Direction) {
         super();
-        this.direction = direction;
+        this.direction.value = direction;
         this.width = width;
         this.height = height;
 
         this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
         this.wrapper.setAttribute("tabindex", "0");
-        this.contentWrapper = this.mk.tag("div", "bar-controller-content");
-        this.legendWrapper = this.mk.tag("div", "controller-legend");
-        this.legendWrapper.style.height = this.legendHeight + "px";
-        this.legendWrapper.appendChild(document.createTextNode("No data"));
+        this.contentWrapper = this.mk.tag("div", "bar-controller-content");        
 
         this.barContainer = this.mk.tag("div", "bar-controller-barContainer");
         this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
@@ -44,16 +55,16 @@
         this.contentWrapper.style.width = this.width + "px";
         this.contentWrapper.style.height = this.height - this.legendHeight + "px";
 
-        this.setDirection(this.direction);
+        this.setDirection(this.direction.value);
 
         // listeners for testing direction switch
         this.wrapper.addEventListener("mousedown", (e: MouseEvent) => {
             this.wrapper.focus();
         });
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (e.key === "t") {
-                let dir = this.direction === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
-                this.direction = dir;
+            if (e.key === "d") {
+                let dir = this.direction.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+                this.direction.value = dir;
                 this.setDirection(dir);
             }
         });
@@ -70,6 +81,8 @@
         if (dir === Direction.Horizontal) {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
+            this.bar2.style.borderTop = "";
+            this.bar2.style.borderLeft = "1px solid black";
             this.bar1.style.height = "100%";
             this.bar2.style.height = "100%";
             this.barContainer.style.flexDirection = "row";
@@ -78,6 +91,8 @@
         else {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
+            this.bar2.style.borderLeft = "";
+            this.bar2.style.borderTop = "1px solid black";
             this.bar1.style.width = "100%";
             this.bar2.style.width = "100%";
             this.barContainer.style.flexDirection = "column";
@@ -90,13 +105,7 @@
     }
 
     protected onSensorChange(): void {
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
-        }
+        
     }
 
     public test_setValue(val: number): void {
@@ -127,7 +136,7 @@
 
         let val = this.percent * 100;
 
-        if (this.direction === Direction.Horizontal) {
+        if (this.direction.value === Direction.Horizontal) {
             
             if (min < 0) {
                 val = (val - 50) * 2;

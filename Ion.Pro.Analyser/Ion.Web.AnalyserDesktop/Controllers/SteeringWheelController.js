@@ -22,8 +22,8 @@ var SteeringWheelController = (function (_super) {
     SteeringWheelController.prototype.generate = function () {
         this.wrapper = this.mk.tag("div", "steeringWheel-wrapper");
         this.wheelWrapper = this.mk.tag("div", "", null, this.svgWheel);
-        this.wheelWrapper.style.width = "100%";
-        this.wheelWrapper.style.height = "100%";
+        this.wheelWrapper.style.width = "90%";
+        this.wheelWrapper.style.height = "90%";
         this.wrapper.appendChild(this.wheelWrapper);
         this.wrapper.style.width = this.width + "px";
         this.wrapper.style.height = this.height + "px";
@@ -34,6 +34,8 @@ var SteeringWheelController = (function (_super) {
         var angle = (p * this.totalAngle);
         angle += this.startAngle;
         this.wheelWrapper.style.transform = "rotate(" + angle + "rad)";
+    };
+    SteeringWheelController.prototype.onSensorChange = function () {
     };
     SteeringWheelController.prototype.onSizeChange = function () {
         this.wrapper.style.width = this.width + "px";

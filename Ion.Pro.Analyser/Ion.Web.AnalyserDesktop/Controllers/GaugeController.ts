@@ -20,18 +20,13 @@
     private centerColor: string = "black";
 
     private contentWrapper: HTMLElement;
-    private legendWrapper: HTMLElement;
     private contentHeight: number;
-    private legendHeight: number = 18;
 
     constructor(width: number, height: number, min?: number, max?: number, step?: number) {
         super();
 
         this.wrapper = this.mk.tag("div", "gauge-controller-wrapper");
-        this.contentWrapper = this.mk.tag("div", "gauge-controller-content");
-        this.legendWrapper = this.mk.tag("div", "controller-legend");
-        this.legendWrapper.style.height = this.legendHeight + "px";
-        this.legendWrapper.appendChild(document.createTextNode("No data"));
+        this.contentWrapper = this.mk.tag("div", "gauge-controller-content");        
 
         this.canvas = new LayeredCanvas(this.contentWrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
@@ -163,15 +158,7 @@
             this.labels = this.generateLabels(min, max, step);
 
             this.draw();
-        }
-
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
-        }
+        }        
     }
 
     protected onDataChange(): void {

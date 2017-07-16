@@ -138,21 +138,21 @@ class StatusBar extends Applet {
         super();
         this.content = content;
         this.content.style.cssFloat = "right";
-        this.content.style.padding = "8px";
+        this.content.style.padding = "10px";
         let mk: HtmlHelper = new HtmlHelper();
 
         this.discon = <HTMLImageElement>mk.tag("img");
         this.discon.src = "/icons/disconnected.png";
-        this.discon.style.width = "24px";
-        this.discon.style.height = "24px";
-        this.discon.title = "Not connected";
+        this.discon.style.width = "20px";
+        this.discon.style.height = "20px";
+        this.content.title = "Not connected";
 
         this.con = <HTMLImageElement>mk.tag("img");
         this.con.src = "/icons/connected.png";
-        this.con.style.width = "24px";
-        this.con.style.height = "24px";
+        this.con.style.width = "20px";
+        this.con.style.height = "20px";
         this.con.style.display = "none";
-        this.con.title = "Connected";
+        this.content.title = "Connected";
 
         this.content.appendChild(this.discon);
         this.content.appendChild(this.con);

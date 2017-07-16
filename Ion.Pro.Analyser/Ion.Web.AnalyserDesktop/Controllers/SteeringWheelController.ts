@@ -15,8 +15,8 @@
     public generate(): HTMLElement {
         this.wrapper = this.mk.tag("div", "steeringWheel-wrapper");
         this.wheelWrapper = this.mk.tag("div", "", null, this.svgWheel);
-        this.wheelWrapper.style.width = "100%";
-        this.wheelWrapper.style.height = "100%";
+        this.wheelWrapper.style.width = "90%";
+        this.wheelWrapper.style.height = "90%";
         this.wrapper.appendChild(this.wheelWrapper);
         this.wrapper.style.width = this.width + "px";
         this.wrapper.style.height = this.height + "px";
@@ -28,6 +28,10 @@
         let angle: number = (p * this.totalAngle);
         angle += this.startAngle;
         this.wheelWrapper.style.transform = "rotate(" + angle + "rad)";
+    }
+
+    protected onSensorChange(): void {
+
     }
 
     protected onSizeChange(): void {

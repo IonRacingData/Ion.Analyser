@@ -1,7 +1,7 @@
-﻿abstract class Controller extends Component {
+﻿abstract class Controller extends Component {    
     protected height: number;
     protected width: number;
-    protected mk: HtmlHelper = new HtmlHelper;
+    protected mk: HtmlHelper = new HtmlHelper;    
 
     public setSize(width: number, height: number) {
         this.width = width;
@@ -10,7 +10,6 @@
     }
     protected abstract onSizeChange(): void;
     protected abstract onDataChange(): void;
-    //public abstract generate(): HTMLElement;
 }
 
 abstract class SingleValueController extends Controller {
@@ -19,6 +18,17 @@ abstract class SingleValueController extends Controller {
     protected data: IDataSource<Point> | null;
     protected lastID: string = "";
     protected lastSensorInfo: sensys.ISensorInformation;
+
+    protected legendWrapper: HTMLElement;
+    protected legendHeight: number = 18;
+
+    constructor() {
+        super();
+        this.legendWrapper = document.createElement("div");
+        this.legendWrapper.className = "controller-legend";
+        this.legendWrapper.style.height = this.legendHeight + "px";
+        this.legendWrapper.appendChild(document.createTextNode("No data"));
+    }
 
     public setData(d: IDataSource<Point> | null) {
         this.data = d;
@@ -30,7 +40,7 @@ abstract class SingleValueController extends Controller {
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
                 this.onDataChange();
-                this.onSensorChange();
+                this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -50,9 +60,29 @@ abstract class SingleValueController extends Controller {
         else {
             this.onDataChange();
         }
-    }    
+    }
 
-    protected onSensorChange(): void { }
+    private sensorChange(): void {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            let unit = this.data.infos.SensorInfos[0].Unit;
+            let name = this.data.infos.SensorInfos[0].Name;
+            if (unit) {
+                unit = unit.replace("&deg;", "°");
+                this.legendWrapper.appendChild(document.createTextNode(name + " (" + unit + ")"));
+            }
+            else {
+                this.legendWrapper.appendChild(document.createTextNode(name));
+            }
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+
+        this.onSensorChange();
+    }
+
+    protected abstract onSensorChange(): void;
 }
 
 abstract class CanvasController extends Controller {
@@ -96,9 +126,6 @@ abstract class MultiValueCanvasController extends CanvasController {
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
             this.updateSensorInfos(kernel.senMan.getInfos());
-            /*kernel.senMan.getInfos((infos: SensorInformation[]) => {                
-                this.updateSensorInfos(infos);
-            });*/
         }
         this.onDataChange();
     }
@@ -125,6 +152,17 @@ abstract class SingleValueCanvasController extends CanvasController {
     protected data: IDataSource<Point> | null;
     protected lastID: string = "";
     protected lastSensorInfo: sensys.ISensorInformation;
+
+    protected legendWrapper: HTMLElement;
+    protected legendHeight: number = 18;
+
+    constructor() {
+        super();
+        this.legendWrapper = document.createElement("div");
+        this.legendWrapper.className = "controller-legend";
+        this.legendWrapper.style.height = this.legendHeight + "px";
+        this.legendWrapper.appendChild(document.createTextNode("No data"));        
+    }
     
     public setData(d: IDataSource<Point> | null) {
         this.data = d;
@@ -136,7 +174,7 @@ abstract class SingleValueCanvasController extends CanvasController {
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
-                this.onSensorChange();
+                this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -155,7 +193,27 @@ abstract class SingleValueCanvasController extends CanvasController {
         }
     }
 
-    protected onSensorChange(): void { }
+    private sensorChange(): void {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            let unit = this.data.infos.SensorInfos[0].Unit;
+            let name = this.data.infos.SensorInfos[0].Name;
+            if (unit) {
+                unit = unit.replace("&deg;", "°");
+                this.legendWrapper.appendChild(document.createTextNode(name + " (" + unit + ")"));
+            }
+            else {
+                this.legendWrapper.appendChild(document.createTextNode(name));
+            }
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+
+        this.onSensorChange();
+    }
+
+    protected abstract onSensorChange(): void;
 }
 
 abstract class ScatterChartBase extends CanvasController {

@@ -12,18 +12,25 @@ var BarController = (function (_super) {
     __extends(BarController, _super);
     function BarController(width, height, direction) {
         var _this = _super.call(this) || this;
+        //private direction: Direction;
         _this.double = false;
         _this.silhouette = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
-        _this.legendHeight = 18;
-        _this.direction = direction;
+        _this.direction = {
+            longText: "Switches the bar chart's direction between horizontal and vertical",
+            text: "Toggle direction",
+            shortCut: "D",
+            type: "direction",
+            value: Direction.Vertical
+        };
+        _this.settings = {
+            toggleDirection: _this.direction
+        };
+        _this.direction.value = direction;
         _this.width = width;
         _this.height = height;
         _this.wrapper = _this.mk.tag("div", "bar-controller-wrapper");
         _this.wrapper.setAttribute("tabindex", "0");
         _this.contentWrapper = _this.mk.tag("div", "bar-controller-content");
-        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
-        _this.legendWrapper.style.height = _this.legendHeight + "px";
-        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         _this.barContainer = _this.mk.tag("div", "bar-controller-barContainer");
         _this.silhouetteContainer = _this.mk.tag("div", "bar-controller-silhouette");
         _this.silhouetteContainer.innerHTML = _this.silhouette;
@@ -37,15 +44,15 @@ var BarController = (function (_super) {
         _this.barWrapper2.appendChild(_this.bar2);
         _this.contentWrapper.style.width = _this.width + "px";
         _this.contentWrapper.style.height = _this.height - _this.legendHeight + "px";
-        _this.setDirection(_this.direction);
+        _this.setDirection(_this.direction.value);
         // listeners for testing direction switch
         _this.wrapper.addEventListener("mousedown", function (e) {
             _this.wrapper.focus();
         });
         _this.wrapper.addEventListener("keydown", function (e) {
-            if (e.key === "t") {
-                var dir = _this.direction === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
-                _this.direction = dir;
+            if (e.key === "d") {
+                var dir = _this.direction.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+                _this.direction.value = dir;
                 _this.setDirection(dir);
             }
         });
@@ -57,10 +64,15 @@ var BarController = (function (_super) {
         _this.wrapper.appendChild(_this.legendWrapper);
         return _this;
     }
+    BarController.prototype.settingsChanged = function (key, value) {
+        this.setDirection(this.direction.value);
+    };
     BarController.prototype.setDirection = function (dir) {
         if (dir === Direction.Horizontal) {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
+            this.bar2.style.borderTop = "";
+            this.bar2.style.borderLeft = "1px solid black";
             this.bar1.style.height = "100%";
             this.bar2.style.height = "100%";
             this.barContainer.style.flexDirection = "row";
@@ -69,6 +81,8 @@ var BarController = (function (_super) {
         else {
             this.bar1.style.height = "0";
             this.bar2.style.height = "0";
+            this.bar2.style.borderLeft = "";
+            this.bar2.style.borderTop = "1px solid black";
             this.bar1.style.width = "100%";
             this.bar2.style.width = "100%";
             this.barContainer.style.flexDirection = "column";
@@ -79,13 +93,6 @@ var BarController = (function (_super) {
         this.contentWrapper.style.height = this.height - this.legendHeight + "px";
     };
     BarController.prototype.onSensorChange = function () {
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
-        }
     };
     BarController.prototype.test_setValue = function (val) {
         if (val > 1) {
@@ -109,7 +116,7 @@ var BarController = (function (_super) {
         }
         var min = SensorInfoHelper.minValue(this.lastSensorInfo);
         var val = this.percent * 100;
-        if (this.direction === Direction.Horizontal) {
+        if (this.direction.value === Direction.Horizontal) {
             if (min < 0) {
                 val = (val - 50) * 2;
                 this.bar2.style.width = val < 0 ? "0%" : val + "%";

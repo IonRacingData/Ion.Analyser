@@ -40,7 +40,7 @@ function registerSensorGroups() {
 }
 function registerLaunchers() {
     // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
-    kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
+    //kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
     kernel.appMan.registerApplication("Data", new Launcher(CsvGenerator, "Csv Creator"));
     kernel.appMan.registerApplication("Data", new Launcher(DataSourceBuilder, "Data Source Builder"));
     kernel.appMan.registerApplication("Charts", new Launcher(LineChartTester, "Line Chart"));

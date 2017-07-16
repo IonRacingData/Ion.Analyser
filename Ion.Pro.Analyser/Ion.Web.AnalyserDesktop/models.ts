@@ -426,11 +426,13 @@ interface IStorageTypes {
     "string": string;
     "boolean": boolean;
     "action": (() => void);
+    "direction": Direction;
 }
 
 interface IStorageObject<K extends keyof IStorageTypes> {
     text: string;
     longText: string;
+    shortCut: string | null;
     type: K;
     value: IStorageTypes[K];
 }

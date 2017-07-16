@@ -22,12 +22,8 @@ var GaugeController = (function (_super) {
         _this.color = "black";
         _this.needleColor = "black";
         _this.centerColor = "black";
-        _this.legendHeight = 18;
         _this.wrapper = _this.mk.tag("div", "gauge-controller-wrapper");
         _this.contentWrapper = _this.mk.tag("div", "gauge-controller-content");
-        _this.legendWrapper = _this.mk.tag("div", "controller-legend");
-        _this.legendWrapper.style.height = _this.legendHeight + "px";
-        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         _this.canvas = new LayeredCanvas(_this.contentWrapper);
         _this.ctxMain = new ContextFixer(_this.canvas.addCanvas());
         _this.ctxNeedle = new ContextFixer(_this.canvas.addCanvas());
@@ -135,13 +131,6 @@ var GaugeController = (function (_super) {
             console.log("New label values: ", min, max, step);
             this.labels = this.generateLabels(min, max, step);
             this.draw();
-        }
-        this.legendWrapper.innerHTML = "";
-        if (this.data) {
-            this.legendWrapper.appendChild(document.createTextNode(this.data.infos.SensorInfos[0].Name));
-        }
-        else {
-            this.legendWrapper.appendChild(document.createTextNode("No data"));
         }
     };
     GaugeController.prototype.onDataChange = function () {

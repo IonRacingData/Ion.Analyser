@@ -33,13 +33,20 @@ class ConfigWindow implements IApplication {
     mainWindow: AppWindow;
     main(client: IConfigurable): void {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Configure window");
+        this.mainWindow.setSize(330, 230);
         if (client.settings) {
             for (let i in client.settings) {
                 let temp = client.settings[i];
                 let row = document.createElement("div");
                 row.style.margin = "10px";
                 let text = document.createElement("span");
-                text.appendChild(document.createTextNode(temp.text));
+                if (temp.shortCut) {
+                    text.appendChild(document.createTextNode(temp.text + " (" + temp.shortCut + ")"));
+                }
+                else {
+                    text.appendChild(document.createTextNode(temp.text));
+                }
+                text.title = temp.longText;
                 row.appendChild(text);
                 switch (temp.type) {
                     case "boolean":
@@ -61,6 +68,16 @@ class ConfigWindow implements IApplication {
                         });
                         but.wrapper.style.cssFloat = "right";
                         row.appendChild(but.wrapper);
+                        break;
+                    case "direction":
+                        let btn = new TextButton();
+                        btn.text = "Toggle";
+                        btn.onclick.addEventListener(() => {
+                            temp.value = temp.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+                            client.settingsChanged(i, temp);
+                        })
+                        btn.wrapper.style.cssFloat = "right";                        
+                        row.appendChild(btn.wrapper);
                         break;
                 }
                 this.mainWindow.content.appendChild(row);
@@ -552,6 +569,11 @@ class BarTester implements IApplication, IViewer<Point> {
                 kernel.appMan.start("DataSourceBuilder", this);
             }
         });
+        testWindow.add({
+            name: "Configure", runner: () => {
+                kernel.appMan.start("ConfigWindow", this.bar);
+            }
+        });
 
         this.window.content.style.overflow = "hidden";
         
@@ -562,6 +584,7 @@ class BarTester implements IApplication, IViewer<Point> {
 
         this.createEvents(this.app.events);
 
+        /*
         barWrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             switch (e.key) {
                 case "j":                    
@@ -574,7 +597,7 @@ class BarTester implements IApplication, IViewer<Point> {
             this.val = this.val < 0 ? 0 : this.val;
             this.val = this.val > 1 ? 1 : this.val;
             this.bar.test_setValue(this.val);
-        });
+        });*/
     }
 
     private createEvents(eh: EventHandler) {

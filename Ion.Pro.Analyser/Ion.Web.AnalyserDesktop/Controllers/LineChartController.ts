@@ -18,32 +18,36 @@
     private mainColor = "white";
     private markingColor;
 
-    private legend: LineChartLegend = new LineChartLegend(130, 50, true);
+    private legend: LineChartLegend = new LineChartLegend(150, 50, true);
 
     private defaultCursor: string = "default";
 
     private showGrid: IStorageObject<"boolean"> = {
         text: "Show grid",
-        longText: "Show or hide the grid",
+        longText: "Show or hide grid lines",
+        shortCut: "G",
         type: "boolean",
         value: true
     };
     private stickyAxes: IStorageObject<"boolean"> = {
         text: "Sticky axes",
-        longText: "makes the axes stick to the side when scrolling of center",
+        longText: "Assures axes are always visible. When off, axes can be scrolled out of view.",
+        shortCut: "A",
         type: "boolean",
         value: true
     };
     private autoScroll: IStorageObject<"boolean"> = {
         text: "Auto scroll",
-        longText: "Automaticly scolls to the last inserted value in the linechart",
+        longText: "Automatically scrolls to the last inserted value in the linechart. Only applicable when receiving data live.",
+        shortCut: "K",
         type: "boolean",
         value: false
     }
 
     private toggleLegend: IStorageObject<"boolean"> = {
         text: "Legend",
-        longText: "Toggles legend",
+        longText: "Show or hide legend",
+        shortCut: "L",
         type: "boolean",
         value: true
     }
@@ -55,7 +59,8 @@
         toggleLegend: this.toggleLegend,
         reset: {
             text: "Reset",
-            longText: "Resets the view of the grid",
+            longText: "Resets the zoom and position of the plot",
+            shortCut: "R",
             type: "action",
             value: () => { this.reset(); }
         }
@@ -554,7 +559,6 @@
     private wrapper_keyDown(e: KeyboardEvent): void {
         switch (e.key) {
             case "g":
-                //this.displayGrid = this.displayGrid === true ? false : true;
                 this.showGrid.value = !this.showGrid.value;
                 break;
             case "r":
@@ -565,6 +569,9 @@
                 break;
             case "k":
                 this.autoScroll.value = !this.autoScroll.value;
+                break;
+            case "l":
+                this.toggleLegend.value = !this.toggleLegend.value;
                 break;
             case "Control":
                 this.wrapper.style.cursor = "w-resize";
@@ -768,6 +775,7 @@ class LineChartLegend {
 
                 let positionX: number = sidePadding;
                 let name: string = data[i].infos.SensorInfos[0].Name;
+                let unit: string | undefined = data[i].infos.SensorInfos[0].Unit;
                 ctx.beginPath();
 
                 if (this.__darkTheme) {
@@ -787,7 +795,13 @@ class LineChartLegend {
                 ctx.fillStyle = this.__textColor;
                 ctx.textAlign = "start";
                 ctx.textBaseline = "middle";
-                ctx.fillText(name, positionX, positionY, (this.width - positionX - sidePadding));
+                if (unit) {
+                    unit = unit.replace("&deg;", "°");
+                    ctx.fillText(name + " (" + unit + ")", positionX, positionY, (this.width - positionX - sidePadding));
+                }
+                else {
+                    ctx.fillText(name, positionX, positionY, (this.width - positionX - sidePadding));
+                }
                 
                 ctx.closePath();
 

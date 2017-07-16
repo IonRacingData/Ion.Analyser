@@ -20,29 +20,33 @@ var LineChartController = (function (_super) {
         _this.movePoint_start = new Point(50, 50);
         _this.autoScroll_plotMoved = false;
         _this.mainColor = "white";
-        _this.legend = new LineChartLegend(130, 50, true);
+        _this.legend = new LineChartLegend(150, 50, true);
         _this.defaultCursor = "default";
         _this.showGrid = {
             text: "Show grid",
-            longText: "Show or hide the grid",
+            longText: "Show or hide grid lines",
+            shortCut: "G",
             type: "boolean",
             value: true
         };
         _this.stickyAxes = {
             text: "Sticky axes",
-            longText: "makes the axes stick to the side when scrolling of center",
+            longText: "Assures axes are always visible. When off, axes can be scrolled out of view.",
+            shortCut: "A",
             type: "boolean",
             value: true
         };
         _this.autoScroll = {
             text: "Auto scroll",
-            longText: "Automaticly scolls to the last inserted value in the linechart",
+            longText: "Automatically scrolls to the last inserted value in the linechart. Only applicable when receiving data live.",
+            shortCut: "K",
             type: "boolean",
             value: false
         };
         _this.toggleLegend = {
             text: "Legend",
-            longText: "Toggles legend",
+            longText: "Show or hide legend",
+            shortCut: "L",
             type: "boolean",
             value: true
         };
@@ -53,7 +57,8 @@ var LineChartController = (function (_super) {
             toggleLegend: _this.toggleLegend,
             reset: {
                 text: "Reset",
-                longText: "Resets the view of the grid",
+                longText: "Resets the zoom and position of the plot",
+                shortCut: "R",
                 type: "action",
                 value: function () { _this.reset(); }
             }
@@ -460,7 +465,6 @@ var LineChartController = (function (_super) {
     LineChartController.prototype.wrapper_keyDown = function (e) {
         switch (e.key) {
             case "g":
-                //this.displayGrid = this.displayGrid === true ? false : true;
                 this.showGrid.value = !this.showGrid.value;
                 break;
             case "r":
@@ -471,6 +475,9 @@ var LineChartController = (function (_super) {
                 break;
             case "k":
                 this.autoScroll.value = !this.autoScroll.value;
+                break;
+            case "l":
+                this.toggleLegend.value = !this.toggleLegend.value;
                 break;
             case "Control":
                 this.wrapper.style.cursor = "w-resize";
@@ -665,6 +672,7 @@ var LineChartLegend = (function () {
                 }
                 var positionX = sidePadding;
                 var name_1 = data[i].infos.SensorInfos[0].Name;
+                var unit = data[i].infos.SensorInfos[0].Unit;
                 ctx.beginPath();
                 if (this.__darkTheme) {
                     ctx.strokeStyle = data[i].color.toString();
@@ -682,7 +690,13 @@ var LineChartLegend = (function () {
                 ctx.fillStyle = this.__textColor;
                 ctx.textAlign = "start";
                 ctx.textBaseline = "middle";
-                ctx.fillText(name_1, positionX, positionY, (this.width - positionX - sidePadding));
+                if (unit) {
+                    unit = unit.replace("&deg;", "°");
+                    ctx.fillText(name_1 + " (" + unit + ")", positionX, positionY, (this.width - positionX - sidePadding));
+                }
+                else {
+                    ctx.fillText(name_1, positionX, positionY, (this.width - positionX - sidePadding));
+                }
                 ctx.closePath();
                 positionY += lineSpacing;
             }

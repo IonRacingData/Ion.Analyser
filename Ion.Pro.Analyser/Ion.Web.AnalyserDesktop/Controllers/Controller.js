@@ -14,7 +14,6 @@ var Controller = (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.mk = new HtmlHelper;
         return _this;
-        //public abstract generate(): HTMLElement;
     }
     Controller.prototype.setSize = function (width, height) {
         this.width = width;
@@ -26,10 +25,15 @@ var Controller = (function (_super) {
 var SingleValueController = (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super.call(this) || this;
         _this.percent = 0;
         _this.value = 0;
         _this.lastID = "";
+        _this.legendHeight = 18;
+        _this.legendWrapper = document.createElement("div");
+        _this.legendWrapper.className = "controller-legend";
+        _this.legendWrapper.style.height = _this.legendHeight + "px";
+        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         return _this;
     }
     SingleValueController.prototype.setData = function (d) {
@@ -41,7 +45,7 @@ var SingleValueController = (function (_super) {
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
                 this.onDataChange();
-                this.onSensorChange();
+                this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -62,7 +66,24 @@ var SingleValueController = (function (_super) {
             this.onDataChange();
         }
     };
-    SingleValueController.prototype.onSensorChange = function () { };
+    SingleValueController.prototype.sensorChange = function () {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            var unit = this.data.infos.SensorInfos[0].Unit;
+            var name_1 = this.data.infos.SensorInfos[0].Name;
+            if (unit) {
+                unit = unit.replace("&deg;", "°");
+                this.legendWrapper.appendChild(document.createTextNode(name_1 + " (" + unit + ")"));
+            }
+            else {
+                this.legendWrapper.appendChild(document.createTextNode(name_1));
+            }
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+        this.onSensorChange();
+    };
     return SingleValueController;
 }(Controller));
 var CanvasController = (function (_super) {
@@ -104,9 +125,6 @@ var MultiValueCanvasController = (function (_super) {
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
             this.updateSensorInfos(kernel.senMan.getInfos());
-            /*kernel.senMan.getInfos((infos: SensorInformation[]) => {
-                this.updateSensorInfos(infos);
-            });*/
         }
         this.onDataChange();
     };
@@ -129,10 +147,15 @@ var MultiValueCanvasController = (function (_super) {
 var SingleValueCanvasController = (function (_super) {
     __extends(SingleValueCanvasController, _super);
     function SingleValueCanvasController() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super.call(this) || this;
         _this.percent = 0;
         _this.value = 0;
         _this.lastID = "";
+        _this.legendHeight = 18;
+        _this.legendWrapper = document.createElement("div");
+        _this.legendWrapper.className = "controller-legend";
+        _this.legendWrapper.style.height = _this.legendHeight + "px";
+        _this.legendWrapper.appendChild(document.createTextNode("No data"));
         return _this;
     }
     SingleValueCanvasController.prototype.setData = function (d) {
@@ -144,7 +167,7 @@ var SingleValueCanvasController = (function (_super) {
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
                 this.onDataChange();
-                this.onSensorChange();
+                this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
@@ -162,7 +185,24 @@ var SingleValueCanvasController = (function (_super) {
             }
         }
     };
-    SingleValueCanvasController.prototype.onSensorChange = function () { };
+    SingleValueCanvasController.prototype.sensorChange = function () {
+        this.legendWrapper.innerHTML = "";
+        if (this.data) {
+            var unit = this.data.infos.SensorInfos[0].Unit;
+            var name_2 = this.data.infos.SensorInfos[0].Name;
+            if (unit) {
+                unit = unit.replace("&deg;", "°");
+                this.legendWrapper.appendChild(document.createTextNode(name_2 + " (" + unit + ")"));
+            }
+            else {
+                this.legendWrapper.appendChild(document.createTextNode(name_2));
+            }
+        }
+        else {
+            this.legendWrapper.appendChild(document.createTextNode("No data"));
+        }
+        this.onSensorChange();
+    };
     return SingleValueCanvasController;
 }(CanvasController));
 var ScatterChartBase = (function (_super) {
