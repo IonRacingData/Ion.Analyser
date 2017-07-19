@@ -167,6 +167,19 @@ namespace Ion.Pro.Analyser.SenSys
         }
     }
 
+    public class GPSCSVSensorProvider : ISensorReaderProvider
+    {
+        public string KeyIDMapPath => "Sensors/Data2016/Sensor.json";
+        public string CalibrationFilePath => "Sensors/Data2016/SensorInfo.json";
+
+        public ISensorReader GetSensorReader(string name)
+        {
+            return new GPSDataReader(name, 2, 3);
+        }
+    }
+
+
+
     public class InFluxDBSensorProvider : ISensorProvider
     {
         public string KeyIDMapPath { get; } = "Sensors/Data2016/Sensor.json";

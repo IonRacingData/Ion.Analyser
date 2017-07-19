@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Threading;
 using Ion.Pro.Analyser.Web;
 using Ion.Pro.Analyser.Controllers;
+using NicroWare.Pro.RPiSPITest;
 
 namespace Ion.Pro.Analyser
 {
@@ -30,7 +31,7 @@ namespace Ion.Pro.Analyser
     class Program
     {
         static RunMode runMode = RunMode.OffLine;
-        public static bool liveSim = true;
+        public static bool liveSim = false;
 
         public static SensorDataStore Store { get; private set; } = SensorDataStore.GetDefault();
         static byte[] GetLegacyFormat(SensorPackage pack)
@@ -64,9 +65,6 @@ namespace Ion.Pro.Analyser
         static void Main(string[] args)
         {
             //manager.Load("../../Data/Sets/126_usart_data.log16");
-
-            //Console.Read();
-            //return;
             try
             {
                 plinkPath = LegacyPIService.TryFindPlink();
@@ -91,6 +89,7 @@ namespace Ion.Pro.Analyser
                 {
                     Task.Run(() => DataInserter("../../Data/Sets/195_usart_data.log16"));
                 }
+                Task.Run(() => InsertTelemetryData());
                 IonAnalyserWebPage.Run();
             }
             catch (Exception e)
@@ -131,6 +130,7 @@ namespace Ion.Pro.Analyser
             SensorManager manager = SensorManager.GetDefault();
             manager.RegisterFileProvider("log16", new LegacySensorProvider());
             manager.RegisterFileProvider("log", new LegacySensorProvider());
+            manager.RegisterFileProvider("gpscsv", new GPSCSVSensorProvider());
             ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
         }
 
@@ -170,6 +170,61 @@ namespace Ion.Pro.Analyser
             SensorDataStore.GetDefault().ReaderLinker.Add("gpscsv", typeof(GPSDataReader));
             SensorDataStore.GetDefault().ReaderLinker.Add("gpx", typeof(GPXDataReader));
 
+        }
+
+        static void InsertTelemetryData()
+        {
+            Console.WriteLine("Startert listening");
+
+            try
+            {
+                NRFRadio baseRadio = new NRFRadio();
+                Console.WriteLine(baseRadio.Begin());
+                baseRadio.SetPALevel(RF24PaDbm.RF24_PA_HIGH);
+                baseRadio.SetDataRate(RF24Datarate.RF24_250KBPS);
+                baseRadio.SetRetries(0, 0);
+                baseRadio.SetAutoAck(false);
+                baseRadio.OpenReadingPipe(0, "00001");
+                baseRadio.OpenWritingPipe("00001");
+                baseRadio.StartListening();
+                int a = 0;
+                while (true)
+                {
+                    if (!baseRadio.Available())
+                    {
+                        Thread.Yield();
+                    }
+                    while (true)
+                    {
+                        byte[] buffer = new byte[30];
+                        baseRadio.Read(buffer, 30);
+                        if (buffer[0] == 0 && buffer[1] == 0)
+                        {
+                            Thread.Yield();
+                        }
+                        else
+                        {
+                            SensorPackage pack = ParseBytes(buffer);
+                            SensorManager.GetDefault().AddLive("telemetry", pack);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to open telemetry");
+                Console.WriteLine(e);
+            }
+        }
+
+        static SensorPackage ParseBytes(byte[] bytes)
+        {
+            SensorPackage pack = new SensorPackage();
+            pack.ID = BitConverter.ToUInt16(bytes, 0);
+            pack.Value = BitConverter.ToUInt32(bytes, 2);
+            pack.TimeStamp = BitConverter.ToUInt32(bytes, 6);
+            return pack;
         }
 
         static void InsertSensorTestData()
