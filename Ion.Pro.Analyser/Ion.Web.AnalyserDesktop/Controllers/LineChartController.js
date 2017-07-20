@@ -264,7 +264,7 @@ var LineChartController = (function (_super) {
                 }
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;
-                this.ctxMain.textBaseline = "alphabetical";
+                this.ctxMain.textBaseline = "alphabetic";
             }
         }
     };
