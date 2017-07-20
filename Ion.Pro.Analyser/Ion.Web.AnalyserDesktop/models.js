@@ -208,6 +208,9 @@ var Point = (function () {
     Point.prototype.copy = function () {
         return new Point(this.x, this.y);
     };
+    Point.prototype.intersects = function (x, y, width, height) {
+        return this.x > x && this.y > y && this.x < x + width && this.y < y + height;
+    };
     Point.prototype.toString = function () {
         return "x: " + this.x.toFixed(2) + "  y: " + this.y.toFixed(2);
     };

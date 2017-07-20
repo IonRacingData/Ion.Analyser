@@ -198,7 +198,8 @@ var GridViewer = (function () {
                 this_1.handleResize();
             }
             else {
-                next.call(this_1, temp, lastBox.content, dataSets);
+                lastBox.box.innerHTML = "";
+                next.call(this_1, temp, lastBox.box, dataSets);
                 //next(temp, lastBox.content);
             }
         };
@@ -281,20 +282,13 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.globalDrag = function (e) {
         if (this.isMouseEvent(e.mouse)) {
-            var windowX = e.mouse.clientX - this.window.x - 9;
-            var windowY = e.mouse.clientY - this.window.y - 39;
-            if (windowX > 0
-                && windowY > 0
-                && windowX < this.window.width
-                && windowY < this.window.height
+            var winPos = new Point(e.mouse.clientX - this.window.x - 9, e.mouse.clientY - this.window.y - 39);
+            if (winPos.intersects(0, 0, this.window.width, this.window.height)
                 && e.window !== this.window) {
                 var containers = this.window.handle.getElementsByClassName("grid-con");
                 for (var i = containers.length - 1; i >= 0; i--) {
                     var cur = containers[i];
-                    if (windowX > cur.offsetLeft
-                        && windowY > cur.offsetTop
-                        && windowX < cur.offsetLeft + cur.offsetWidth
-                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                    if (winPos.intersects(cur.offsetLeft, cur.offsetTop, cur.offsetWidth, cur.offsetHeight)) {
                         console.log(cur);
                         this.selectedContainer = cur.gridContainer;
                         break;
@@ -304,10 +298,7 @@ var GridViewer = (function () {
                 var foundGridWindow = null;
                 for (var i = gridBoxes.length - 1; i >= 0; i--) {
                     var cur = gridBoxes[i];
-                    if (windowX > cur.offsetLeft
-                        && windowY > cur.offsetTop
-                        && windowX < cur.offsetLeft + cur.offsetWidth
-                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                    if (winPos.intersects(cur.offsetLeft, cur.offsetTop, cur.offsetWidth, cur.offsetHeight)) {
                         this.selectedBox = cur.gridBox;
                         this.selectorWindow.setPos(this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45, this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
                         // this.selectedBox.box.offsetTop 
@@ -344,9 +335,8 @@ var GridViewer = (function () {
     };
     GridViewer.prototype.globalUp = function (e) {
         if (this.isMouseEvent(e.mouse)) {
-            var windowX = e.mouse.clientX - this.window.x - 9;
-            var windowY = e.mouse.clientY - this.window.y - 39;
-            if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
+            var winPos = new Point(e.mouse.clientX - this.window.x - 9, e.mouse.clientY - this.window.y - 39);
+            if (winPos.intersects(0, 0, this.window.width, this.window.height) && e.window !== this.window) {
                 this.selectorWindow.hide();
             }
         }

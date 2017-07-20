@@ -273,6 +273,10 @@ class Point implements IPoint<Point> {
         return new Point(this.x, this.y);
     }
 
+    intersects(x: number, y: number, width: number, height: number) {
+        return this.x > x && this.y > y && this.x < x + width && this.y < y + height;
+    }
+
     toString(): string {
         return "x: " + this.x.toFixed(2) + "  y: " + this.y.toFixed(2);
     }

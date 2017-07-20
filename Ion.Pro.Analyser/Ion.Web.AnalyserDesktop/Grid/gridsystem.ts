@@ -217,7 +217,8 @@
                 this.handleResize();
             }
             else {
-                next.call(this, temp, lastBox.content, dataSets);
+                lastBox.box.innerHTML = "";
+                next.call(this, temp, lastBox.box, dataSets);
                 //next(temp, lastBox.content);
             }
         }
@@ -303,21 +304,18 @@
 
     globalDrag(e: IWindowEvent) {
         if (this.isMouseEvent(e.mouse)) {
-            var windowX = e.mouse.clientX - this.window.x - 9;
-            var windowY = e.mouse.clientY - this.window.y - 39;
-            if (windowX > 0
-                && windowY > 0
-                && windowX < this.window.width
-                && windowY < this.window.height
+            const winPos = new Point(e.mouse.clientX - this.window.x - 9, e.mouse.clientY - this.window.y - 39);
+            if (winPos.intersects(0, 0, this.window.width, this.window.height)
                 && e.window !== this.window) {
 
                 var containers = this.window.handle.getElementsByClassName("grid-con");
                 for (let i = containers.length - 1; i >= 0; i--) {
                     let cur = <HTMLElement>containers[i];
-                    if (windowX > cur.offsetLeft
-                        && windowY > cur.offsetTop
-                        && windowX < cur.offsetLeft + cur.offsetWidth
-                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                    if (winPos.intersects(
+                        cur.offsetLeft,
+                        cur.offsetTop,
+                        cur.offsetWidth,
+                        cur.offsetHeight)) {
                         console.log(cur);
                         this.selectedContainer = cur.gridContainer;
                         break;
@@ -328,10 +326,7 @@
                 for (let i = gridBoxes.length - 1; i >= 0; i--) {
                     let cur = <HTMLElement>gridBoxes[i];
 
-                    if (windowX > cur.offsetLeft
-                        && windowY > cur.offsetTop
-                        && windowX < cur.offsetLeft + cur.offsetWidth
-                        && windowY < cur.offsetTop + cur.offsetHeight) {
+                    if (winPos.intersects(cur.offsetLeft, cur.offsetTop, cur.offsetWidth, cur.offsetHeight)) { 
                         this.selectedBox = cur.gridBox;
                         this.selectorWindow.setPos(
                             this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45
@@ -375,9 +370,8 @@
 
     globalUp(e: IWindowEvent) {
         if (this.isMouseEvent(e.mouse)) {
-            var windowX = e.mouse.clientX - this.window.x - 9;
-            var windowY = e.mouse.clientY - this.window.y - 39;
-            if (windowX > 0 && windowY > 0 && windowX < this.window.width && windowY < this.window.height && e.window !== this.window) {
+            const winPos = new Point(e.mouse.clientX - this.window.x - 9, e.mouse.clientY - this.window.y - 39);
+            if (winPos.intersects(0, 0, this.window.width, this.window.height) && e.window !== this.window) {
                 this.selectorWindow.hide();
             }
         }
