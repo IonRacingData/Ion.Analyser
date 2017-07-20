@@ -125,8 +125,8 @@ var WindowManager = (function () {
         //this.raiseEvent(WindowManager.event_globalUp, { window: this.activeWindow, mouse: e });
     };
     WindowManager.prototype.touchEnd = function (e) {
-        var x = e.touches[0].pageX;
-        var y = e.touches[0].pageY;
+        var x = e.changedTouches[0].pageX;
+        var y = e.changedTouches[0].pageY;
         var appWindow = this.getWindowAt(x, y, true);
         if (appWindow) {
             appWindow.handleGlobalRelease(x, y, this.activeWindow);
@@ -172,7 +172,7 @@ var WindowManager = (function () {
             return this.avaiableRules[name];
         }
         console.log("The css rule: " + name + " does not exist");
-        throw "CSS rule not found exception";
+        throw new Error("CSS rule not found exception");
     };
     WindowManager.prototype.changeTheme = function (theme) {
         var name = "/Style/" + theme + ".css";

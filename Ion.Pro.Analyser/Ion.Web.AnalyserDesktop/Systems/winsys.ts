@@ -157,8 +157,8 @@
     }
 
     private touchEnd(e: TouchEvent): void {
-        let x = e.touches[0].pageX;
-        let y = e.touches[0].pageY;
+        let x = e.changedTouches[0].pageX;
+        let y = e.changedTouches[0].pageY;
         let appWindow = this.getWindowAt(x, y, true);
         if (appWindow) {
             appWindow.handleGlobalRelease(x, y, this.activeWindow);
@@ -210,7 +210,7 @@
             return this.avaiableRules[name];
         }
         console.log("The css rule: " + name + " does not exist");
-        throw "CSS rule not found exception";
+        throw new Error("CSS rule not found exception");
     }
 
     public changeTheme(theme: string): void {
