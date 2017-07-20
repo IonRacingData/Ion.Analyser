@@ -1,8 +1,13 @@
 ﻿[
   {
-    "Key": "SPEED",
-    "Name": "Speed",
-    "Unit": "km/h"
+    "Key": "ACC_PEDAL_1",
+    "Name": "Accelerator Pedal Sensor 1",
+    "Unit": "%"
+  },
+  {
+    "Key": "ACC_PEDAL_2",
+    "Name": "Acceleration Pedal Position Sensor 2",
+    "Unit": ""
   },
   {
     "Key": "VOLT_12",
@@ -30,6 +35,11 @@
     "Unit": "&deg;C"
   },
   {
+    "Key": "TEMP_AIR",
+    "Name": "AIR Temperature",
+    "Unit": "&deg;C"
+  },
+  {
     "Key": "CRITICAL_ECU",
     "Name": "Critical ECU Error",
     "Unit": ""
@@ -49,9 +59,72 @@
     "Name": "Error Brake While Throttle",
     "Unit": ""
   },
-
-  // #####--Gyro Accs and mag--######
-
+  {
+    "Key": "STEERING",
+    "Name": "Steering",
+    "Unit": ""
+  },
+  {
+    "Key": "ADC_MISMATCH",
+    "Name": "ADC Pedal Mismatch",
+    "Unit": ""
+  },
+  {
+    "Key": "FLOW",
+    "Name": "Water flow, really unkown",
+    "Unit": ""
+  },
+  {
+    "Key": "WHEEL_FL",
+    "Name": "Wheel Front Left RPM",
+    "Unit": ""
+  },
+  {
+    "Key": "WHEEL_FR",
+    "Name": "Wheel Front Right RPM",
+    "Unit": ""
+  },
+  {
+    "Key": "WHEEL_BL",
+    "Name": "Wheel Back Left RPM",
+    "Unit": ""
+  },
+  {
+    "Key": "WHEEL_BR",
+    "Name": "Wheel Back Right RPM",
+    "Unit": ""
+  },
+  {
+    "Key": "WATER_TEMP_1",
+    "Name": "Water Temperature 1",
+    "Unit": ""
+  },
+  {
+    "Key": "WATER_TEMP_2",
+    "Name": "Water Temperature 2",
+    "Unit": ""
+  },
+  {
+    "Key": "WATER_TEMP_3",
+    "Name": "Water Temperature 3",
+    "Unit": ""
+  },
+  {
+    "Key": "WATER_TEMP_4",
+    "Name": "Water Temperature 4",
+    "Unit": ""
+  },
+  {
+    "Key": "DASH_7_SEGMENT",
+    "Name": "Dashboard 7-segment display values",
+    "Unit": ""
+  },
+  {
+    "Key": "DASH_LEDS",
+    "Name": "Dashboard LEDs",
+    "Unit": ""
+  },
+  // #####--Gyro Accs and mag (IMU)--######
   {
     "Key": "GYRO_X",
     "Name": "Gyroscope X Axis",
@@ -97,9 +170,17 @@
     "Name": "Magnetomerer Z Axis",
     "Unit": "T"
   },
-
+  {
+    "Key": "IMU_RATE",
+    "Name": "IMU Rate",
+    "Unit": ""
+  },
+  {
+    "Key": "IMU_TEMP",
+    "Name": "IMU Temp",
+    "Unit": ""
+  },
   // #####--BMS_RAW values--#####
-
   {
     "Key": "BMS_RAW_1",
     "Name": "Raw BMS Value 1",
@@ -155,9 +236,7 @@
     "Name": "Raw NLG5 BMS Value",
     "Unit": ""
   },
-
   // #####--BMS_VOLT--#####
-
   {
     "Key": "BMS_VOLT",
     "Name": "BMS Voltage",
@@ -183,9 +262,7 @@
     "Name": "BMS Maximum Voltage ID",
     "Unit": "ID"
   },
-
   // #####--BMS_CURRENT--#####
-
   {
     "Key": "BMS_CURRENT",
     "Name": "BMS Current",
@@ -201,7 +278,6 @@
     "Name": "BMS Discharge Limit",
     "Unit": "A"
   },
-
   {
     "Key": "BMS_TOTAL_ENERGY_IN",
     "Name": "BMS Total Energy In",
@@ -212,9 +288,7 @@
     "Name": "BMS Total Energy Out",
     "Unit": "kWh"
   },
-
   // #####--BMS Battery Info--#####
-
   {
     "Key": "BMS_SOC",
     "Name": "BMS State Of Charge",
@@ -240,9 +314,7 @@
     "Name": "BMS State Of Health",
     "Unit": "%"
   },
-
   // #####--BMS_TEMP--#####
-
   {
     "Key": "BMS_TEMP_BAT",
     "Name": "BMS Battery Temperature",
@@ -268,9 +340,7 @@
     "Name": "BMS Battery Maximum Temperature ID",
     "Unit": "ID"
   },
-
   // #####--BMS_RES--#####
-
   {
     "Key": "BMS_RES_BAT",
     "Name": "BMS Battery Resistance",
@@ -296,9 +366,7 @@
     "Name": "BMS Battery Maximum Resistance ID",
     "Unit": ""
   },
-
   // #####--BMS State Info--#####
-
   {
     "Key": "BMS_STATE",
     "Name": "BMS State",
@@ -329,10 +397,7 @@
     "Name": "BMS Warning",
     "Unit": ""
   },
-
-
   // #####--Car Info--#####
-
   {
     "Key": "BAR",
     "Name": "Barometer",
@@ -343,19 +408,43 @@
     "Name": "Button in dashboard",
     "Unit": ""
   },
-
+  {
+    "Key": "STOP",
+    "Name": "Stop",
+    "Unit": ""
+  },
+  {
+    "Key": "BTN_STOP",
+    "Name": "Stop Button",
+    "Unit": ""
+  },
+  {
+    "Key": "BTN_START",
+    "Name": "Start Button",
+    "Unit": ""
+  },
+  {
+    "Key": "BTN_MODE",
+    "Name": "Mode Button",
+    "Unit": ""
+  },
+  {
+    "Key": "BTN_LOG",
+    "Name": "Log Button",
+    "Unit": ""
+  },
   {
     "Key": "BRAKE_LIGHT",
     "Name": "Brake light",
     "Unit": ""
   },
   {
-    "Key": "BRAKE_FORCE_FRONT",
+    "Key": "BRAKE_PRESS_FRONT",
     "Name": "Brake force front",
     "Unit": "Bar"
   },
   {
-    "Key": "BRAKE_FORCE_BACK",
+    "Key": "BRAKE_PRESS_BACK",
     "Name": "Brake force back",
     "Unit": "Bar"
   },
@@ -364,10 +453,7 @@
     "Name": "Indicator for Merged data sets",
     "Unit": ""
   },
-
-
   // #####--GPS--######
-
   {
     "Key": "GPS_LAT",
     "Name": "GPS Latitude",
@@ -384,6 +470,31 @@
     "Unit": "&deg;"
   },
   {
+    "Key": "GPS_TIME_LSB",
+    "Name": "GPS Time LSB",
+    "Unit": ""
+  },
+  {
+    "Key": "GPS_TIME_MSB",
+    "Name": "GPS Time MSB",
+    "Unit": ""
+  },
+  {
+    "Key": "GPS_VALIDITY",
+    "Name": "GPS Validity",
+    "Unit": ""
+  },
+  {
+    "Key": "GPS_SPEED",
+    "Name": "GPS Speed",
+    "Unit": ""
+  },
+  {
+    "Key": "GPS_COURSE",
+    "Name": "GPS Course",
+    "Unit": ""
+  },
+  {
     "Key": "SIN1",
     "Name": "Sinus 1",
     "Unit": "%"
@@ -398,7 +509,6 @@
     "Name": "Cos 1",
     "Unit": "%"
   },
-
   // #####--Motor Controller--#####
   {
     "Key": "MC_RAW",

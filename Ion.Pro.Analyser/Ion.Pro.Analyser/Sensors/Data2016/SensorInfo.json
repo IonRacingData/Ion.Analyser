@@ -1,6 +1,6 @@
 ﻿[
   {
-    "Key": "SPEED",
+    "Key": "ACC_PEDAL_1",
     "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 100
@@ -155,7 +155,6 @@
   {
     "Key": "BMS_VOLT_MIN_ID",
     "Resolution": 8
-
   },
   {
     "Key": "BMS_VOLT_MAX",
@@ -188,7 +187,6 @@
     "Signed": false,
     "MaxValue": 65535
   },
-
   {
     "Key": "BMS_TOTAL_ENERGY_IN",
     "Resolution": 32,
@@ -312,7 +310,6 @@
     "Key": "BMS_WARNING"
   },
 
-
   // #####--Car Info--#####
 
   {
@@ -321,22 +318,20 @@
   {
     "Key": "BUTTON"
   },
-
   {
     "Key": "BRAKE_LIGHT"
   },
   {
-    "Key": "BRAKE_FORCE_FRONT",
+    "Key": "BRAKE_PRESS_FRONT",
     "Resolution": 12
   },
   {
-    "Key": "BRAKE_FORCE_BACK",
+    "Key": "BRAKE_PRESS_BACK",
     "Resolution": 12
   },
   {
     "Key": "PACKAGESHIFT"
   },
-
 
   // #####--GPS--######
 
@@ -349,12 +344,6 @@
   {
     "Key": "GPS_HIGHRES"
   },
-
-
-
-
-
-
   // #####--Sinus test curves--#####
   {
     "Key": "SIN1",
@@ -373,10 +362,10 @@
     "Signed": false,
     "MaxValue": 100,
     "Resolution": 8
-
   },
 
   // #####--Motor Controller--#####
+
   {
     "Key": "MC_RAW"
   },

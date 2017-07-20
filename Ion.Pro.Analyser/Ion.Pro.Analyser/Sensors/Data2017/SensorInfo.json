@@ -1,0 +1,163 @@
+﻿[
+  {
+    "Key": "STOP",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "BTN_STOP",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "BTN_START",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "BTN_MODE",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "BTN_LOG",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "IMU_RATE",
+    "Resolution": 16
+  },
+  {
+    "Key": "ACCEL_X",
+    "Resolution": 16
+  },
+  {
+    "Key": "ACCEL_Y",
+    "Resolution": 16
+  },
+  {
+    "Key": "ACCEL_Z",
+    "Resolution": 16
+  },
+  {
+    "Key": "IMU_TEMP",
+    "Resolution": 16
+  },
+  {
+    "Key": "GPS_TIME_LSB",
+    "Resolution": 32
+  },
+  {
+    "Key": "GPS_TIME_MSB",
+    "Resolution": 32
+  },
+  {
+    "Key": "GPS_VALIDITY",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "GPS_LAT",
+    "Resolution": 32
+  },
+  {
+    "Key": "GPS_LONG",
+    "Resolution": 32
+  },
+  {
+    "Key": "GPS_SPEED",
+    "Resolution": 32
+  },
+  {
+    "Key": "GPS_COURSE",
+    "Resolution": 32
+  },
+  {
+    "Key": "BRAKE_PRESS_FRONT",
+    "Resolution": 16
+  },
+  {
+    "Key": "BRAKE_PRESS_BACK",
+    "Resolution": 16
+  },
+  {
+    "Key": "TEMP_AIR",
+    "Resolution": 16
+  },
+  {
+    "Key": "ACC_PEDAL_1",
+    "Resolution": 16
+  },
+  {
+    "Key": "ACC_PEDAL_2",
+    "Resolution": 16
+  },
+  {
+    "Key": "BREAK_PEDAL_1",
+    "Resolution": 16
+  },
+  {
+    "Key": "STEERING",
+    "Resolution": 16
+  },
+  {
+    "Key": "ADC_MISMATCH",
+    "Resolution": 1,
+    "MinValue": 0,
+    "MaxValue": 1
+  },
+  {
+    "Key": "FLOW",
+    "Resolution": 16
+  },
+  {
+    "Key": "WHEEL_FL",
+    "Resolution": 32
+  },
+  {
+    "Key": "WHEEL_FR",
+    "Resolution": 32
+  },
+  {
+    "Key": "WHEEL_BR",
+    "Resolution": 32
+  },
+  {
+    "Key": "WHEEL_BL",
+    "Resolution": 32
+  },
+  {
+    "Key": "WATER_TEMP_1",
+    "Resolution": 16
+  },
+  {
+    "Key": "WATER_TEMP_2",
+    "Resolution": 16
+  },
+  {
+    "Key": "WATER_TEMP_3",
+    "Resolution": 16
+  },
+  {
+    "Key": "WATER_TEMP_4",
+    "Resolution": 16
+  },
+  {
+    "Key": "DASH_7_SEGMENT",
+    "Resolution": 64
+  },
+  {
+    "Key": "DASH_LEDS",
+    "Resolution": 5
+  },
+  {
+    "Key": "MC_RAW"
+  }
+]

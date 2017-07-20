@@ -1,0 +1,150 @@
+﻿[
+  {
+    "ID": 1,
+    "Key": "STOP"
+  },
+  {
+    "ID": 100, //0x64
+    "Key": "BTN_STOP"
+  },
+  {
+    "ID": 101, // 0x65
+    "Key": "BTN_START"
+  },
+  {
+    "ID": 102, // 0x66
+    "Key": "BTN_MODE"
+  },
+  {
+    "ID": 103, //0x67
+    "Key": "BTN_LOG"
+  },
+  {
+    "ID": 104, //0x68
+    "Key": "IMU_RATE"
+  },
+  {
+    "ID": 105, //0x69
+    "Key": "ACCEL_X"
+  },
+  {
+    "ID": 106, //0x6A
+    "Key": "ACCEL_Y"
+  },
+  {
+    "ID": 107, //0x6B
+    "Key": "ACCEL_Z"
+  },
+  {
+    "ID": 108, // 0x6C
+    "Key": "IMU_TEMP"
+  },
+  {
+    "ID": 112, // 0x70
+    "Key": "GPS_TIME_LSB"
+  },
+  {
+    "ID": 113, // 0x71
+    "Key": "GPS_TIME_MSB"
+  },
+  {
+    "ID": 114, // 0x72
+    "Key": "GPS_VALIDITY"
+  },
+  {
+    "ID": 115, // 0x73
+    "Key": "GPS_LAT"
+  },
+  {
+    "ID": 116, // 0x74
+    "Key": "GPS_LONG"
+  },
+  {
+    "ID": 117, // 0x75
+    "Key": "GPS_SPEED"
+  },
+  {
+    "ID": 118, // 0x76
+    "Key": "GPS_COURSE"
+  },
+  {
+    "ID": 122, // 0x7A
+    "Key": "BRAKE_PRESS_FRONT"
+  },
+  {
+    "ID": 123, //0x7B
+    "Key": "BRAKE_PRESS_BACK"
+  },
+  {
+    "ID": 124, //0x7C
+    "Key": "TEMP_AIR"
+  },
+  {
+    "ID": 125, //0x7D
+    "Key": "ACC_PEDAL_1"
+  },
+  {
+    "ID": 126, //0x7E
+    "Key": "ACC_PEDAL_2"
+  },
+  {
+    "ID": 127, //0x7F
+    "Key": "BREAK_PEDAL_1"
+  },
+  {
+    "ID": 128, //0x80
+    "Key": "STEERING"
+  },
+  {
+    "ID": 129, //0x81
+    "Key": "ADC_MISMATCH"
+  },
+  {
+    "ID": 130, //0x82
+    "Key": "FLOW"
+  },
+  {
+    "ID": 132, //0x84
+    "Key": "WHEEL_FL"
+  },
+  {
+    "ID": 133, //0x85
+    "Key": "WHEEL_FR"
+  },
+  {
+    "ID": 134, //0x86
+    "Key": "WHEEL_BR"
+  },
+  {
+    "ID": 135, // 0x87
+    "Key": "WHEEL_BL"
+  },
+  {
+    "ID": 144, // 0x90
+    "Key": "WATER_TEMP_1"
+  },
+  {
+    "ID": 145, // 0x91
+    "Key": "WATER_TEMP_2"
+  },
+  {
+    "ID": 146, // 0x92
+    "Key": "WATER_TEMP_3"
+  },
+  {
+    "ID": 147, // 0x93
+    "Key": "WATER_TEMP_4"
+  },
+  {
+    "ID": 400, // 0x190
+    "Key": "DASH_7_SEGMENT"
+  },
+  {
+    "ID": 401, // 0x191
+    "Key": "DASH_LEDS"
+  },
+  {
+    "ID": 528, // 0xF008
+    "Key": "MC_RAW"
+  }
+]

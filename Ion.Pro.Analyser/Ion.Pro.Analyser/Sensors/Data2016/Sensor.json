@@ -1,7 +1,7 @@
 ﻿[
   {
     "ID": 0,
-    "Key": "SPEED"
+    "Key": "ACC_PEDAL_1"
   },
   {
     "ID": 4,
@@ -39,9 +39,7 @@
     "ID": 93,
     "Key": "ERROR_BRAKE_W_THROTTLE"
   },
-
   // #####--Gyro Accs and mag--######
-
   {
     "ID": 200, // 0xC8
     "Key": "GYRO_X"
@@ -78,9 +76,7 @@
     "ID": 208, // 0xD0
     "Key": "MAG_Z"
   },
-
   // #####--BMS_RAW values--#####
-
   {
     "ID": 1568, //0x620
     "Key": "BMS_RAW_1"
@@ -125,9 +121,7 @@
     "ID": 1560, //0x618
     "Key": "BMS_RAW_NLG5"
   },
-
   // #####--BMS_VOLT--#####
-
   {
     "ID": 61441, // 0xf001
     "Key": "BMS_VOLT"
@@ -148,9 +142,7 @@
     "ID": 61445, // 0xf005
     "Key": "BMS_VOLT_MAX_ID"
   },
-
   // #####--BMS_CURRENT--#####
-
   {
     "ID": 61446, // 0xF006
     "Key": "BMS_CURRENT"
@@ -163,7 +155,6 @@
     "ID": 61448, // 0xF008
     "Key": "BMS_DISCHARGELIMIT"
   },
-
   {
     "ID": 61449, // 0xF009
     "Key": "BMS_TOTAL_ENERGY_IN"
@@ -172,9 +163,7 @@
     "ID": 61450, // 0xF00A
     "Key": "BMS_TOTAL_ENERGY_OUT"
   },
-
   // #####--BMS Battery Info--#####
-
   {
     "ID": 61451, // 0xF00B
     "Key": "BMS_SOC"
@@ -195,9 +184,7 @@
     "ID": 61455, // 0xF00F
     "Key": "BMS_SOH"
   },
-
   // #####--BMS_TEMP--#####
-
   {
     "ID": 61456, // 0xF010
     "Key": "BMS_TEMP_BAT"
@@ -218,9 +205,7 @@
     "ID": 61460, // 0xF014
     "Key": "BMS_TEMP_BAT_MAX_ID"
   },
-
   // #####--BMS_RES--#####
-
   {
     "ID": 61461, // 0xF015
     "Key": "BMS_RES_BAT"
@@ -241,9 +226,7 @@
     "ID": 61465, // 0xF019
     "Key": "BMS_RES_BAT_MAX_ID"
   },
-
   // #####--BMS State Info--#####
-
   {
     "ID": 61472, // 0xF020
     "Key": "BMS_STATE"
@@ -268,10 +251,7 @@
     "ID": 61477, // 0xF025
     "Key": "BMS_WARNING"
   },
-
-
   // #####--Car Info--#####
-
   {
     "ID": 210, // 0xD2
     "Key": "BAR"
@@ -280,27 +260,23 @@
     "ID": 133, // 0x85
     "Key": "BUTTON"
   },
-
   {
     "ID": 1202, // 0x4B2
     "Key": "BRAKE_LIGHT"
   },
   {
     "ID": 808, // 0x328
-    "Key": "BRAKE_FORCE_FRONT"
+    "Key": "BRAKE_PRESS_FRONT"
   },
   {
     "ID": 800, // 0x329
-    "Key": "BRAKE_FORCE_BACK"
+    "Key": "BRAKE_PRESS_BACK"
   },
   {
     "ID": 210, // 0xFF00 ?
     "Key": "PACKAGESHIFT"
   },
-
-
   // #####--GPS--######
-
   {
     "ID": 250,
     "Key": "GPS_LAT"
@@ -325,7 +301,6 @@
     "ID": 44,
     "Key": "COS1"
   },
-
   // #####--MotorController--######
   {
     "ID": 384,
