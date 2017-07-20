@@ -14,6 +14,7 @@ namespace Ion.Pro.CarHub
         static void Main(string[] args)
         {
             Console.WriteLine("Starting carhub");
+            InitWriter();
             SerialPort port = new SerialPort("/dev/serial0", 115200, Parity.None, 8, StopBits.One);
             port.Open();
             Console.WriteLine("Port open");
@@ -25,8 +26,6 @@ namespace Ion.Pro.CarHub
             baseRadio.SetRetries(0, 0);
             baseRadio.SetAutoAck(false);
             Console.WriteLine("Initializing");
-            //baseRadio.OpenReadingPipe(0, "\0\0\0\0");
-            //baseRadio.OpenWritingPipe("\0\0\0\0\0");
             baseRadio.OpenReadingPipe(0, "00001");
             baseRadio.OpenWritingPipe("00001");
             baseRadio.StopListening();
@@ -43,7 +42,38 @@ namespace Ion.Pro.CarHub
                 Array.Copy(reader.ReadBytes(6), package, 6);
                 Array.Copy(BitConverter.GetBytes((uint)(DateTime.Now - startTime).TotalMilliseconds), 0, package, 6, 4);
                 baseRadio.Write(package, 10);
+                WriteToFile(package);
             }
+        }
+
+        static BinaryWriter writer;
+
+        static void InitWriter()
+        {
+            int i = 0;
+            string path = null;
+            while (true)
+            {
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "ion", "data", i.ToString("0000") + "_logfile.log17");
+                if (!File.Exists(path))
+                {
+                    break;
+                }
+                i++;
+            }
+            FileInfo fi = new FileInfo(path);
+            if (!fi.Directory.Exists)
+            {
+                fi.Directory.Create();
+            }
+            Console.WriteLine("Using file: " + path);
+            writer = new BinaryWriter(new FileStream(fi.FullName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, 400));
+        }
+        
+
+        static void WriteToFile(byte[] package)
+        {
+            writer.Write(package);
         }
 
         static void FindStart(BinaryReader reader)
