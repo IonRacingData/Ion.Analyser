@@ -286,19 +286,23 @@
 
 
             if (this.selectedPoint !== null) {
-                var abs: Point = this.getAbsolute(this.selectedPoint);
-                var pointString: string = this.selectedPoint.toString();
+                let abs: Point = this.getAbsolute(this.selectedPoint);
+                let pointString: string = this.selectedPoint.toString();
+
                 this.ctxMain.strokeStyle = this.axisColor;
                 this.ctxMain.fillStyle = this.axisColor;
                 this.ctxMain.beginPath();
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
                 this.ctxMain.textBaseline = "middle";
+
+                let modifiedPoint: Point = this.selectedPoint.divide(new Point(1000, 1));
+
                 if (this.toggleLegend.value) {
-                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
                 }
                 else {
-                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
                 }               
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;

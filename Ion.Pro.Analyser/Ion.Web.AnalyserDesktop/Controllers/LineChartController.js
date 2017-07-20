@@ -255,11 +255,12 @@ var LineChartController = (function (_super) {
                 this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
                 this.ctxMain.stroke();
                 this.ctxMain.textBaseline = "middle";
+                var modifiedPoint = this.selectedPoint.divide(new Point(1000, 1));
                 if (this.toggleLegend.value) {
-                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
                 }
                 else {
-                    this.ctxMain.fillText(this.selectedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
                 }
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;

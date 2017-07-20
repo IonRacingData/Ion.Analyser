@@ -8,6 +8,9 @@
     main(temp): void {
         console.log(temp);
         this.window = kernel.winMan.createWindow(this.app, "New Grid");
+        if (temp) {
+            this.window.maximize();
+        }
         this.selectorWindow = kernel.winMan.createWindow(this.app, "Selector");
         this.selectorWindow.showTaskbar = false;
         this.selectorWindow.setSize(92, 92);
