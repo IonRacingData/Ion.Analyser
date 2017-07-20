@@ -94,8 +94,7 @@ var LineChartController = (function (_super) {
         this.wrapper.addEventListener("wheel", function (e) { return _this.zoom(e); });
         this.wrapper.addEventListener("keydown", function (e) { return _this.wrapper_keyDown(e); });
         this.wrapper.addEventListener("keyup", function (e) { return _this.wrapper_keyUp(e); });
-        this.setColors();
-        this.draw();
+        this.updateColors();
         return this.wrapper;
     };
     LineChartController.prototype.setColors = function () {
@@ -107,7 +106,10 @@ var LineChartController = (function (_super) {
         this.legend.borderColor = kernel.winMan.getRule(".line-chart-legend").style.borderColor;
     };
     LineChartController.prototype.updateColors = function () {
-        this.darkTheme = !this.darkTheme;
+        this.darkTheme = true;
+        if (kernel.winMan.curTheme === "app-style") {
+            this.darkTheme = false;
+        }
         this.setColors();
         this.draw();
     };

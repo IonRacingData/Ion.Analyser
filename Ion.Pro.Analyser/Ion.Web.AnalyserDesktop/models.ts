@@ -432,7 +432,7 @@ interface IStorageTypes {
 interface IStorageObject<K extends keyof IStorageTypes> {
     text: string;
     longText: string;
-    shortCut: string | null;
+    shortCut?: string;
     type: K;
     value: IStorageTypes[K];
 }

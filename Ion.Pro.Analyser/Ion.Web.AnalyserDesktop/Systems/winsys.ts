@@ -5,6 +5,8 @@
     public dragging: boolean;
     public resizing: boolean;
 
+    public curTheme: string = "";
+
     public activeWindow: AppWindow;
 
     public windows: AppWindow[] = [];
@@ -213,6 +215,7 @@
 
     public changeTheme(theme: string): void {
         let name = "/Style/" + theme + ".css";
+        this.curTheme = theme;
         console.log(name);
         if (preloaded[name]) {
             preloadStyle.innerHTML = preloaded[name];

@@ -103,10 +103,8 @@
         this.wrapper.addEventListener("wheel", (e: WheelEvent) => this.zoom(e));
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
         this.wrapper.addEventListener("keyup", (e: KeyboardEvent) => this.wrapper_keyUp(e));
+        this.updateColors();
 
-        this.setColors();
-
-        this.draw();
         return this.wrapper;
     }
     darkTheme: boolean = true;
@@ -122,7 +120,10 @@
     }
 
     public updateColors(): void {
-        this.darkTheme = !this.darkTheme;
+        this.darkTheme = true;
+        if (kernel.winMan.curTheme === "app-style") {
+            this.darkTheme = false;
+        }
         this.setColors();
         this.draw();
     }

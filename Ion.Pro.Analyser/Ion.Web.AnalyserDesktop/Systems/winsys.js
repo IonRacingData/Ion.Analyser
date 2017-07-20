@@ -1,6 +1,7 @@
 var WindowManager = (function () {
     function WindowManager(container) {
         var _this = this;
+        this.curTheme = "";
         this.windows = [];
         this.order = [];
         this.events = {};
@@ -175,6 +176,7 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.changeTheme = function (theme) {
         var name = "/Style/" + theme + ".css";
+        this.curTheme = theme;
         console.log(name);
         if (preloaded[name]) {
             preloadStyle.innerHTML = preloaded[name];

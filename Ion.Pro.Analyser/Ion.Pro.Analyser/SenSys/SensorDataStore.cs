@@ -291,7 +291,7 @@ namespace Ion.Pro.Analyser.SenSys
                 SensorDataSet set = new SensorDataSet(dataSet, FileProviders[extension]);
                 set.Load();
                 set.SetNames(this);
-                LoadedDataSets.Add(set.Name, set);
+                LoadedDataSets[set.Name] =  set;
                 return set;
             }
             else
