@@ -763,7 +763,8 @@ class LineChartLegend {
             let lineSpacing: number = 13;
             let topBottompadding: number = 13;
             let sidePadding: number = 10;
-            let lineWidth: number = 10;
+            let lineLength: number = 10;
+            let lineWidth: number = 3;
             
             let positionY: number = topBottompadding;
             for (let i = 0; i < data.length; i++) {
@@ -786,9 +787,11 @@ class LineChartLegend {
                 }
                 ctx.ctx.lineCap = "round";
                 ctx.moveTo(positionX, positionY);
-                positionX += lineWidth;
+                positionX += lineLength;
                 ctx.lineTo(positionX, positionY);
+                ctx.lineWidth = lineWidth;
                 ctx.stroke();
+                ctx.lineWidth = 1;
 
                 positionX += 10;
                 ctx.moveTo(positionX, positionY);
@@ -843,6 +846,7 @@ class ContextFixer {
     strokeStyle: string;
     textAlign: string;
     textBaseline: string;
+    lineWidth: number;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -853,6 +857,7 @@ class ContextFixer {
         this.ctx = temp;
         this.fillStyle = "black";
         this.strokeStyle = "black";
+        this.lineWidth = 1;
     }
     fill() {
         this.ctx.fillStyle = this.fillStyle;
@@ -864,6 +869,7 @@ class ContextFixer {
         this.ctx.moveTo(newX, newY);
     }
     lineTo(x: number, y: number): void {
+        this.ctx.lineWidth = this.lineWidth;
         var newX: number = Math.floor(x) + 0.5;
         var newY: number = Math.floor(y) + 0.5;
         this.ctx.lineTo(newX, newY);
@@ -878,6 +884,7 @@ class ContextFixer {
         this.ctx.closePath();
     }
     stroke(): void {
+        this.ctx.lineWidth = this.lineWidth;
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();
     }
@@ -886,10 +893,10 @@ class ContextFixer {
         this.ctx.textAlign = this.textAlign;
         this.ctx.textBaseline = this.textBaseline;
         if (maxWidth) {
-            this.ctx.fillText(text, x, y, maxWidth);
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
         }
         else {
-            this.ctx.fillText(text, x, y);
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
         }
     }
     fillRect(x: number, y: number, width: number, height: number): void {

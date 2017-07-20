@@ -139,7 +139,9 @@ var DataSourceBuildController = (function (_super) {
     DataSourceBuildController.prototype.initChosenList = function () {
         var _this = this;
         this.chosenList = new ListBoxRearrangable();
-        //this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        if (this.groupArgs > 1) {
+            this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        }
         this.chosenList.selector = function (item) {
             return { mainText: item.Name, infoText: item.SensorSet.Name };
         };

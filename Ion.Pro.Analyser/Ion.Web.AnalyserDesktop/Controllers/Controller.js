@@ -44,26 +44,30 @@ var SingleValueController = (function (_super) {
                 var i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
+                this.updateVals(this.data);
                 this.onDataChange();
                 this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
-                    var lastIndex = this.data.length() - 1;
-                    if (lastIndex < 0) {
-                        console.log("Empty dataset in SingleValueController");
-                    }
-                    else {
-                        var lastValue = this.data.getValue(lastIndex);
-                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
-                        this.value = lastValue.y;
-                    }
+                    this.updateVals(this.data);
                 }
                 this.onDataChange();
             }
         }
         else {
             this.onDataChange();
+        }
+    };
+    SingleValueController.prototype.updateVals = function (data) {
+        var lastIndex = data.length() - 1;
+        if (lastIndex < 0) {
+            console.log("Empty dataset in SingleValueController");
+        }
+        else {
+            var lastValue = data.getValue(lastIndex);
+            this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+            this.value = lastValue.y;
         }
     };
     SingleValueController.prototype.sensorChange = function () {
@@ -166,23 +170,27 @@ var SingleValueCanvasController = (function (_super) {
                 var i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
+                this.updateVals(this.data);
                 this.onDataChange();
                 this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
-                    var lastIndex = this.data.length() - 1;
-                    if (lastIndex < 0) {
-                        console.log("Empty dataset in SingleValueCanvasController");
-                    }
-                    else {
-                        var lastValue = this.data.getValue(lastIndex);
-                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
-                        this.value = lastValue.y;
-                    }
+                    this.updateVals(this.data);
                 }
                 this.onDataChange();
             }
+        }
+    };
+    SingleValueCanvasController.prototype.updateVals = function (data) {
+        var lastIndex = data.length() - 1;
+        if (lastIndex < 0) {
+            console.log("Empty dataset in SingleValueController");
+        }
+        else {
+            var lastValue = data.getValue(lastIndex);
+            this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+            this.value = lastValue.y;
         }
     };
     SingleValueCanvasController.prototype.sensorChange = function () {

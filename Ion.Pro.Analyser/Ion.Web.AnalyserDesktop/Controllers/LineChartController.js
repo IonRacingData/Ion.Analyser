@@ -662,7 +662,8 @@ var LineChartLegend = (function () {
             var lineSpacing = 13;
             var topBottompadding = 13;
             var sidePadding = 10;
-            var lineWidth = 10;
+            var lineLength = 10;
+            var lineWidth = 3;
             var positionY = topBottompadding;
             for (var i = 0; i < data.length; i++) {
                 if (positionY > this.height - topBottompadding) {
@@ -682,9 +683,11 @@ var LineChartLegend = (function () {
                 }
                 ctx.ctx.lineCap = "round";
                 ctx.moveTo(positionX, positionY);
-                positionX += lineWidth;
+                positionX += lineLength;
                 ctx.lineTo(positionX, positionY);
+                ctx.lineWidth = lineWidth;
                 ctx.stroke();
+                ctx.lineWidth = 1;
                 positionX += 10;
                 ctx.moveTo(positionX, positionY);
                 ctx.fillStyle = this.__textColor;
@@ -724,6 +727,7 @@ var ContextFixer = (function () {
         this.ctx = temp;
         this.fillStyle = "black";
         this.strokeStyle = "black";
+        this.lineWidth = 1;
     }
     ContextFixer.prototype.fill = function () {
         this.ctx.fillStyle = this.fillStyle;
@@ -735,6 +739,7 @@ var ContextFixer = (function () {
         this.ctx.moveTo(newX, newY);
     };
     ContextFixer.prototype.lineTo = function (x, y) {
+        this.ctx.lineWidth = this.lineWidth;
         var newX = Math.floor(x) + 0.5;
         var newY = Math.floor(y) + 0.5;
         this.ctx.lineTo(newX, newY);
@@ -749,6 +754,7 @@ var ContextFixer = (function () {
         this.ctx.closePath();
     };
     ContextFixer.prototype.stroke = function () {
+        this.ctx.lineWidth = this.lineWidth;
         this.ctx.strokeStyle = this.strokeStyle;
         this.ctx.stroke();
     };
@@ -757,10 +763,10 @@ var ContextFixer = (function () {
         this.ctx.textAlign = this.textAlign;
         this.ctx.textBaseline = this.textBaseline;
         if (maxWidth) {
-            this.ctx.fillText(text, x, y, maxWidth);
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
         }
         else {
-            this.ctx.fillText(text, x, y);
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
         }
     };
     ContextFixer.prototype.fillRect = function (x, y, width, height) {

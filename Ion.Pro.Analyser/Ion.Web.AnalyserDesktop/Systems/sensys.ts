@@ -326,7 +326,7 @@
                 }
             }
             let group = this.getGroup(template.grouptype);
-            if (group) {
+            if (group && ((group as any).numGroups as number) === sources.length) {
                 return new group(sources);
             }
             else {

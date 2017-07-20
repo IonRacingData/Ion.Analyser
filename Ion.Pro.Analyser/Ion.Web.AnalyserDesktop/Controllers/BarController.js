@@ -87,6 +87,7 @@ var BarController = (function (_super) {
             this.bar2.style.width = "100%";
             this.barContainer.style.flexDirection = "column";
         }
+        this.onDataChange();
     };
     BarController.prototype.onSizeChange = function () {
         this.contentWrapper.style.width = this.width + "px";

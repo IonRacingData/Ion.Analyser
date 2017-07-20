@@ -189,10 +189,12 @@
                     if (sensys.SensorManager.isViewer(viewer)) {
                         
                         let singleViewer = viewer;
-                        viewer.dataSource = dataSets[temp.data[0]];
-                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
-                            singleViewer.dataUpdate();
-                        });
+                        if (dataSets[temp.data[0]]) {
+                            viewer.dataSource = dataSets[temp.data[0]];
+                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], () => {
+                                singleViewer.dataUpdate();
+                            });
+                        }
                     }
                     else if (sensys.SensorManager.isCollectionViewer(viewer)) {
                         let colViewer = viewer;
@@ -200,8 +202,10 @@
                             viewer.dataUpdate();
                         });
                         for (let name of temp.data) {
-                            viewer.dataCollectionSource.push(dataSets[name]);
-                            kernel.senMan.fillDataSource(dataSets[name], back.createCallback());
+                            if (dataSets[name]) {
+                                viewer.dataCollectionSource.push(dataSets[name]);
+                                kernel.senMan.fillDataSource(dataSets[name], back.createCallback());
+                            }
                         }
                     }
 
