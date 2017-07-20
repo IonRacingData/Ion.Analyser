@@ -294,7 +294,7 @@ span.table-resize{
 
 .controller-legend {
     font-size: 0.7em;
-    padding: 1px 0;
+    /*padding: 1px 0;*/
     text-align: center;
     -moz-transition: background 0.3s;
     -o-transition: background 0.3s;

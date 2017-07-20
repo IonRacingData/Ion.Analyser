@@ -148,7 +148,7 @@
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
-                //this.autoScaleY();                
+                this.autoScaleY();
             }
         }
 
@@ -157,7 +157,7 @@
 
     protected onSensorChange(): void {
         if (this.data.length > 0) {
-            //this.autoScaleY();            
+            this.autoScaleY();
         }
     }
     

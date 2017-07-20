@@ -131,14 +131,14 @@ var LineChartController = (function (_super) {
             this.moveToLastPoint();
             if (this.autoScroll_plotMoved) {
                 this.autoScroll_plotMoved = false;
-                //this.autoScaleY();                
+                this.autoScaleY();
             }
         }
         this.draw();
     };
     LineChartController.prototype.onSensorChange = function () {
         if (this.data.length > 0) {
-            //this.autoScaleY();            
+            this.autoScaleY();
         }
     };
     LineChartController.prototype.moveToLastPoint = function () {
