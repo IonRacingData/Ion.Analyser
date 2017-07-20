@@ -304,7 +304,7 @@ var Kernel;
                     }
                 }
                 var group = this.getGroup(template.grouptype);
-                if (group) {
+                if (group && group.numGroups === sources.length) {
                     return new group(sources);
                 }
                 else {

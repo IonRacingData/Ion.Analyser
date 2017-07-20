@@ -39,20 +39,13 @@ abstract class SingleValueController extends Controller {
                 let i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
+                this.updateVals(this.data);
                 this.onDataChange();
                 this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
-                    let lastIndex = this.data.length() - 1;
-                    if (lastIndex < 0) {
-                        console.log("Empty dataset in SingleValueController");
-                    }
-                    else {
-                        let lastValue = this.data.getValue(lastIndex);
-                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
-                        this.value = lastValue.y;
-                    }
+                    this.updateVals(this.data);
                 }
                 this.onDataChange();
             }
@@ -60,6 +53,18 @@ abstract class SingleValueController extends Controller {
         else {
             this.onDataChange();
         }
+    }
+
+    private updateVals(data: IDataSource<Point>): void {        
+        let lastIndex = data.length() - 1;
+        if (lastIndex < 0) {
+            console.log("Empty dataset in SingleValueController");
+        }
+        else {
+            let lastValue = data.getValue(lastIndex);
+            this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+            this.value = lastValue.y;
+        }        
     }
 
     private sensorChange(): void {
@@ -173,23 +178,28 @@ abstract class SingleValueCanvasController extends CanvasController {
                 let i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
+                this.updateVals(this.data);
                 this.onDataChange();
                 this.sensorChange();
             }
             else {
                 if (this.lastSensorInfo) {
-                    let lastIndex = this.data.length() - 1;
-                    if (lastIndex < 0) {
-                        console.log("Empty dataset in SingleValueCanvasController");
-                    }
-                    else {
-                        let lastValue = this.data.getValue(lastIndex);
-                        this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
-                        this.value = lastValue.y;
-                    }
+                    this.updateVals(this.data);
                 }
                 this.onDataChange();
             }
+        }
+    }
+
+    private updateVals(data: IDataSource<Point>): void {
+        let lastIndex = data.length() - 1;
+        if (lastIndex < 0) {
+            console.log("Empty dataset in SingleValueController");
+        }
+        else {
+            let lastValue = data.getValue(lastIndex);
+            this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
+            this.value = lastValue.y;
         }
     }
 
