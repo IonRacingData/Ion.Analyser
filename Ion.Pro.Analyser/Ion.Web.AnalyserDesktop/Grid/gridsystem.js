@@ -171,10 +171,12 @@ var GridViewer = (function () {
                     console.log(viewer_1);
                     if (sensys.SensorManager.isViewer(viewer_1)) {
                         var singleViewer_1 = viewer_1;
-                        viewer_1.dataSource = dataSets[temp.data[0]];
-                        kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
-                            singleViewer_1.dataUpdate();
-                        });
+                        if (dataSets[temp.data[0]]) {
+                            viewer_1.dataSource = dataSets[temp.data[0]];
+                            kernel.senMan.fillDataSource(dataSets[temp.data[0]], function () {
+                                singleViewer_1.dataUpdate();
+                            });
+                        }
                     }
                     else if (sensys.SensorManager.isCollectionViewer(viewer_1)) {
                         var colViewer = viewer_1;
@@ -183,8 +185,10 @@ var GridViewer = (function () {
                         });
                         for (var _i = 0, _a = temp.data; _i < _a.length; _i++) {
                             var name_1 = _a[_i];
-                            viewer_1.dataCollectionSource.push(dataSets[name_1]);
-                            kernel.senMan.fillDataSource(dataSets[name_1], back.createCallback());
+                            if (dataSets[name_1]) {
+                                viewer_1.dataCollectionSource.push(dataSets[name_1]);
+                                kernel.senMan.fillDataSource(dataSets[name_1], back.createCallback());
+                            }
                         }
                     }
                 }

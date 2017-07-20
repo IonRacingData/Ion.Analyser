@@ -97,6 +97,7 @@
             this.bar2.style.width = "100%";
             this.barContainer.style.flexDirection = "column";
         }
+        this.onDataChange();
     }
 
     protected onSizeChange(): void {

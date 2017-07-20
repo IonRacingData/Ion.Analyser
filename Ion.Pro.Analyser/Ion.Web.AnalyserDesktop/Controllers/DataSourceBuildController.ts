@@ -129,7 +129,7 @@
                 this.chosenData.push(e.data);
                 this.updateChosenList();                
             }
-            if (this.chosenData.length === this.groupArgs) {                
+            if (this.chosenData.length === this.groupArgs) {  
                 
                 if (this.chosenListClickCounter > this.groupArgs) {
                     this.chosenData.pop();
@@ -137,7 +137,7 @@
                     this.updateChosenList();
                 }
                 
-                this.btnMakeSource.disabled = false;                
+                this.btnMakeSource.disabled = false;
             }
         });
     }
@@ -149,7 +149,9 @@
 
     private initChosenList(): void {
         this.chosenList = new ListBoxRearrangable();
-        //this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        if (this.groupArgs > 1) {
+            this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
+        }
         this.chosenList.selector = (item: sensys.ISensorInformation) => {
             return <IListBoxRearrangableItem>{ mainText: item.Name, infoText: item.SensorSet.Name };
         }

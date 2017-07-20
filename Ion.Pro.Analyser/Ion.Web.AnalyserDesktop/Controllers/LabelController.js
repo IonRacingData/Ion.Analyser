@@ -33,7 +33,7 @@ var LabelController = (function (_super) {
         this.adjustFontSize();
     };
     LabelController.prototype.onDataChange = function () {
-        var val = this.percent * 100;
+        var val = this.value;
         this.textWrapper.innerHTML = val.toFixed(2);
         this.adjustFontSize();
     };
