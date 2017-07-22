@@ -305,6 +305,7 @@ span.table-resize{
 .controller-legend-value {
     position: absolute;
     right: 5px;
+    padding-left: 5px;
     text-align: right;
     -moz-transition: background 0.3s;
     -o-transition: background 0.3s;
