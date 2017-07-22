@@ -56,11 +56,7 @@ var BarController = (function (_super) {
                 _this.setDirection(dir);
             }
         });
-        _this.valWrapper = document.createElement("span");
-        _this.valWrapper.style.position = "absolute";
-        _this.valWrapper.style.right = "5px";
-        _this.valWrapper.style.width = "20%";
-        _this.valWrapper.style.textAlign = "right";
+        _this.valWrapper = _this.mk.tag("span", "controller-legend-value");
         _this.legendWrapper.appendChild(_this.valWrapper);
         _this.barContainer.style.display = "none";
         _this.barContainer.style.flexGrow = "1";

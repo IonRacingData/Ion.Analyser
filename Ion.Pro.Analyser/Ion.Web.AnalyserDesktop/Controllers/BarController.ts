@@ -70,11 +70,7 @@
             }
         });
 
-        this.valWrapper = document.createElement("span");
-        this.valWrapper.style.position = "absolute";
-        this.valWrapper.style.right = "5px";
-        this.valWrapper.style.width = "20%";
-        this.valWrapper.style.textAlign = "right";
+        this.valWrapper = this.mk.tag("span", "controller-legend-value");        
         this.legendWrapper.appendChild(this.valWrapper);
 
         this.barContainer.style.display = "none";

@@ -198,17 +198,19 @@ function registerGridPresets() {
         grid: {
             data: [
                 /*{ name: "DataAssigner", data: null },*/
-                { name: "LineChartTester", data: ["speed", "current", "volt"] },
+                { name: "LineChartTester", data: ["volt"] },
                 {
                     data: [
                         {
                             data: [
+                                { name: "BarTester", data: ["batTemp"] },
+                                { name: "BarTester", data: ["batTemp"] },
                                 { name: "BarTester", data: ["volt"] },
-                                { name: "GaugeTester", data: ["current"] }
+                                { name: "BarTester", data: ["soc"] }
                             ]
                         },
-                        { name: "LabelTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["temp"] }
+                        { name: "GaugeTester", data: ["current"] },
+                        { name: "LineChartTester", data: ["current"] }
                     ]
                 }
             ]
@@ -216,9 +218,9 @@ function registerGridPresets() {
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
-                key: "speed",
+                key: "batTemp",
                 layers: [],
-                sources: [{ key: "SPEED", name: "telemetry" }]
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
             },
             {
                 grouptype: "PointSensorGroup",
@@ -234,9 +236,9 @@ function registerGridPresets() {
             },
             {
                 grouptype: "PointSensorGroup",
-                key: "temp",
+                key: "soc",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
+                sources: [{ key: "BMS_SOC", name: "telemetry" }]
             }
         ]
     }));
