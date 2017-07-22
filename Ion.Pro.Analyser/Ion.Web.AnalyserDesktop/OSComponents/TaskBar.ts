@@ -1,4 +1,4 @@
-﻿class Taskbar {
+class Taskbar {
 }
 
 class Applet {
@@ -10,7 +10,7 @@ class WindowList extends Applet {
     constructor(content: HTMLElement) {
         super();
         this.content = content;
-        let winMan: WindowManager = this.winMan = kernel.winMan;
+        const winMan: WindowManager = this.winMan = kernel.winMan;
         winMan.onWindowOpen.addEventListener(() => this.programOpen());
         winMan.onWindowClose.addEventListener(() => this.programClose());
         winMan.onWindowSelect.addEventListener(() => this.programSelect());
@@ -22,10 +22,10 @@ class WindowList extends Applet {
         this.content.innerHTML = "";
 
         for (let i: number = 0; i < this.winMan.windows.length; i++) {
-            let cur: AppWindow = this.winMan.windows[i];
+            const cur: AppWindow = this.winMan.windows[i];
 
             if (cur.showTaskbar) {
-                let ctrl: HTMLDivElement = document.createElement("div");
+                const ctrl: HTMLDivElement = document.createElement("div");
                 ctrl.innerHTML = cur.title;
                 ctrl.classList.add("taskbar-button-text");
                 if (cur === this.winMan.activeWindow) {
@@ -64,24 +64,24 @@ class MainMenu extends Applet {
     constructor(content: HTMLElement) {
         super();
         this.content = content;
-        let mk: HtmlHelper = new HtmlHelper();
+        const mk: HtmlHelper = new HtmlHelper();
         this.content.appendChild(mk.tag(
             "div"
             , "taskbar-button-text"
-            , [{ event: "click", func: (e: Event): void => this.click_menu(<MouseEvent>e) }]
-            , "Menu"
+            , [{ event: "click", func: (e: Event): void => this.click_menu(e as MouseEvent) }]
+            , "Menu",
         ));
         this.menuHandle = new MenuWindow(document.body);
     }
 
     fillMenu(): void {
         this.menuHandle.clear();
-        let all: { [category: string]: Launcher[] } = kernel.appMan.launchers;
-        let keys: string[] = Object.keys(all);
+        const all: { [category: string]: Launcher[] } = kernel.appMan.launchers;
+        const keys: string[] = Object.keys(all);
         for (let i: number = 0; i < keys.length; i++) {
             if (keys[i] === "hidden")
                 continue;
-            let cur: Launcher[] = all[keys[i]];
+            const cur: Launcher[] = all[keys[i]];
             for (let j: number = 0; j < cur.length; j++) {
                 this.menuHandle.add(cur[j], keys[i]);
             }
@@ -104,16 +104,16 @@ class ChangeTheme extends Applet {
         super();
         this.content = content;
         this.content.style.verticalAlign = "top";
-        let mk: HtmlHelper = new HtmlHelper();
+        const mk: HtmlHelper = new HtmlHelper();
 
-        let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.fill{fill:#F0F0F0;}	.fill2{fill:#2a2a2a;}</style><g id="XMLID_3_">	<circle id="XMLID_1_" class="fill" cx="8.2" cy="8.2" r="7.7"/>	<circle id="XMLID_2_" class="fill2" cx="15.8" cy="15.8" r="7.7"/></g></svg>';
+        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.fill{fill:#F0F0F0;}	.fill2{fill:#2a2a2a;}</style><g id="XMLID_3_">	<circle id="XMLID_1_" class="fill" cx="8.2" cy="8.2" r="7.7"/>	<circle id="XMLID_2_" class="fill2" cx="15.8" cy="15.8" r="7.7"/></g></svg>';
 
         this.content.appendChild(mk.tag(
             "div"
             , "btn-themechange"
-            , [{ event: "click", func: (e: Event): void => this.click_theme(<MouseEvent>e) }]
-            , svg
-        )); 
+            , [{ event: "click", func: (e: Event): void => this.click_theme(e as MouseEvent) }]
+            , svg,
+        ));
     }
     private isDark: boolean = true;
 
@@ -145,7 +145,7 @@ class StatusBar extends Applet {
         this.content.appendChild(this.telemetryStatus());
 
         // server connection symbol
-        let discon = <HTMLImageElement>this.mk.tag("img");
+        const discon = this.mk.tag("img") as HTMLImageElement;
 
         discon.src = "/Icons/disconnected.png";
         discon.style.width = "20px";
@@ -153,8 +153,8 @@ class StatusBar extends Applet {
         discon.style.paddingLeft = "10px";
         discon.title = "Not connected";
 
-        let con = <HTMLImageElement>this.mk.tag("img");
-        con.src = "/Icons/connected.png";   
+        const con = this.mk.tag("img") as HTMLImageElement;
+        con.src = "/Icons/connected.png";
         con.style.width = "20px";
         con.style.height = "20px";
         con.style.paddingLeft = "10px";
@@ -176,16 +176,16 @@ class StatusBar extends Applet {
         kernel.netMan.onLostConnection.addEventListener(() => {
             discon.style.display = "inherit";
             con.style.display = "none";
-        });        
+        });
     }
 
     telemetryStatus(): HTMLElement {
-        let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve"><style type="text/css">.lines{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}</style><g id="XMLID_63_"><g id="XMLID_65_"><g id="XMLID_71_"><path id="XMLID_75_" class="lines" d="M3.6,0.2C2,1.9,1,4.1,1,6.6c0,2.4,1,4.7,2.6,6.3"/><path id="XMLID_74_" class="lines" d="M16.4,12.9C18,11.3,19,9,19,6.6c0-2.5-1-4.7-2.6-6.4"/><path id="XMLID_73_" class="lines" d="M3.6,0.2"/><path id="XMLID_72_" class="lines" d="M16.4,0.2"/></g><g id="XMLID_66_"><path id="XMLID_70_" class="lines" d="M6,2.6c-1,1-1.7,2.5-1.7,4c0,1.5,0.6,2.9,1.6,4"/><path id="XMLID_69_" class="lines" d="M14.1,10.6c1-1,1.6-2.4,1.6-4c0-1.6-0.6-3-1.7-4"/><path id="XMLID_68_" class="lines" d="M6,2.6"/><path id="XMLID_67_" class="lines" d="M14,2.6"/></g></g><line id="XMLID_64_" class="lines" x1="10" y1="5.9" x2="10" y2="20"/></g></svg>';
-        let tag = this.mk.tag(
+        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve"><style type="text/css">.lines{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}</style><g id="XMLID_63_"><g id="XMLID_65_"><g id="XMLID_71_"><path id="XMLID_75_" class="lines" d="M3.6,0.2C2,1.9,1,4.1,1,6.6c0,2.4,1,4.7,2.6,6.3"/><path id="XMLID_74_" class="lines" d="M16.4,12.9C18,11.3,19,9,19,6.6c0-2.5-1-4.7-2.6-6.4"/><path id="XMLID_73_" class="lines" d="M3.6,0.2"/><path id="XMLID_72_" class="lines" d="M16.4,0.2"/></g><g id="XMLID_66_"><path id="XMLID_70_" class="lines" d="M6,2.6c-1,1-1.7,2.5-1.7,4c0,1.5,0.6,2.9,1.6,4"/><path id="XMLID_69_" class="lines" d="M14.1,10.6c1-1,1.6-2.4,1.6-4c0-1.6-0.6-3-1.7-4"/><path id="XMLID_68_" class="lines" d="M6,2.6"/><path id="XMLID_67_" class="lines" d="M14,2.6"/></g></g><line id="XMLID_64_" class="lines" x1="10" y1="5.9" x2="10" y2="20"/></g></svg>';
+        const tag = this.mk.tag(
             "div"
             , "telemetry-symbol"
             , null
-            , svg
+            , svg,
         );
         tag.style.width = "19px";
         tag.style.height = "20px";

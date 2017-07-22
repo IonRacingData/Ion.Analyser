@@ -200,7 +200,7 @@ var WindowManager = (function () {
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
-        
+
         style.href = "/" + theme + ".css";*/
     };
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
@@ -225,7 +225,7 @@ var WindowManager = (function () {
     };
     WindowManager.prototype.closeWindow = function (appWindow) {
         if (appWindow.handle.parentElement === null) {
-            throw "appWindow null exception";
+            throw new Error("appWindow null exception");
         }
         appWindow.handle.parentElement.removeChild(appWindow.handle);
         this.windows.splice(this.windows.indexOf(appWindow), 1);

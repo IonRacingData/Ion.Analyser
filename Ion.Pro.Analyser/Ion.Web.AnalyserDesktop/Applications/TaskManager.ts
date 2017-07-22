@@ -1,4 +1,4 @@
-﻿class TaskManager implements IApplication {
+class TaskManager implements IApplication {
     app: Application;
     mainWindow: AppWindow;
     infoWindows: AppWindow[] = [];
@@ -19,11 +19,10 @@
         eh.on(kernel.appMan.onAppClose, () => this.update());
     }
 
-
     appTable: TableList = new TableList();
 
     initializeComponents() {
-        let ta = this.appTable;
+        const ta = this.appTable;
         ta.header = ["PID", "Application", "# Windows", "# Events"];
         ta.selector = (app: Application) => {
             return [app.pid.toString(), app.name, app.windows.length.toString(), app.events.localNewEvent.length.toString()];
@@ -39,36 +38,36 @@
 
     draw() {
         this.mainWindow.content.innerHTML = "";
-        var tg = new HtmlTableGen("table", true);
+        const tg = new HtmlTableGen("table", true);
         tg.addHeader("PID", "Application", "# of Windows");
-        var apps = kernel.appMan.appList;
-        for (var i = 0; i < apps.length; i++) {
-            let tempApp = apps[i];
+        const apps = kernel.appMan.appList;
+        for (let i = 0; i < apps.length; i++) {
+            const tempApp = apps[i];
             tg.addRow(
                 [
                     {
                         event: "click",
-                        func: (e: MouseEvent) => this.onAppClick(tempApp)
-                    }
+                        func: (e: MouseEvent) => this.onAppClick(tempApp),
+                    },
                 ],
                 apps[i].pid,
                 apps[i].name, apps[i].windows.length);
         }
-        var table = tg.generate();
+        const table = tg.generate();
         this.mainWindow.content.appendChild(table);
     }
 
     onAppClick(app: Application) {
-        var win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
+        const win = kernel.winMan.createWindow(this.app, "Task Manager - " + app.name);
         this.infoWindows.push(win);
         this.drawInfoWindow(app, win);
     }
 
     drawInfoWindow(app: Application, win: AppWindow) {
-        let windowTab = new HtmlTableGen("table");
+        const windowTab = new HtmlTableGen("table");
         windowTab.addHeader("Title");
         windowTab.addArray(app.windows, ["title"]);
-        let windowEvents = new HtmlTableGen("table");
+        const windowEvents = new HtmlTableGen("table");
         windowEvents.addHeader("Event", "Extra");
         windowEvents.addArray(app.events.localNewEvent, ["info"]);
         windowEvents.addArray(app.events.localEvents, ["type", "manager"]);

@@ -36,17 +36,17 @@ var TaskManager = (function () {
         var tg = new HtmlTableGen("table", true);
         tg.addHeader("PID", "Application", "# of Windows");
         var apps = kernel.appMan.appList;
-        var _loop_1 = function () {
+        var _loop_1 = function (i) {
             var tempApp = apps[i];
             tg.addRow([
                 {
                     event: "click",
-                    func: function (e) { return _this.onAppClick(tempApp); }
-                }
+                    func: function (e) { return _this.onAppClick(tempApp); },
+                },
             ], apps[i].pid, apps[i].name, apps[i].windows.length);
         };
         for (var i = 0; i < apps.length; i++) {
-            _loop_1();
+            _loop_1(i);
         }
         var table = tg.generate();
         this.mainWindow.content.appendChild(table);

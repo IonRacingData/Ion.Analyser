@@ -20,10 +20,10 @@ var BarController = (function (_super) {
             text: "Toggle direction",
             shortCut: "D",
             type: "direction",
-            value: Direction.Vertical
+            value: Direction.Vertical,
         };
         _this.settings = {
-            toggleDirection: _this.direction
+            toggleDirection: _this.direction,
         };
         _this.direction.value = direction;
         _this.width = width;

@@ -31,25 +31,25 @@ function tester() {
     var arr = [
         { first: "Per", last: "Pettersen" },
         { first: "Truls", last: "Trulsen" },
-        { first: "Bob", last: "Bobsen" }
+        { first: "Bob", last: "Bobsen" },
     ];
     var exArr = [
         {
             name: "work",
-            employee: { first: "hey", last: "bye" }
+            employee: { first: "hey", last: "bye" },
         },
         {
             name: "work2",
-            employee: { first: "hey2", last: "bye2" }
-        }
+            employee: { first: "hey2", last: "bye2" },
+        },
     ];
     ex.selector = function (item) {
         return {
             title: item.name,
             items: [
                 { text: item.employee.first, object: item.employee.first },
-                { text: item.employee.last, object: item.employee.last }
-            ]
+                { text: item.employee.last, object: item.employee.last },
+            ],
         };
     };
     ex.data = exArr;
@@ -93,19 +93,19 @@ function storageTest() {
             longText: "This is a long text",
             text: "bob",
             type: "string",
-            value: "Hello World"
+            value: "Hello World",
         },
         test: {
             longText: "AnotherTest",
             text: "hello",
             type: "number",
-            value: 3
+            value: 3,
         },
         anotherTest: {
             longText: "dsadsa",
             text: "test",
             type: "boolean",
-            value: false
-        }
+            value: false,
+        },
     };
 }

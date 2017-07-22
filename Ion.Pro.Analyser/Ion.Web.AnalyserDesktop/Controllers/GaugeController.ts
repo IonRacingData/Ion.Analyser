@@ -1,4 +1,4 @@
-﻿class GaugeController extends SingleValueCanvasController {
+class GaugeController extends SingleValueCanvasController {
     private ctxMain: ContextFixer;
     private ctxNeedle: ContextFixer;
     private ctxCenter: ContextFixer;
@@ -13,7 +13,7 @@
     private defMin: number = 0;
     private defMax: number = 100;
     private defStep: number = 10;
-    private customLabels: boolean = false;    
+    private customLabels: boolean = false;
 
     private color: string = "black";
     private needleColor: string = "black";
@@ -26,7 +26,7 @@
         super();
 
         this.wrapper = this.mk.tag("div", "gauge-controller-wrapper");
-        this.contentWrapper = this.mk.tag("div", "gauge-controller-content");        
+        this.contentWrapper = this.mk.tag("div", "gauge-controller-content");
 
         this.canvas = new LayeredCanvas(this.contentWrapper);
         this.ctxMain = new ContextFixer(this.canvas.addCanvas());
@@ -47,11 +47,11 @@
         }
 
         this.setColor();
-        this.setSize(this.size, this.size);        
+        this.setSize(this.size, this.size);
     }
 
     private generateLabels(min: number, max: number, step: number): string[] {
-        let labels: string[] = [];
+        const labels: string[] = [];
         for (let i = min; i <= max; i += step) {
             labels.push(i.toString());
         }
@@ -65,7 +65,7 @@
 
         this.ctxMain.fillStyle = this.color;
         this.ctxMain.strokeStyle = this.color;
-        let radius = this.size / 2;
+        const radius = this.size / 2;
 
         // center dot
         this.ctxCenter.fillStyle = this.color;
@@ -88,8 +88,8 @@
         this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";
 
         for (let i = 0; i < this.labels.length; i++) {
-            let increment = this.totalAngle / (this.labels.length - 1);
-            let ang = (i * increment) + this.startAngle;
+            const increment = this.totalAngle / (this.labels.length - 1);
+            const ang = (i * increment) + this.startAngle;
 
             this.ctxMain.rotate(ang);
             this.ctxMain.translate(0, -radius * 0.8);
@@ -115,14 +115,14 @@
             console.error("Percentage calculation malfunction");
             this.percent = 0;
         }
-        let val = this.percent * 100;
+        const val = this.percent * 100;
 
         this.ctxNeedle.fillStyle = this.needleColor;
         this.ctxNeedle.clear();
-        let radius = this.size / 2;
+        const radius = this.size / 2;
         this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
-    
-        let ang = (val / 100) * this.totalAngle;
+
+        const ang = (val / 100) * this.totalAngle;
 
         this.ctxNeedle.rotate(this.startAngle);
         this.ctxNeedle.rotate(ang);
@@ -133,7 +133,7 @@
         this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
 
         this.ctxNeedle.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    }    
+    }
 
     protected onSizeChange(): void {
         this.contentHeight = this.height - this.legendHeight;
@@ -146,8 +146,8 @@
 
     protected onSensorChange(): void {
         if (!this.customLabels) {
-            let min: number = SensorInfoHelper.minValue(this.lastSensorInfo);
-            let max: number = SensorInfoHelper.maxValue(this.lastSensorInfo);
+            const min: number = SensorInfoHelper.minValue(this.lastSensorInfo);
+            const max: number = SensorInfoHelper.maxValue(this.lastSensorInfo);
             let step: number = ((max - min) / 10);
             if (step < 1) {
                 step = 1;
@@ -158,7 +158,7 @@
             this.labels = this.generateLabels(min, max, step);
 
             this.draw();
-        }        
+        }
     }
 
     protected onDataChange(): void {

@@ -1,4 +1,4 @@
-﻿class DataSourceAssignmentController extends Component {
+class DataSourceAssignmentController extends Component {
 
     private builder: DataSourceBuildController;
     private selectedViewer: IViewerBase<any> | null = null;
@@ -22,7 +22,7 @@
 
     constructor(viewer?: IViewerBase<any>) {
         super();
-        let mk = this.mk;
+        const mk = this.mk;
         this.wrapper = mk.tag("div", "dsaController-wrapper");
         this.contentWrapper = mk.tag("div", "dsaController-contentwrapper");
         this.navWrapper = mk.tag("div", "dsaController-navwrapper");
@@ -32,7 +32,7 @@
         }
 
         for (let i = 0; i < 3; i++) {
-            let e: HTMLElement = mk.tag("div", "dsaController-navelement")
+            const e: HTMLElement = mk.tag("div", "dsaController-navelement");
             this.navElements.push(e);
             this.navWrapper.appendChild(e);
         }
@@ -52,7 +52,7 @@
 
     private displayEmptyPage(): void {
         this.contentWrapper.innerHTML = "";
-        let text = document.createElement("p");
+        const text = document.createElement("p");
         text.className = "dsaController-emptyPage";
         text.innerText = "No open charts";
 
@@ -62,14 +62,14 @@
     }
 
     private displayPage1(): void {
-        let mk = this.mk;
+        const mk = this.mk;
         this.contentWrapper.innerHTML = "";
         this.navWrapper.style.display = "none";
 
         this.content = mk.tag("div", "dsaController-content");
         this.divLeft = mk.tag("div", "dsaController-left");
-        this.divRight = mk.tag("div", "dsaController-right");        
-        
+        this.divRight = mk.tag("div", "dsaController-right");
+
         this.content.appendChild(this.divLeft);
         this.content.appendChild(this.divRight);
         this.contentWrapper.appendChild(this.content);
@@ -77,10 +77,10 @@
         this.displayViewers();
 
         this.page = 1;
-        this.onPageSwitch({ target: this, data: this.page });  
+        this.onPageSwitch({ target: this, data: this.page });
 
         if (kernel.senMan.viewers.length === 0) {
-            this.displayEmptyPage();            
+            this.displayEmptyPage();
         }
     }
 
@@ -90,20 +90,20 @@
         if (this.selectedViewer) {
             this.builder = new DataSourceBuildController(this.selectedViewer);
             this.contentWrapper.appendChild(this.builder.wrapper);
-            let viewer: HTMLElement = this.mk.tag("div", "dsaController-viewerInfo", [
+            const viewer: HTMLElement = this.mk.tag("div", "dsaController-viewerInfo", [
                 {
                     event: "mouseenter", func: (e: MouseEvent) => {
                         if (this.selectedViewer) {
                             this.selectedViewer.plotWindow.highlight(true);
                         }
-                    }
+                    },
                 },
                 {
                     event: "mouseleave", func: (e: MouseEvent) => {
                         if (this.selectedViewer) {
                             this.selectedViewer.plotWindow.highlight(false);
                         }
-                    }
+                    },
                 }], this.selectedViewer.plotType);
             this.navElements[1].appendChild(viewer);
         }
@@ -118,14 +118,14 @@
 
     private displayViewers(): void {
         this.divLeft.innerHTML = "";
-        let tableGen = new HtmlTableGen("table selectable");
-        let senMan: sensys.SensorManager = kernel.senMan;
+        const tableGen = new HtmlTableGen("table selectable");
+        const senMan: sensys.SensorManager = kernel.senMan;
         //tableGen.addHeader("Plot name");
         for (let i = 0; i < senMan.viewers.length; i++) {
-            let curPlot = senMan.viewers[i];
+            const curPlot = senMan.viewers[i];
             this.drawRow(curPlot, tableGen);
         }
-        this.divLeft.appendChild(tableGen.generate());        
+        this.divLeft.appendChild(tableGen.generate());
     }
 
     private drawRow(curPlot: IViewerBase<any>, tableGen: HtmlTableGen): void {
@@ -135,23 +135,23 @@
                     if (this.selectedRow !== null) {
                         this.selectedRow.classList.remove("selectedrow");
                     }
-                    this.selectedRow = this.findTableRow(<HTMLElement>e.target);
+                    this.selectedRow = this.findTableRow(e.target as HTMLElement);
                     this.selectedRow.classList.add("selectedrow");
                     this.selectedViewer = curPlot;
                     this.displaySources();
-                }
+                },
             },
             {
                 event: "mouseenter", func: (e: Event) => {
                     curPlot.plotWindow.highlight(true);
-                }
+                },
             },
             {
                 event: "mouseleave", func: (e: Event) => {
                     curPlot.plotWindow.highlight(false);
-                }
-            }
-        ], curPlot.plotType);        
+                },
+            },
+        ], curPlot.plotType);
     }
 
     private findTableRow(element: HTMLElement): HTMLElement {
@@ -166,15 +166,15 @@
     private displaySources(): void {
         this.divRight.innerHTML = "";
         if (this.selectedViewer) {
-            let btnNewSource: TextButton = new TextButton();
+            const btnNewSource: TextButton = new TextButton();
             btnNewSource.text = "NEW SOURCE";
             btnNewSource.onclick.addEventListener(() => {
                 this.displayPage2();
             });
 
-            let list: TempDataSourceList = new TempDataSourceList(this.selectedViewer);
+            const list: TempDataSourceList = new TempDataSourceList(this.selectedViewer);
             list.wrapper.style.overflowY = "auto";
-            this.divRight.appendChild(list.wrapper);            
+            this.divRight.appendChild(list.wrapper);
             this.divRight.appendChild(btnNewSource.wrapper);
         }
     }
@@ -191,11 +191,11 @@
                 else {
                     this.displayViewers();
                     this.displaySources();
-                }            
+                }
                 break;
-            case 2: 
+            case 2:
                 let isRegistered: boolean = false;
-                for (let v of kernel.senMan.viewers) {
+                for (const v of kernel.senMan.viewers) {
                     if (v === this.selectedViewer) {
                         isRegistered = true;
                     }
@@ -205,7 +205,6 @@
                 }
         }
 
-        
     }
 
 }

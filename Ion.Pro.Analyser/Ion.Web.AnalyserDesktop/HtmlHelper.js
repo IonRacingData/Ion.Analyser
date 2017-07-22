@@ -79,8 +79,8 @@ var HtmlTableGen = (function () {
         if (this.header.length > 0) {
             var thead = document.createElement("thead");
             var headerRow = document.createElement("tr");
-            var _loop_1 = function () {
-                header = document.createElement("th");
+            var _loop_1 = function (i) {
+                var header = document.createElement("th");
                 header.innerHTML = this_1.header[i];
                 headerRow.appendChild(header);
                 if (this_1.resizeable) {
@@ -88,7 +88,7 @@ var HtmlTableGen = (function () {
                     span_1.className = "table-resize";
                     span_1.addEventListener("mousedown", function (e) {
                         if (span_1.parentElement === null) {
-                            throw "Parent null exception";
+                            throw new Error("Parent null exception");
                         }
                         span_1.deltaX = span_1.parentElement.offsetWidth - e.pageX;
                         selectedSpan = span_1;
@@ -96,9 +96,9 @@ var HtmlTableGen = (function () {
                     header.appendChild(span_1);
                 }
             };
-            var this_1 = this, header;
+            var this_1 = this;
             for (var i = 0; i < this.header.length; i++) {
-                _loop_1();
+                _loop_1(i);
             }
             thead.appendChild(headerRow);
             table.appendChild(thead);

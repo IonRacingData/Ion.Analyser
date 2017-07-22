@@ -1,4 +1,4 @@
-﻿class EventData {
+class EventData {
     public target: any;
 }
 
@@ -14,25 +14,25 @@ interface INewEvent<T extends IEventData> {
 }
 
 function newEvent<T extends IEventData>(info: string): INewEvent<T> {
-    let callbacks: ((event: T) => void)[] = [];
-    let handler = <any>function EventHandler(event: T) {
+    const callbacks: Array<(event: T) => void> = [];
+    const handler = function EventHandler(event: T) {
         // console.log("running events");
         // console.log(callbacks);
         for (let i = 0; i < callbacks.length; i++) {
             callbacks[i](event);
         }
-    }
+    } as any;
 
     handler.info = info;
 
     handler.addEventListener = function addEventListener(callback: (event: T) => void) {
         callbacks.push(callback);
-    }
+    };
 
     handler.removeEventListener = function removeEventListener(callback: (event: T) => void) {
-        let a = callbacks.indexOf(callback);
+        const a = callbacks.indexOf(callback);
         callbacks.splice(a, 1);
-    }
+    };
 
     return handler;
 }
@@ -73,25 +73,25 @@ class EventHandler {
             first.addEventListener(sec);
         }
         else {
-            this.localEvents.push({ manager: first, type: sec, handler: handler });
+            this.localEvents.push({ manager: first, type: sec, handler });
             first.addEventListener(sec, handler);
         }
     }
 
     close() {
-        for (var cur of this.localEvents) {
+        for (const cur of this.localEvents) {
             // var cur = this.localEvents[i];
             cur.manager.removeEventListener(cur.type, cur.handler);
         }
 
-        for (var temp of this.localNewEvent) {
+        for (const temp of this.localNewEvent) {
             temp.event.removeEventListener(temp.handler);
         }
     }
 }
 
 class EventManager implements IEventManager {
-    events: { [type: string]: ((e: any) => void)[] } = {};
+    events: { [type: string]: Array<(e: any) => void> } = {};
 
     addEventListener(type: string, listener: any): void {
         //console.log("secondStep");
@@ -102,14 +102,14 @@ class EventManager implements IEventManager {
     }
 
     removeEventListener(type: string, listener: any): void {
-        var i = this.events[type].indexOf(listener);
+        const i = this.events[type].indexOf(listener);
         this.events[type].splice(i, 1);
     }
 
     raiseEvent(type: string, data: EventData): boolean {
         if (this.events[type]) {
-            var temp = this.events[type];
-            for (var i = 0; i < temp.length; i++) {
+            const temp = this.events[type];
+            for (let i = 0; i < temp.length; i++) {
                 temp[i](data);
             }
             return true;
@@ -118,4 +118,4 @@ class EventManager implements IEventManager {
         return false;
     }
 }
-
+

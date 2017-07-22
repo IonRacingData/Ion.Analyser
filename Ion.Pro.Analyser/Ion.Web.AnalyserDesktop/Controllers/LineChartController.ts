@@ -1,4 +1,4 @@
-﻿class LineChartController extends MultiValueCanvasController implements IConfigurable {
+class LineChartController extends MultiValueCanvasController implements IConfigurable {
     private ctxMain: ContextFixer;
     private ctxMarking: ContextFixer;
     private ctxLegend: ContextFixer;
@@ -27,30 +27,30 @@
         longText: "Show or hide grid lines",
         shortCut: "G",
         type: "boolean",
-        value: true
+        value: true,
     };
     private stickyAxes: IStorageObject<"boolean"> = {
         text: "Sticky axes",
         longText: "Assures axes are always visible. When off, axes can be scrolled out of view.",
         shortCut: "A",
         type: "boolean",
-        value: true
+        value: true,
     };
     private autoScroll: IStorageObject<"boolean"> = {
         text: "Auto scroll",
         longText: "Automatically scrolls to the last inserted value in the linechart. Only applicable when receiving data live.",
         shortCut: "K",
         type: "boolean",
-        value: false
-    }
+        value: false,
+    };
 
     private toggleLegend: IStorageObject<"boolean"> = {
         text: "Legend",
         longText: "Show or hide legend",
         shortCut: "L",
         type: "boolean",
-        value: true
-    }
+        value: true,
+    };
 
     public settings: IStorageList = {
         showGrid: this.showGrid,
@@ -62,13 +62,12 @@
             longText: "Resets the zoom and position of the plot",
             shortCut: "R",
             type: "action",
-            value: () => { this.reset(); }
-        }
+            value: () => { this.reset(); },
+        },
     };
     public settingsChanged(key: string, value: IStorageObject<keyof IStorageTypes>) {
         this.draw();
     }
-    
 
     constructor() {
         super();
@@ -109,7 +108,7 @@
     }
     darkTheme: boolean = true;
     private setColors(): void {
-        
+
         this.axisColor = kernel.winMan.getRule(".line-chart").style.borderColor;
         this.gridColor = kernel.winMan.getRule(".line-chart").style.color;
         this.markingColor = kernel.winMan.getRule(".line-chart").style.backgroundColor;
@@ -160,10 +159,10 @@
             this.autoScaleY();
         }
     }
-    
+
     private moveToLastPoint(): void {
         if (this.data[0]) {
-            let lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
+            const lastPointAbs: Point = this.getAbsolute(this.data[0].getValue(this.data[0].length() - 1));
             if (lastPointAbs.x > this.width * 0.75 && !this.mouseDown) {
                 this.movePoint.x -= lastPointAbs.x - (this.width * 0.75);
             }
@@ -173,11 +172,11 @@
     private selectPoint(e: Point): void {
         if (this.data) {
             // var mp: Point = this.getMousePoint(e);
-            var mp = e;
-            var p: Point | null = null;
+            const mp = e;
+            let p: Point | null = null;
             for (let i: number = 0; i < this.data.length; i++) {
                 // var closest: Point = this.data[i].getClosest(this.getRelative(mp));
-                var closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
+                const closest: Point = PlotDataHelper.getClosest(this.data[i], this.getRelative(mp));
                 if (Math.abs(this.getAbsolute(closest).y - mp.y) < 10) {
                     p = closest;
                 }
@@ -197,8 +196,8 @@
 
     private zoom(e: WheelEvent): void {
         e.preventDefault();
-        var mousePoint: Point = this.getMousePoint(e);
-        var curRel: Point = this.getRelative(mousePoint);
+        const mousePoint: Point = this.getMousePoint(e);
+        const curRel: Point = this.getRelative(mousePoint);
 
         if (e.deltaY < 0) {
             if (e.ctrlKey === true) {
@@ -224,9 +223,9 @@
                 this.scalePoint.y /= this.zoomSpeed;
             }
         }
-        var newRel: Point = this.getRelative(mousePoint);
+        const newRel: Point = this.getRelative(mousePoint);
 
-        var move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
+        const move: Point = new Point((newRel.x - curRel.x) * this.scalePoint.x, (newRel.y - curRel.y) * this.scalePoint.y);
         this.movePoint = this.movePoint.add(move);
         this.draw();
     }
@@ -239,8 +238,8 @@
         this.drawLegend();
 
         if (this.data) {
-            for (var d: number = 0; d < this.data.length; d++) {
-                var firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
+            for (let d: number = 0; d < this.data.length; d++) {
+                let firstVisibleIdx: number = PlotDataHelper.getIndexOf(this.data[d], this.getRelative(new Point(0, 0)));
                 if (firstVisibleIdx > 0) {
                     firstVisibleIdx--;
                 }
@@ -249,10 +248,10 @@
                     console.log("Empty dataset detected");
                     continue;
                 }
-                
-                var lastPoint: Point = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
-                var totalLength: number = this.data[d].length();
-                var checkPoint: Point = lastPoint;
+
+                let lastPoint: Point = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
+                const totalLength: number = this.data[d].length();
+                let checkPoint: Point = lastPoint;
 
                 this.ctxMain.beginPath();
                 if (this.darkTheme) {
@@ -264,8 +263,8 @@
                     this.ctxMain.strokeStyle = this.data[d].color.toString(true);
                 }
 
-                for (var i: number = firstVisibleIdx; i < totalLength; i++) {
-                    var point: Point = this.getAbsolute(this.data[d].getValue(i));
+                for (let i: number = firstVisibleIdx; i < totalLength; i++) {
+                    const point: Point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
                         this.ctxMain.moveTo(point.x, point.y);
                         this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
@@ -283,11 +282,9 @@
                 this.ctxMain.fillStyle = this.mainColor;
             }
 
-
-
             if (this.selectedPoint !== null) {
-                let abs: Point = this.getAbsolute(this.selectedPoint);
-                let pointString: string = this.selectedPoint.toString();
+                const abs: Point = this.getAbsolute(this.selectedPoint);
+                const pointString: string = this.selectedPoint.toString();
 
                 this.ctxMain.strokeStyle = this.axisColor;
                 this.ctxMain.fillStyle = this.axisColor;
@@ -296,20 +293,20 @@
                 this.ctxMain.stroke();
                 this.ctxMain.textBaseline = "middle";
 
-                let modifiedPoint: Point = this.selectedPoint.divide(new Point(1000, 1));
+                const modifiedPoint: Point = this.selectedPoint.divide(new Point(1000, 1));
 
                 if (this.toggleLegend.value) {
                     this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
                 }
                 else {
                     this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
-                }               
+                }
                 this.ctxMain.fillStyle = this.mainColor;
                 this.ctxMain.strokeStyle = this.mainColor;
                 this.ctxMain.textBaseline = "alphabetic";
             }
         }
-    }    
+    }
 
     private drawLegend(): void {
         this.ctxLegend.clear();
@@ -328,21 +325,21 @@
                 this.legend.dataSources = null;
             }
 
-            let legCan: HTMLCanvasElement = this.legend.canvas;
-            let margin: number = 10;
+            const legCan: HTMLCanvasElement = this.legend.canvas;
+            const margin: number = 10;
 
             this.ctxLegend.ctx.drawImage(legCan, this.width - legCan.width - margin, margin);
-        }        
+        }
     }
 
     private drawXAxis(): void {
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
 
-        var origo: Point = this.getAbsolute(new Point(0, 0));
-        var visible: boolean = origo.y >= 0 && origo.y <= this.height ? true : false;
+        const origo: Point = this.getAbsolute(new Point(0, 0));
+        const visible: boolean = origo.y >= 0 && origo.y <= this.height ? true : false;
 
-        var y: number = origo.y;
+        let y: number = origo.y;
         if (!visible && this.stickyAxes.value) {
             if (origo.y < 0) {
                 y = -1;
@@ -357,25 +354,25 @@
         this.ctxMain.lineTo(this.width, y);
         this.ctxMain.stroke();
 
-        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.x * 1000);
-        var steps: number = stepping.steps;
-        var decimalPlaces: number = stepping.decimalPlaces;
-        var scale: number = stepping.scale;
+        const stepping: IStepInfo = this.calculateSteps(this.scalePoint.x * 1000);
+        const steps: number = stepping.steps;
+        const decimalPlaces: number = stepping.decimalPlaces;
+        const scale: number = stepping.scale;
 
-        for (var i: number = -steps; i < this.width + steps; i += steps) {
+        for (let i: number = -steps; i < this.width + steps; i += steps) {
             this.ctxMain.beginPath();
-            var absX: number = i + this.movePoint.x % steps;
-            var transformer: Point = this.getRelative(new Point(absX, y));
-            var num: string;
-            var numWidth: number;
-            var numOffset: number;
+            const absX: number = i + this.movePoint.x % steps;
+            const transformer: Point = this.getRelative(new Point(absX, y));
+            let num: string;
+            let numWidth: number;
+            let numOffset: number;
 
-            let val = transformer.x / 1000;
+            const val = transformer.x / 1000;
 
             if (Math.abs(val).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 num = "     0";
             }
-            else if (Math.abs(scale) > 5) {                
+            else if (Math.abs(scale) > 5) {
                 num = val.toExponential(2);
             }
             else {
@@ -405,10 +402,10 @@
         this.ctxMain.strokeStyle = this.axisColor;
         this.ctxMain.fillStyle = this.axisColor;
 
-        var origo: Point = this.getAbsolute(new Point(0, 0));
-        var visible: boolean = origo.x >= 0 && origo.x <= this.width ? true : false;
+        const origo: Point = this.getAbsolute(new Point(0, 0));
+        const visible: boolean = origo.x >= 0 && origo.x <= this.width ? true : false;
 
-        var x: number = origo.x;
+        let x: number = origo.x;
         if (!visible && this.stickyAxes.value) {
             if (origo.x < 0) {
                 x = -1;
@@ -423,18 +420,18 @@
         this.ctxMain.lineTo(x, this.height);
         this.ctxMain.stroke();
 
-        var stepping: IStepInfo = this.calculateSteps(this.scalePoint.y);
-        var steps: number = stepping.steps;
-        var decimalPlaces: number = stepping.decimalPlaces;
-        var scale: number = stepping.scale;
+        const stepping: IStepInfo = this.calculateSteps(this.scalePoint.y);
+        const steps: number = stepping.steps;
+        const decimalPlaces: number = stepping.decimalPlaces;
+        const scale: number = stepping.scale;
 
-        for (var i: number = -steps; i < this.height + steps; i += steps) {
+        for (let i: number = -steps; i < this.height + steps; i += steps) {
             this.ctxMain.beginPath();
-            var absY: number = this.height - (i + this.movePoint.y % steps);
-            var transformer: Point = this.getRelative(new Point(x, absY));
-            var number: string;
-            var numWidth: number;
-            var numOffset: number;
+            const absY: number = this.height - (i + this.movePoint.y % steps);
+            const transformer: Point = this.getRelative(new Point(x, absY));
+            let number: string;
+            let numWidth: number;
+            let numOffset: number;
 
             if (Math.abs(transformer.y).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "";
@@ -466,11 +463,11 @@
     }
 
     private calculateSteps(scaling: number): IStepInfo {
-        var log10: (val: number) => number = (val: number): number => Math.log(val) / Math.LN10;
+        const log10: (val: number) => number = (val: number): number => Math.log(val) / Math.LN10;
 
-        var maxR: number = 100 / scaling;
-        var scale: number = Math.floor(log10(maxR));
-        var step: number = Math.floor(maxR / Math.pow(10, scale));
+        const maxR: number = 100 / scaling;
+        const scale: number = Math.floor(log10(maxR));
+        let step: number = Math.floor(maxR / Math.pow(10, scale));
         if (step < 2) {
             step = 1;
         }
@@ -480,38 +477,38 @@
         else {
             step = 5;
         }
-        var newstep: number = step * Math.pow(10, scale) * scaling;
-        var decimalPlaces: number = 0;
+        const newstep: number = step * Math.pow(10, scale) * scaling;
+        let decimalPlaces: number = 0;
         if (scale < 0) {
             decimalPlaces = scale * -1;
         }
 
-        return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
+        return { steps: newstep, decimalPlaces, scale };
     }
 
     private zoomByMarking(): void {
         this.ctxMarking.clear();
 
-        var width: number = this.marking.width;
-        var height: number = this.marking.height;
-        var xRatio: number = this.width / width;
-        var yRatio: number = this.height / height;
+        const width: number = this.marking.width;
+        const height: number = this.marking.height;
+        const xRatio: number = this.width / width;
+        const yRatio: number = this.height / height;
 
-        var downLeft: Point = new Point(
+        const downLeft: Point = new Point(
             Math.min(
                 this.marking.firstPoint.x,
                 this.marking.secondPoint.x),
             Math.max(
                 this.marking.firstPoint.y,
-                this.marking.secondPoint.y)
+                this.marking.secondPoint.y),
         );
 
-        var first: Point = this.getRelative(downLeft);
+        const first: Point = this.getRelative(downLeft);
 
         this.scalePoint.x = Math.abs(this.scalePoint.x * xRatio);
         this.scalePoint.y = Math.abs(this.scalePoint.y * yRatio);
 
-        var sec: Point = this.getAbsolute(first);
+        const sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
@@ -524,26 +521,26 @@
         let max: number = 0;
 
         for (let i = 0; i < this.data.length; i++) {
-            
-            let info = this.data[i].infos.SensorInfos[0];
+
+            const info = this.data[i].infos.SensorInfos[0];
             if (info) {
-                let dmin: number = SensorInfoHelper.minValue(info);
-                let dmax: number = SensorInfoHelper.maxValue(info);
+                const dmin: number = SensorInfoHelper.minValue(info);
+                const dmax: number = SensorInfoHelper.maxValue(info);
                 min = dmin < min ? dmin : min;
                 max = dmax > max ? dmax : max;
             }
         }
 
         if (min !== max) {
-            let padding: number = (max - min) * 0.2;
+            const padding: number = (max - min) * 0.2;
             min -= padding / 2;
             max += padding / 2;
-            let minAbs: number = this.getAbsolute(new Point(0, min)).y;
-            let maxAbs: number = this.getAbsolute(new Point(0, max)).y;
-            let plotHeight = Math.abs(maxAbs - minAbs);
+            const minAbs: number = this.getAbsolute(new Point(0, min)).y;
+            const maxAbs: number = this.getAbsolute(new Point(0, max)).y;
+            const plotHeight = Math.abs(maxAbs - minAbs);
 
-            let ratio: number = this.height / plotHeight;
-            let first = min;
+            const ratio: number = this.height / plotHeight;
+            const first = min;
             this.scalePoint.y *= ratio;
             let sec = this.getAbsolute(new Point(0, first)).y;
             sec = this.height - sec;
@@ -608,7 +605,7 @@
         this.mouseDown = true;
         if (e.altKey) {
             this.isMarking = true;
-            var mousePoint: Point = this.getMousePoint(e);
+            const mousePoint: Point = this.getMousePoint(e);
             this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
         }
     }
@@ -620,7 +617,7 @@
                 this.drawMarking();
             }
             else {
-                this.autoScroll_plotMoved = true;                                
+                this.autoScroll_plotMoved = true;
                 this.isDragging = true;
                 this.movePoint = new Point(e.layerX + this.mouseMod.x, (this.height - e.layerY) + this.mouseMod.y);
                 this.draw();
@@ -633,7 +630,7 @@
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
-            this.isDragging = false;            
+            this.isDragging = false;
         }
         else if (this.isMarking) {
             this.isMarking = false;
@@ -654,7 +651,7 @@
         this.mouseDown = true;
         if (e.altKey) {
             this.isMarking = true;
-            var mousePoint: Point = this.getTouchPoint(e);
+            const mousePoint: Point = this.getTouchPoint(e);
             this.marking = { firstPoint: mousePoint, secondPoint: mousePoint, width: 0, height: 0 };
             console.log(this.marking.firstPoint);
         }
@@ -707,7 +704,7 @@ class LineChartLegend {
 
     private __backgroundColor: string = "black";
     private __textColor = "white";
-    private __borderColor = "green";    
+    private __borderColor = "green";
     set backgroundColor(color: string | null) {
         if (color) {
             this.__backgroundColor = color;
@@ -724,12 +721,12 @@ class LineChartLegend {
         }
     }
 
-    private __dataSources: IDataSource<Point>[] | null;
-    set dataSources(data: IDataSource<Point>[] | null) {
+    private __dataSources: Array<IDataSource<Point>> | null;
+    set dataSources(data: Array<IDataSource<Point>> | null) {
         this.__dataSources = data;
         this.resize(this.defHeight);
         this.draw();
-        
+
     }
 
     private __darkTheme: boolean;
@@ -744,7 +741,7 @@ class LineChartLegend {
 
         this.__darkTheme = darkTheme;
 
-        let canvas: HTMLCanvasElement = document.createElement("canvas");
+        const canvas: HTMLCanvasElement = document.createElement("canvas");
 
         canvas.width = this.width;
         canvas.height = this.height;
@@ -753,8 +750,8 @@ class LineChartLegend {
     }
 
     private draw(): void {
-        let ctx = this.ctx;
-        let data = this.__dataSources;
+        const ctx = this.ctx;
+        const data = this.__dataSources;
         ctx.clear();
 
         ctx.fillStyle = this.__backgroundColor;
@@ -765,12 +762,12 @@ class LineChartLegend {
 
         if (data) {
 
-            let lineSpacing: number = 13;
-            let topBottompadding: number = 13;
-            let sidePadding: number = 10;
-            let lineLength: number = 10;
-            let lineWidth: number = 3;
-            
+            const lineSpacing: number = 13;
+            const topBottompadding: number = 13;
+            const sidePadding: number = 10;
+            const lineLength: number = 10;
+            const lineWidth: number = 3;
+
             let positionY: number = topBottompadding;
             for (let i = 0; i < data.length; i++) {
                 if (positionY > this.height - topBottompadding) {
@@ -780,7 +777,7 @@ class LineChartLegend {
                 }
 
                 let positionX: number = sidePadding;
-                let name: string = data[i].infos.SensorInfos[0].Name;
+                const name: string = data[i].infos.SensorInfos[0].Name;
                 let unit: string | undefined = data[i].infos.SensorInfos[0].Unit;
                 ctx.beginPath();
 
@@ -810,7 +807,7 @@ class LineChartLegend {
                 else {
                     ctx.fillText(name, positionX, positionY, (this.width - positionX - sidePadding));
                 }
-                
+
                 ctx.closePath();
 
                 positionY += lineSpacing;
@@ -828,7 +825,7 @@ class LineChartLegend {
         this.height = height;
         this.ctx.canvas.height = height;
     }
-    
+
 }
 
 interface IStepInfo {
@@ -855,9 +852,9 @@ class ContextFixer {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        let temp = this.canvas.getContext("2d");
+        const temp = this.canvas.getContext("2d");
         if (temp === null) {
-            throw "Context undefined exception, context 2D not supported";
+            throw new Error("Context undefined exception, context 2D not supported");
         }
         this.ctx = temp;
         this.fillStyle = "black";
@@ -869,14 +866,14 @@ class ContextFixer {
         this.ctx.fill();
     }
     moveTo(x: number, y: number): void {
-        var newX: number = Math.floor(x) + 0.5;
-        var newY: number = Math.floor(y) + 0.5;
+        const newX: number = Math.floor(x) + 0.5;
+        const newY: number = Math.floor(y) + 0.5;
         this.ctx.moveTo(newX, newY);
     }
     lineTo(x: number, y: number): void {
         this.ctx.lineWidth = this.lineWidth;
-        var newX: number = Math.floor(x) + 0.5;
-        var newY: number = Math.floor(y) + 0.5;
+        const newX: number = Math.floor(x) + 0.5;
+        const newY: number = Math.floor(y) + 0.5;
         this.ctx.lineTo(newX, newY);
     }
     clear(): void {
@@ -906,10 +903,10 @@ class ContextFixer {
     }
     fillRect(x: number, y: number, width: number, height: number): void {
         this.ctx.fillStyle = this.fillStyle;
-        let newX: number = Math.floor(x);
-        let newY: number = Math.floor(y);
-        let newWidth: number = Math.floor(width);
-        let newHeight: number = Math.floor(height);
+        const newX: number = Math.floor(x);
+        const newY: number = Math.floor(y);
+        const newWidth: number = Math.floor(width);
+        const newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
     arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
@@ -937,7 +934,7 @@ class LayeredCanvas {
     }
 
     addCanvas(): HTMLCanvasElement {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>this.mk.tag("canvas", "plot-canvas");
+        const canvas: HTMLCanvasElement = this.mk.tag("canvas", "plot-canvas") as HTMLCanvasElement;
         this.wrapper.appendChild(canvas);
         this.canvases.push(canvas);
         return canvas;
@@ -956,7 +953,7 @@ class LayeredCanvas {
         return -1;
     }
     setSize(width: number, height: number): void {
-        for (let c of this.canvases) {
+        for (const c of this.canvases) {
             c.width = width;
             c.height = height;
         }

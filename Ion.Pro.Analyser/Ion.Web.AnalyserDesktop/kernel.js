@@ -8,7 +8,7 @@ function startUp() {
         winMan: new WindowManager(document.body),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: new sensys.SensorManager()
+        senMan: new sensys.SensorManager(),
     };
     kernel.senMan.lateInit(); // Late init because it needs netMan
     //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
@@ -76,24 +76,24 @@ function registerGridPresets() {
                     data: [
                         { name: "LineChartTester", data: ["speed"] },
                         { name: "LineChartTester", data: ["current"] }
-                    ]
-                }
-            ]
+                    ],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }]
+                sources: [{ key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }]
-            }
-        ]
+                sources: [{ key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }],
+            },
+        ],
     }));
     kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Basic Receive", {
         name: "Basic Receive",
@@ -106,41 +106,41 @@ function registerGridPresets() {
                         {
                             data: [
                                 { name: "BarTester", data: ["volt"] },
-                                { name: "GaugeTester", data: ["current"] }
-                            ]
+                                { name: "GaugeTester", data: ["current"] },
+                            ],
                         },
                         { name: "LabelTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["temp"] }
-                    ]
-                }
-            ]
+                        { name: "LineChartTester", data: ["temp"] },
+                    ],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "telemetry" }]
+                sources: [{ key: "SPEED", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }]
+                sources: [{ key: "CURRENT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "volt",
                 layers: [],
-                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "temp",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
-            }
-        ]
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
+            },
+        ],
     }));
     kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Battery Receive", {
         name: "Battery Receive",
@@ -155,40 +155,40 @@ function registerGridPresets() {
                                 { name: "BarTester", data: ["batTemp"] },
                                 { name: "BarTester", data: ["batTemp"] },
                                 { name: "BarTester", data: ["volt"] },
-                                { name: "BarTester", data: ["soc"] }
-                            ]
+                                { name: "BarTester", data: ["soc"] },
+                            ],
                         },
                         { name: "GaugeTester", data: ["current"] },
-                        { name: "LineChartTester", data: ["current"] }
-                    ]
-                }
-            ]
+                        { name: "LineChartTester", data: ["current"] },
+                    ],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "batTemp",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }]
+                sources: [{ key: "CURRENT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "volt",
                 layers: [],
-                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "soc",
                 layers: [],
-                sources: [{ key: "BMS_SOC", name: "telemetry" }]
-            }
-        ]
+                sources: [{ key: "BMS_SOC", name: "telemetry" }],
+            },
+        ],
     }));
 }

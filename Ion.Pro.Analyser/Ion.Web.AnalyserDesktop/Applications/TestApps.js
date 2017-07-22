@@ -162,7 +162,6 @@ var SVGEditor = (function () {
         }
         this.window.content.appendChild(table.generate());
 
-
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
         //kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
@@ -278,12 +277,12 @@ var LineChartTester = (function () {
         this.testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
-            }
+            },
         });
         this.testWindow.add({
             name: "Configure", runner: function () {
                 kernel.appMan.start("ConfigWindow", _this.lineChart);
-            }
+            },
         });
         this.window.content.style.overflow = "hidden";
         this.lineChart = new LineChartController();
@@ -333,7 +332,7 @@ var GaugeTester = (function () {
         testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
-            }
+            },
         });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
@@ -385,7 +384,7 @@ var GPSPlotTester = (function () {
         testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
-            }
+            },
         });
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
@@ -430,7 +429,7 @@ var LabelTester = (function () {
         testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
-            }
+            },
         });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
@@ -476,12 +475,12 @@ var BarTester = (function () {
         testWindow.add({
             name: "Change data", runner: function () {
                 kernel.appMan.start("DataSourceBuilder", _this);
-            }
+            },
         });
         testWindow.add({
             name: "Configure", runner: function () {
                 kernel.appMan.start("ConfigWindow", _this.bar);
-            }
+            },
         });
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
@@ -498,7 +497,7 @@ var BarTester = (function () {
                 case "k":
                     this.val -= 0.1;
             }
-            
+
             this.val = this.val < 0 ? 0 : this.val;
             this.val = this.val > 1 ? 1 : this.val;
             this.bar.test_setValue(this.val);
@@ -532,25 +531,25 @@ var LegacyRPIManager = (function () {
                 event: "click",
                 func: function (event) {
                     requestAction("ConnectLegacy", null);
-                }
+                },
             }], "Connect"));
         wrapper.appendChild(this.mk.tag("button", "", [{
                 event: "click",
                 func: function (event) {
                     requestAction("Status", null);
-                }
+                },
             }], "Status"));
         wrapper.appendChild(this.mk.tag("button", "", [{
                 event: "click",
                 func: function (event) {
                     requestAction("StartReceive", null);
-                }
+                },
             }], "StartReceive"));
         wrapper.appendChild(this.mk.tag("button", "", [{
                 event: "click",
                 func: function (event) {
                     requestAction("StopReceive", null);
-                }
+                },
             }], "StopReceive"));
         this.window.content.appendChild(wrapper);
     };

@@ -1,4 +1,4 @@
-﻿var selectedSpan: HTMLSpanElement | null = null;
+let selectedSpan: HTMLSpanElement | null = null;
 
 interface IEventTag {
     event: string;
@@ -18,11 +18,11 @@ class HtmlHelper {
     }
 
     static tag(tag: string, className: any = "", events: IEventTag[] | null = null, innerHTML: string = ""): HTMLElement {
-        let temp: HTMLElement = document.createElement(tag);
+        const temp: HTMLElement = document.createElement(tag);
         temp.className = className;
         temp.innerHTML = innerHTML;
         if (events != null) {
-            for (var i: number = 0; i < events.length; i++) {
+            for (let i: number = 0; i < events.length; i++) {
                 temp.addEventListener(events[i].event, events[i].func);
             }
         }
@@ -55,10 +55,10 @@ class HtmlTableGen {
 
     addArray<T>(data: T[], keys: string[] | null = null, check: ((value: T) => boolean) | null = null): void {
         if (check == null) {
-            check = (value: T) => { return true; };
+            check = (value: T) => true;
         }
-        for (var i: number = 0; i < data.length; i++) {
-            let row: string[] = [];
+        for (let i: number = 0; i < data.length; i++) {
+            const row: string[] = [];
             if (keys == null) {
                 keys = Object.keys(data[i]);
             }
@@ -72,24 +72,24 @@ class HtmlTableGen {
     }
 
     generate(): HTMLElement {
-        var table: HTMLElement = document.createElement("table");
+        const table: HTMLElement = document.createElement("table");
         if (this.className != null) {
             table.className = this.className;
         }
 
         if (this.header.length > 0) {
-            var thead: HTMLElement = document.createElement("thead");
-            var headerRow: HTMLTableRowElement = document.createElement("tr");
-            for (var i: number = 0; i < this.header.length; i++) {
-                var header: HTMLTableHeaderCellElement = document.createElement("th");
+            const thead: HTMLElement = document.createElement("thead");
+            const headerRow: HTMLTableRowElement = document.createElement("tr");
+            for (let i: number = 0; i < this.header.length; i++) {
+                const header: HTMLTableHeaderCellElement = document.createElement("th");
                 header.innerHTML = this.header[i];
                 headerRow.appendChild(header);
                 if (this.resizeable) {
-                    let span: HTMLSpanElement = document.createElement("span");
+                    const span: HTMLSpanElement = document.createElement("span");
                     span.className = "table-resize";
                     span.addEventListener("mousedown", (e: MouseEvent) => {
                         if (span.parentElement === null) {
-                            throw "Parent null exception";
+                            throw new Error("Parent null exception");
                         }
                         span.deltaX = span.parentElement.offsetWidth - e.pageX;
                         selectedSpan = span;
@@ -100,15 +100,15 @@ class HtmlTableGen {
             thead.appendChild(headerRow);
             table.appendChild(thead);
         }
-        var rows: any[][] = this.rows;
-        var tbody: HTMLElement = document.createElement("tbody");
+        const rows: any[][] = this.rows;
+        const tbody: HTMLElement = document.createElement("tbody");
         table.appendChild(tbody);
-        for (var row: number = 0; row < rows.length; row++) {
-            var curRow: any[] = rows[row];
-            var rowEle: HTMLTableRowElement = document.createElement("tr");
-            for (var col: number = 0; col < curRow.length; col++) {
+        for (let row: number = 0; row < rows.length; row++) {
+            const curRow: any[] = rows[row];
+            const rowEle: HTMLTableRowElement = document.createElement("tr");
+            for (let col: number = 0; col < curRow.length; col++) {
                 if (Array.isArray(this.rows[row][col])) {
-                    for (var i: number = 0; i < this.rows[row][col].length; i++) {
+                    for (let i: number = 0; i < this.rows[row][col].length; i++) {
                         if (this.rows[row][col][i].event != null) {
                             rowEle.addEventListener(this.rows[row][col][i].event, this.rows[row][col][i].func);
                         }
@@ -118,7 +118,7 @@ class HtmlTableGen {
                     }
                 }
                 else {
-                    var colEle: HTMLTableDataCellElement = document.createElement("td");
+                    const colEle: HTMLTableDataCellElement = document.createElement("td");
                     colEle.innerHTML = this.rows[row][col];
                     rowEle.appendChild(colEle);
                 }

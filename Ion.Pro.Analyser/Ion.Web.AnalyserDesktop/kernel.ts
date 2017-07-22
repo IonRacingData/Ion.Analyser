@@ -1,6 +1,5 @@
-﻿var kernel: IKernel;
+﻿let kernel: IKernel;
 let testing = false;
-
 
 interface IKernel {
     winMan: WindowManager;
@@ -23,8 +22,6 @@ interface IWork {
     employee: IPerson;
 }
 
-
-
 function startUp() {
     if (testing) {
         return;
@@ -34,7 +31,7 @@ function startUp() {
         winMan: new WindowManager(document.body),
         appMan: new ApplicationManager(),
         netMan: new NetworkManager(),
-        senMan: new sensys.SensorManager()
+        senMan: new sensys.SensorManager(),
     };
 
     kernel.senMan.lateInit(); // Late init because it needs netMan
@@ -51,20 +48,19 @@ function startUp() {
     registerLaunchers();
     registerSensorGroups();
 
+    const mk: HtmlHelper = new HtmlHelper();
 
-    let mk: HtmlHelper = new HtmlHelper();
+    const content: HTMLElement = mk.tag("div", "taskbar-applet");
+    const menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
+    const themeChange: HTMLElement = mk.tag("div", "taskbar-applet");
+    const statusbar: HTMLElement = mk.tag("div", "taskbar-applet");
 
-    let content: HTMLElement = mk.tag("div", "taskbar-applet");
-    let menuContent: HTMLElement = mk.tag("div", "taskbar-applet");
-    let themeChange: HTMLElement = mk.tag("div", "taskbar-applet");
-    let statusbar: HTMLElement = mk.tag("div", "taskbar-applet");
+    const wl: WindowList = new WindowList(content);
+    const menu: MainMenu = new MainMenu(menuContent);
+    const theme: ChangeTheme = new ChangeTheme(themeChange);
+    const bar: StatusBar = new StatusBar(statusbar);
 
-    let wl: WindowList = new WindowList(content);
-    let menu: MainMenu = new MainMenu(menuContent);
-    let theme: ChangeTheme = new ChangeTheme(themeChange);
-    let bar: StatusBar = new StatusBar(statusbar);
-
-    let taskbar: Element = document.getElementsByClassName("taskbar")[0];
+    const taskbar: Element = document.getElementsByClassName("taskbar")[0];
 
     taskbar.appendChild(menu.content);
     taskbar.appendChild(theme.content);
@@ -75,7 +71,6 @@ function startUp() {
         e.preventDefault();
     });
 
-    
 }
 
 function registerSensorGroups() {
@@ -84,9 +79,6 @@ function registerSensorGroups() {
 }
 
 function registerLaunchers() {
-
-
-
 
     // kernel.appMan.registerApplication("Data", new Launcher(DataAssignerOld, "Data Assigner"));
     //kernel.appMan.registerApplication("Data", new Launcher(DataAssigner, "Data Assigner"));
@@ -101,7 +93,6 @@ function registerLaunchers() {
     kernel.appMan.registerApplication("Charts", new Launcher(BarTester, "Bar Chart"));
     kernel.appMan.registerApplication("Charts", new Launcher(SteeringWheelTester, "Steering Wheel"));
     // kernel.appMan.registerApplication("Charts", new Launcher(TestDataViewer, "Test Viewer"));
-
 
     //kernel.appMan.registerApplication("Test", new Launcher(DataViewer, "Data Viewer"));
     kernel.appMan.registerApplication("Test", new Launcher(TestViewer, "Test Window"));
@@ -119,7 +110,7 @@ function registerLaunchers() {
 }
 
 function registerGridPresets() {
-    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Speed and Current", <IGridLanchTemplate>{
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Speed and Current", {
         name: "Preset Speed and Current",
         grid: {
             data: [
@@ -128,27 +119,27 @@ function registerGridPresets() {
                 {
                     data: [
                         { name: "LineChartTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["current"] }]
-                }
-            ]
+                        { name: "LineChartTester", data: ["current"] }],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }]
+                sources: [{ key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }]
-            }
-        ]
-    }));
+                sources: [{ key: "CURRENT", name: "../../Data/Sets/126_usart_data.log16" }],
+            },
+        ],
+    } as IGridLanchTemplate));
 
-    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Basic Receive", <IGridLanchTemplate>{
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Basic Receive", {
         name: "Basic Receive",
         grid: {
             data: [
@@ -159,44 +150,44 @@ function registerGridPresets() {
                         {
                             data: [
                                 { name: "BarTester", data: ["volt"] },
-                                { name: "GaugeTester", data: ["current"] }
-                            ]
+                                { name: "GaugeTester", data: ["current"] },
+                            ],
                         },
                         { name: "LabelTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["temp"] }
-                    ]
-                }
-            ]
+                        { name: "LineChartTester", data: ["temp"] },
+                    ],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "telemetry" }]
+                sources: [{ key: "SPEED", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }]
+                sources: [{ key: "CURRENT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "volt",
                 layers: [],
-                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "temp",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
-            }
-        ]
-    }));
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
+            },
+        ],
+    } as IGridLanchTemplate));
 
-    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Battery Receive", <IGridLanchTemplate>{
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Battery Receive", {
         name: "Battery Receive",
         grid: {
             data: [
@@ -209,42 +200,41 @@ function registerGridPresets() {
                                 { name: "BarTester", data: ["batTemp"] },
                                 { name: "BarTester", data: ["batTemp"] },
                                 { name: "BarTester", data: ["volt"] },
-                                { name: "BarTester", data: ["soc"] }
-                            ]
+                                { name: "BarTester", data: ["soc"] },
+                            ],
                         },
                         { name: "GaugeTester", data: ["current"] },
-                        { name: "LineChartTester", data: ["current"] }
-                    ]
-                }
-            ]
+                        { name: "LineChartTester", data: ["current"] },
+                    ],
+                },
+            ],
         },
         sensorsets: [
             {
                 grouptype: "PointSensorGroup",
                 key: "batTemp",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }]
+                sources: [{ key: "CURRENT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "volt",
                 layers: [],
-                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "soc",
                 layers: [],
-                sources: [{ key: "BMS_SOC", name: "telemetry" }]
-            }
-        ]
-    }));
+                sources: [{ key: "BMS_SOC", name: "telemetry" }],
+            },
+        ],
+    } as IGridLanchTemplate));
 }
-
 

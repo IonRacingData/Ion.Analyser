@@ -116,7 +116,7 @@ var GridViewer = (function () {
             }
         }
         if (box === null) {
-            throw "Gridbox not set to an actual value";
+            throw new Error("Gridbox not set to an actual value");
         }
         var windowBody = kernel.winMan.activeWindow.handle;
         var window = kernel.winMan.activeWindow;
@@ -308,7 +308,7 @@ var GridViewer = (function () {
                     if (winPos.intersects(cur.offsetLeft, cur.offsetTop, cur.offsetWidth, cur.offsetHeight)) {
                         this.selectedBox = cur.gridBox;
                         this.selectorWindow.setPos(this.getAbsoluteLeft(this.selectedBox.box) + this.selectedBox.box.offsetWidth / 2 - 45, this.getAbsoluteTop(this.selectedBox.box) + this.selectedBox.box.offsetHeight / 2 - 45);
-                        // this.selectedBox.box.offsetTop 
+                        // this.selectedBox.box.offsetTop
                         // + (<HTMLElement>(<HTMLElement>this.selectedBox.box.offsetParent).offsetParent).offsetTop +
                         break;
                     }
@@ -361,11 +361,11 @@ var test = {
             { name: "LineChartTester", data: null },
             {
                 data: [
-                    { name: "DataAssigner", data: null }
-                ]
-            }
-        ]
-    }
+                    { name: "DataAssigner", data: null },
+                ],
+            },
+        ],
+    },
 };
 var GridContainer = (function () {
     // last: HTMLElement;
@@ -398,7 +398,7 @@ var GridContainer = (function () {
         return base;
     };
     GridContainer.prototype.createSeperator = function () {
-        throw "Not implmeneted exception";
+        throw new Error("Not implmeneted exception");
     };
     GridContainer.prototype.insertChildBefore = function (box) {
         return this.insertChild(box, "before");
@@ -433,7 +433,7 @@ var GridContainer = (function () {
         seperator.addEventListener("mousedown", function (e) {
             var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos], _this.correction);
             if (seperator.parentElement === null) {
-                throw "ParrentElement null exception";
+                throw new Error("ParrentElement null exception");
             }
             seperator.parentElement.onmousemove = function (e) {
                 _this.appWindow.handleResize();
@@ -441,7 +441,7 @@ var GridContainer = (function () {
             };
             seperator.parentElement.onmouseup = function (e) {
                 if (seperator.parentElement === null) {
-                    throw "ParrentElement null exception";
+                    throw new Error("ParrentElement null exception");
                 }
                 seperator.parentElement.onmousemove = function () { };
                 seperator.parentElement.onmouseup = function () { };
@@ -465,7 +465,7 @@ var GridContainer = (function () {
         seperator.addEventListener("mousedown", function (e) {
             var container = new ResizeContainer(seperator, _this.dir, _this.offset, _this.set, _this.mouse, _this.appWindow.window[_this.pos], _this.correction);
             if (seperator.parentElement === null) {
-                throw "ParrentElement null exception";
+                throw new Error("ParrentElement null exception");
             }
             seperator.parentElement.onmousemove = function (e) {
                 _this.appWindow.handleResize();
@@ -473,7 +473,7 @@ var GridContainer = (function () {
             };
             seperator.parentElement.onmouseup = function (e) {
                 if (seperator.parentElement === null) {
-                    throw "ParrentElement null exception";
+                    throw new Error("ParrentElement null exception");
                 }
                 seperator.parentElement.onmousemove = function () { };
                 seperator.parentElement.onmouseup = function () { };
@@ -553,7 +553,7 @@ var ResizeContainer = (function () {
         this.prev = this.cur.previousElementSibling;
         this.next = this.cur.nextElementSibling;
         if (this.cur.parentElement === null) {
-            throw "ParrentElement null exception";
+            throw new Error("ParrentElement null exception");
         }
         this.total = this.cur.parentElement[this.dir];
         this.part = this.prev[this.dir] + this.next[this.dir] + 12;

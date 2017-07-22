@@ -1,4 +1,4 @@
-﻿class SteeringWheelController extends SingleValueController {
+class SteeringWheelController extends SingleValueController {
     private steeringWheel: HTMLImageElement;
     private totalAngle: number = Math.PI * 2;
     private startAngle: number = -Math.PI;
@@ -21,10 +21,10 @@
         this.wrapper.style.width = this.width + "px";
         this.wrapper.style.height = this.height + "px";
         return this.wrapper;
-    }    
+    }
 
     protected onDataChange(): void {
-        let p: number = this.percent;
+        const p: number = this.percent;
         let angle: number = (p * this.totalAngle);
         angle += this.startAngle;
         this.wheelWrapper.style.transform = "rotate(" + angle + "rad)";

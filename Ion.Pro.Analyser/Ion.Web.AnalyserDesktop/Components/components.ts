@@ -1,4 +1,4 @@
-﻿interface IDataEvent<T> extends IEventData {
+interface IDataEvent<T> extends IEventData {
     data: T;
 }
 
@@ -13,12 +13,9 @@ interface IExpandableListItem {
 }
 
 interface IListBoxRearrangableItem {
-    mainText: string,
+    mainText: string;
     infoText: string | null;
 }
-
-
-
 
 class Component {
     public wrapper: HTMLElement;
@@ -49,7 +46,7 @@ abstract class Button extends Component {
             this.wrapper.onclick = this.onclick;
         }
     }
-    
+
     onclick = newEvent("Button.onclick");
 }
 
@@ -67,7 +64,7 @@ class TextButton extends Button {
         if (this.textNode.nodeValue)
             return this.textNode.nodeValue;
         else
-            throw "textNode.nodeValue is null";
+            throw new Error("textNode.nodeValue is null");
     }
     set text(value: string) {
         this.textNode.nodeValue = value;
@@ -76,11 +73,10 @@ class TextButton extends Button {
     constructor() {
         super();
         this.textNode = document.createTextNode("button");
-        let span = document.createElement("span");
+        const span = document.createElement("span");
         span.appendChild(this.textNode);
         this.wrapper.appendChild(span);
     }
-
 
 }
 
@@ -118,18 +114,18 @@ class ListBox extends Component {
 
     private generateList() {
         this.wrapper.innerHTML = "";
-        for (let v of this.__data) {
-            let row = document.createElement("li");
+        for (const v of this.__data) {
+            const row = document.createElement("li");
 
             row.onclick = () => {
                 this.onItemClick(v);
-            }
+            };
             let txt: string | null = null;
             if (this.selector) {
                 txt = this.selector(v);
             }
             else {
-                txt = (<object>v).toString();
+                txt = (v as object).toString();
             }
 
             row.appendChild(document.createTextNode(txt));
@@ -187,7 +183,6 @@ class Switch extends Component {
     }
 }
 
-
 class TableList extends Component {
     private __data: any[];
     private __header: string[] = [];
@@ -224,7 +219,6 @@ class TableList extends Component {
         this.wrapper.appendChild(this.tableHeader);
         this.wrapper.appendChild(this.tableBody);
 
-
     }
 
     public update() {
@@ -233,10 +227,10 @@ class TableList extends Component {
 
     private generateHeader() {
         this.tableHeader.innerHTML = "";
-        let tr = document.createElement("tr");
+        const tr = document.createElement("tr");
         this.tableHeader.appendChild(tr);
-        for (let v of this.__header) {
-            let headerItem = document.createElement("th");
+        for (const v of this.__header) {
+            const headerItem = document.createElement("th");
             headerItem.appendChild(document.createTextNode(v));
             tr.appendChild(headerItem);
         }
@@ -244,22 +238,21 @@ class TableList extends Component {
 
     private generateList() {
         this.tableBody.innerHTML = "";
-        for (let v of this.__data) {
-            let row = document.createElement("tr");
-
+        for (const v of this.__data) {
+            const row = document.createElement("tr");
 
             row.onclick = () => {
                 this.onItemClick({ target: this, data: v });
-            }
+            };
             let txt: string[] = [];
             if (this.selector) {
                 txt = this.selector(v);
             }
             else {
-                txt = [(<object>v).toString()];
+                txt = [(v as object).toString()];
             }
-            for (let d of txt) {
-                let cell = document.createElement("td");
+            for (const d of txt) {
+                const cell = document.createElement("td");
                 cell.appendChild(document.createTextNode(d));
                 row.appendChild(cell);
             }
@@ -295,14 +288,14 @@ class ExpandableList extends Component {
     }
 
     private generateList() {
-        let mk = this.mk;
+        const mk = this.mk;
         this.wrapper.innerHTML = "";
-        for (let d of this.__data) {
-            let section: HTMLElement = mk.tag("div", "comp-expList-section");
-            let clicker: HTMLElement = mk.tag("div", "comp-expList-clicker");
-            let collapsible: HTMLElement = mk.tag("div", "comp-expList-collapsible");
+        for (const d of this.__data) {
+            const section: HTMLElement = mk.tag("div", "comp-expList-section");
+            const clicker: HTMLElement = mk.tag("div", "comp-expList-clicker");
+            const collapsible: HTMLElement = mk.tag("div", "comp-expList-collapsible");
             collapsible.style.maxHeight = "0px";
-            let list: HTMLElement = document.createElement("ul");
+            const list: HTMLElement = document.createElement("ul");
 
             this.wrapper.appendChild(section);
             section.appendChild(clicker);
@@ -316,24 +309,24 @@ class ExpandableList extends Component {
                 items = this.selector(d).items;
             }
             else {
-                title = (<object>d).toString();
+                title = (d as object).toString();
             }
 
             clicker.appendChild(document.createTextNode(title));
-            for (let i of items) {
-                let li: HTMLElement = document.createElement("li");
+            for (const i of items) {
+                const li: HTMLElement = document.createElement("li");
                 li.appendChild(document.createTextNode(i.text));
                 list.appendChild(li);
 
                 li.onclick = () => {
                     this.onItemClick({ target: this, data: i.object });
-                }
+                };
             }
 
             clicker.onclick = () => {
-                let contentHeight: number = collapsible.scrollHeight;
+                const contentHeight: number = collapsible.scrollHeight;
                 collapsible.style.maxHeight = collapsible.style.maxHeight === "0px" ? contentHeight + "px" : "0px";
-            }
+            };
         }
     }
 }
@@ -377,25 +370,25 @@ class ListBoxRearrangable extends Component {
     }
 
     private generateList() {
-        let mk = this.mk;
+        const mk = this.mk;
         this.wrapper.innerHTML = "";
         if (this.__data) {
             for (let i: number = 0; i < this.__data.length; i++) {
-                let row = document.createElement("li");
+                const row = document.createElement("li");
 
                 let marker: HTMLElement | null = null;
                 if (this.__rowInfoMarkers) {
                     marker = mk.tag("div", "comp-listBoxRearr-marker");
                 }
 
-                let textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
-                let mainSpan = mk.tag("span");
-                let infoSpan = mk.tag("span");
+                const textWrapper = mk.tag("div", "comp-listBoxRearr-textWrapper");
+                const mainSpan = mk.tag("span");
+                const infoSpan = mk.tag("span");
 
-                let iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
-                let arrUp = mk.tag("span", "comp-listBoxRearr-icon");
-                let arrDown = mk.tag("span", "comp-listBoxRearr-icon");
-                let remove = mk.tag("span", "comp-listBoxRearr-icon");
+                const iconWrapper = mk.tag("div", "comp-listBoxRearr-icons");
+                const arrUp = mk.tag("span", "comp-listBoxRearr-icon");
+                const arrDown = mk.tag("span", "comp-listBoxRearr-icon");
+                const remove = mk.tag("span", "comp-listBoxRearr-icon");
 
                 arrUp.innerHTML = "&#8593;";
                 arrDown.innerHTML = "&#8595;";
@@ -423,12 +416,12 @@ class ListBoxRearrangable extends Component {
                 let mainTxt: string;
                 let infoTxt: string | null = null;
                 if (this.selector) {
-                    let item = this.selector(this.__data[i]);
+                    const item = this.selector(this.__data[i]);
                     mainTxt = item.mainText;
                     infoTxt = item.infoText || null;
                 }
                 else {
-                    mainTxt = (<object>this.__data[i]).toString();
+                    mainTxt = (this.__data[i] as object).toString();
                 }
 
                 mainSpan.appendChild(document.createTextNode(mainTxt));
@@ -437,17 +430,17 @@ class ListBoxRearrangable extends Component {
                 this.wrapper.appendChild(row);
 
                 remove.onclick = () => {
-                    let temp = this.__data[i];
+                    const temp = this.__data[i];
                     this.__data.splice(i, 1);
 
                     this.onItemRemove({ target: this, data: temp });
 
                     this.generateList();
-                }
+                };
 
                 arrUp.onclick = () => {
                     if (i > 0) {
-                        let temp = this.__data[i];
+                        const temp = this.__data[i];
                         this.__data[i] = this.__data[i - 1];
                         this.__data[i - 1] = temp;
 
@@ -455,11 +448,11 @@ class ListBoxRearrangable extends Component {
 
                         this.generateList();
                     }
-                }
+                };
 
                 arrDown.onclick = () => {
                     if (i < this.__data.length - 1) {
-                        let temp = this.__data[i];
+                        const temp = this.__data[i];
                         this.__data[i] = this.__data[i + 1];
                         this.__data[i + 1] = temp;
 
@@ -467,13 +460,11 @@ class ListBoxRearrangable extends Component {
 
                         this.generateList();
                     }
-                }
+                };
             }
         }
     }
 }
-
-
 
 class TempDataSourceList extends Component {
 
@@ -481,13 +472,12 @@ class TempDataSourceList extends Component {
     private sensorTable: HTMLElement;
     private plot: IViewerBase<any>;
 
-
     constructor(plot: IViewerBase<any>) {
         super();
 
         this.plot = plot;
 
-        let info: IDataSource<any>[] = kernel.senMan.getDataSources(plot.type);
+        const info: Array<IDataSource<any>> = kernel.senMan.getDataSources(plot.type);
 
         this.sensorTable = this.mk.tag("div");
         //this.sensorTable.style.minWidth = "200px";
@@ -498,35 +488,34 @@ class TempDataSourceList extends Component {
         this.wrapper.appendChild(this.sensorTable);
 
         if (sensys.SensorManager.isViewer(plot)) {
-            this.drawSingleSensors(<IViewer<any>>plot, info);
+            this.drawSingleSensors(plot as IViewer<any>, info);
         }
         else if (sensys.SensorManager.isCollectionViewer(plot)) {
-            this.drawMultiSensors(<ICollectionViewer<any>>plot, info);
+            this.drawMultiSensors(plot as ICollectionViewer<any>, info);
         }
     }
 
     public update(): void {
-        let info: IDataSource<any>[] = kernel.senMan.getDataSources(this.plot.type);
+        const info: Array<IDataSource<any>> = kernel.senMan.getDataSources(this.plot.type);
 
         if (sensys.SensorManager.isViewer(this.plot)) {
-            this.drawSingleSensors(<IViewer<any>>this.plot, info);
+            this.drawSingleSensors(this.plot as IViewer<any>, info);
         }
         else if (sensys.SensorManager.isCollectionViewer(this.plot)) {
-            this.drawMultiSensors(<ICollectionViewer<any>>this.plot, info);
+            this.drawMultiSensors(this.plot as ICollectionViewer<any>, info);
         }
     }
 
-    private drawSingleSensors(plot: IViewer<any>, info: IDataSource<any>[]) {
+    private drawSingleSensors(plot: IViewer<any>, info: Array<IDataSource<any>>) {
         this.drawSensors<IViewer<any>>(plot, info, this.createSingleSensor);
     }
 
-    private drawMultiSensors(plot: ICollectionViewer<any>, info: IDataSource<any>[]) {
+    private drawMultiSensors(plot: ICollectionViewer<any>, info: Array<IDataSource<any>>) {
         this.drawSensors<ICollectionViewer<any>>(plot, info, this.createMultiSensor);
     }
 
-
     private createSingleSensor(plot: IViewer<any>, sensor: IDataSource<any>): HTMLElement {
-        let radio = <HTMLInputElement>this.mk.tag("input");
+        const radio = this.mk.tag("input") as HTMLInputElement;
         radio.type = "radio";
         radio.name = "sensor";
         if (plot.dataSource && plot.dataSource === sensor) {
@@ -552,7 +541,7 @@ class TempDataSourceList extends Component {
     }
 
     private createMultiSensor(plot: ICollectionViewer<any>, sensor: IDataSource<any>): HTMLElement {
-        let checkBox = <HTMLInputElement>this.mk.tag("input");
+        const checkBox = this.mk.tag("input") as HTMLInputElement;
         checkBox.type = "checkbox";
         for (let i = 0; i < plot.dataCollectionSource.length; i++) {
             if (plot.dataCollectionSource[i] === sensor) {
@@ -591,19 +580,19 @@ class TempDataSourceList extends Component {
         return checkBox;
     }
 
-    drawSensors<T extends IViewerBase<any>>(plot: T, info: IDataSource<any>[], drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
+    drawSensors<T extends IViewerBase<any>>(plot: T, info: Array<IDataSource<any>>, drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
         this.sensorTable.innerHTML = "";
         for (let i = 0; i < info.length; i++) {
-            let sensor = info[i];
-            let ctrl = drawMethod.call(this, plot, sensor);
-            let label = this.mk.tag("label", "listitem");
-            let firstInfo = sensor.infos.SensorInfos[0];
+            const sensor = info[i];
+            const ctrl = drawMethod.call(this, plot, sensor);
+            const label = this.mk.tag("label", "listitem");
+            const firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
-            let innerBox = this.mk.tag("div");
+            const innerBox = this.mk.tag("div");
             innerBox.style.display = "inline-block";
             innerBox.style.verticalAlign = "middle";
             innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));

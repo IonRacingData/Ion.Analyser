@@ -1,8 +1,8 @@
-﻿class LabelController extends SingleValueController {
+class LabelController extends SingleValueController {
     private textWrapper: HTMLElement;
-    private contentWrapper: HTMLElement;    
+    private contentWrapper: HTMLElement;
     private fontSize: number = 10;
-    private contentHeight: number = 0;    
+    private contentHeight: number = 0;
     private initFontSizeCounter: number = 0;
 
     constructor(width: number, height: number) {
@@ -29,13 +29,13 @@
     }
 
     protected onDataChange(): void {
-        let val = this.value;
+        const val = this.value;
         this.textWrapper.innerHTML = val.toFixed(2);
         this.adjustFontSize();
     }
 
-    protected onSensorChange(): void {        
-        
+    protected onSensorChange(): void {
+
     }
 
     private adjustFontSize() {
@@ -49,11 +49,11 @@
             else {
                 throw new Error("Initialize font size exception");
             }
-            
+
         }
         else if (this.textWrapper.offsetWidth > 0) {
-            let textwidth: number = this.textWrapper.offsetWidth;
-            let ratio = this.width / textwidth;
+            const textwidth: number = this.textWrapper.offsetWidth;
+            const ratio = this.width / textwidth;
             this.fontSize *= ratio;
 
             this.fontSize = this.fontSize > this.contentHeight ? this.contentHeight : this.fontSize;

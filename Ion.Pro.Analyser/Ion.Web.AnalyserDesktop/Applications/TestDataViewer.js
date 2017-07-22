@@ -63,17 +63,17 @@ var DataAssigner = (function () {
                     else {
                         _this.drawSingleSensors(curPlot, sources);
                     }
-                }
+                },
             },
             {
                 event: "mouseenter", func: function (e) {
                     curPlot.plotWindow.highlight(true);
-                }
+                },
             },
             {
                 event: "mouseleave", func: function (e) {
                     curPlot.plotWindow.highlight(false);
-                }
+                },
             },
         ], curPlot.plotType, name);
         var sources = kernel.senMan.getDataSources(curPlot.type);
@@ -234,14 +234,14 @@ var SensorSetSelector = (function () {
         var _loop_1 = function (a) {
             table.addRow([
                 {
-                    "event": "click",
-                    "func": function (event) {
+                    event: "click",
+                    func: function (event) {
                         // console.log("you clicked on: " + a.FileName);
                         kernel.senMan.load(a.FullFileName);
                         //requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
                         //kernel.senMan.clearCache();
-                    }
-                }
+                    },
+                },
             ], a.FileName, a.Size, a.FileReader);
         };
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {

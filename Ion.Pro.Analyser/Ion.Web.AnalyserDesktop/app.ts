@@ -1,17 +1,17 @@
-﻿import sensys = Kernel.SenSys;
+import sensys = Kernel.SenSys;
 
 window.addEventListener("load", () => {
     startUp();
 });
 
-window.onbeforeunload = function (e) {
+window.onbeforeunload = function(e) {
     e = e || window.event;
 
     // For IE and Firefox prior to version 4
     if (e) {
-        e.returnValue = 'Sure?';
+        e.returnValue = "Sure?";
     }
 
     // For Safari
-    return 'Sure?';
+    return "Sure?";
 };

@@ -1,11 +1,11 @@
-﻿namespace Kernel.SenSys {
+namespace Kernel.SenSys {
     export class SensorManager implements IEventManager {
         private eventManager: EventManager = new EventManager();
         private sensorInformation: ISensorInformation[] = [];
         private loadedDataSet: SensorDataSet[] = [];
-        public viewers: IViewerBase<any>[] = [];
-        private dataSources: IDataSource<any>[] = [];
-        public groups: (new (containers: SensorDataContainer[]) => SensorGroup<any>)[] = [];
+        public viewers: Array<IViewerBase<any>> = [];
+        private dataSources: Array<IDataSource<any>> = [];
+        public groups: Array<new (containers: SensorDataContainer[]) => SensorGroup<any>> = [];
 
         private __telemetryAvailable = false;
         get telemetryAvailable() {
@@ -46,7 +46,6 @@
                 }
             });
 
-
             requestAction("GetInfo", (data: { telemetry: boolean, version: string }) => {
                 if (data.telemetry) {
                     this.load("telemetry");
@@ -56,7 +55,7 @@
 
         private registerTelemetry(data: ISensorDataSet) {
             console.log(data);
-            let dataSet = new SensorDataSet(data);
+            const dataSet = new SensorDataSet(data);
             this.telemetryDataSet = dataSet;
             this.__telemetryAvailable = true;
             this.loadedDataSet.push(dataSet);
@@ -74,7 +73,7 @@
         }
 
         private refreshViewers() {
-            for (let v of this.viewers) {
+            for (const v of this.viewers) {
                 v.dataUpdate();
             }
         }
@@ -94,15 +93,15 @@
         }
 
         private convertToSensorPackage(str: string): ISensorPackage[] {
-            let raw = atob(str);
-            let ret: ISensorPackage[] = [];
+            const raw = atob(str);
+            const ret: ISensorPackage[] = [];
             for (let i = 0; i < raw.length / 28; i++) {
                 /*console.log(raw.charCodeAt(i * 28));
                 console.log(raw.charCodeAt(i * 28 + 1));
                 console.log(raw.charCodeAt(i * 28 + 2));
                 console.log(raw.charCodeAt(i * 28 + 3));*/
-                let buf = new ArrayBuffer(8);
-                let insert = new Uint8Array(buf);
+                const buf = new ArrayBuffer(8);
+                const insert = new Uint8Array(buf);
                 insert[0] = raw.charCodeAt(i * 28 + 4);
                 insert[1] = raw.charCodeAt(i * 28 + 5);
                 insert[2] = raw.charCodeAt(i * 28 + 6);
@@ -111,7 +110,7 @@
                 insert[5] = raw.charCodeAt(i * 28 + 9);
                 insert[6] = raw.charCodeAt(i * 28 + 10);
                 insert[7] = raw.charCodeAt(i * 28 + 11);
-                let output = new Float64Array(buf);
+                const output = new Float64Array(buf);
                 /* tslint:disable:no-bitwise */
                 ret[i] = {
                     ID: raw.charCodeAt(i * 28)
@@ -151,9 +150,9 @@
 
         public load(file: string, callback?: (data: ISensorDataSet) => void): void {
             requestAction("LoadNewDataSet?file=" + file, (data: ISensorDataSet) => {
-                if (!(<any>data).data) {
+                if (!(data as any).data) {
 
-                    let dataSet = new SensorDataSet(data);
+                    const dataSet = new SensorDataSet(data);
                     this.loadedDataSet.push(dataSet);
 
                     if (dataSet.Name == "telemetry") {
@@ -169,7 +168,6 @@
 
                         //this.dataSources.push(new PointSensorGroup([dataSet.SensorData[v]]));
                     }*/
-
 
                 }
                 console.log(data);
@@ -198,7 +196,7 @@
         }
 
         public unregister<T>(viewer: IViewerBase<T>): void {
-            let index = this.viewers.indexOf(viewer);
+            const index = this.viewers.indexOf(viewer);
             this.viewers.splice(index, 1);
             this.onUnRegisterViewer({ target: this });
             //this.eventManager.raiseEvent(SensorManager.event_unregisterViewer, null);
@@ -213,10 +211,9 @@
 
         }
 
-
-        public getDataSources<T>(type: IClassType<T>): IDataSource<T>[] {
-            let returnArray: IDataSource<T>[] = [];
-            for (let cur of this.dataSources) {
+        public getDataSources<T>(type: IClassType<T>): Array<IDataSource<T>> {
+            const returnArray: Array<IDataSource<T>> = [];
+            for (const cur of this.dataSources) {
                 if (SensorManager.isDatasource(cur, type)) {
                     returnArray.push(cur);
                 }
@@ -226,19 +223,19 @@
 
         private pushToCache(data: ISensorPackage[], info: ISensorInformation): SensorDataContainer {
             if (data.length > 0) {
-                let id = data[0].ID;
-                let key = info.SensorSet.IdKeyMap[id];//  this.loadedDataSet[0].IdKeyMap[data[0].ID];
+                const id = data[0].ID;
+                let key = info.SensorSet.IdKeyMap[id]; //  this.loadedDataSet[0].IdKeyMap[data[0].ID];
                 if (!key) {
                     key = id.toString();
                 }
-                let temp = info.SensorSet.SensorData[key];
+                const temp = info.SensorSet.SensorData[key];
 
                 temp.insertSensorPackage(data);
 
                 console.log(this.dataSources);
                 return temp;
             }
-            throw "Empty dataset exception";
+            throw new Error("Empty dataset exception");
 
         }
 
@@ -247,16 +244,16 @@
             console.log(info);
 
             for (let i = 0; i < this.callbackStack.length; i++) {
-                let item = this.callbackStack[i];
+                const item = this.callbackStack[i];
                 if (item.name === info.SensorSet.Name && item.key === info.Key) {
                     this.callbackStack[i].callbacks.push(callback);
                     return;
                 }
             }
-            let all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
+            const all = { name: info.SensorSet.Name, key: info.Key, callbacks: [callback] };
             this.callbackStack.push(all);
             kernel.netMan.sendMessage("/sensor/getdata", { num: info.ID, dataset: info.SensorSet.Name }, (data: any) => {
-                let dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors), info);
+                const dataContainer = this.pushToCache(this.convertToSensorPackage(data.Sensors), info);
                 console.log(all);
                 for (let i = 0; i < all.callbacks.length; i++) {
                     all.callbacks[i](dataContainer);
@@ -269,14 +266,14 @@
             });*/
         }
 
-        private callbackStack: { name: string, key: string, callbacks: ((data: SensorDataContainer) => void)[] }[] = [];
+        private callbackStack: Array<{ name: string, key: string, callbacks: Array<(data: SensorDataContainer) => void> }> = [];
 
         public fillDataSource<T>(source: IDataSource<T>, callback: () => void): void {
             if (source.length() > 0) {
                 callback();
                 return;
             }
-            let multiback = new Multicallback(source.infos.Keys.length, (...params: SensorDataContainer[]) => {
+            const multiback = new Multicallback(source.infos.Keys.length, (...params: SensorDataContainer[]) => {
                 callback();
             });
 
@@ -287,7 +284,7 @@
         }
 
         public getDataSet(name: string): SensorDataSet | null {
-            for (let v of this.loadedDataSet) {
+            for (const v of this.loadedDataSet) {
                 if (v.Name === name) {
                     return v;
                 }
@@ -297,9 +294,9 @@
         }
 
         public getSensorDataContainer(info: ISensorDataContainerTemplate): SensorDataContainer | null {
-            let set: SensorDataSet | null = this.getDataSet(info.name);
+            const set: SensorDataSet | null = this.getDataSet(info.name);
             if (set) {
-                let container: SensorDataContainer = set.SensorData[info.key];
+                const container: SensorDataContainer = set.SensorData[info.key];
                 return container;
             }
             console.log("Could not find sensordatacontainer: " + info.name);
@@ -307,8 +304,8 @@
         }
 
         public getGroup(name: string): (new (containers: SensorDataContainer[]) => SensorGroup<any>) | null {
-            for (let v of this.groups) {
-                if ((<any>v).name === name) {
+            for (const v of this.groups) {
+                if ((v as any).name === name) {
                     return v;
                 }
             }
@@ -317,8 +314,8 @@
         }
 
         public getGroupByType(type: IClassType<any>): (new (container: SensorDataContainer[]) => SensorGroup<any>) | null {
-            for (let v of this.groups) {
-                if ((<any>v).type === type) {
+            for (const v of this.groups) {
+                if ((v as any).type === type) {
                     return v;
                 }
             }
@@ -326,9 +323,9 @@
         }
 
         public createDataSource<T>(template: DataSourceTemplate): IDataSource<T> | null {
-            let sources: SensorDataContainer[] = [];
-            for (let v of template.sources) {
-                let temp = this.getSensorDataContainer(v);
+            const sources: SensorDataContainer[] = [];
+            for (const v of template.sources) {
+                const temp = this.getSensorDataContainer(v);
                 if (temp) {
                     sources.push(temp);
                 }
@@ -337,7 +334,7 @@
                     console.log("Got empty dataset");
                 }
             }
-            let group = this.getGroup(template.grouptype);
+            const group = this.getGroup(template.grouptype);
             if (group && ((group as any).numGroups as number) === sources.length) {
                 return new group(sources);
             }
@@ -353,14 +350,13 @@
         }
 
         public static isViewer(value: IViewerBase<any>): value is IViewer<any> {
-            return (<IViewer<any>>value).dataSource !== undefined;
+            return (value as IViewer<any>).dataSource !== undefined;
         }
 
         public static isCollectionViewer(value: IViewerBase<any>): value is ICollectionViewer<any> {
-            return (<ICollectionViewer<any>>value).dataCollectionSource !== undefined;
+            return (value as ICollectionViewer<any>).dataCollectionSource !== undefined;
         }
 
-        
     }
 
     export class SensorDataSet {
@@ -380,18 +376,18 @@
             this.Name = data.Name;
             this.LoadedKeys = data.LoadedKeys;
             this.AllInfos = data.AllInfos;
-            for (let a of this.AllInfos) {
+            for (const a of this.AllInfos) {
                 this.IdKeyMap[a.ID] = a.Key;
                 this.KeyInfoMap[a.Key] = a;
                 a.SensorSet = this;
             }
-            for (let a of this.LoadedKeys) {
+            for (const a of this.LoadedKeys) {
                 this.createLoadedKey(a);
             }
         }
 
         private createLoadedKey(key: string): void{
-            let temp = new SensorDataContainer(key);
+            const temp = new SensorDataContainer(key);
             let sensInfo = this.KeyInfoMap[key];
             if (!sensInfo) {
                 sensInfo = {
@@ -399,8 +395,8 @@
                     Key: key,
                     SensorSet: this,
                     Name: key,
-                    Resolution: 0
-                }
+                    Resolution: 0,
+                };
             }
             temp.info = sensInfo;
             this.SensorData[temp.ID] = temp;
@@ -424,7 +420,6 @@
         AllInfos: ISensorInformation[];
         LoadedKeys: string[];
     }
-
 
     export interface ISensorInformation {
         Key: string;
@@ -474,7 +469,7 @@ class SensorGroup<T> implements IDataSource<T> {
     }
 
     public getValue(index: number, subplot: number = 0): T {
-        throw "Not implmeneted exception";
+        throw new Error("Not implmeneted exception");
     }
 
     public length(subplot: number = 0): number {
@@ -508,7 +503,7 @@ class PointSensorGroup extends SensorGroup<Point>{
         if (index < this.length() && index >= 0) {
             return this.data.points[index].getPoint();
         }
-        throw "Index out of bounds exception";
+        throw new Error("Index out of bounds exception");
     }
 
     public length(): number {
@@ -542,20 +537,19 @@ class Point3DSensorGroup extends SensorGroup<Point3D>{
     }
 
     public getValue(index: number): Point3D {
-        let max = this.length();
-        let percent = index / max;
-        let x = percent * this.dataX.points.length;
-        let y = percent * this.dataY.points.length;
-        let intX = x | 0;
-        let intY = y | 0;
-        let partX = x - intX;
-        let partY = y - intY;
+        const max = this.length();
+        const percent = index / max;
+        const x = percent * this.dataX.points.length;
+        const y = percent * this.dataY.points.length;
+        const intX = x | 0;
+        const intY = y | 0;
+        const partX = x - intX;
+        const partY = y - intY;
 
-        let valX = this.dataX.points[intX];
-        let valY = this.dataY.points[intY];
+        const valX = this.dataX.points[intX];
+        const valY = this.dataY.points[intY];
 
         return new Point3D(valX.value, valY.value, valX.timestamp);
-
 
     }
 
@@ -579,7 +573,7 @@ interface IViewer<T> extends IViewerBase<T> {
 }
 
 interface ICollectionViewer<T> extends IViewerBase<T> {
-    dataCollectionSource: IDataSource<T>[];
+    dataCollectionSource: Array<IDataSource<T>>;
 }
 
 class DataSourceTemplate {

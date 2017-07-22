@@ -27,28 +27,28 @@ var LineChartController = (function (_super) {
             longText: "Show or hide grid lines",
             shortCut: "G",
             type: "boolean",
-            value: true
+            value: true,
         };
         _this.stickyAxes = {
             text: "Sticky axes",
             longText: "Assures axes are always visible. When off, axes can be scrolled out of view.",
             shortCut: "A",
             type: "boolean",
-            value: true
+            value: true,
         };
         _this.autoScroll = {
             text: "Auto scroll",
             longText: "Automatically scrolls to the last inserted value in the linechart. Only applicable when receiving data live.",
             shortCut: "K",
             type: "boolean",
-            value: false
+            value: false,
         };
         _this.toggleLegend = {
             text: "Legend",
             longText: "Show or hide legend",
             shortCut: "L",
             type: "boolean",
-            value: true
+            value: true,
         };
         _this.settings = {
             showGrid: _this.showGrid,
@@ -60,8 +60,8 @@ var LineChartController = (function (_super) {
                 longText: "Resets the zoom and position of the plot",
                 shortCut: "R",
                 type: "action",
-                value: function () { _this.reset(); }
-            }
+                value: function () { _this.reset(); },
+            },
         };
         _this.darkTheme = true;
         _this.movePoint = _this.movePoint_start.copy();
@@ -218,7 +218,7 @@ var LineChartController = (function (_super) {
                     console.log("Empty dataset detected");
                     continue;
                 }
-                var lastPoint = lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
+                var lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength = this.data[d].length();
                 var checkPoint = lastPoint;
                 this.ctxMain.beginPath();
@@ -314,9 +314,9 @@ var LineChartController = (function (_super) {
             this.ctxMain.beginPath();
             var absX = i + this.movePoint.x % steps;
             var transformer = this.getRelative(new Point(absX, y));
-            var num;
-            var numWidth;
-            var numOffset;
+            var num = void 0;
+            var numWidth = void 0;
+            var numOffset = void 0;
             var val = transformer.x / 1000;
             if (Math.abs(val).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 num = "     0";
@@ -368,9 +368,9 @@ var LineChartController = (function (_super) {
             this.ctxMain.beginPath();
             var absY = this.height - (i + this.movePoint.y % steps);
             var transformer = this.getRelative(new Point(x, absY));
-            var number;
-            var numWidth;
-            var numOffset;
+            var number = void 0;
+            var numWidth = void 0;
+            var numOffset = void 0;
             if (Math.abs(transformer.y).toFixed(decimalPlaces) === (0).toFixed(decimalPlaces)) {
                 number = "";
             }
@@ -725,7 +725,7 @@ var ContextFixer = (function () {
         this.canvas = canvas;
         var temp = this.canvas.getContext("2d");
         if (temp === null) {
-            throw "Context undefined exception, context 2D not supported";
+            throw new Error("Context undefined exception, context 2D not supported");
         }
         this.ctx = temp;
         this.fillStyle = "black";

@@ -217,7 +217,7 @@ var Kernel;
                     console.log(this.dataSources);
                     return temp;
                 }
-                throw "Empty dataset exception";
+                throw new Error("Empty dataset exception");
             };
             SensorManager.prototype.loadData = function (info, callback) {
                 var _this = this;
@@ -369,7 +369,7 @@ var Kernel;
                         Key: key,
                         SensorSet: this,
                         Name: key,
-                        Resolution: 0
+                        Resolution: 0,
                     };
                 }
                 temp.info = sensInfo;
@@ -398,7 +398,7 @@ var SensorGroup = (function () {
     }
     SensorGroup.prototype.getValue = function (index, subplot) {
         if (subplot === void 0) { subplot = 0; }
-        throw "Not implmeneted exception";
+        throw new Error("Not implmeneted exception");
     };
     SensorGroup.prototype.length = function (subplot) {
         if (subplot === void 0) { subplot = 0; }
@@ -427,7 +427,7 @@ var PointSensorGroup = (function (_super) {
         if (index < this.length() && index >= 0) {
             return this.data.points[index].getPoint();
         }
-        throw "Index out of bounds exception";
+        throw new Error("Index out of bounds exception");
     };
     PointSensorGroup.prototype.length = function () {
         return this.data.points.length;

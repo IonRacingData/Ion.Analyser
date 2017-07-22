@@ -1,7 +1,7 @@
-﻿class GPSController extends CanvasController {
+class GPSController extends CanvasController {
     private data: IDataSource<Point3D> | null;
     private lastID: string = "";
-    private lastSensorInfo: sensys.ISensorInformation;   
+    private lastSensorInfo: sensys.ISensorInformation;
 
     private ctxMain: ContextFixer;
     private relSize: IRelativeSize;
@@ -14,7 +14,7 @@
     color: string = "white";
 
     constructor(width: number, height: number) {
-        super();        
+        super();
         this.movePoint = new Point(0, 0);
         this.scalePoint = new Point(1, 1);
         this.width = width;
@@ -41,7 +41,7 @@
         this.padding = this.width * 0.05;
         this.availablePlotWidth = this.width - (this.padding * 2);
         this.availablePlotHeight = this.height - (this.padding * 2);
-    
+
         this.draw();
     }
 
@@ -49,7 +49,7 @@
         if (this.data && this.data.length() > 0) {
             let offsetX: number;
             let offsetY: number;
-            let posDataLength: number = this.data.length();
+            const posDataLength: number = this.data.length();
 
             this.ctxMain.clear();
             this.ctxMain.beginPath();
@@ -61,14 +61,14 @@
             offsetY = (this.height - this.plotHeight) / 2;
 
             if (posDataLength > 0) {
-                let firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
+                const firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
                 this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
             for (let i = 0; i < posDataLength; i++) {
 
-                let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
-                let absPoint: Point = this.getAbsolute(relPoint);
+                const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+                const absPoint: Point = this.getAbsolute(relPoint);
                 this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
@@ -78,15 +78,15 @@
 
     private findMinMax(): void {
         if (this.data) {
-            let posDataLength: number = this.data.length();
+            const posDataLength: number = this.data.length();
 
             if (posDataLength > 0) {
-                let firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+                const firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
                 this.relSize = { min: firstPoint.copy(), max: firstPoint.copy() };
             }
 
             for (let i = 0; i < posDataLength; i++) {
-                let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+                const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
 
                 this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
                 this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
@@ -97,21 +97,21 @@
     }
 
     private rescale(): void {
-        this.findMinMax();        
+        this.findMinMax();
 
-        let oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        let oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        const oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        const oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
 
-        let xRatio: number = this.availablePlotWidth / oldWidth;
-        let yRatio: number = this.availablePlotHeight / oldHeight;
-        let ratio: number = Math.min(xRatio, yRatio);
+        const xRatio: number = this.availablePlotWidth / oldWidth;
+        const yRatio: number = this.availablePlotHeight / oldHeight;
+        const ratio: number = Math.min(xRatio, yRatio);
 
-        let first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
+        const first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
 
         this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
         this.scalePoint.y = Math.abs(this.scalePoint.y * ratio);
 
-        var sec: Point = this.getAbsolute(first);
+        const sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
@@ -128,13 +128,13 @@
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.Keys[0];
+            const curID = this.data.infos.Keys[0];
             if (curID != this.lastID) {
                 this.lastSensorInfo = this.data.infos.SensorInfos[0];
                 this.lastID = curID;
                 /*kernel.senMan.getSensorInfoNew(this.data, (i: SensorInformation) => {
                     this.lastSensorInfo = i;
-                    this.lastID = this.data.infos.IDs[0];                    
+                    this.lastID = this.data.infos.IDs[0];
                     this.onDataChange();
                 });*/
             }

@@ -1,4 +1,4 @@
-﻿class TestViewer implements IApplication {
+class TestViewer implements IApplication {
     app: Application;
     window: AppWindow;
     window2: AppWindow;
@@ -21,8 +21,6 @@
     }
 }
 
-
-
 interface IConfigurable {
     settings: IStorageList;
     settingsChanged: (key: string, value: IStorageObject<keyof IStorageTypes>) => void;
@@ -35,11 +33,11 @@ class ConfigWindow implements IApplication {
         this.mainWindow = kernel.winMan.createWindow(this.app, "Configure window");
         this.mainWindow.setSize(330, 230);
         if (client.settings) {
-            for (let i in client.settings) {
-                let temp = client.settings[i];
-                let row = document.createElement("div");
+            for (const i in client.settings) {
+                const temp = client.settings[i];
+                const row = document.createElement("div");
                 row.style.margin = "10px";
-                let text = document.createElement("span");
+                const text = document.createElement("span");
                 if (temp.shortCut) {
                     text.appendChild(document.createTextNode(temp.text + " (" + temp.shortCut + ")"));
                 }
@@ -50,8 +48,8 @@ class ConfigWindow implements IApplication {
                 row.appendChild(text);
                 switch (temp.type) {
                     case "boolean":
-                        let sw = new Switch();
-                        sw.checked = <boolean>temp.value;
+                        const sw = new Switch();
+                        sw.checked = temp.value as boolean;
                         sw.onCheckedChange.addEventListener((e: ISwitchEvent) => {
                             temp.value = e.newValue;
                             client.settingsChanged(i, temp);
@@ -60,23 +58,23 @@ class ConfigWindow implements IApplication {
                         row.appendChild(sw.wrapper);
                         break;
                     case "action":
-                        let but = new TextButton();
+                        const but = new TextButton();
                         but.text = temp.text;
                         but.onclick.addEventListener(() => {
-                            (<() => void>temp.value)();
+                            (temp.value as () => void)();
                             client.settingsChanged(i, temp);
                         });
                         but.wrapper.style.cssFloat = "right";
                         row.appendChild(but.wrapper);
                         break;
                     case "direction":
-                        let btn = new TextButton();
+                        const btn = new TextButton();
                         btn.text = "Toggle";
                         btn.onclick.addEventListener(() => {
                             temp.value = temp.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
                             client.settingsChanged(i, temp);
-                        })
-                        btn.wrapper.style.cssFloat = "right";                        
+                        });
+                        btn.wrapper.style.cssFloat = "right";
                         row.appendChild(btn.wrapper);
                         break;
                 }
@@ -96,7 +94,7 @@ class SVGEditor implements IApplication {
     svgCanvas: SVGSVGElement;
 
     main(): void {
-        
+
         this.window = kernel.winMan.createWindow(this.app, "SVG Editor");
         //this.window.content.addEventListener("click", (e) => this.mouseClick(e));
         this.window.content.addEventListener("mousedown", (e) => this.mouseDown(e));
@@ -106,14 +104,14 @@ class SVGEditor implements IApplication {
         this.svgCanvas.style.width = "100%";
         this.svgCanvas.style.height = "calc(100% - 5px)";
         this.window.content.appendChild(this.svgCanvas);
-        
+
     }
 
     curLine: SVGLineElement | null = null;
 
     mouseDown(e: MouseEvent) {
         this.curLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        let a = this.curLine;
+        const a = this.curLine;
         a.x1.baseVal.value = e.layerX;
         a.x2.baseVal.value = e.layerX;
         a.y1.baseVal.value = e.layerY;
@@ -124,7 +122,7 @@ class SVGEditor implements IApplication {
     }
 
     mouseMove(e: MouseEvent) {
-        let a = this.curLine;
+        const a = this.curLine;
         if (a) {
             a.x2.baseVal.value = e.layerX;
             a.y2.baseVal.value = e.layerY;
@@ -134,10 +132,10 @@ class SVGEditor implements IApplication {
     mouseUp(e: MouseEvent) {
         this.curLine = null;
     }
-    
+
     mouseClick(e: MouseEvent) {
         console.log(e);
-        let a = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        const a = document.createElementNS("http://www.w3.org/2000/svg", "line");
         a.x1.baseVal.value = 0;
         a.x2.baseVal.value = e.layerX;
         a.y1.baseVal.value = 0;
@@ -178,7 +176,6 @@ class SVGEditor implements IApplication {
         }
         this.window.content.appendChild(table.generate());
 
-
         this.innerTable = mk.tag("div");
         this.window.content.appendChild(this.innerTable);
         //kernel.senMan.addEventListener(SensorManager.event_globalPlot, (data: ISensorPackage[]) => this.drawInner(data));
@@ -213,7 +210,7 @@ class CsvGenerator implements IApplication {
                         checked: boolean = false,
                         disabled: boolean = false): HTMLInputElement {
 
-        let input = <HTMLInputElement>this.mk.tag("input");
+        const input = this.mk.tag("input") as HTMLInputElement;
         input.type = inputType;
         input.checked = checked;
         input.name = name;
@@ -222,11 +219,11 @@ class CsvGenerator implements IApplication {
         return input;
     }
 
-    private createContainer<T extends HTMLElement>(container: string, ...childs: (Node | Node[])[]): T {
-        let element = <T>this.mk.tag(container);
-        for (let a of childs) {
+    private createContainer<T extends HTMLElement>(container: string, ...childs: Array<Node | Node[]>): T {
+        const element = this.mk.tag(container) as T;
+        for (const a of childs) {
             if (Array.isArray(a)) {
-                for (let b of a) {
+                for (const b of a) {
                     element.appendChild(b);
                 }
             }
@@ -241,7 +238,7 @@ class CsvGenerator implements IApplication {
         return this.createContainer<HTMLFieldSetElement>(
             "fieldset",
             this.mk.tag("legend", "", null, legende),
-            childs
+            childs,
         );
     }
 
@@ -250,42 +247,41 @@ class CsvGenerator implements IApplication {
     }
 
     public draw() {
-        let form = <HTMLFormElement>this.mk.tag("form");
+        const form = this.mk.tag("form") as HTMLFormElement;
         form.action = "/test/csv";
         form.method = "GET";
         // let formatFields = <HTMLFieldSetElement>this.mk.tag("fieldset");
         // formatFields.appendChild(this.mk.tag("legende", "", null, "Format"));
 
-        let formatFields = this.createFieldSet(
+        const formatFields = this.createFieldSet(
             "Format",
             this.createLabelWithContent(
                 this.createInput("radio", "encoding", "nor", true),
-                this.mk.tag("span", "", null, "Semicolon seperated")
+                this.mk.tag("span", "", null, "Semicolon seperated"),
             ),
             this.mk.tag("br"),
             this.createLabelWithContent(
                 this.createInput("radio", "encoding", "int"),
-                this.mk.tag("span", "", null, "Comma seperated")
+                this.mk.tag("span", "", null, "Comma seperated"),
             ),
         );
-        let valueFields = this.createFieldSet(
+        const valueFields = this.createFieldSet(
             "Values",
             this.createLabelWithContent(
                 this.createInput("radio", "values", "real", true),
-                this.mk.tag("span", "", null, "Real Values")
+                this.mk.tag("span", "", null, "Real Values"),
             ),
             this.mk.tag("br"),
             this.createLabelWithContent(
                 this.createInput("radio", "values", "raw", false, true),
-                this.mk.tag("span", "disabled", null, "Raw Values")
+                this.mk.tag("span", "disabled", null, "Raw Values"),
             ),
         );
-        let titleLabel = this.createLabelWithContent(
+        const titleLabel = this.createLabelWithContent(
             this.createInput("checkbox", "title", "checked", true),
-            this.mk.tag("span", "", null, "Raw Values")
+            this.mk.tag("span", "", null, "Raw Values"),
         );
-        let submit = this.createInput("submit", "", "Download csv");
-
+        const submit = this.createInput("submit", "", "Download csv");
 
         form.appendChild(formatFields);
         form.appendChild(valueFields);
@@ -301,24 +297,21 @@ class StorageTester implements IApplication {
     public app: Application;
 
     public main(): void {
-        
+
     }
 }
-
-
 
 class LineChartTester implements IApplication, ICollectionViewer<Point> {
     plotType: string = "Line Chart";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataCollectionSource: IDataSource<Point>[] = [];
+    dataCollectionSource: Array<IDataSource<Point>> = [];
 
     app: Application;
     window: AppWindow;
     lineChart: LineChartController;
     data: ISensorPackage[];
     testWindow = new MenuWindow(document.body);
-
 
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Line Chart");
@@ -330,12 +323,12 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataSourceBuilder", this);
-            }
+            },
         });
         this.testWindow.add({
             name: "Configure", runner: () => {
                 kernel.appMan.start("ConfigWindow", this.lineChart);
-            }
+            },
         });
 
         this.window.content.style.overflow = "hidden";
@@ -344,7 +337,6 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.window.content.appendChild(this.lineChart.generate());
         this.lineChart.setSize(this.window.width, this.window.height);
 
-        
         kernel.senMan.register(this);
         this.createEvents(this.app.events);
     }
@@ -358,18 +350,18 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.lineChart.setData(this.dataCollectionSource);
     }
 
-    private createEvents(eh: EventHandler) {        
+    private createEvents(eh: EventHandler) {
         eh.on(this.window.onResize, () => {
             this.lineChart.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
+            this.window_close();
         });
         eh.on(kernel.winMan.onThemeChange, () => {
             this.darkTheme = !this.darkTheme;
             this.lineChart.updateColors();
         });
-                
+
     }
 
     darkTheme: boolean = true;
@@ -389,7 +381,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Gauge");
 
-        let testWindow: MenuWindow = new MenuWindow(document.body);
+        const testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
             testWindow.y = e.y;
@@ -398,7 +390,7 @@ class GaugeTester implements IApplication, IViewer<Point> {
         testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataSourceBuilder", this);
-            }
+            },
         });
 
         this.window.content.style.overflow = "hidden";
@@ -415,20 +407,20 @@ class GaugeTester implements IApplication, IViewer<Point> {
             this.gauge.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
+            this.window_close();
         });
         this.app.events.on(kernel.winMan.onThemeChange, () => {
             this.gauge.updateColors();
         });
     }
 
-    private window_close() {        
+    private window_close() {
         kernel.senMan.unregister(this);
     }
 
     drawMeter() {
         this.gauge = new GaugeController(this.window.width, this.window.height);
-        let gaugeWrapper = this.gauge.wrapper;
+        const gaugeWrapper = this.gauge.wrapper;
         this.window.content.appendChild(gaugeWrapper);
     }
 
@@ -451,7 +443,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "GPS Viewer");
 
-        let testWindow: MenuWindow = new MenuWindow(document.body);
+        const testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
             testWindow.y = e.y;
@@ -460,7 +452,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
         testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataSourceBuilder", this);
-            }
+            },
         });
 
         this.window.content.style.overflow = "hidden";
@@ -476,7 +468,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
             this.plot.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
+            this.window_close();
         });
     }
 
@@ -503,7 +495,7 @@ class LabelTester implements IApplication, IViewer<Point> {
     main() {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Label");
         this.window.setSize(350, 180);
-        let testWindow: MenuWindow = new MenuWindow(document.body);
+        const testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
             testWindow.y = e.y;
@@ -512,15 +504,15 @@ class LabelTester implements IApplication, IViewer<Point> {
         testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataSourceBuilder", this);
-            }
+            },
         });
 
         this.window.content.style.overflow = "hidden";
         kernel.senMan.register(this);
 
         this.label = new LabelController(this.window.width, this.window.height);
-        let div = this.label.wrapper;
-        this.window.content.appendChild(div);        
+        const div = this.label.wrapper;
+        this.window.content.appendChild(div);
 
         this.createEvents(this.app.events);
     }
@@ -530,7 +522,7 @@ class LabelTester implements IApplication, IViewer<Point> {
             this.label.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
+            this.window_close();
         });
     }
 
@@ -558,7 +550,7 @@ class BarTester implements IApplication, IViewer<Point> {
         this.plotWindow = this.window = kernel.winMan.createWindow(this.app, "Bar Chart");
         this.window.setSize(300, this.window.height);
 
-        let testWindow: MenuWindow = new MenuWindow(document.body);
+        const testWindow: MenuWindow = new MenuWindow(document.body);
         this.plotWindow.content.oncontextmenu = (e: MouseEvent) => {
             testWindow.x = e.x;
             testWindow.y = e.y;
@@ -567,19 +559,19 @@ class BarTester implements IApplication, IViewer<Point> {
         testWindow.add({
             name: "Change data", runner: () => {
                 kernel.appMan.start("DataSourceBuilder", this);
-            }
+            },
         });
         testWindow.add({
             name: "Configure", runner: () => {
                 kernel.appMan.start("ConfigWindow", this.bar);
-            }
+            },
         });
 
         this.window.content.style.overflow = "hidden";
-        
+
         kernel.senMan.register(this);
         this.bar = new BarController(this.window.width, this.window.height, Direction.Vertical);
-        let barWrapper = this.bar.wrapper;
+        const barWrapper = this.bar.wrapper;
         this.window.content.appendChild(barWrapper);
 
         this.createEvents(this.app.events);
@@ -587,13 +579,13 @@ class BarTester implements IApplication, IViewer<Point> {
         /*
         barWrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             switch (e.key) {
-                case "j":                    
+                case "j":
                     this.val += 0.1;
                     break;
                 case "k":
                     this.val -= 0.1;
             }
-            
+
             this.val = this.val < 0 ? 0 : this.val;
             this.val = this.val > 1 ? 1 : this.val;
             this.bar.test_setValue(this.val);
@@ -605,8 +597,8 @@ class BarTester implements IApplication, IViewer<Point> {
             this.bar.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
-        });        
+            this.window_close();
+        });
     }
 
     private window_close() {
@@ -619,7 +611,6 @@ class BarTester implements IApplication, IViewer<Point> {
 
 }
 
-
 class LegacyRPIManager implements IApplication {
     public app: Application;
     public window: AppWindow;
@@ -627,34 +618,34 @@ class LegacyRPIManager implements IApplication {
 
     public main() {
         this.window = kernel.winMan.createWindow(this.app, "Legacy RPI Manager");
-        let wrapper = this.mk.tag("div");
+        const wrapper = this.mk.tag("div");
 
         wrapper.appendChild(this.mk.tag("button", "", [{
             event: "click",
             func: (event: Event) => {
                 requestAction("ConnectLegacy", null);
-            }
+            },
         }], "Connect"));
 
         wrapper.appendChild(this.mk.tag("button", "", [{
             event: "click",
             func: (event: Event) => {
                 requestAction("Status", null);
-            }
+            },
         }], "Status"));
 
         wrapper.appendChild(this.mk.tag("button", "", [{
             event: "click",
             func: (event: Event) => {
                 requestAction("StartReceive", null);
-            }
+            },
         }], "StartReceive"));
 
         wrapper.appendChild(this.mk.tag("button", "", [{
             event: "click",
             func: (event: Event) => {
                 requestAction("StopReceive", null);
-            }
+            },
         }], "StopReceive"));
         this.window.content.appendChild(wrapper);
     }
@@ -664,7 +655,7 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
     plotType: string = "Steering Wheel";
     plotWindow: AppWindow;
     type: IClassType<Point> = Point;
-    dataSource: IDataSource<Point> | null = null;        
+    dataSource: IDataSource<Point> | null = null;
 
     app: Application;
     window: AppWindow;
@@ -677,7 +668,7 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
         this.plotWindow = this.window;
         kernel.senMan.register(this);
         this.wheel = new SteeringWheelController(this.window.width, this.window.height);
-        let wheelWrapper = this.wheel.generate();
+        const wheelWrapper = this.wheel.generate();
         this.window.content.appendChild(wheelWrapper);
         this.wheel.setPer(this.val);
 
@@ -696,7 +687,7 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
             this.wheel.setSize(this.window.width, this.window.height);
         });
         eh.on(this.plotWindow.onClose, () => {
-            this.window_close()
+            this.window_close();
         });
     }
 

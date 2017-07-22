@@ -1,7 +1,7 @@
-﻿let preloadStyle = document.createElement("style");
+let preloadStyle = document.createElement("style");
 preloadStyle.id = "current-theme";
 let preLoadDone = false;
-let waitingCallbacks: (() => void)[] = [];
+let waitingCallbacks: Array<() => void> = [];
 
 let preloaded: { [key: string]: string } = {};
 
@@ -10,10 +10,8 @@ let testStore = document.createElement("script");
 testStore.type = "application/json";
 testStore.id = "preload";
 
-
-
 if (storePreload) {
-    let oldStore = <HTMLScriptElement>document.getElementById("preload");
+    const oldStore = document.getElementById("preload") as HTMLScriptElement;
     if (oldStore) {
         testStore = oldStore;
         preloaded = JSON.parse(testStore.innerHTML);
@@ -32,10 +30,8 @@ function onPreloadDone(callback: () => void): void {
     waitingCallbacks.push(callback);
 }
 
-
-
 function preloadFile(file: string, callback: (data: string) => void) {
-    let request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     if (preloaded[file]) {
         callback(preloaded[file]);
         return;
@@ -50,13 +46,11 @@ function preloadFile(file: string, callback: (data: string) => void) {
             }
 
         }
-    }
+    };
 
     request.open("GET", file, true);
     request.send();
 }
-
-
 
 preloadFile("/Style/app-style-dark.css", (data: string) => {
     preloadStyle.innerHTML = data;
@@ -68,7 +62,7 @@ preloadFile("/Style/app-style-dark.css", (data: string) => {
 
     //console.log("requested: stylesheet");
     preLoadDone = true;
-    for (let a of waitingCallbacks) {
+    for (const a of waitingCallbacks) {
         a();
     }
 });

@@ -1,4 +1,4 @@
-﻿class WindowManager implements IEventManager {
+class WindowManager implements IEventManager {
     private body: HTMLElement;
     private template: HTMLTemplateElement;
 
@@ -31,12 +31,10 @@
 
     private availableThemes: string[] = ["app-style", "app-style-dark"];
 
-
-
     constructor(container: HTMLElement) {
         this.body = container;
 
-        this.template = <HTMLTemplateElement>document.getElementById("temp-window");
+        this.template = document.getElementById("temp-window") as HTMLTemplateElement;
 
         window.addEventListener("mousemove", (e: MouseEvent) => this.mouseMove(e));
         window.addEventListener("mouseup", (e: MouseEvent) => this.mouseUp(e));
@@ -65,11 +63,11 @@
         }*/
         //console.log(preloadStyle);
         //console.log(preloadStyle.sheet);
-        this.current = <CSSStyleSheet>preloadStyle.sheet;
+        this.current = preloadStyle.sheet as CSSStyleSheet;
         console.log(this.current);
         this.avaiableRules = {};
         for (let i = 0; i < this.current.cssRules.length; i++) {
-            let a = <CSSStyleRule>this.current.cssRules[i];
+            const a = this.current.cssRules[i] as CSSStyleRule;
             this.avaiableRules[a.selectorText] = a;
         }
     }
@@ -86,8 +84,8 @@
     public handleMouseMoving(x: number, y: number, e: MouseEvent | TouchEvent): void {
         if (this.dragging) {
             this.activeWindow.__setRelativePos(x, y);
-            var tileZone: number = this.tileZone;
-            var topBar: number = this.topBar;
+            const tileZone: number = this.tileZone;
+            const topBar: number = this.topBar;
 
             if (x < tileZone && y < topBar + tileZone) {
                 this.activeWindow.tile(TileState.TOPLEFT);
@@ -112,7 +110,7 @@
             }
             this.onGlobalDrag({ target: this, window: this.activeWindow, mouse: e });
             //this.raiseEvent(WindowManager.event_globalDrag, { window: this.activeWindow, mouse: e });
-            let appWindow = this.getWindowAt(x, y, true);
+            const appWindow = this.getWindowAt(x, y, true);
             if (appWindow) {
                 appWindow.handleGlobalDrag(x, y, this.activeWindow);
             }
@@ -124,7 +122,7 @@
 
     private getWindowAt(x: number, y: number, ignoreActive: boolean): AppWindow | null {
         for (let i = this.order.length - 1; i >= 0 ; i--) {
-            let curWindow = this.windows[i];
+            const curWindow = this.windows[i];
             if (ignoreActive && curWindow === this.activeWindow) {
                 continue;
             }
@@ -144,9 +142,9 @@
 
     private mouseUp(e: MouseEvent): void {
         // console.log(e);
-        let x = e.layerX;
-        let y = e.layerY;
-        let appWindow = this.getWindowAt(x, y, true);
+        const x = e.layerX;
+        const y = e.layerY;
+        const appWindow = this.getWindowAt(x, y, true);
         if (appWindow) {
             appWindow.handleGlobalRelease(x, y, this.activeWindow);
         }
@@ -157,9 +155,9 @@
     }
 
     private touchEnd(e: TouchEvent): void {
-        let x = e.changedTouches[0].pageX;
-        let y = e.changedTouches[0].pageY;
-        let appWindow = this.getWindowAt(x, y, true);
+        const x = e.changedTouches[0].pageX;
+        const y = e.changedTouches[0].pageY;
+        const appWindow = this.getWindowAt(x, y, true);
         if (appWindow) {
             appWindow.handleGlobalRelease(x, y, this.activeWindow);
         }
@@ -170,7 +168,7 @@
     }
 
     public createWindow(app: Application, title: string): AppWindow {
-        var window: AppWindow = this.makeWindow(app);
+        const window: AppWindow = this.makeWindow(app);
         // window.setTitle(title);
         window.title = title;
         app.windows.push(window);
@@ -180,8 +178,8 @@
     }
 
     private makeWindow(app: Application): AppWindow {
-        var tempWindow: AppWindow = new AppWindow(app);
-        let extra = this.windows.length % 10 * 50;
+        const tempWindow: AppWindow = new AppWindow(app);
+        const extra = this.windows.length % 10 * 50;
         tempWindow.setPos(tempWindow.x + extra, tempWindow.y + extra);
         tempWindow.onUpdate.addEventListener(() => {
             this.onWindowUpdate({ target: this });
@@ -214,7 +212,7 @@
     }
 
     public changeTheme(theme: string): void {
-        let name = "/Style/" + theme + ".css";
+        const name = "/Style/" + theme + ".css";
         this.curTheme = theme;
         console.log(name);
         if (preloaded[name]) {
@@ -239,14 +237,14 @@
                 //this.raiseEvent(WindowManager.event_themeChange, null);
             }, 200);
         }
-        
+
         style.href = "/" + theme + ".css";*/
     }
 
     public makeWindowHandle(appWindow: AppWindow): HTMLElement {
-        var div: HTMLElement = document.createElement("div");
+        const div: HTMLElement = document.createElement("div");
         div.className = "window-wrapper";
-        var clone: HTMLElement = <HTMLElement>document.importNode(this.template.content, true);
+        const clone: HTMLElement = document.importNode(this.template.content, true) as HTMLElement;
         div.appendChild(clone);
         return div;
     }
@@ -260,7 +258,7 @@
     }
 
     public makeTopMost(appWindow: AppWindow): void {
-        let index: number = this.order.indexOf(appWindow);
+        const index: number = this.order.indexOf(appWindow);
         this.order.splice(index, 1);
         this.order.push(appWindow);
         this.reorderWindows();
@@ -268,7 +266,7 @@
 
     public closeWindow(appWindow: AppWindow): void {
         if (appWindow.handle.parentElement === null) {
-            throw "appWindow null exception";
+            throw new Error("appWindow null exception");
         }
         appWindow.handle.parentElement.removeChild(appWindow.handle);
         this.windows.splice(this.windows.indexOf(appWindow), 1);

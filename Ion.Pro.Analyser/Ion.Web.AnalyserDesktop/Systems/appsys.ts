@@ -1,4 +1,4 @@
-﻿class ApplicationManager implements IEventManager {
+class ApplicationManager implements IEventManager {
     appList: Application[] = [];
     launchers: { [category: string]: Launcher[] } = {};
     allApps: { [name: string]: Launcher } = {};
@@ -12,8 +12,8 @@
     onAppClose = newEvent("ApplicationManager.onAppClose");
 
     launchApplication(launcher: Launcher, ...args: any[]): Application {
-        var temp: IApplication = new launcher.mainFunction();
-        var appTemp = new Application(temp);
+        let temp: IApplication = new launcher.mainFunction();
+        let appTemp = new Application(temp);
         appTemp.name = launcher.name;
         appTemp.pid = this.nextPID++;
         this.appList.push(appTemp);
@@ -29,15 +29,15 @@
         if (this.allApps[appName]) {
             return this.launchApplication(this.allApps[appName], ...args);
         }
-        throw "Application does not exist";
+        throw new Error("Application does not exist");
     }
 
     registerApplication(category: string, launcher: Launcher): void {
         if (!this.launchers[category]) {
-            this.launchers[category] = [];  
+            this.launchers[category] = [];
         }
         this.launchers[category].push(launcher);
-        this.allApps[(<any>launcher.mainFunction).name] = launcher;
+        this.allApps[(launcher.mainFunction as any).name] = launcher;
     }
 
     addEventListener(type: string, listener: any): void {
@@ -47,7 +47,6 @@
     removeEventListener(type: string, listener: any): void {
         this.eventManager.removeEventListener(type, listener);
     }
-
 
     closeApplication(app: Application): void {
         this.appList.splice(this.appList.indexOf(app), 1);

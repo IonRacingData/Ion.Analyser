@@ -1,9 +1,9 @@
-﻿class MenuWindow {
+class MenuWindow {
     container: HTMLElement;
     x: number;
     y: number;
     items: MenuItem[] = [];
-    categories: (MenuItem[])[] = [];
+    categories: Array<MenuItem[]> = [];
     content: HTMLElement | null;
     visible: boolean;
     selectedMenu: MenuItem | null;
@@ -16,7 +16,7 @@
     }
 
     globalClick(e: MouseEvent): void {
-        let ele: HTMLElement = <HTMLElement>e.target;
+        let ele: HTMLElement = e.target as HTMLElement;
         while (ele.parentElement != null) {
             if (ele === this.content) {
                 return;
@@ -37,14 +37,14 @@
     }
 
     add(item: any, category: string = ""): void {
-        let name: string = MenuWindow.isIMenuItem(item) ? item.name : item.toString();
+        const name: string = MenuWindow.isIMenuItem(item) ? item.name : item.toString();
         if (category === "") {
             this.items.push(new MenuItem(name, item));
         }
         else {
             if (!this.categories[category]) {
-                let miAr: MenuItem[] = [];
-                let mi: MenuItem = new MenuItem(category, miAr);
+                const miAr: MenuItem[] = [];
+                const mi: MenuItem = new MenuItem(category, miAr);
                 this.items.push(mi);
                 this.categories[category] = miAr;
             }
@@ -59,8 +59,8 @@
 
     show(): void {
         if (!this.visible) {
-            let mk: HtmlHelper = new HtmlHelper();
-            let div: HTMLElement = this.content = mk.tag("div", "menu-window");
+            const mk: HtmlHelper = new HtmlHelper();
+            const div: HTMLElement = this.content = mk.tag("div", "menu-window");
             div.style.left = this.x + "px";
             div.style.top = this.y + "px";
 
@@ -71,12 +71,12 @@
     }
 
     makeList(list: MenuItem[], mk: HtmlHelper): HTMLElement {
-        let ul: HTMLElement = mk.tag("ul");
+        const ul: HTMLElement = mk.tag("ul");
         for (let i: number = 0; i < list.length; i++) {
-            let curItem: MenuItem = list[i];
-            let li: HTMLElement = mk.tag("li");
+            const curItem: MenuItem = list[i];
+            const li: HTMLElement = mk.tag("li");
 
-            let a: HTMLAnchorElement = <HTMLAnchorElement>mk.tag("a", "", [{
+            const a: HTMLAnchorElement = mk.tag("a", "", [{
                 event: "click", func: (e: Event): void => {
                     e.preventDefault();
                     if (MenuWindow.isIMenuItem(curItem.value)) {
@@ -91,15 +91,15 @@
                         curItem.subMenu.style.display = "";
                         this.selectedMenu = curItem;
                     }
-                }
-            }], curItem.name);
+                },
+            }], curItem.name) as HTMLAnchorElement;
             li.appendChild(a);
             a.href = "#";
             if (curItem.value instanceof Array) {
-                let arrow = mk.tag("span", "", null, "&gt;");
+                const arrow = mk.tag("span", "", null, "&gt;");
                 arrow.style.cssFloat = "right";
                 a.appendChild(arrow);
-                curItem.subMenu = this.makeList(<MenuItem[]>curItem.value, mk);
+                curItem.subMenu = this.makeList(curItem.value as MenuItem[], mk);
                 curItem.subMenu.style.display = "none";
                 li.appendChild(curItem.subMenu);
             }

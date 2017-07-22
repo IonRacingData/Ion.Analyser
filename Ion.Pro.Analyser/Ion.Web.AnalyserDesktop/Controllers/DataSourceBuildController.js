@@ -63,7 +63,7 @@ var DataSourceBuildController = (function (_super) {
             key: "",
             grouptype: this.sensorGroup,
             layers: [],
-            sources: sources
+            sources: sources,
         };
         var ds = kernel.senMan.createDataSource(template);
         if (ds) {
@@ -112,7 +112,7 @@ var DataSourceBuildController = (function (_super) {
         expList.selector = function (item) {
             return {
                 title: item.title,
-                items: item.items
+                items: item.items,
             };
         };
         expList.data = data;

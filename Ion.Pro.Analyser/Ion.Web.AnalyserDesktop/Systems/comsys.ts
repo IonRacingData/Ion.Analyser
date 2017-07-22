@@ -1,5 +1,5 @@
-﻿function requestAction(action: string, callback: ((data: any) => void) | null): void {
-    var request = new XMLHttpRequest();
+function requestAction(action: string, callback: ((data: any) => void) | null): void {
+    const request = new XMLHttpRequest();
 
     request.responseType = "json";
 
@@ -20,8 +20,8 @@ class NetworkManager {
     public curId: number = 0;
 
     private backlog: IComMessage[] = [];
-    private serviceCallback: ((path: string, data: any) => void)[] = [];
-    private callback: ((data: any) => void)[] = [];
+    private serviceCallback: Array<(path: string, data: any) => void> = [];
+    private callback: Array<(data: any) => void> = [];
 
     private reconnecter: number | null = null;
 
@@ -35,13 +35,13 @@ class NetworkManager {
     }
 
     createWebSocket(): WebSocket | null {
-        let site = window.location.toString();
+        const site = window.location.toString();
         if (site.match("file://")) {
             console.log("Detected from local machine, prevents websocket");
             return null;
         }
 
-        let socket = new WebSocket(site.replace("http", "ws") + "socket/connect");
+        const socket = new WebSocket(site.replace("http", "ws") + "socket/connect");
 
         socket.onmessage = (ev: MessageEvent) => {
             this.receiveMessage(ev);
@@ -51,7 +51,7 @@ class NetworkManager {
 
         socket.onerror = (ev: Event) => {
             console.log(ev);
-        }
+        };
 
         socket.onclose = (ev: Event) => {
             this.connectionOpen = false;
@@ -59,7 +59,7 @@ class NetworkManager {
             this.tryReconnect();
             this.onLostConnection({ target: this });
             //this.manager.raiseEvent(NetworkManager.event_lostConnection, null);
-        }
+        };
 
         socket.onopen = (ev: Event) => {
             this.connectionOpen = true;
@@ -72,8 +72,8 @@ class NetworkManager {
     }
 
     private tryReconnect() {
-        let reconnectInterval = 2000;
-        console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval)
+        const reconnectInterval = 2000;
+        console.log("Lost connection, trying to reconnect with interval: " + reconnectInterval);
         this.reconnecter = this.reconnecter = setInterval(() => {
             if (this.connectionOpen && this.reconnecter) {
                 clearInterval(this.reconnecter);
@@ -90,17 +90,16 @@ class NetworkManager {
         }, reconnectInterval);
     }
 
-
     registerService(callbackId: number, callback: (path: string, data: any) => void) {
         this.serviceCallback[callbackId] = callback;
     }
 
     sendMessage(path: string, message: any, callback: (data: any) => void) {
-        let pack: IComMessage = {
+        const pack: IComMessage = {
             Status: ComMessageStatus.Request110,
             Path: path,
             Data: JSON.stringify(message),
-            MessageId: this.curId++
+            MessageId: this.curId++,
         };
         this.callback[pack.MessageId] = callback;
         if (!this.connectionOpen) {
@@ -112,17 +111,17 @@ class NetworkManager {
     }
 
     private sendRawMessage(message: IComMessage) {
-        let str: string = JSON.stringify(message);
+        const str: string = JSON.stringify(message);
         if (this.socket) {
             this.socket.send(str);
         }
         else {
-            throw "Tried sending message over non existring socket";
+            throw new Error("Tried sending message over non existring socket");
         }
     }
 
     receiveMessage(ev: MessageEvent) {
-        let message: IComMessage = JSON.parse(ev.data);
+        const message: IComMessage = JSON.parse(ev.data);
 
         if (message.Status === ComMessageStatus.Request110) {
             if (this.serviceCallback[message.MessageId]) {

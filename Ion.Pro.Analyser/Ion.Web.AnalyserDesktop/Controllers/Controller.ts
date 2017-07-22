@@ -1,7 +1,7 @@
-﻿abstract class Controller extends Component {    
+abstract class Controller extends Component {
     protected height: number;
     protected width: number;
-    protected mk: HtmlHelper = new HtmlHelper;    
+    protected mk: HtmlHelper = new HtmlHelper;
 
     public setSize(width: number, height: number) {
         this.width = width;
@@ -34,9 +34,9 @@ abstract class SingleValueController extends Controller {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.Keys[0];
+            const curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
-                let i = this.data.infos.SensorInfos[0];
+                const i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = i.Key;
                 this.updateVals(this.data);
@@ -55,23 +55,23 @@ abstract class SingleValueController extends Controller {
         }
     }
 
-    private updateVals(data: IDataSource<Point>): void {        
-        let lastIndex = data.length() - 1;
+    private updateVals(data: IDataSource<Point>): void {
+        const lastIndex = data.length() - 1;
         if (lastIndex < 0) {
             console.log("Empty dataset in SingleValueController");
         }
         else {
-            let lastValue = data.getValue(lastIndex);
+            const lastValue = data.getValue(lastIndex);
             this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
             this.value = lastValue.y;
-        }        
+        }
     }
 
     private sensorChange(): void {
         this.legendWrapper.innerHTML = "";
         if (this.data) {
             let unit = this.data.infos.SensorInfos[0].Unit;
-            let name = this.data.infos.SensorInfos[0].Name;
+            const name = this.data.infos.SensorInfos[0].Name;
             if (unit) {
                 unit = unit.replace("&deg;", "°");
                 this.legendWrapper.appendChild(document.createTextNode(name + " (" + unit + ")"));
@@ -96,14 +96,14 @@ abstract class CanvasController extends Controller {
     protected scalePoint: Point;
 
     protected getRelative(p: Point): Point {
-        let moved: Point = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
-        let scaled: Point = moved.divide(this.scalePoint);
+        const moved: Point = new Point(p.x - this.movePoint.x, this.height - p.y - this.movePoint.y);
+        const scaled: Point = moved.divide(this.scalePoint);
         return scaled;
     }
 
     protected getAbsolute(p: Point): Point {
-        let scaled: Point = p.multiply(this.scalePoint);
-        let moved: Point = scaled.add(this.movePoint);
+        const scaled: Point = p.multiply(this.scalePoint);
+        const moved: Point = scaled.add(this.movePoint);
         return new Point(moved.x, this.height - moved.y);
     }
 
@@ -122,11 +122,11 @@ abstract class CanvasController extends Controller {
 }
 
 abstract class MultiValueCanvasController extends CanvasController {
-    protected data: IDataSource<Point>[];
+    protected data: Array<IDataSource<Point>>;
     protected sensorInfos: { [id: string]: sensys.ISensorInformation } = {};
     private lastDataLength: number = 0;
 
-    public setData(d: IDataSource<Point>[]): void {
+    public setData(d: Array<IDataSource<Point>>): void {
         this.data = d;
         if (this.lastDataLength !== this.data.length) {
             this.lastDataLength = this.data.length;
@@ -138,8 +138,8 @@ abstract class MultiValueCanvasController extends CanvasController {
     private updateSensorInfos(infos: sensys.ISensorInformation[]) {
         this.sensorInfos = {};
 
-        for (let i of infos) {
-            for (let d of this.data) {
+        for (const i of infos) {
+            for (const d of this.data) {
                 if (d.infos.Keys[0] === i.Key) {
                     this.sensorInfos[i.ID.toString()] = i;
                 }
@@ -166,16 +166,16 @@ abstract class SingleValueCanvasController extends CanvasController {
         this.legendWrapper = document.createElement("div");
         this.legendWrapper.className = "controller-legend";
         this.legendWrapper.style.height = this.legendHeight + "px";
-        this.legendWrapper.appendChild(document.createTextNode("No data"));        
+        this.legendWrapper.appendChild(document.createTextNode("No data"));
     }
-    
+
     public setData(d: IDataSource<Point> | null) {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.Keys[0];
+            const curID = this.data.infos.Keys[0];
             if (curID !== this.lastID) {
-                let i = this.data.infos.SensorInfos[0];
+                const i = this.data.infos.SensorInfos[0];
                 this.lastSensorInfo = i;
                 this.lastID = this.data.infos.Keys[0];
                 this.updateVals(this.data);
@@ -192,12 +192,12 @@ abstract class SingleValueCanvasController extends CanvasController {
     }
 
     private updateVals(data: IDataSource<Point>): void {
-        let lastIndex = data.length() - 1;
+        const lastIndex = data.length() - 1;
         if (lastIndex < 0) {
             console.log("Empty dataset in SingleValueController");
         }
         else {
-            let lastValue = data.getValue(lastIndex);
+            const lastValue = data.getValue(lastIndex);
             this.percent = SensorInfoHelper.getPercent(this.lastSensorInfo, lastValue).y;
             this.value = lastValue.y;
         }
@@ -207,7 +207,7 @@ abstract class SingleValueCanvasController extends CanvasController {
         this.legendWrapper.innerHTML = "";
         if (this.data) {
             let unit = this.data.infos.SensorInfos[0].Unit;
-            let name = this.data.infos.SensorInfos[0].Name;
+            const name = this.data.infos.SensorInfos[0].Name;
             if (unit) {
                 unit = unit.replace("&deg;", "°");
                 this.legendWrapper.appendChild(document.createTextNode(name + " (" + unit + ")"));
@@ -230,7 +230,6 @@ abstract class ScatterChartBase extends CanvasController {
     private data: IDataSource<Point3D>;
     private lastID: string = "";
     private lastSensorInfo: sensys.ISensorInformation;
-
 
     private ctxMain: ContextFixer;
     private relSize: Rectangle;
@@ -278,7 +277,7 @@ abstract class ScatterChartBase extends CanvasController {
         if (this.data.length() > 0) {
             let offsetX: number;
             let offsetY: number;
-            let posDataLength: number = this.data.length();
+            const posDataLength: number = this.data.length();
 
             this.ctxMain.clear();
             this.ctxMain.beginPath();
@@ -290,14 +289,14 @@ abstract class ScatterChartBase extends CanvasController {
             offsetY = (this.height - this.plotHeight) / 2;
 
             if (posDataLength > 0) {
-                let firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
+                const firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
                 this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
             for (let i = 0; i < posDataLength; i++) {
 
-                let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
-                let absPoint: Point = this.getAbsolute(relPoint);
+                const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+                const absPoint: Point = this.getAbsolute(relPoint);
                 this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
@@ -306,15 +305,15 @@ abstract class ScatterChartBase extends CanvasController {
     }
 
     protected findMinMax(): void {
-        let posDataLength: number = this.data.length();
+        const posDataLength: number = this.data.length();
 
         if (posDataLength > 0) {
-            let firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
+            const firstPoint: Point = new Point(this.data.getValue(0).x, this.data.getValue(0).y);
             this.relSize = new Rectangle(firstPoint, firstPoint);
         }
 
         for (let i = 0; i < posDataLength; i++) {
-            let relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
+            const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
 
             this.relSize.min.x = Math.min(relPoint.x, this.relSize.min.x);
             this.relSize.min.y = Math.min(relPoint.y, this.relSize.min.y);
@@ -326,19 +325,19 @@ abstract class ScatterChartBase extends CanvasController {
     private rescale(): void {
         this.findMinMax();
 
-        let oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
-        let oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
+        const oldWidth = Math.abs(this.getAbsolute(this.relSize.max).x - this.getAbsolute(this.relSize.min).x) + 1;
+        const oldHeight = Math.abs(this.getAbsolute(this.relSize.max).y - this.getAbsolute(this.relSize.min).y) + 1;
 
-        let xRatio: number = this.availablePlotWidth / oldWidth;
-        let yRatio: number = this.availablePlotHeight / oldHeight;
-        let ratio: number = Math.min(xRatio, yRatio);
+        const xRatio: number = this.availablePlotWidth / oldWidth;
+        const yRatio: number = this.availablePlotHeight / oldHeight;
+        const ratio: number = Math.min(xRatio, yRatio);
 
-        let first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
+        const first: Point = new Point(this.relSize.min.x, this.relSize.min.y);
 
         this.scalePoint.x = Math.abs(this.scalePoint.x * ratio);
         this.scalePoint.y = Math.abs(this.scalePoint.y * ratio);
 
-        var sec: Point = this.getAbsolute(first);
+        const sec: Point = this.getAbsolute(first);
         sec.y = this.height - sec.y;
 
         this.movePoint = this.movePoint.sub(sec);
@@ -355,7 +354,7 @@ abstract class ScatterChartBase extends CanvasController {
         this.data = d;
 
         if (this.data) {
-            let curID = this.data.infos.Keys[0];
+            const curID = this.data.infos.Keys[0];
             if (curID != this.lastID) {
                 this.lastSensorInfo = this.data.infos.SensorInfos[0];
                 this.lastID = curID;

@@ -66,7 +66,7 @@ var TextButton = (function (_super) {
             if (this.textNode.nodeValue)
                 return this.textNode.nodeValue;
             else
-                throw "textNode.nodeValue is null";
+                throw new Error("textNode.nodeValue is null");
         },
         set: function (value) {
             this.textNode.nodeValue = value;

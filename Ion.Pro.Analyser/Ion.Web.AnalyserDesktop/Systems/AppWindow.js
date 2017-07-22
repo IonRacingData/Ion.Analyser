@@ -155,7 +155,7 @@ var AppWindow = (function () {
     AppWindow.prototype.restoreSize = function () {
         this.setSize(this.width, this.height, false);
         if (this.sizeHandle.parentElement === null || this.sizeHandle.parentElement.parentElement === null) {
-            throw "Parent element is null exception, is the window body out of window container?";
+            throw new Error("Parent element is null exception, is the window body out of window container?");
         }
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
         var curHandle = this.sizeHandle.parentElement;
@@ -163,7 +163,7 @@ var AppWindow = (function () {
             curHandle.style.width = null;
             curHandle.style.height = null;
             if (curHandle.parentElement === null) {
-                throw "Parent element is null exception, is the window body out of window container?";
+                throw new Error("Parent element is null exception, is the window body out of window container?");
             }
             curHandle = curHandle.parentElement;
         }
@@ -181,7 +181,7 @@ var AppWindow = (function () {
                 break;
             }
             if (curHandle.parentElement === null) {
-                throw "Parent element is null exception, is the window body out of window container?";
+                throw new Error("Parent element is null exception, is the window body out of window container?");
             }
             curHandle = curHandle.parentElement;
         }

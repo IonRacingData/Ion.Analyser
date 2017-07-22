@@ -1,4 +1,4 @@
-﻿class BarController extends SingleValueController implements IConfigurable {
+class BarController extends SingleValueController implements IConfigurable {
     private bar1: HTMLElement;
     private bar2: HTMLElement;
     private barWrapper1: HTMLElement;
@@ -9,7 +9,7 @@
 
     private silhouette: string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="100%" height="100%" viewBox="0 0 152 316.2"><g id="XMLID_3_">	<rect id="XMLID_1_" x="0" class="silhouette" width="152" height="206"></rect>	<rect id="XMLID_2_" x="0" y="219.4" class="silhouette" width="152" height="96.9"></rect></g></svg>';
     private silhouetteContainer: HTMLElement;
-    private barContainer: HTMLElement;    
+    private barContainer: HTMLElement;
 
     private contentWrapper: HTMLElement;
 
@@ -18,12 +18,12 @@
         text: "Toggle direction",
         shortCut: "D",
         type: "direction",
-        value: Direction.Vertical
-    }
+        value: Direction.Vertical,
+    };
 
     public settings: IStorageList = {
-        toggleDirection: this.direction
-    }
+        toggleDirection: this.direction,
+    };
 
     public settingsChanged(key: string, value: IStorageObject<keyof IStorageTypes>) {
         this.setDirection(this.direction.value);
@@ -37,7 +37,7 @@
 
         this.wrapper = this.mk.tag("div", "bar-controller-wrapper");
         this.wrapper.setAttribute("tabindex", "0");
-        this.contentWrapper = this.mk.tag("div", "bar-controller-content");        
+        this.contentWrapper = this.mk.tag("div", "bar-controller-content");
 
         this.barContainer = this.mk.tag("div", "bar-controller-barContainer");
         this.silhouetteContainer = this.mk.tag("div", "bar-controller-silhouette");
@@ -64,13 +64,13 @@
         });
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => {
             if (e.key === "d") {
-                let dir = this.direction.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+                const dir = this.direction.value === Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
                 this.direction.value = dir;
                 this.setDirection(dir);
             }
         });
 
-        this.valWrapper = this.mk.tag("span", "controller-legend-value");        
+        this.valWrapper = this.mk.tag("span", "controller-legend-value");
         this.legendWrapper.appendChild(this.valWrapper);
 
         this.barContainer.style.display = "none";
@@ -78,9 +78,9 @@
         this.contentWrapper.appendChild(this.silhouetteContainer);
         this.contentWrapper.appendChild(this.barContainer);
         this.wrapper.appendChild(this.contentWrapper);
-        this.wrapper.appendChild(this.legendWrapper);        
+        this.wrapper.appendChild(this.legendWrapper);
     }
-    
+
     private setDirection(dir: Direction): void {
         if (dir === Direction.Horizontal) {
             this.bar1.style.height = "0";
@@ -139,19 +139,19 @@
             this.barContainer.style.display = "none";
             this.silhouetteContainer.style.display = "flex";
             return;
-        }        
+        }
 
-        let min = SensorInfoHelper.minValue(this.lastSensorInfo);
+        const min = SensorInfoHelper.minValue(this.lastSensorInfo);
         let val = this.percent * 100;
 
         if (this.direction.value === Direction.Horizontal) {
-            
+
             if (min < 0) {
                 val = (val - 50) * 2;
 
                 this.bar2.style.width = val < 0 ? "0%" : val + "%";
                 this.bar1.style.width = val < 0 ? Math.abs(val) + "%" : "0%";
-                
+
                 this.barWrapper1.style.justifyContent = "flex-end";
                 this.barWrapper2.style.display = "flex";
             }
@@ -163,7 +163,7 @@
             }
         }
         else {
-            
+
             if (min < 0) {
                 val = (val - 50) * 2;
 
@@ -185,5 +185,5 @@
 
 enum Direction {
     Horizontal = 1,
-    Vertical
+    Vertical,
 }

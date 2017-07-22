@@ -1,4 +1,4 @@
-﻿interface IApplication {
+interface IApplication {
     app: Application;
     main(...params: any[]): void;
 }
@@ -20,7 +20,7 @@ class Application {
     }
 
     private closeWindows() {
-        for (let win of this.windows) {
+        for (const win of this.windows) {
             win.close();
         }
     }

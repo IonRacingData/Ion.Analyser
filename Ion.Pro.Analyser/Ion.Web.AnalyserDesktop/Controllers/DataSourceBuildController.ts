@@ -1,4 +1,4 @@
-﻿class DataSourceBuildController extends Component{
+class DataSourceBuildController extends Component{
 
     private plot: IViewerBase<any>;
     private sensorGroup: string;
@@ -14,7 +14,7 @@
 
     private sourcesList: TempDataSourceList;
 
-    private availableSources: IDataSource<any>[];
+    private availableSources: Array<IDataSource<any>>;
 
     get viewer() {
         return this.plot;
@@ -26,7 +26,7 @@
 
         this.wrapper = this.mk.tag("div", "dsbController-wrapper");
         for (let i = 0; i < 3; i++) {
-            let div: HTMLElement = this.mk.tag("div", "dsbController-section");
+            const div: HTMLElement = this.mk.tag("div", "dsbController-section");
             this.subDivs.push(div);
             this.wrapper.appendChild(div);
         }
@@ -43,14 +43,14 @@
             this.chosenData = [];
             this.updateChosenList();
             this.btnMakeSource.disabled = true;
-        });        
-        
+        });
+
         this.determineGroup();
         this.listSensors();
         this.listDataSources();
         this.initChosenList();
 
-        let emptyDiv = document.createElement("div");
+        const emptyDiv = document.createElement("div");
         emptyDiv.style.height = "90px";
         emptyDiv.style.textAlign = "center";
         this.subDivs[1].appendChild(emptyDiv);
@@ -59,19 +59,19 @@
     }
 
     private generateSource(): void {
-        let sources: ISensorDataContainerTemplate[] = [];
-        for (let s of this.chosenData) {
+        const sources: ISensorDataContainerTemplate[] = [];
+        for (const s of this.chosenData) {
             sources.push({ name: s.SensorSet.Name, key: s.Key });
         }
 
-        let template: DataSourceTemplate = {
+        const template: DataSourceTemplate = {
             key: "",
             grouptype: this.sensorGroup,
             layers: [],
-            sources: sources
-        }
+            sources,
+        };
 
-        let ds = kernel.senMan.createDataSource(template);
+        const ds = kernel.senMan.createDataSource(template);
         if (ds) {
             kernel.senMan.registerDataSource(ds);
         }
@@ -82,15 +82,15 @@
     }
 
     private listSensors(): void {
-        let expList: ExpandableList = new ExpandableList();
+        const expList: ExpandableList = new ExpandableList();
         this.subDivs[0].appendChild(expList.wrapper);
 
-        let sensorsets: sensys.SensorDataSet[] = kernel.senMan.getLoadedDatasets();
-        let infos: sensys.ISensorInformation[] = [];
+        const sensorsets: sensys.SensorDataSet[] = kernel.senMan.getLoadedDatasets();
+        const infos: sensys.ISensorInformation[] = [];
 
-        for (let set of sensorsets) {
-            for (let key of set.LoadedKeys) {
-                let info: sensys.ISensorInformation = set.KeyInfoMap[key];
+        for (const set of sensorsets) {
+            for (const key of set.LoadedKeys) {
+                const info: sensys.ISensorInformation = set.KeyInfoMap[key];
                 if (info) {
                     infos.push(info);
                 }
@@ -100,43 +100,43 @@
             }
         }
 
-        let data: IExpandableListSection[] = [];
-        for (let info of infos) {
+        const data: IExpandableListSection[] = [];
+        for (const info of infos) {
             let found: boolean = false;
-            for (let section of data) {
+            for (const section of data) {
                 if (section.title === info.Name) {
                     found = true;
-                    section.items.push(<IExpandableListItem>{ text: info.SensorSet.Name, object: info });
+                    section.items.push({ text: info.SensorSet.Name, object: info } as IExpandableListItem);
                     break;
-                }                
+                }
             }
             if (!found) {
-                data.push(<IExpandableListSection>{ title: info.Name, items: [<IExpandableListItem>{ text: info.SensorSet.Name, object: info }] });
+                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info } as IExpandableListItem] } as IExpandableListSection);
             }
         }
 
         expList.selector = (item: IExpandableListSection) => {
-            return <IExpandableListSection>{
+            return {
                 title: item.title,
-                items: item.items
-            }
-        }
+                items: item.items,
+            } as IExpandableListSection;
+        };
 
         expList.data = data;
         expList.onItemClick.addEventListener((e) => {
             this.chosenListClickCounter++;
             if (this.chosenData.length < this.groupArgs) {
                 this.chosenData.push(e.data);
-                this.updateChosenList();                
+                this.updateChosenList();
             }
-            if (this.chosenData.length === this.groupArgs) {  
-                
+            if (this.chosenData.length === this.groupArgs) {
+
                 if (this.chosenListClickCounter > this.groupArgs) {
                     this.chosenData.pop();
                     this.chosenData.push(e.data);
                     this.updateChosenList();
                 }
-                
+
                 this.btnMakeSource.disabled = false;
             }
         });
@@ -153,8 +153,8 @@
             this.chosenList.rowInfoMarkers = ["X", "Y", "Z"];
         }
         this.chosenList.selector = (item: sensys.ISensorInformation) => {
-            return <IListBoxRearrangableItem>{ mainText: item.Name, infoText: item.SensorSet.Name };
-        }
+            return { mainText: item.Name, infoText: item.SensorSet.Name } as IListBoxRearrangableItem;
+        };
 
         this.subDivs[1].appendChild(this.chosenList.wrapper);
 
@@ -165,7 +165,7 @@
 
         this.chosenList.onItemRearrange.addEventListener((e) => {
             this.chosenData = this.chosenList.data;
-        });      
+        });
     }
 
     private fillLayerSection(): void {
@@ -178,10 +178,10 @@
     }
 
     private determineGroup(): void {
-        let s = kernel.senMan.getGroupByType(this.plot.type);
+        const s = kernel.senMan.getGroupByType(this.plot.type);
         if (s) {
-            this.sensorGroup = (<any>s).name;
-            this.groupArgs = (<any>s).numGroups;
+            this.sensorGroup = (s as any).name;
+            this.groupArgs = (s as any).numGroups;
             return;
         }
 
@@ -191,6 +191,6 @@
 }
 
 interface IExpListData {
-    title: string,
-    items: any[]
+    title: string;
+    items: any[];
 }

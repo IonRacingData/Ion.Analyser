@@ -1,4 +1,4 @@
-﻿interface IHelloPackage {
+interface IHelloPackage {
     Text: string;
 }
 
@@ -12,8 +12,6 @@ interface IMenuItem {
     name: string;
     runner: () => void;
 }
-
-
 
 /* tslint:disable:interface-name */
 interface EventTarget extends IEventManager {
@@ -67,7 +65,6 @@ class Color {
             b = 255 - b;
         }
 
-
         if (this.a) {
             return "rgba(" + r.toString() + ", " + g.toString() + ", " + b.toString() + ", " + this.a.toString() + ")";
         }
@@ -88,7 +85,6 @@ class Color {
         }
         while ((r + g + b) < lowLimit || (r + g + b) > highLimit);
 
-
         return new Color(r, g, b);
     }
 }
@@ -99,7 +95,6 @@ class SensorDataContainer {
     public points: SensorValue[];
     public info: sensys.ISensorInformation;
 
-
     constructor(id: string)
     constructor(id: string, p: SensorValue[] = []) {
         this.ID = id;
@@ -109,7 +104,7 @@ class SensorDataContainer {
     }
 
     insertSensorPackage(p: ISensorPackage[]) {
-        this.insertData(p.map((value: ISensorPackage, index: number, array: ISensorPackage[]) => { return new SensorValue(value.Value, value.TimeStamp); }));
+        this.insertData(p.map((value: ISensorPackage, index: number, array: ISensorPackage[]) => new SensorValue(value.Value, value.TimeStamp)));
     }
 
     pushArray<T>(to: T[], from: T[]) {
@@ -125,8 +120,8 @@ class SensorDataContainer {
                 //this.points.push(...p);
             }
             else {
-                let first = p[0];
-                let last = p[p.length - 1];
+                const first = p[0];
+                const last = p[p.length - 1];
                 if (first.timestamp > this.last().timestamp) {
                     this.pushArray(this.points, p);
                     //this.points.push(...p);
@@ -155,14 +150,14 @@ class SensorDataContainer {
 
     // returns index of closest point to 'p' on x-axis
     getClosesIndexOf(p: SensorValue): number {
-        var min: number = 0;
-        var max: number = this.points.length - 1;
-        var half: number;
+        let min: number = 0;
+        let max: number = this.points.length - 1;
+        let half: number;
         while (true) {
             half = Math.floor((min + max) / 2);
             if (half === min) {
-                var diffMin: number = p.timestamp - this.points[min].timestamp;
-                var diffMax: number = this.points[max].timestamp - p.timestamp;
+                const diffMin: number = p.timestamp - this.points[min].timestamp;
+                const diffMax: number = this.points[max].timestamp - p.timestamp;
                 if (diffMin < diffMax) {
                     return min;
                 }
@@ -207,14 +202,14 @@ class PlotDataHelper {
         if (plotData.length() == 0) {
             return -1;
         }
-        var min: number = 0;
-        var max: number = plotData.length() - 1;
-        var half: number;
+        let min: number = 0;
+        let max: number = plotData.length() - 1;
+        let half: number;
         while (true) {
             half = Math.floor((min + max) / 2);
             if (half === min) {
-                var diffMin: number = p.x - plotData.getValue(min).x;
-                var diffMax: number = plotData.getValue(max).x - p.x;
+                const diffMin: number = p.x - plotData.getValue(min).x;
+                const diffMax: number = plotData.getValue(max).x - p.x;
                 if (diffMin < diffMax) {
                     return min;
                 }
@@ -356,7 +351,7 @@ class Multicallback {
     }
 
     createCallback(): (param?: any) => void {
-        let current = this.curId;
+        const current = this.curId;
         this.curId++;
         return (param: any) => {
             this.responses[current] = param;
@@ -386,7 +381,7 @@ class SensorInfoHelper {
         else if (info.MaxValue) {
             val = info.MaxValue;
         }
-        else {            
+        else {
             /* tslint:disable:no-bitwise */
             val = (1 << info.Resolution) - 1;
             /* tslint:enable:no-bitwise */
@@ -394,7 +389,7 @@ class SensorInfoHelper {
                 console.log("fix this @Nicolas");
                 val++;
             }
-        }        
+        }
         return val;
     }
 
@@ -408,15 +403,15 @@ class SensorInfoHelper {
         }
         else if (info.Signed) {
             val = -SensorInfoHelper.maxValue(info) - 1;
-        }        
+        }
         return val;
     }
 
     public static getPercent(info: sensys.ISensorInformation, p: Point): Point {
-        let min = SensorInfoHelper.minValue(info);
-        let max = SensorInfoHelper.maxValue(info);
+        const min = SensorInfoHelper.minValue(info);
+        const max = SensorInfoHelper.maxValue(info);
 
-        let newVal = (p.y - min) / (max - min);
+        const newVal = (p.y - min) / (max - min);
         return new Point(p.x, newVal);
     }
 }

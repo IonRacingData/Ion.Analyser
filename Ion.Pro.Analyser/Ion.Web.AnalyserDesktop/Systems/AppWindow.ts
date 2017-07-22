@@ -1,4 +1,4 @@
-﻿class AppWindow implements IEventManager {
+class AppWindow implements IEventManager {
     app: Application;
     private _title: string;
     get title(): string {
@@ -42,7 +42,6 @@
     static readonly event_maximize = "maximize";
     static readonly event_mouseMove = "mouseMove";
 
-
     static readonly event_dragOver = "dragOver";
     static readonly event_dragRelease = "dragRelease";
 
@@ -74,37 +73,35 @@
     constructor(app: Application) {
         this.app = app;
 
-        var handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
+        let handle: HTMLElement = this.handle = kernel.winMan.makeWindowHandle(this);
         // kernel.winMan.registerWindow(this);
 
         handle.addEventListener("mousedown", (e: MouseEvent) => this.main_mouseDown(e));
         this.moveHandle = handle;
-        this.sizeHandle = <HTMLElement>handle.getElementsByClassName("window-body")[0];
+        this.sizeHandle = handle.getElementsByClassName("window-body")[0] as HTMLElement;
 
-        var headerBar: Element = handle.getElementsByClassName("window-header")[0];
-        var min: Element = handle.getElementsByClassName("window-control-min")[0];
-        var max: Element = handle.getElementsByClassName("window-control-max")[0];
-        var exit: Element = handle.getElementsByClassName("window-control-exit")[0];
-        var resize: HTMLElement = <HTMLElement>handle.getElementsByClassName("window-bottom-right")[0];
+        let headerBar: Element = handle.getElementsByClassName("window-header")[0];
+        let min: Element = handle.getElementsByClassName("window-control-min")[0];
+        let max: Element = handle.getElementsByClassName("window-control-max")[0];
+        let exit: Element = handle.getElementsByClassName("window-control-exit")[0];
+        let resize: HTMLElement = handle.getElementsByClassName("window-bottom-right")[0] as HTMLElement;
 
         headerBar.addEventListener("mousedown", (e: MouseEvent) => this.header_mouseDown(e));
         resize.addEventListener("mousedown", (e: MouseEvent) => this.resize_mouseDown(e));
 
-        (<HTMLDivElement>headerBar).addEventListener("touchstart", (e: TouchEvent) => this.header_touchStart(e));
-        (<HTMLDivElement>resize).addEventListener("touchstart", (e: TouchEvent) => this.resize_touchStart(e));
+        (headerBar as HTMLDivElement).addEventListener("touchstart", (e: TouchEvent) => this.header_touchStart(e));
+        (resize as HTMLDivElement).addEventListener("touchstart", (e: TouchEvent) => this.resize_touchStart(e));
 
         min.addEventListener("mousedown", (e: MouseEvent) => this.minimize_click(e));
         max.addEventListener("mousedown", (e: MouseEvent) => this.maximize_click(e));
         exit.addEventListener("mousedown", (e: MouseEvent) => this.close_click(e));
 
-
-
         this.handle.window = this;
 
         this.setPos(300, 50);
         this.setSize(500, 400);
-        this.windowElement = <HTMLElement>handle.getElementsByClassName("window")[0];
-        this.content = this.sizeHandle;// <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
+        this.windowElement = handle.getElementsByClassName("window")[0] as HTMLElement;
+        this.content = this.sizeHandle; // <HTMLElement>this.handle.getElementsByClassName("window-body")[0];
 
         this.content.addEventListener("mousemove", (e: MouseEvent) => this.content_mouseMove(e));
     }
@@ -195,19 +192,18 @@
     }
 
     public handleGlobalDrag(x: number, y: number, window: AppWindow): void {
-        this.onDragOver({ target: this, x: x, y: y, window: window });
+        this.onDragOver({ target: this, x, y, window });
     }
 
     public handleGlobalRelease(x: number, y: number, window: AppWindow): void {
-        this.onDragRelease({ target: this, x: x, y: y, window: window });
+        this.onDragRelease({ target: this, x, y, window });
     }
-
 
     /* Private stuff */
     private restoreSize(): void {
         this.setSize(this.width, this.height, false);
         if (this.sizeHandle.parentElement === null || this.sizeHandle.parentElement.parentElement === null) {
-            throw "Parent element is null exception, is the window body out of window container?";
+            throw new Error("Parent element is null exception, is the window body out of window container?");
         }
         this.sizeHandle.parentElement.parentElement.style.padding = "8px";
 
@@ -216,7 +212,7 @@
             curHandle.style.width = null;
             curHandle.style.height = null;
             if (curHandle.parentElement === null) {
-                throw "Parent element is null exception, is the window body out of window container?";
+                throw new Error("Parent element is null exception, is the window body out of window container?");
             }
             curHandle = curHandle.parentElement;
         }
@@ -236,7 +232,7 @@
                 break;
             }
             if (curHandle.parentElement === null) {
-                throw "Parent element is null exception, is the window body out of window container?";
+                throw new Error("Parent element is null exception, is the window body out of window container?");
             }
             curHandle = curHandle.parentElement;
         }
@@ -244,11 +240,11 @@
     }
 
     private removeHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = "none";
+        (this.handle.getElementsByClassName("window-header")[0] as HTMLElement).style.display = "none";
     }
 
     private restoreHeader() {
-        (<HTMLElement>this.handle.getElementsByClassName("window-header")[0]).style.display = null;
+        (this.handle.getElementsByClassName("window-header")[0] as HTMLElement).style.display = null;
     }
 
     private removePos(): void {
@@ -282,19 +278,17 @@
     onUpdate = newEvent("AppWindow.onUpdate");
 
     private __onMouseMove(x: number, y: number): void {
-        this.onMouseMove({ target: this, x: x, y: y });
+        this.onMouseMove({ target: this, x, y });
     }
 
     private __onDragOver(x: number, y: number, window: AppWindow): void {
-        this.onDragOver({ target: this, x: x, y: y, window: window });
+        this.onDragOver({ target: this, x, y, window });
     }
 
     private __onDragRelease(x: number, y: number, window: AppWindow): void {
         console.log("Release");
-        this.onDragRelease({ target: this, x: x, y: y, window: window });
+        this.onDragRelease({ target: this, x, y, window });
     }
-
-    
 
     close() {
         this.onClose({ target: this });
@@ -326,16 +320,16 @@
     }
 
     tile(state: TileState): void {
-        var topBar: number = 40;
-        var windowTitle: number = 30;
+        let topBar: number = 40;
+        let windowTitle: number = 30;
 
-        var windowWidth: number = window.innerWidth;
-        var windowHeight: number = window.innerHeight - topBar;
+        let windowWidth: number = window.innerWidth;
+        let windowHeight: number = window.innerHeight - topBar;
 
-        var newX: number = 0;
-        var newY: number = 40;
-        var newWidth: number = windowWidth / 2 - 1;
-        var newHeight: number = windowHeight / 2 - windowTitle;
+        let newX: number = 0;
+        let newY: number = 40;
+        let newWidth: number = windowWidth / 2 - 1;
+        let newHeight: number = windowHeight / 2 - windowTitle;
         switch (state) {
             case TileState.LEFT:
                 newHeight = windowHeight - windowTitle;
@@ -397,7 +391,7 @@
 
     changeWindowMode(mode: WindowMode): void {
         switch (mode) {
-            case WindowMode.BORDERLESSFULL: 
+            case WindowMode.BORDERLESSFULL:
                 this.removeSize();
                 this.removePos();
                 this.removeHeader();
@@ -419,14 +413,12 @@
 
     highlight(highlight: boolean) {
         if (highlight) {
-            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "block";
+            (this.handle.getElementsByClassName("window-overlay")[0] as HTMLElement).style.display = "block";
         }
         else {
-            (<HTMLElement>this.handle.getElementsByClassName("window-overlay")[0]).style.display = "none";
+            (this.handle.getElementsByClassName("window-overlay")[0] as HTMLElement).style.display = "none";
         }
     }
-
-
 
     __setRelativePos(x: number, y: number, storePos: boolean = true): void {
 
@@ -507,12 +499,12 @@ enum TileState {
     TOPLEFT = 2,
     TOPRIGHT = 3,
     BOTTOMLEFT = 4,
-    BOTTOMRIGHT = 5
+    BOTTOMRIGHT = 5,
 }
 
 enum WindowState {
     RESTORED = 0,
     MINIMIZED = 1,
     MAXIMIZED = 2,
-    TILED = 3
+    TILED = 3,
 }

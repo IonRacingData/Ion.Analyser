@@ -81,7 +81,7 @@ var NetworkManager = (function () {
             Status: ComMessageStatus.Request110,
             Path: path,
             Data: JSON.stringify(message),
-            MessageId: this.curId++
+            MessageId: this.curId++,
         };
         this.callback[pack.MessageId] = callback;
         if (!this.connectionOpen) {
@@ -97,7 +97,7 @@ var NetworkManager = (function () {
             this.socket.send(str);
         }
         else {
-            throw "Tried sending message over non existring socket";
+            throw new Error("Tried sending message over non existring socket");
         }
     };
     NetworkManager.prototype.receiveMessage = function (ev) {

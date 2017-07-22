@@ -81,7 +81,7 @@ var MenuWindow = (function () {
                             curItem.subMenu.style.display = "";
                             _this.selectedMenu = curItem;
                         }
-                    }
+                    },
                 }], curItem.name);
             li.appendChild(a);
             a.href = "#";

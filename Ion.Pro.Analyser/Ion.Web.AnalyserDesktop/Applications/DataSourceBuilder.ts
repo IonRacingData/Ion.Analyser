@@ -1,21 +1,21 @@
-﻿class DataSourceBuilder implements IApplication {
+class DataSourceBuilder implements IApplication {
     app: Application;
     window: AppWindow;
-    mk: HtmlHelper = new HtmlHelper();    
+    mk: HtmlHelper = new HtmlHelper();
 
     private dsb: DataSourceAssignmentController;
     private page1Width: number = 401.5;
-    private page2Width: number = 800;    
+    private page2Width: number = 800;
 
     public main(...args: any[]): void {
         let viewer: IViewerBase<any> | null = null;
         if (args) {
-            for (let arg of args) {
+            for (const arg of args) {
                 try {
                     viewer = arg;
                 }
-                catch(e) {
-                    console.log(<Error>e.message);
+                catch (e) {
+                    console.log(e.message as Error);
                 }
             }
         }
@@ -29,7 +29,7 @@
             this.dsb = new DataSourceAssignmentController();
         }
         this.window.content.appendChild(this.dsb.wrapper);
-        
+
         this.app.events.on(kernel.senMan.onRegisterViewer, () => {
             this.dsb.onViewersChange();
         });
@@ -37,7 +37,7 @@
             this.dsb.onViewersChange();
         });
         this.dsb.onPageSwitch.addEventListener((e) => {
-            let page: number = e.data;
+            const page: number = e.data;
             if (!this.window.state || this.window.state === 0) {
                 switch (page) {
                     case 1:
@@ -46,9 +46,9 @@
                     case 2:
                         this.window.setSize(this.page2Width, this.window.height);
                         break;
-                }                
+                }
             }
-        });        
+        });
     }
 }
 
@@ -76,12 +76,12 @@ class Carousel {
 
         this.navWrapper.appendChild(this.description);
 
-        this.btn_next= this.mk.tag("img");        
+        this.btn_next = this.mk.tag("img");
         this.btn_next.setAttribute("src", "arrow.png");
 
         this.navWrapper.appendChild(this.btn_next);
         this.btn_next.style.cssFloat = "right";
-        this.navWrapper.style.msUserSelect = "none";        
+        this.navWrapper.style.msUserSelect = "none";
 
         this.contentWrapper = this.mk.tag("div", "carousel_contentWrapper");
 
@@ -105,15 +105,15 @@ class Carousel {
         this.wrapper.appendChild(this.navWrapper);
     }
 
-    public addSlide(content: HTMLElement, description?: string) {        
-        let des = description || "";
-        let slide: ISlide = { slide: content, description: des };
+    public addSlide(content: HTMLElement, description?: string) {
+        const des = description || "";
+        const slide: ISlide = { slide: content, description: des };
 
         if (this.slides.length === 0) {
             this.contentWrapper.appendChild(content);
             this.description.innerHTML = des;
         }
-        
+
         this.slides.push(slide);
     }
 }

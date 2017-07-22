@@ -79,14 +79,14 @@ var DataSourceAssignmentController = (function (_super) {
                         if (_this.selectedViewer) {
                             _this.selectedViewer.plotWindow.highlight(true);
                         }
-                    }
+                    },
                 },
                 {
                     event: "mouseleave", func: function (e) {
                         if (_this.selectedViewer) {
                             _this.selectedViewer.plotWindow.highlight(false);
                         }
-                    }
+                    },
                 }
             ], this.selectedViewer.plotType);
             this.navElements[1].appendChild(viewer);
@@ -121,18 +121,18 @@ var DataSourceAssignmentController = (function (_super) {
                     _this.selectedRow.classList.add("selectedrow");
                     _this.selectedViewer = curPlot;
                     _this.displaySources();
-                }
+                },
             },
             {
                 event: "mouseenter", func: function (e) {
                     curPlot.plotWindow.highlight(true);
-                }
+                },
             },
             {
                 event: "mouseleave", func: function (e) {
                     curPlot.plotWindow.highlight(false);
-                }
-            }
+                },
+            },
         ], curPlot.plotType);
     };
     DataSourceAssignmentController.prototype.findTableRow = function (element) {

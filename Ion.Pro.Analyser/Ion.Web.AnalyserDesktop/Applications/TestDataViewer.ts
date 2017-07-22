@@ -1,4 +1,4 @@
-﻿class DataAssigner implements IApplication {
+class DataAssigner implements IApplication {
     app: Application;
     window: AppWindow;
     mk = new HtmlHelper();
@@ -18,26 +18,25 @@
 
     draw() {
         this.window.content.innerHTML = "";
-        let mk = this.mk;
-        let divLeft = mk.tag("div");
-        let divRight = this.sensorTable = mk.tag("div");
-        let tableGen = new HtmlTableGen("table selectable");
-        let senMan: sensys.SensorManager = kernel.senMan;
-        let last: { item: HTMLElement | null } = { item: null };
+        const mk = this.mk;
+        const divLeft = mk.tag("div");
+        const divRight = this.sensorTable = mk.tag("div");
+        const tableGen = new HtmlTableGen("table selectable");
+        const senMan: sensys.SensorManager = kernel.senMan;
+        const last: { item: HTMLElement | null } = { item: null };
         // let selectedPlot: IPlot = null;
         tableGen.addHeader("Plot name", "plot type");
         for (let i = 0; i < senMan.viewers.length; i++) {
-            let curPlot = senMan.viewers[i];
-            let isMulti = (<ICollectionViewer<any>>curPlot).dataCollectionSource !== undefined;
+            const curPlot = senMan.viewers[i];
+            const isMulti = (curPlot as ICollectionViewer<any>).dataCollectionSource !== undefined;
             if (this.selected) {
                 this.drawRow(curPlot, isMulti, tableGen, last, true);
             }
             else {
                 this.drawRow(curPlot, isMulti, tableGen, last, false);
             }
-            
-        }
 
+        }
 
         divLeft.appendChild(tableGen.generate());
         divLeft.style.minWidth = "250px";
@@ -52,47 +51,46 @@
         this.window.content.appendChild(divRight);
     }
 
-
     private drawRow(curPlot: IViewerBase<any>, isMulti: boolean, tableGen: HtmlTableGen, last: { item: HTMLElement | null }, preSelect: boolean): void {
         let name = "Single Plot";
         if (isMulti) {
             name = "Multi Plot";
         }
-        tableGen.addRow([   
+        tableGen.addRow([
             {
                 event: "click", func: (e: Event) => {
                     if (last.item !== null) {
                         last.item.classList.remove("selectedrow");
                     }
-                    last.item = this.findTableRow(<HTMLElement>e.target);
+                    last.item = this.findTableRow(e.target as HTMLElement);
                     last.item.classList.add("selectedrow");
-                    let sources = kernel.senMan.getDataSources(curPlot.type);
+                    const sources = kernel.senMan.getDataSources(curPlot.type);
                     if (isMulti) {
-                        this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
+                        this.drawMultiSensors(curPlot as ICollectionViewer<any>, sources);
                     }
                     else {
-                        this.drawSingleSensors(<IViewer<any>>curPlot, sources);
+                        this.drawSingleSensors(curPlot as IViewer<any>, sources);
                     }
-                }
+                },
             },
             {
                 event: "mouseenter", func: (e: Event) => {
                     curPlot.plotWindow.highlight(true);
-                }
+                },
             },
             {
                 event: "mouseleave", func: (e: Event) => {
                     curPlot.plotWindow.highlight(false);
-                }
+                },
             },
         ], curPlot.plotType, name);
 
-        let sources = kernel.senMan.getDataSources(curPlot.type);
+        const sources = kernel.senMan.getDataSources(curPlot.type);
         if (isMulti) {
-            this.drawMultiSensors(<ICollectionViewer<any>>curPlot, sources);
+            this.drawMultiSensors(curPlot as ICollectionViewer<any>, sources);
         }
         else {
-            this.drawSingleSensors(<IViewer<any>>curPlot, sources);
+            this.drawSingleSensors(curPlot as IViewer<any>, sources);
         }
     }
 
@@ -105,18 +103,16 @@
         return curElement;
     }
 
-
-    drawSingleSensors(plot: IViewer<any>, info: IDataSource<any>[]) {
+    drawSingleSensors(plot: IViewer<any>, info: Array<IDataSource<any>>) {
         this.drawSensors<IViewer<any>>(plot, info, this.createSingleSensor);
     }
 
-    drawMultiSensors(plot: ICollectionViewer<any>, info: IDataSource<any>[]) {
+    drawMultiSensors(plot: ICollectionViewer<any>, info: Array<IDataSource<any>>) {
         this.drawSensors<ICollectionViewer<any>>(plot, info, this.createMultiSensor);
     }
 
-
     createSingleSensor(plot: IViewer<any>, sensor: IDataSource<any>): HTMLElement {
-        let radio = <HTMLInputElement>this.mk.tag("input");
+        const radio = this.mk.tag("input") as HTMLInputElement;
         radio.type = "radio";
         radio.name = "sensor";
         if (plot.dataSource && plot.dataSource === sensor) {
@@ -137,13 +133,13 @@
                 plot.dataUpdate();
                 radio.disabled = false;
             }
-            
+
         });
         return radio;
     }
 
     createMultiSensor(plot: ICollectionViewer<any>, sensor: IDataSource<any>): HTMLElement {
-        let checkBox = <HTMLInputElement>this.mk.tag("input");
+        const checkBox = this.mk.tag("input") as HTMLInputElement;
         checkBox.type = "checkbox";
         for (let i = 0; i < plot.dataCollectionSource.length; i++) {
             if (plot.dataCollectionSource[i] === sensor) {
@@ -182,19 +178,19 @@
         return checkBox;
     }
 
-    drawSensors<T extends IViewerBase<any>>(plot: T, info: IDataSource<any>[], drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
+    drawSensors<T extends IViewerBase<any>>(plot: T, info: Array<IDataSource<any>>, drawMethod: (plot: T, sensor: IDataSource<any>) => HTMLElement) {
         this.sensorTable.innerHTML = "";
         for (let i = 0; i < info.length; i++) {
-            let sensor = info[i];
-            let ctrl = drawMethod.call(this, plot, sensor);
-            let label = this.mk.tag("label", "listitem");
-            let firstInfo = sensor.infos.SensorInfos[0];
+            const sensor = info[i];
+            const ctrl = drawMethod.call(this, plot, sensor);
+            const label = this.mk.tag("label", "listitem");
+            const firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
-            let innerBox = this.mk.tag("div");
+            const innerBox = this.mk.tag("div");
             innerBox.style.display = "inline-block";
             innerBox.style.verticalAlign = "middle";
             innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
@@ -254,25 +250,25 @@ class SensorSetSelector implements IApplication {
 
     private drawData(data: ISensorSetInformation[]): void {
         this.wrapper.innerHTML = "";
-        var table = new HtmlTableGen("table selectable");
+        const table = new HtmlTableGen("table selectable");
 
         table.addHeader("File name", "File size", "Sensor reader");
-        for (let a of data) {
+        for (const a of data) {
             table.addRow(
                 [
                     {
-                        "event": "click",
-                        "func": (event: Event) => {
+                        event: "click",
+                        func: (event: Event) => {
                             // console.log("you clicked on: " + a.FileName);
                             kernel.senMan.load(a.FullFileName);
                             //requestAction("LoadDataset?file=" + a.FullFileName, (data: any) => { });
                             //kernel.senMan.clearCache();
-                        }
-                    }
+                        },
+                    },
                 ],
                 a.FileName,
                 a.Size,
-                a.FileReader
+                a.FileReader,
             );
         }
 
