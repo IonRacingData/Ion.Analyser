@@ -12,6 +12,6 @@
         "newLine": "LF"
     },
     "include": [
-        "src/**/*"
+        "**/*"
     ]
 }
