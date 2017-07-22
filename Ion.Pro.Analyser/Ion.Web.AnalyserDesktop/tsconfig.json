@@ -2,14 +2,14 @@
     "compilerOptions": {
         "outDir": "./dist/",
         "module": "commonjs",
-        "target": "es2015",
+        "target": "es5",
         "noImplicitAny": true,
         "strictNullChecks": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": false,
         "jsx": "react",
-        "newLine": "LF"
+        "newLine": "CRLF"
     },
     "include": [
         "**/*"
