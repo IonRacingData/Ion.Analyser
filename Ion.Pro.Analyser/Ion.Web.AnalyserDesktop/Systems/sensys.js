@@ -24,6 +24,8 @@ var Kernel;
                 this.groups = [];
                 this.__telemetryAvailable = false;
                 this.telemetryDataSet = null;
+                this.telemetryReceiving = false;
+                this.ontelemetry = newEvent("SensorManager.ontelemetry");
                 this.onRegisterViewer = newEvent("SensorManager.onRegisterViewer");
                 this.onUnRegisterViewer = newEvent("SensorManager.onUnRegisterViewer");
                 this.callbackStack = [];
@@ -45,6 +47,13 @@ var Kernel;
                             break;
                         case "/sensor/update":
                             _this.handleService(_this.convertToSensorPackage(data.Sensors));
+                            clearTimeout(_this.timeOut);
+                            _this.telemetryReceiving = true;
+                            _this.ontelemetry({ target: _this });
+                            _this.timeOut = setTimeout(function () {
+                                _this.telemetryReceiving = false;
+                                _this.ontelemetry({ target: _this });
+                            }, 3000);
                             break;
                     }
                 });

@@ -180,6 +180,7 @@ class StatusBar extends Applet {
     }
 
     telemetryStatus(): HTMLElement{
+
         let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" style="enable-background:new 0 0 1000 1000;" xml:space="preserve"><style type="text/css">.lines{fill:none;stroke:#FFFFFF;stroke-width:50;stroke-miterlimit:10;}</style><g id="XMLID_53_"><g id="XMLID_17_"><g id="XMLID_34_"><path id="XMLID_37_" class="lines" d="M184.3,19.7C103.5,100.5,53.5,212.1,53.5,335.4c0,121.2,48.3,231.1,126.7,311.5"/><path id="XMLID_38_" class="lines" d="M819.8,646.9c78.4-80.5,126.7-190.3,126.7-311.5c0-123.3-50-234.9-130.8-315.7"/><path id="XMLID_82_" class="lines" d="M184.3,19.7"/><path id="XMLID_81_" class="lines" d="M815.7,19.7"/></g><g id="XMLID_6_"><path id="XMLID_83_" class="lines" d="M300.3,134.9c-51.1,51.1-82.7,121.7-82.7,199.7c0,76.7,30.6,146.2,80.1,197.1"/><path id="XMLID_40_" class="lines" d="M702.3,531.7c49.6-50.9,80.1-120.4,80.1-197.1c0-78-31.6-148.6-82.7-199.7"/><path id="XMLID_39_" class="lines" d="M300.3,134.9"/><path id="XMLID_35_" class="lines" d="M699.7,134.9"/></g></g><line id="XMLID_36_" class="lines" x1="500" y1="302.5" x2="500" y2="1000"/></g></svg>';
         let tag = this.mk.tag(
             "div"
@@ -189,7 +190,18 @@ class StatusBar extends Applet {
         );
         tag.style.width = "20px";
         tag.style.height = "20px";
-        tag.style.display = "inline-block";        
+        tag.style.display = "none";
+        if (kernel.senMan.telemetryReceiving) {
+            tag.style.display = "inline-block";
+        }
+
+        kernel.senMan.ontelemetry.addEventListener(() => {
+            if (kernel.senMan.telemetryReceiving) {
+                tag.style.display = "inline-block";
+            } else {
+                tag.style.display = "none";
+            }
+        });
         //tag.style.padding = "10px";
 
         return tag;

@@ -167,6 +167,17 @@ namespace Ion.Pro.Analyser.SenSys
         }
     }
 
+    public class Sensor2017Provider : ISensorReaderProvider
+    {
+        public string KeyIDMapPath { get; } = "Sensors/Data2017/Sensor.json";
+        public string CalibrationFilePath { get; } = "Sensors/Data2017/SensorInfo.json";
+
+        public ISensorReader GetSensorReader(string name)
+        {
+            return new Sensor2017Reader(name);
+        }
+    }
+
     public class GPSCSVSensorProvider : ISensorReaderProvider
     {
         public string KeyIDMapPath => "Sensors/Data2016/Sensor.json";
@@ -244,7 +255,7 @@ namespace Ion.Pro.Analyser.SenSys
         {
             if (!this.LoadedDataSets.ContainsKey(dataSet))
             {
-                this.LoadedDataSets[dataSet] = new SensorDataSet(dataSet, new LegacySensorProvider());
+                this.LoadedDataSets[dataSet] = new SensorDataSet(dataSet, new Sensor2017Provider());
                 this.LoadedDataSets[dataSet].Load(false);
                 this.LoadedDataSets[dataSet].SetNames(this);
             }

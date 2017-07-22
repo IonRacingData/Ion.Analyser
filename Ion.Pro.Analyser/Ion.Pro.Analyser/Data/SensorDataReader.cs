@@ -65,6 +65,59 @@ namespace Ion.Pro.Analyser.Data
 
     }
 
+    public class Sensor2017Reader : ISensorReader
+    {
+        string sensorFile;
+
+        public Sensor2017Reader(string file)
+        {
+            this.sensorFile = file;
+        }
+
+        public SensorPackage[] ReadPackages()
+        {
+            BinaryReader reader = new BinaryReader(new FileStream(sensorFile, FileMode.Open));
+            List<SensorPackage> packages = new List<SensorPackage>();
+            SensorPackage lastPackage = new SensorPackage();
+            int ignoredPackages = 0;
+            while (reader.BaseStream.Position < reader.BaseStream.Length - 10)
+            {
+                SensorPackage package = new SensorPackage();
+                package.ID = reader.ReadByte() << 8 | reader.ReadByte();
+                package.Value = reader.ReadUInt32();
+                package.TimeStamp = reader.ReadUInt32();
+                if (!(package.ID == 0 && package.Value == 0 && package.TimeStamp == 0))
+                {
+                    if (package.ID >= 0xF000)
+                    {
+                        ignoredPackages++;
+                        continue;
+                    }
+                    packages.Add(package);
+                }
+
+                if (package.ID == 0x180)
+                {
+                    packages.AddRange(SensorExtracter.ExtractMotorContoller(package));
+                    //System.Diagnostics.Debugger.Break();
+                }
+                if (lastPackage.ID >= 0x622 && lastPackage.ID <= 0x628 && package.ID == lastPackage.ID)
+                {
+                    packages.AddRange(SensorExtracter.ExtractBMS(lastPackage, package));
+                }
+
+
+                lastPackage = package;
+            }
+            reader.Close();
+            return packages.ToArray();
+        }
+
+
+    }
+
+    
+
     public static class SensorExtracter
     {
         static Dictionary<int, int> mcIdMap = new Dictionary<int, int>()

@@ -65,8 +65,8 @@
     <None Include="ClassDiagram1.cd" />
     <None Include="Content\testpdf.pdf" />
     <None Include="Data\freq.log16" />
+    <None Include="Data\Sets\0006_logfile.log17" />
     <None Include="Data\Sets\167_usart_data.log16" />
-    <None Include="Data\Sets\195_usart_data.log" />
     <None Include="Data\Sets\195_usart_data.log16" />
     <None Include="Data\sinus.log16" />
     <None Include="Sensors\Data2016\SensorInfo.json">
@@ -77,6 +77,12 @@
     <None Include="Data\fredrikgps.gpx" />
     <None Include="Data\GPS_DataFile.gpscsv" />
     <None Include="Sensors\Data2016\Sensor.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sensors\Data2017\Sensor.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sensors\Data2017\SensorInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sensors\TypeDef\sensorInformationTypeDef.json" />

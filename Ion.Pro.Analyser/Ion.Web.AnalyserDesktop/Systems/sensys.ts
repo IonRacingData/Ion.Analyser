@@ -13,6 +13,9 @@
         }
 
         private telemetryDataSet: SensorDataSet | null = null;
+        public telemetryReceiving: boolean = false;
+
+        public ontelemetry = newEvent<IEventData>("SensorManager.ontelemetry");
 
         //static readonly event_registerViewer = "registerViewer";
         //static readonly event_unregisterViewer = "unregisterViewer";
@@ -22,6 +25,8 @@
             //this.loadSensorInformation();
         }
 
+        private timeOut: number;
+
         public lateInit(): void {
             kernel.netMan.registerService(10, (path: string, data: any) => {
                 switch (path) {
@@ -30,6 +35,13 @@
                         break;
                     case "/sensor/update":
                         this.handleService(this.convertToSensorPackage(data.Sensors));
+                        clearTimeout(this.timeOut);
+                        this.telemetryReceiving = true;
+                        this.ontelemetry({ target: this });
+                        this.timeOut = setTimeout(() => {
+                            this.telemetryReceiving = false;
+                            this.ontelemetry({ target: this });
+                        }, 3000);
                         break;
                 }
             });

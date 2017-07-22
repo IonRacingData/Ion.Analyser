@@ -174,7 +174,18 @@ var StatusBar = (function (_super) {
         var tag = this.mk.tag("div", "telemetry-symbol", null, svg);
         tag.style.width = "20px";
         tag.style.height = "20px";
-        tag.style.display = "inline-block";
+        tag.style.display = "none";
+        if (kernel.senMan.telemetryReceiving) {
+            tag.style.display = "inline-block";
+        }
+        kernel.senMan.ontelemetry.addEventListener(function () {
+            if (kernel.senMan.telemetryReceiving) {
+                tag.style.display = "inline-block";
+            }
+            else {
+                tag.style.display = "none";
+            }
+        });
         //tag.style.padding = "10px";
         return tag;
     };

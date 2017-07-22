@@ -131,6 +131,7 @@ namespace Ion.Pro.Analyser
             manager.RegisterFileProvider("log16", new LegacySensorProvider());
             manager.RegisterFileProvider("log", new LegacySensorProvider());
             manager.RegisterFileProvider("gpscsv", new GPSCSVSensorProvider());
+            manager.RegisterFileProvider("log17", new Sensor2017Provider());
             ComBus.GetDefault().RegisterClient(new NewSensorComService(manager));
         }
 
@@ -169,6 +170,7 @@ namespace Ion.Pro.Analyser
             SensorDataStore.GetDefault().ReaderLinker.Add("log16", typeof(LegacySensorReader));
             SensorDataStore.GetDefault().ReaderLinker.Add("gpscsv", typeof(GPSDataReader));
             SensorDataStore.GetDefault().ReaderLinker.Add("gpx", typeof(GPXDataReader));
+            SensorDataStore.GetDefault().ReaderLinker.Add("log17", typeof(Sensor2017Reader));
 
         }
 

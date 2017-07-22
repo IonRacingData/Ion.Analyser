@@ -39,11 +39,14 @@ function startUp() {
 
     kernel.senMan.lateInit(); // Late init because it needs netMan
 
-    kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
+    //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
-    kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
-    kernel.senMan.load("../../Data/GPS_DataFile.gpscsv");
+    //kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
+    //kernel.senMan.load("../../Data/GPS_DataFile.gpscsv");
     // kernel.senMan.setGlobal(841);
+    //kernel.senMan.load("../../Data/Sets/0006_logfile.log17");
+    kernel.senMan.load("../../Data/Sets/data/0017_logfile.log17");
+    kernel.senMan.load("../../Data/Sets/data/0015_logfile.log17");
 
     registerLaunchers();
     registerSensorGroups();
