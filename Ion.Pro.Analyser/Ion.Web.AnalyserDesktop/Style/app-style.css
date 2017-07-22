@@ -137,6 +137,10 @@ span.table-resize{
     color: black;
 }
 
+.controller-legend-value {
+    background-color: #dbdbdb;
+}
+
 .silhouette {
     fill: #eaeaea;
     transition: fill 0.3s;

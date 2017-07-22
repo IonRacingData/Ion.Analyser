@@ -179,16 +179,15 @@ class StatusBar extends Applet {
         });        
     }
 
-    telemetryStatus(): HTMLElement{
-
-        let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" style="enable-background:new 0 0 1000 1000;" xml:space="preserve"><style type="text/css">.lines{fill:none;stroke:#FFFFFF;stroke-width:50;stroke-miterlimit:10;}</style><g id="XMLID_53_"><g id="XMLID_17_"><g id="XMLID_34_"><path id="XMLID_37_" class="lines" d="M184.3,19.7C103.5,100.5,53.5,212.1,53.5,335.4c0,121.2,48.3,231.1,126.7,311.5"/><path id="XMLID_38_" class="lines" d="M819.8,646.9c78.4-80.5,126.7-190.3,126.7-311.5c0-123.3-50-234.9-130.8-315.7"/><path id="XMLID_82_" class="lines" d="M184.3,19.7"/><path id="XMLID_81_" class="lines" d="M815.7,19.7"/></g><g id="XMLID_6_"><path id="XMLID_83_" class="lines" d="M300.3,134.9c-51.1,51.1-82.7,121.7-82.7,199.7c0,76.7,30.6,146.2,80.1,197.1"/><path id="XMLID_40_" class="lines" d="M702.3,531.7c49.6-50.9,80.1-120.4,80.1-197.1c0-78-31.6-148.6-82.7-199.7"/><path id="XMLID_39_" class="lines" d="M300.3,134.9"/><path id="XMLID_35_" class="lines" d="M699.7,134.9"/></g></g><line id="XMLID_36_" class="lines" x1="500" y1="302.5" x2="500" y2="1000"/></g></svg>';
+    telemetryStatus(): HTMLElement {
+        let svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve"><style type="text/css">.lines{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}</style><g id="XMLID_63_"><g id="XMLID_65_"><g id="XMLID_71_"><path id="XMLID_75_" class="lines" d="M3.6,0.2C2,1.9,1,4.1,1,6.6c0,2.4,1,4.7,2.6,6.3"/><path id="XMLID_74_" class="lines" d="M16.4,12.9C18,11.3,19,9,19,6.6c0-2.5-1-4.7-2.6-6.4"/><path id="XMLID_73_" class="lines" d="M3.6,0.2"/><path id="XMLID_72_" class="lines" d="M16.4,0.2"/></g><g id="XMLID_66_"><path id="XMLID_70_" class="lines" d="M6,2.6c-1,1-1.7,2.5-1.7,4c0,1.5,0.6,2.9,1.6,4"/><path id="XMLID_69_" class="lines" d="M14.1,10.6c1-1,1.6-2.4,1.6-4c0-1.6-0.6-3-1.7-4"/><path id="XMLID_68_" class="lines" d="M6,2.6"/><path id="XMLID_67_" class="lines" d="M14,2.6"/></g></g><line id="XMLID_64_" class="lines" x1="10" y1="5.9" x2="10" y2="20"/></g></svg>';
         let tag = this.mk.tag(
             "div"
             , "telemetry-symbol"
             , null
             , svg
         );
-        tag.style.width = "20px";
+        tag.style.width = "19px";
         tag.style.height = "20px";
         tag.style.display = "none";
         if (kernel.senMan.telemetryReceiving) {

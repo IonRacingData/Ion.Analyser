@@ -292,10 +292,25 @@ span.table-resize{
     /*position: relative;*/
 }
 
-.controller-legend {   
+.controller-legend {
     font-size: 0.7em;
-    padding: 1px 0;
+    /*padding: 1px 0;*/
     text-align: center;
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
+}
+
+.controller-legend-value {
+    position: absolute;
+    right: 5px;
+    padding-left: 5px;
+    text-align: right;
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
 }
 
 .gauge-controller-wrapper {
@@ -461,17 +476,20 @@ span.table-resize{
     padding: 5px 5px;
 }
 
-.small {
-    font-size: 0.6em;
+.listitem:hover {
+    cursor: pointer;
 }
 
-.comp-button {    
+.comp-button {
     display: inline-block;
     padding: 3px 5px;
     margin: 1px;
     min-width: 70px;
     text-align: center;
-    min-height: 23px;    
+    -moz-transition: background 0.3s;
+    -o-transition: background 0.3s;
+    -webkit-transition: background 0.3s;
+    transition: background 0.3s;
 }
 
 .comp-button:hover {

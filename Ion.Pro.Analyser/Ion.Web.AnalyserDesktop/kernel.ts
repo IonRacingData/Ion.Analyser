@@ -195,6 +195,56 @@ function registerGridPresets() {
             }
         ]
     }));
+
+    kernel.appMan.registerApplication("Grid Preset", new Launcher(GridViewer, "Battery Receive", <IGridLanchTemplate>{
+        name: "Battery Receive",
+        grid: {
+            data: [
+                /*{ name: "DataAssigner", data: null },*/
+                { name: "LineChartTester", data: ["volt"] },
+                {
+                    data: [
+                        {
+                            data: [
+                                { name: "BarTester", data: ["batTemp"] },
+                                { name: "BarTester", data: ["batTemp"] },
+                                { name: "BarTester", data: ["volt"] },
+                                { name: "BarTester", data: ["soc"] }
+                            ]
+                        },
+                        { name: "GaugeTester", data: ["current"] },
+                        { name: "LineChartTester", data: ["current"] }
+                    ]
+                }
+            ]
+        },
+        sensorsets: [
+            {
+                grouptype: "PointSensorGroup",
+                key: "batTemp",
+                layers: [],
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "current",
+                layers: [],
+                sources: [{ key: "CURRENT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "volt",
+                layers: [],
+                sources: [{ key: "BMS_VOLT", name: "telemetry" }]
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "soc",
+                layers: [],
+                sources: [{ key: "BMS_SOC", name: "telemetry" }]
+            }
+        ]
+    }));
 }
 
 

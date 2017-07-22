@@ -3,6 +3,7 @@
     private bar2: HTMLElement;
     private barWrapper1: HTMLElement;
     private barWrapper2: HTMLElement;
+    private valWrapper: HTMLElement;
     //private direction: Direction;
     private double: boolean = false;
 
@@ -69,12 +70,15 @@
             }
         });
 
+        this.valWrapper = this.mk.tag("span", "controller-legend-value");        
+        this.legendWrapper.appendChild(this.valWrapper);
+
         this.barContainer.style.display = "none";
         this.barContainer.style.flexGrow = "1";
         this.contentWrapper.appendChild(this.silhouetteContainer);
         this.contentWrapper.appendChild(this.barContainer);
         this.wrapper.appendChild(this.contentWrapper);
-        this.wrapper.appendChild(this.legendWrapper);
+        this.wrapper.appendChild(this.legendWrapper);        
     }
     
     private setDirection(dir: Direction): void {
@@ -106,7 +110,11 @@
     }
 
     protected onSensorChange(): void {
-        
+        this.legendWrapper.appendChild(this.valWrapper);
+        if (this.data) {
+            this.bar1.style.backgroundColor = this.data.color.toString();
+            this.bar2.style.backgroundColor = this.data.color.toString();
+        }
     }
 
     public test_setValue(val: number): void {
@@ -131,10 +139,9 @@
             this.barContainer.style.display = "none";
             this.silhouetteContainer.style.display = "flex";
             return;
-        }
+        }        
 
         let min = SensorInfoHelper.minValue(this.lastSensorInfo);
-
         let val = this.percent * 100;
 
         if (this.direction.value === Direction.Horizontal) {
@@ -171,6 +178,8 @@
                 this.barWrapper2.style.display = "none";
             }
         }
+
+        this.valWrapper.innerHTML = this.value.toFixed(2);
     }
 }
 

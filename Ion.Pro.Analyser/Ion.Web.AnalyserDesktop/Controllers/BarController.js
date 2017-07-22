@@ -56,6 +56,8 @@ var BarController = (function (_super) {
                 _this.setDirection(dir);
             }
         });
+        _this.valWrapper = _this.mk.tag("span", "controller-legend-value");
+        _this.legendWrapper.appendChild(_this.valWrapper);
         _this.barContainer.style.display = "none";
         _this.barContainer.style.flexGrow = "1";
         _this.contentWrapper.appendChild(_this.silhouetteContainer);
@@ -94,6 +96,11 @@ var BarController = (function (_super) {
         this.contentWrapper.style.height = this.height - this.legendHeight + "px";
     };
     BarController.prototype.onSensorChange = function () {
+        this.legendWrapper.appendChild(this.valWrapper);
+        if (this.data) {
+            this.bar1.style.backgroundColor = this.data.color.toString();
+            this.bar2.style.backgroundColor = this.data.color.toString();
+        }
     };
     BarController.prototype.test_setValue = function (val) {
         if (val > 1) {
@@ -143,6 +150,7 @@ var BarController = (function (_super) {
                 this.barWrapper2.style.display = "none";
             }
         }
+        this.valWrapper.innerHTML = this.value.toFixed(2);
     };
     return BarController;
 }(SingleValueController));
