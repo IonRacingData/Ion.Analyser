@@ -81,41 +81,41 @@
   },
   {
     "Key": "BRAKE_PRESS_FRONT",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 68.948
   },
   {
     "Key": "BRAKE_PRESS_BACK",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 68.948
   },
   {
     "Key": "TEMP_AIR",
-    "Resolution": 16
+    "Resolution": 12
   },
   {
     "Key": "ACC_PEDAL_1",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 100
   },
   {
     "Key": "ACC_PEDAL_2",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 100
   },
   {
     "Key": "BRAKE_PEDAL_1",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 100
   },
   {
     "Key": "STEERING",
-    "Resolution": 16,
+    "Resolution": 12,
     "MinValue": 0,
     "MaxValue": 360
   },
@@ -147,19 +147,27 @@
   },
   {
     "Key": "WATER_TEMP_1",
-    "Resolution": 16
+    "Resolution": 12,
+    "MinValue": -50,
+    "MaxValue": 150
   },
   {
     "Key": "WATER_TEMP_2",
-    "Resolution": 16
+    "Resolution": 12,
+    "MinValue": -50,
+    "MaxValue": 150
   },
   {
     "Key": "WATER_TEMP_3",
-    "Resolution": 16
+    "Resolution": 12,
+    "MinValue": -50,
+    "MaxValue": 150
   },
   {
     "Key": "WATER_TEMP_4",
-    "Resolution": 16
+    "Resolution": 12,
+    "MinValue": -50,
+    "MaxValue": 150
   },
   {
     "Key": "DASH_7_SEGMENT",

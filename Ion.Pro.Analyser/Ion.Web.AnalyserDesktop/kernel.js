@@ -19,6 +19,7 @@ function startUp() {
     //kernel.senMan.load("../../Data/Sets/0006_logfile.log17");
     kernel.senMan.load("../../Data/Sets/data/0017_logfile.log17");
     kernel.senMan.load("../../Data/Sets/data/0015_logfile.log17");
+    kernel.senMan.load("../../Data/Sets/data2/0035_logfile.log17");
     registerLaunchers();
     registerSensorGroups();
     var mk = new HtmlHelper();
