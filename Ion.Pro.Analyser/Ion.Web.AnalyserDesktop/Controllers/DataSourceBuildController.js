@@ -84,7 +84,7 @@ var DataSourceBuildController = (function (_super) {
             var set = sensorsets_1[_i];
             for (var _a = 0, _b = set.LoadedKeys; _a < _b.length; _a++) {
                 var key = _b[_a];
-                var info = set.KeyInfoMap[key];
+                var info = set.SensorData[key].info;
                 if (info) {
                     infos.push(info);
                 }

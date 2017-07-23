@@ -101,9 +101,16 @@ namespace Ion.Pro.Analyser.Data
                     packages.AddRange(SensorExtracter.ExtractMotorContoller(package));
                     //System.Diagnostics.Debugger.Break();
                 }
-                if (lastPackage.ID >= 0x622 && lastPackage.ID <= 0x628 && package.ID == lastPackage.ID)
+                if (lastPackage.ID >= 0x622 && lastPackage.ID <= 0x628)
                 {
-                    packages.AddRange(SensorExtracter.ExtractBMS(lastPackage, package));
+                    if (package.ID == lastPackage.ID)
+                    {
+                        packages.AddRange(SensorExtracter.ExtractBMS(lastPackage, package));
+                    }
+                    else
+                    {
+                        packages.AddRange(SensorExtracter.ExtractBMSShort(lastPackage));
+                    }
                 }
 
 
@@ -187,6 +194,64 @@ namespace Ion.Pro.Analyser.Data
                     returnPackages.Add(GenerateFrom(a, 0xF017, bytesA[3])); //Min Res#
                     returnPackages.Add(GenerateFrom(a, 0xF018, bytesB[0])); //Max Res
                     returnPackages.Add(GenerateFrom(a, 0xF019, bytesB[1])); //Max Res#
+                    break;
+            }
+            return returnPackages.ToArray();
+        }
+
+        public static SensorPackage[] ExtractBMSShort(SensorPackage a)
+        {
+            byte[] bytesA = BitConverter.GetBytes((int)a.Value);
+            //byte[] bytesB = BitConverter.GetBytes((int)b.Value);
+            List<SensorPackage> returnPackages = new List<SensorPackage>();
+            switch (a.ID)
+            {
+                case 0x622:
+                    returnPackages.Add(GenerateFrom(a, 0xF020, bytesA[0]));
+                    returnPackages.Add(GenerateFrom(a, 0xF021, ToBigUInt16(bytesA, 1)));
+                    returnPackages.Add(GenerateFrom(a, 0xF022, bytesA[3]));
+                    //returnPackages.Add(GenerateFrom(a, 0xF023, bytesB[0]));
+                    //returnPackages.Add(GenerateFrom(a, 0xF024, bytesB[1]));
+                    //returnPackages.Add(GenerateFrom(a, 0xF025, bytesB[2]));
+                    break;
+                case 0x623:
+                    returnPackages.Add(GenerateFrom(a, 0xF001, ToBigUInt16(bytesA, 0))); //Pack voltage
+                    returnPackages.Add(GenerateFrom(a, 0xF002, bytesA[2])); // Min Vtg
+                    returnPackages.Add(GenerateFrom(a, 0xF003, bytesA[3])); // min Vtg#
+                    //returnPackages.Add(GenerateFrom(a, 0xF004, bytesB[0])); // Max vtg
+                    //returnPackages.Add(GenerateFrom(a, 0xF005, bytesB[1])); // Max vtg #
+                    break;
+                case 0x624:
+                    returnPackages.Add(GenerateFrom(a, 0xF006, ToBigUInt16(bytesA, 0))); // Current
+                    returnPackages.Add(GenerateFrom(a, 0xF007, ToBigUInt16(bytesA, 2))); //Charge Limit
+                    //returnPackages.Add(GenerateFrom(a, 0xF008, ToBigUInt16(bytesB, 0))); //Discharge limit
+                    break;
+                case 0x625:
+                    returnPackages.Add(GenerateFrom(a, 0xF009, ToBigUInt32(bytesA, 0))); // Batt. energy in
+                    //returnPackages.Add(GenerateFrom(a, 0xF00A, ToBigUInt32(bytesB, 0))); // Batt. energy out
+                    break;
+                case 0x626:
+                    /*if (bytesB[1] != 0)
+                        System.Diagnostics.Debugger.Break();*/
+                    returnPackages.Add(GenerateFrom(a, 0xF00B, bytesA[0])); //SOC
+                    returnPackages.Add(GenerateFrom(a, 0xF00C, ToBigUInt16(bytesA, 1))); //DOD
+                    //returnPackages.Add(GenerateFrom(a, 0xF00D, (uint)(bytesA[3] << 8 | bytesB[0]))); //Capacity
+                    //returnPackages.Add(GenerateFrom(a, 0xF00E, bytesB[1])); //00h
+                    //returnPackages.Add(GenerateFrom(a, 0xF00F, bytesB[2])); //SOH
+                    break;
+                case 0x627:
+                    returnPackages.Add(GenerateFrom(a, 0xF010, bytesA[0])); // Temperature
+                    returnPackages.Add(GenerateFrom(a, 0xF011, bytesA[2])); //Min Temp
+                    returnPackages.Add(GenerateFrom(a, 0xF012, bytesA[3])); //Min Temp #
+                    //returnPackages.Add(GenerateFrom(a, 0xF013, bytesB[0])); //Max temp
+                    //returnPackages.Add(GenerateFrom(a, 0xF014, bytesB[1])); //Max temp #
+                    break;
+                case 0x628:
+                    returnPackages.Add(GenerateFrom(a, 0xF015, ToBigUInt16(bytesA, 0))); //Pack resistance
+                    returnPackages.Add(GenerateFrom(a, 0xF016, bytesA[2])); //Min Res
+                    returnPackages.Add(GenerateFrom(a, 0xF017, bytesA[3])); //Min Res#
+                    //returnPackages.Add(GenerateFrom(a, 0xF018, bytesB[0])); //Max Res
+                    //returnPackages.Add(GenerateFrom(a, 0xF019, bytesB[1])); //Max Res#
                     break;
             }
             return returnPackages.ToArray();

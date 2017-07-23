@@ -146,5 +146,225 @@
   {
     "ID": 528, // 0xF008
     "Key": "MC_RAW"
+  },
+  // #####--BMS_RAW values--#####
+  {
+    "ID": 1568, //0x620
+    "Key": "BMS_RAW_1"
+  },
+  {
+    "ID": 1569, //0x621
+    "Key": "BMS_RAW_2"
+  },
+  {
+    "ID": 1570, //0x622
+    "Key": "BMS_RAW_3"
+  },
+  {
+    "ID": 1571, //0x623
+    "Key": "BMS_RAW_4"
+  },
+  {
+    "ID": 1572, //0x624
+    "Key": "BMS_RAW_5"
+  },
+  {
+    "ID": 1573, //0x625
+    "Key": "BMS_RAW_6"
+  },
+  {
+    "ID": 1574, //0x626
+    "Key": "BMS_RAW_7"
+  },
+  {
+    "ID": 1575, //0x627
+    "Key": "BMS_RAW_8"
+  },
+  {
+    "ID": 1576, //0x628
+    "Key": "BMS_RAW_9"
+  },
+  {
+    "ID": 1664, //0x680
+    "Key": "BMS_RAW_CUSTOM"
+  },
+  {
+    "ID": 1560, //0x618
+    "Key": "BMS_RAW_NLG5"
+  },
+  // #####--BMS_VOLT--#####
+  {
+    "ID": 61441, // 0xf001
+    "Key": "BMS_VOLT"
+  },
+  {
+    "ID": 61442, // 0xf002
+    "Key": "BMS_VOLT_MIN"
+  },
+  {
+    "ID": 61443, // 0xf003
+    "Key": "BMS_VOLT_MIN_ID"
+  },
+  {
+    "ID": 61444, // 0xf004
+    "Key": "BMS_VOLT_MAX"
+  },
+  {
+    "ID": 61445, // 0xf005
+    "Key": "BMS_VOLT_MAX_ID"
+  },
+  // #####--BMS_CURRENT--#####
+  {
+    "ID": 61446, // 0xF006
+    "Key": "BMS_CURRENT"
+  },
+  {
+    "ID": 61447, // 0xF007
+    "Key": "BMS_CHARGELIMIT"
+  },
+  {
+    "ID": 61448, // 0xF008
+    "Key": "BMS_DISCHARGELIMIT"
+  },
+  {
+    "ID": 61449, // 0xF009
+    "Key": "BMS_TOTAL_ENERGY_IN"
+  },
+  {
+    "ID": 61450, // 0xF00A
+    "Key": "BMS_TOTAL_ENERGY_OUT"
+  },
+  // #####--BMS Battery Info--#####
+  {
+    "ID": 61451, // 0xF00B
+    "Key": "BMS_SOC"
+  },
+  {
+    "ID": 61452, // 0xF00C
+    "Key": "BMS_DOD"
+  },
+  {
+    "ID": 61453, // 0xF00D
+    "Key": "BMS_CAPACITY"
+  },
+  {
+    "ID": 61454, // 0xF00E
+    "Key": "BMS_00H"
+  },
+  {
+    "ID": 61455, // 0xF00F
+    "Key": "BMS_SOH"
+  },
+  // #####--BMS_TEMP--#####
+  {
+    "ID": 61456, // 0xF010
+    "Key": "BMS_TEMP_BAT"
+  },
+  {
+    "ID": 61457, // 0xF011
+    "Key": "BMS_TEMP_BAT_MIN"
+  },
+  {
+    "ID": 61458, // 0xF012
+    "Key": "BMS_TEMP_BAT_MIN_ID"
+  },
+  {
+    "ID": 61459, // 0xF013
+    "Key": "BMS_TEMP_BAT_MAX"
+  },
+  {
+    "ID": 61460, // 0xF014
+    "Key": "BMS_TEMP_BAT_MAX_ID"
+  },
+  // #####--BMS_RES--#####
+  {
+    "ID": 61461, // 0xF015
+    "Key": "BMS_RES_BAT"
+  },
+  {
+    "ID": 61462, // 0xF016
+    "Key": "BMS_RES_BAT_MIN"
+  },
+  {
+    "ID": 61463, // 0xF017
+    "Key": "BMS_RES_BAT_MIN_ID"
+  },
+  {
+    "ID": 61464, // 0xF018
+    "Key": "BMS_RES_BAT_MAX"
+  },
+  {
+    "ID": 61465, // 0xF019
+    "Key": "BMS_RES_BAT_MAX_ID"
+  },
+  // #####--BMS State Info--#####
+  {
+    "ID": 61472, // 0xF020
+    "Key": "BMS_STATE"
+  },
+  {
+    "ID": 61473, // 0xF021
+    "Key": "BMS_TIMER"
+  },
+  {
+    "ID": 61474, // 0xF022
+    "Key": "BMS_FLAGS"
+  },
+  {
+    "ID": 61475, // 0xF023
+    "Key": "BMS_LASTFAULT"
+  },
+  {
+    "ID": 61476, // 0xF024
+    "Key": "BMS_LEVEL"
+  },
+  {
+    "ID": 61477, // 0xF025
+    "Key": "BMS_WARNING"
+  },
+  // #####--MotorController--######
+  {
+    "ID": 384,
+    "Key": "MC_RAW"
+  },
+  {
+    "ID": 61504, //0xF040 -> 0x27
+    "Key": "MC_VSI_CURRENT_Q"
+  },
+  {
+    "ID": 61505, //0xF041 -> 0x28
+    "Key": "MC_VSI_CURRENT_D"
+  },
+  {
+    "ID": 61506, //0xF042 -> 0x29
+    "Key": "MC_VSI_VOLTAGE_Q"
+  },
+  {
+    "ID": 61507, //0xF043 -> 0x2a
+    "Key": "MC_VSI_VOLTAGE_D"
+  },
+  {
+    "ID": 61508, //0xF044 -> 0xf6
+    "Key": "MC_MOTOR_POWER"
+  },
+  {
+    "ID": 61509, //0xF045 -> 0x30
+    "Key": "MC_MOTOR_SPEED"
+  },
+  {
+    "ID": 61510, //0xF046 -> 0xa8
+    "Key": "MC_MOTOR_SPEED_FILTER"
+  },
+  {
+    "ID": 61511, //0xF047 -> 0x49,
+    "Key": "MC_TEMP_MOTOR"
+  },
+  {
+    "ID": 61512, //0xF048 -> 0x4A,
+    "Key": "MC_TEMP_IGBT"
+  },
+  {
+    "ID": 61513, //0xF049 -> 0x4B,
+    "Key": "MC_TEMP_VSI_AMBIENT"
   }
 ]

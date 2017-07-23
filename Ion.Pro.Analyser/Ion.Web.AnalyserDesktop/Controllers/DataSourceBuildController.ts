@@ -90,7 +90,7 @@ class DataSourceBuildController extends Component{
 
         for (const set of sensorsets) {
             for (const key of set.LoadedKeys) {
-                const info: sensys.ISensorInformation = set.KeyInfoMap[key];
+                const info: sensys.ISensorInformation = set.SensorData[key].info;
                 if (info) {
                     infos.push(info);
                 }
