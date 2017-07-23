@@ -99,6 +99,9 @@ var DataSourceBuildController = (function (_super) {
             var found = false;
             for (var _d = 0, data_1 = data; _d < data_1.length; _d++) {
                 var section = data_1[_d];
+                if (!info.Name) {
+                    console.log(info);
+                }
                 if (section.title === info.Name) {
                     found = true;
                     section.items.push({ text: info.SensorSet.Name, object: info });

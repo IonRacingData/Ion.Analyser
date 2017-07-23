@@ -104,6 +104,9 @@ class DataSourceBuildController extends Component{
         for (const info of infos) {
             let found: boolean = false;
             for (const section of data) {
+                if (!info.Name) {
+                    console.log(info);
+                }
                 if (section.title === info.Name) {
                     found = true;
                     section.items.push({ text: info.SensorSet.Name, object: info } as IExpandableListItem);

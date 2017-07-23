@@ -89,7 +89,7 @@
   },
   {
     "ID": 127, //0x7F
-    "Key": "BREAK_PEDAL_1"
+    "Key": "BRAKE_PEDAL_1"
   },
   {
     "ID": 128, //0x80

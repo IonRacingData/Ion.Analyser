@@ -81,11 +81,15 @@
   },
   {
     "Key": "BRAKE_PRESS_FRONT",
-    "Resolution": 16
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 68.948
   },
   {
     "Key": "BRAKE_PRESS_BACK",
-    "Resolution": 16
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 68.948
   },
   {
     "Key": "TEMP_AIR",
@@ -93,19 +97,27 @@
   },
   {
     "Key": "ACC_PEDAL_1",
-    "Resolution": 16
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 100
   },
   {
     "Key": "ACC_PEDAL_2",
-    "Resolution": 16
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 100
   },
   {
-    "Key": "BREAK_PEDAL_1",
-    "Resolution": 16
+    "Key": "BRAKE_PEDAL_1",
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 100
   },
   {
     "Key": "STEERING",
-    "Resolution": 16
+    "Resolution": 16,
+    "MinValue": 0,
+    "MaxValue": 360
   },
   {
     "Key": "ADC_MISMATCH",
@@ -161,7 +173,6 @@
     "Key": "MC_RAW"
   },
   // #####--BMS_RAW values--#####
-
   {
     "Key": "BMS_RAW_1"
   },
@@ -195,9 +206,7 @@
   {
     "Key": "BMS_RAW_NLG5"
   },
-
   // #####--BMS_VOLT--#####
-
   {
     "Key": "BMS_VOLT",
     "Resolution": 16,
@@ -226,9 +235,7 @@
     "Key": "BMS_VOLT_MAX_ID",
     "Resolution": 8
   },
-
   // #####--BMS_CURRENT--#####
-
   {
     "Key": "BMS_CURRENT",
     "Resolution": 16,
@@ -259,9 +266,7 @@
     "Signed": false,
     "MaxValue": 4294967295
   },
-
   // #####--BMS Battery Info--#####
-
   {
     "Key": "BMS_SOC",
     "Resolution": 8,
@@ -290,9 +295,7 @@
     "Signed": false,
     "MaxValue": 255
   },
-
   // #####--BMS_TEMP--#####
-
   {
     "Key": "BMS_TEMP_BAT",
     "Resolution": 8,
@@ -319,9 +322,7 @@
     "Key": "BMS_TEMP_BAT_MAX_ID",
     "Resolution": 8
   },
-
   // #####--BMS_RES--#####
-
   {
     "Key": "BMS_RES_BAT",
     "Resolution": 16,
@@ -348,9 +349,7 @@
     "Key": "BMS_RES_BAT_MAX_ID",
     "Resolution": 8
   },
-
   // #####--BMS State Info--#####
-
   {
     "Key": "BMS_STATE"
   },
@@ -370,7 +369,6 @@
     "Key": "BMS_WARNING"
   },
   // #####--Motor Controller--#####
-
   {
     "Key": "MC_RAW"
   },

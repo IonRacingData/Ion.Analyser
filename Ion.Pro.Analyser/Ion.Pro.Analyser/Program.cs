@@ -206,7 +206,7 @@ namespace Ion.Pro.Analyser
                         }
                         else
                         {
-                            SensorPackage pack = ParseBytes(buffer);
+                            SensorPackage pack = ParseBytesBigEndian(buffer);
                             SensorManager.GetDefault().AddLive("telemetry", pack);
                             break;
                         }
@@ -224,6 +224,15 @@ namespace Ion.Pro.Analyser
         {
             SensorPackage pack = new SensorPackage();
             pack.ID = BitConverter.ToUInt16(bytes, 0);
+            pack.Value = BitConverter.ToUInt32(bytes, 2);
+            pack.TimeStamp = BitConverter.ToUInt32(bytes, 6);
+            return pack;
+        }
+
+        static SensorPackage ParseBytesBigEndian(byte[] bytes)
+        {
+            SensorPackage pack = new SensorPackage();
+            pack.ID = bytes[0] << 8 | bytes[1];
             pack.Value = BitConverter.ToUInt32(bytes, 2);
             pack.TimeStamp = BitConverter.ToUInt32(bytes, 6);
             return pack;

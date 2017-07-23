@@ -449,6 +449,11 @@
     "Unit": "Bar"
   },
   {
+    "Key": "BRAKE_PEDAL_1",
+    "Name": "Brake Pedal 1",
+    "Unit": "%"
+  },
+  {
     "Key": "PACKAGESHIFT",
     "Name": "Indicator for Merged data sets",
     "Unit": ""
