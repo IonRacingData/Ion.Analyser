@@ -206,7 +206,7 @@ var WindowManager = (function () {
     WindowManager.prototype.makeWindowHandle = function (appWindow) {
         var div = document.createElement("div");
         div.className = "window-wrapper";
-        var clone = document.importNode(this.template.content, true);
+        var clone = this.template.content.cloneNode(true);
         div.appendChild(clone);
         return div;
     };
