@@ -244,7 +244,7 @@ class WindowManager implements IEventManager {
     public makeWindowHandle(appWindow: AppWindow): HTMLElement {
         const div: HTMLElement = document.createElement("div");
         div.className = "window-wrapper";
-        const clone: HTMLElement = document.importNode(this.template.content, true) as HTMLElement;
+        const clone: HTMLElement = this.template.content.cloneNode(true) as HTMLElement;
         div.appendChild(clone);
         return div;
     }

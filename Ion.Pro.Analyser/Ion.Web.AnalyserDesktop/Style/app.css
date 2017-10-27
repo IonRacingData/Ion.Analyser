@@ -128,8 +128,8 @@ body {
     font-size: 18px;*/
 }
 
-.window-control-exit {
-}
+/*.window-control-exit {
+}*/
 
 .window-control span {
     padding: 3px 0px;
@@ -288,9 +288,9 @@ span.table-resize{
     position: absolute;
     /*border: 1px solid black;*/
 }
-.plot-wrapper {
-    /*position: relative;*/
-}
+/*.plot-wrapper {
+    position: relative;
+}*/
 
 .controller-legend {
     font-size: 0.7em;
