@@ -558,5 +558,9 @@
   {
     "Key": "MC_TEMP_VSI_AMBIENT",
     "Name": "MC Temperature Ambient VSI"
+  },
+  {
+    "Key": "MC_PEDAL_GAIN",
+    "Name": "MC Pedal Gain"
   }
 ]

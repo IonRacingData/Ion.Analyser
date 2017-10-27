@@ -409,5 +409,11 @@
   },
   {
     "Key": "MC_TEMP_VSI_AMBIENT"
+  },
+  {
+    "Key": "MC_PEDAL_GAIN",
+    "Resolution": 16,
+    "Signed": true,
+    "MaxValue": 100
   }
 ]

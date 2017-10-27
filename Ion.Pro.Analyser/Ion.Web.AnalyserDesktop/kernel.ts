@@ -36,15 +36,15 @@ function startUp() {
 
     kernel.senMan.lateInit(); // Late init because it needs netMan
 
-    //kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
+    kernel.senMan.load("../../Data/Sets/126_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/167_usart_data.log16");
     //kernel.senMan.load("../../Data/Sets/195_usart_data.log16");
     //kernel.senMan.load("../../Data/GPS_DataFile.gpscsv");
     // kernel.senMan.setGlobal(841);
     //kernel.senMan.load("../../Data/Sets/0006_logfile.log17");
-    kernel.senMan.load("../../Data/Sets/data/0017_logfile.log17");
-    kernel.senMan.load("../../Data/Sets/data/0015_logfile.log17");
-    kernel.senMan.load("../../Data/Sets/data2/0035_logfile.log17");
+    //kernel.senMan.load("../../Data/Sets/data/0017_logfile.log17");
+    //kernel.senMan.load("../../Data/Sets/data/0015_logfile.log17");
+    //kernel.senMan.load("../../Data/Sets/data2/0036_logfile.log17");
 
     registerLaunchers();
     registerSensorGroups();
@@ -129,7 +129,7 @@ function registerGridPresets() {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "../../Data/Sets/126_usart_data.log16" }],
+                sources: [{ key: "ACC_PEDAL_1", name: "../../Data/Sets/126_usart_data.log16" }],
             },
             {
                 grouptype: "PointSensorGroup",
@@ -155,7 +155,7 @@ function registerGridPresets() {
                             ],
                         },
                         { name: "LabelTester", data: ["speed"] },
-                        { name: "LineChartTester", data: ["temp"] },
+                        { name: "LineChartTester", data: ["temp", "temp1", "temp2", "temp3"] },
                     ],
                 },
             ],
@@ -165,25 +165,49 @@ function registerGridPresets() {
                 grouptype: "PointSensorGroup",
                 key: "speed",
                 layers: [],
-                sources: [{ key: "SPEED", name: "telemetry" }],
+                sources: [{ key: "ACC_PEDAL_1", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }],
+                sources: [{ key: "BRAKE_PRESS_FRONT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "volt",
                 layers: [],
-                sources: [{ key: "BMS_VOLT", name: "telemetry" }],
+                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",
                 key: "temp",
                 layers: [],
-                sources: [{ key: "BMS_TEMP_BAT", name: "telemetry" }],
+                sources: [{ key: "WATER_TEMP_1", name: "telemetry" }],
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp1",
+                layers: [],
+                sources: [{ key: "WATER_TEMP_2", name: "telemetry" }],
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp2",
+                layers: [],
+                sources: [{ key: "WATER_TEMP_3", name: "telemetry" }],
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp3",
+                layers: [],
+                sources: [{ key: "WATER_TEMP_4", name: "telemetry" }],
+            },
+            {
+                grouptype: "PointSensorGroup",
+                key: "temp4",
+                layers: [],
+                sources: [{ key: "TEMP_AIR", name: "telemetry" }],
             },
         ],
     } as IGridLanchTemplate));
@@ -221,7 +245,7 @@ function registerGridPresets() {
                 grouptype: "PointSensorGroup",
                 key: "current",
                 layers: [],
-                sources: [{ key: "CURRENT", name: "telemetry" }],
+                sources: [{ key: "BMS_CURRENT", name: "telemetry" }],
             },
             {
                 grouptype: "PointSensorGroup",

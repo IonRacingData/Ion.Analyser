@@ -143,10 +143,6 @@
     "ID": 401, // 0x191
     "Key": "DASH_LEDS"
   },
-  {
-    "ID": 528, // 0xF008
-    "Key": "MC_RAW"
-  },
   // #####--BMS_RAW values--#####
   {
     "ID": 1568, //0x620
@@ -324,7 +320,7 @@
   },
   // #####--MotorController--######
   {
-    "ID": 384,
+    "ID": 528, // 0x210
     "Key": "MC_RAW"
   },
   {
@@ -366,5 +362,9 @@
   {
     "ID": 61513, //0xF049 -> 0x4B,
     "Key": "MC_TEMP_VSI_AMBIENT"
+  },
+  {
+    "ID": 61514, //0xF04A -> 0x90,
+    "Key": "MC_PEDAL_GAIN"
   }
 ]

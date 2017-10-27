@@ -100,11 +100,13 @@
     <Content Include="NRF\RF24.cpp" />
     <Content Include="NRF\RF24.h" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Data\Sets\data2\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Sensors_4Data2017_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" />
+      <UserProperties Sensors_4Data2016_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" Sensors_4Data2016_4Sensor_1json__JSONSchema="..\TypeDef\SensorTypeDef.json" Sensors_4SensorInformation_1json__JSONSchema="TypeDef\sensorInformationTypeDef.json" Sensors_4Data2017_4SensorInfo_1json__JSONSchema="..\TypeDef\sensorInfoTypeDef.json" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -96,7 +96,7 @@ namespace Ion.Pro.Analyser.Data
                     packages.Add(package);
                 }
 
-                if (package.ID == 0x180)
+                if (package.ID == 0x210)
                 {
                     packages.AddRange(SensorExtracter.ExtractMotorContoller(package));
                     //System.Diagnostics.Debugger.Break();
@@ -139,6 +139,7 @@ namespace Ion.Pro.Analyser.Data
             [0x49] = 0xF047,
             [0x4A] = 0xF048,
             [0x4B] = 0xF049,
+            [0x90] = 0xF04A,
         };
 
         public static SensorPackage[] ExtractBMS(SensorPackage a, SensorPackage b)
@@ -267,6 +268,10 @@ namespace Ion.Pro.Analyser.Data
             if (mcIdMap.ContainsKey(bytesA[0]))
             {
                 packages.Add(GenerateFrom(a, mcIdMap[bytesA[0]], value));
+            }
+            else
+            {
+                Console.WriteLine("Missing key for: " + bytesA[0]);
             }
 
             return packages.ToArray();
