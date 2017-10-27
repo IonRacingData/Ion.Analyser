@@ -322,7 +322,7 @@ class GridViewer implements IApplication {
                         cur.offsetTop,
                         cur.offsetWidth,
                         cur.offsetHeight)) {
-                        console.log(cur);
+                        //console.log(cur);
                         this.selectedContainer = cur.gridContainer;
                         break;
                     }

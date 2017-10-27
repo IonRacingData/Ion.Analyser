@@ -296,7 +296,7 @@ var GridViewer = (function () {
                 for (var i = containers.length - 1; i >= 0; i--) {
                     var cur = containers[i];
                     if (winPos.intersects(cur.offsetLeft, cur.offsetTop, cur.offsetWidth, cur.offsetHeight)) {
-                        console.log(cur);
+                        //console.log(cur);
                         this.selectedContainer = cur.gridContainer;
                         break;
                     }
@@ -622,3 +622,4 @@ var GridVContainer = (function (_super) {
     };
     return GridVContainer;
 }(GridContainer));
+//# sourceMappingURL=gridsystem.js.map

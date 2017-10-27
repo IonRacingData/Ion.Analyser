@@ -49,7 +49,7 @@ var LabelController = (function (_super) {
                 this.initFontSizeCounter++;
             }
             else {
-                throw new Error("Initialize font size exception");
+                console.warn("Initialize font size exception");
             }
         }
         else if (this.textWrapper.offsetWidth > 0) {
@@ -62,3 +62,4 @@ var LabelController = (function (_super) {
     };
     return LabelController;
 }(SingleValueController));
+//# sourceMappingURL=LabelController.js.map

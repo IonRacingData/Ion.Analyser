@@ -47,7 +47,7 @@ class LabelController extends SingleValueController {
                 this.initFontSizeCounter++;
             }
             else {
-                throw new Error("Initialize font size exception");
+                console.warn("Initialize font size exception");
             }
 
         }
