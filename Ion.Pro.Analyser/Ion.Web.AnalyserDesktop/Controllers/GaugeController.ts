@@ -53,8 +53,12 @@ class GaugeController extends SingleValueCanvasController {
     private generateLabels(min: number, max: number, step: number): string[] {
         const labels: string[] = [];
         for (let i = min; i <= max; i += step) {
-            labels.push(i.toString());
+            if (i % 1 == 0)
+                labels.push(i.toString());
+            else
+                labels.push(i.toFixed(2));
         }
+        
         return labels;
     }
 

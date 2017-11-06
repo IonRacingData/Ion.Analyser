@@ -46,7 +46,10 @@ var GaugeController = (function (_super) {
     GaugeController.prototype.generateLabels = function (min, max, step) {
         var labels = [];
         for (var i = min; i <= max; i += step) {
-            labels.push(i.toString());
+            if (i % 1 == 0)
+                labels.push(i.toString());
+            else
+                labels.push(i.toFixed(2));
         }
         return labels;
     };
