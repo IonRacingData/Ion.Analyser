@@ -724,7 +724,7 @@ var Canvas = (function (_super) {
         this.ctx.drawImage(image.canvas, dstX, dstY);
     };
     Canvas.prototype.setTransform = function (m11, m12, m21, m22, dx, dy) {
-        this.ctx.setTransform(m11, m12, m21, m22, dx, dy);
+        this.ctx.setTransform(m11 * devicePixelRatio, m12 * devicePixelRatio, m21 * devicePixelRatio, m22 * devicePixelRatio, dx, dy);
     };
     Canvas.prototype.rect = function (x, y, w, h) {
         this.ctx.rect(x, y, w, h);

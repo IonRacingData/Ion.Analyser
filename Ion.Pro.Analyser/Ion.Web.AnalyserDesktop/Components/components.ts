@@ -719,7 +719,7 @@ class Canvas extends Component {
         this.ctx.drawImage(image.canvas, dstX, dstY);
     }
     public setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number): void {
-        this.ctx.setTransform(m11, m12, m21, m22, dx, dy);
+        this.ctx.setTransform(m11 * devicePixelRatio, m12 * devicePixelRatio, m21 * devicePixelRatio, m22 * devicePixelRatio, dx, dy);
     }
     public rect(x: number, y: number, w: number, h: number): void {
         this.ctx.rect(x, y, w, h);
