@@ -22,8 +22,8 @@ function tester() {
     document.body.appendChild(document.createElement("br"));
     document.body.appendChild(lst.wrapper);
     document.body.appendChild(table.wrapper);
-    document.body.appendChild(listArr.wrapper);*/
-    document.body.appendChild(sw.wrapper);
+    document.body.appendChild(listArr.wrapper);
+    document.body.appendChild(sw.wrapper);*/
     b.text = "Click Me!";
     b2.text = "Add Fourth";
     b3.text = "Add expList item";
@@ -86,6 +86,43 @@ function tester() {
         alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     lst.data = arr;
+    var canvas = new Canvas();
+    document.body.appendChild(canvas.wrapper);
+    function draw() {
+        canvas.clear();
+        canvas.strokeStyle = "white";
+        canvas.beginPath();
+        canvas.moveTo(50, 40);
+        for (var i = 50; i < 1000; i += 50) {
+            if (i % 5 == 0)
+                canvas.lineTo(i, 40);
+            if (i % 10 == 0)
+                canvas.lineTo(i, 90);
+            if (i % 100 == 0)
+                canvas.lineTo(i, 187);
+        }
+        canvas.stroke();
+        canvas.closePath();
+    }
+    var inWidth = 500;
+    var inHeight = 200;
+    canvas.height = inHeight;
+    canvas.width = inWidth;
+    draw();
+    var counter = 0;
+    canvas.wrapper.addEventListener("click", function (e) {
+        counter += 50;
+        canvas.height = inHeight + counter;
+        canvas.width = inWidth + counter;
+        draw();
+    });
+    /*const lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt augue at justo posuere, sed scelerisque libero rutrum. Donec fermentum, quam et placerat mattis, augue arcu cursus quam, vitae finibus neque nulla sed massa. Mauris congue massa non nisl rhoncus, id malesuada odio iaculis. Aliquam mauris neque, molestie sed tellus vitae, efficitur scelerisque enim. Aliquam viverra vulputate velit quis gravida. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur interdum lorem sed porttitor posuere. Sed posuere nulla quis neque tempus, id ullamcorper metus cursus.";
+    canvas.fillStyle = "white";
+    canvas.font = "30px sans-serif";
+    canvas.fillText(lorem, 50, 50);*/
+    var leg = new LineChartLegend(100, 50, false);
+    document.body.appendChild(leg.canvas.wrapper);
+    leg.dataSources = null;
 }
 function storageTest() {
     var storageList = {

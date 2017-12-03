@@ -231,7 +231,7 @@ abstract class ScatterChartBase extends CanvasController {
     private lastID: string = "";
     private lastSensorInfo: sensys.ISensorInformation;
 
-    private ctxMain: ContextFixer;
+    private cavasMain: Canvas;
     private relSize: Rectangle;
     private availablePlotWidth: number;
     private availablePlotHeight: number;
@@ -258,8 +258,8 @@ abstract class ScatterChartBase extends CanvasController {
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        //this.canvas = new LayeredCanvasOld(this.wrapper);
+        //this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.canvas.setSize(this.width, this.height);
         return this.wrapper;
     }
@@ -279,9 +279,9 @@ abstract class ScatterChartBase extends CanvasController {
             let offsetY: number;
             const posDataLength: number = this.data.length();
 
-            this.ctxMain.clear();
-            this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.color;
+            this.cavasMain.clear();
+            this.cavasMain.beginPath();
+            this.cavasMain.strokeStyle = this.color;
 
             this.rescale();
 
@@ -290,17 +290,17 @@ abstract class ScatterChartBase extends CanvasController {
 
             if (posDataLength > 0) {
                 const firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
-                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
+                this.cavasMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
             for (let i = 0; i < posDataLength; i++) {
 
                 const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 const absPoint: Point = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
+                this.cavasMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
-            this.ctxMain.stroke();
+            this.cavasMain.stroke();
         }
     }
 

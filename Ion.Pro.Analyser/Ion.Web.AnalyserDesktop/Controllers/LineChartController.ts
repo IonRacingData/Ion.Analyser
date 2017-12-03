@@ -1,7 +1,7 @@
 class LineChartController extends MultiValueCanvasController implements IConfigurable {
-    private ctxMain: ContextFixer;
-    private ctxMarking: ContextFixer;
-    private ctxLegend: ContextFixer;
+    private canvasMain: Canvas;
+    private canvasMarking: Canvas;
+    private canvasLegend: Canvas;
     private mouseMod: Point;
     private mouseDown: boolean;
     private isDragging = false;
@@ -81,14 +81,16 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         this.wrapper.className = "plot-wrapper";
         this.wrapper.style.cursor = this.defaultCursor;
 
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.ctxLegend = new ContextFixer(this.canvas.addCanvas());
+        this.canvas = new LayeredCanvas();
+        this.canvasMarking = this.canvas.addCanvas();
+        this.canvasMain = this.canvas.addCanvas();
+        this.canvasLegend = this.canvas.addCanvas();
 
-        this.width = this.canvas.getWidth();
-        this.height = this.canvas.getHeight();
-        this.ctxMain.strokeStyle = this.mainColor;
+        this.wrapper.appendChild(this.canvas.wrapper);
+
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.canvasMain.strokeStyle = this.mainColor;
 
         this.wrapper.addEventListener("mousedown", (e: MouseEvent) => this.wrapper_mouseDown(e));
         this.wrapper.addEventListener("mousemove", (e: MouseEvent) => this.wrapper_mouseMove(e));
@@ -128,11 +130,11 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
     }
 
     private drawMarking(): void {
-        this.ctxMarking.clear();
-        this.ctxMarking.fillStyle = this.markingColor;
+        this.canvasMarking.clear();
+        this.canvasMarking.fillStyle = this.markingColor;
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-        this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
+        this.canvasMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
     }
 
     protected onSizeChange(): void {
@@ -231,7 +233,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
     }
 
     protected draw(): void {
-        this.ctxMain.clear();
+        this.canvasMain.clear();
 
         this.drawXAxis();
         this.drawYAxis();
@@ -253,21 +255,21 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
                 const totalLength: number = this.data[d].length();
                 let checkPoint: Point = lastPoint;
 
-                this.ctxMain.beginPath();
+                this.canvasMain.beginPath();
                 if (this.darkTheme) {
                     //console.log("Dark theme");
-                    this.ctxMain.strokeStyle = this.data[d].color.toString();
+                    this.canvasMain.strokeStyle = this.data[d].color.toString();
                 }
                 else {
                     //console.log("Light theme");
-                    this.ctxMain.strokeStyle = this.data[d].color.toString(true);
+                    this.canvasMain.strokeStyle = this.data[d].color.toString(true);
                 }
 
                 for (let i: number = firstVisibleIdx; i < totalLength; i++) {
                     const point: Point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                        this.ctxMain.moveTo(point.x, point.y);
-                        this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
+                        this.canvasMain.moveTo(point.x, point.y);
+                        this.canvasMain.lineTo(checkPoint.x, checkPoint.y);
                         checkPoint = point;
                     }
 
@@ -277,39 +279,39 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
                     lastPoint = point;
                 }
 
-                this.ctxMain.ctx.closePath();
-                this.ctxMain.stroke();
-                this.ctxMain.fillStyle = this.mainColor;
+                this.canvasMain.closePath();
+                this.canvasMain.stroke();
+                this.canvasMain.fillStyle = this.mainColor;
             }
 
             if (this.selectedPoint !== null) {
                 const abs: Point = this.getAbsolute(this.selectedPoint);
                 const pointString: string = this.selectedPoint.toString();
 
-                this.ctxMain.strokeStyle = this.axisColor;
-                this.ctxMain.fillStyle = this.axisColor;
-                this.ctxMain.beginPath();
-                this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-                this.ctxMain.stroke();
-                this.ctxMain.textBaseline = "middle";
+                this.canvasMain.strokeStyle = this.axisColor;
+                this.canvasMain.fillStyle = this.axisColor;
+                this.canvasMain.beginPath();
+                this.canvasMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+                this.canvasMain.stroke();
+                this.canvasMain.textBaseline = "middle";
 
                 const modifiedPoint: Point = this.selectedPoint.divide(new Point(1000, 1));
 
                 if (this.toggleLegend.value) {
-                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                    this.canvasMain.fillText(modifiedPoint.toString(), this.width - this.canvasMain.measureText(pointString) - 6, this.height - 10);
                 }
                 else {
-                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                    this.canvasMain.fillText(modifiedPoint.toString(), this.width - this.canvasMain.measureText(pointString) - 6, 10);
                 }
-                this.ctxMain.fillStyle = this.mainColor;
-                this.ctxMain.strokeStyle = this.mainColor;
-                this.ctxMain.textBaseline = "alphabetic";
+                this.canvasMain.fillStyle = this.mainColor;
+                this.canvasMain.strokeStyle = this.mainColor;
+                this.canvasMain.textBaseline = "alphabetic";
             }
         }
     }
 
     private drawLegend(): void {
-        this.ctxLegend.clear();
+        this.canvasLegend.clear();
         this.legend.darkTheme = this.darkTheme;
 
         if (this.toggleLegend.value) {
@@ -325,16 +327,14 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
                 this.legend.dataSources = null;
             }
 
-            const legCan: HTMLCanvasElement = this.legend.canvas;
             const margin: number = 10;
-
-            this.ctxLegend.ctx.drawImage(legCan, this.width - legCan.width - margin, margin);
+            this.canvasLegend.drawImage(this.legend.canvas, this.width - this.legend.width - margin, margin);
         }
     }
 
     private drawXAxis(): void {
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
+        this.canvasMain.strokeStyle = this.axisColor;
+        this.canvasMain.fillStyle = this.axisColor;
 
         const origo: Point = this.getAbsolute(new Point(0, 0));
         const visible: boolean = origo.y >= 0 && origo.y <= this.height ? true : false;
@@ -349,10 +349,10 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
             }
         }
 
-        this.ctxMain.beginPath();
-        this.ctxMain.moveTo(0, y);
-        this.ctxMain.lineTo(this.width, y);
-        this.ctxMain.stroke();
+        this.canvasMain.beginPath();
+        this.canvasMain.moveTo(0, y);
+        this.canvasMain.lineTo(this.width, y);
+        this.canvasMain.stroke();
 
         const stepping: IStepInfo = this.calculateSteps(this.scalePoint.x * 1000);
         const steps: number = stepping.steps;
@@ -360,7 +360,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         const scale: number = stepping.scale;
 
         for (let i: number = -steps; i < this.width + steps; i += steps) {
-            this.ctxMain.beginPath();
+            this.canvasMain.beginPath();
             const absX: number = i + this.movePoint.x % steps;
             const transformer: Point = this.getRelative(new Point(absX, y));
             let num: string;
@@ -379,28 +379,28 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
                 num = val.toFixed(decimalPlaces);
             }
 
-            numWidth = this.ctxMain.measureText(num);
+            numWidth = this.canvasMain.measureText(num);
             numOffset = y === this.height ? y - 15 : y + 15;
-            this.ctxMain.fillText(num, absX - (numWidth / 2), numOffset);
+            this.canvasMain.fillText(num, absX - (numWidth / 2), numOffset);
 
-            this.ctxMain.stroke();
-            this.ctxMain.beginPath();
+            this.canvasMain.stroke();
+            this.canvasMain.beginPath();
 
             if (this.showGrid.value) {
-                this.ctxMain.moveTo(absX, 0);
-                this.ctxMain.lineTo(absX, this.height);
-                this.ctxMain.strokeStyle = this.gridColor;
-                this.ctxMain.stroke();
+                this.canvasMain.moveTo(absX, 0);
+                this.canvasMain.lineTo(absX, this.height);
+                this.canvasMain.strokeStyle = this.gridColor;
+                this.canvasMain.stroke();
             }
         }
 
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
+        this.canvasMain.strokeStyle = this.mainColor;
+        this.canvasMain.fillStyle = this.mainColor;
     }
 
     private drawYAxis(): void {
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
+        this.canvasMain.strokeStyle = this.axisColor;
+        this.canvasMain.fillStyle = this.axisColor;
 
         const origo: Point = this.getAbsolute(new Point(0, 0));
         const visible: boolean = origo.x >= 0 && origo.x <= this.width ? true : false;
@@ -415,10 +415,10 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
             }
         }
 
-        this.ctxMain.beginPath();
-        this.ctxMain.moveTo(x, 0);
-        this.ctxMain.lineTo(x, this.height);
-        this.ctxMain.stroke();
+        this.canvasMain.beginPath();
+        this.canvasMain.moveTo(x, 0);
+        this.canvasMain.lineTo(x, this.height);
+        this.canvasMain.stroke();
 
         const stepping: IStepInfo = this.calculateSteps(this.scalePoint.y);
         const steps: number = stepping.steps;
@@ -426,7 +426,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         const scale: number = stepping.scale;
 
         for (let i: number = -steps; i < this.height + steps; i += steps) {
-            this.ctxMain.beginPath();
+            this.canvasMain.beginPath();
             const absY: number = this.height - (i + this.movePoint.y % steps);
             const transformer: Point = this.getRelative(new Point(x, absY));
             let number: string;
@@ -443,23 +443,23 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
                 number = transformer.y.toFixed(decimalPlaces);
             }
 
-            numWidth = this.ctxMain.measureText(number);
+            numWidth = this.canvasMain.measureText(number);
             numOffset = x === -1 ? x + 8 : x - (numWidth + 7);
-            this.ctxMain.fillText(number, numOffset, absY + 3);
+            this.canvasMain.fillText(number, numOffset, absY + 3);
 
-            this.ctxMain.stroke();
-            this.ctxMain.beginPath();
+            this.canvasMain.stroke();
+            this.canvasMain.beginPath();
 
             if (this.showGrid.value) {
-                this.ctxMain.moveTo(0, absY);
-                this.ctxMain.lineTo(this.width, absY);
-                this.ctxMain.strokeStyle = this.gridColor;
-                this.ctxMain.stroke();
+                this.canvasMain.moveTo(0, absY);
+                this.canvasMain.lineTo(this.width, absY);
+                this.canvasMain.strokeStyle = this.gridColor;
+                this.canvasMain.stroke();
             }
         }
 
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
+        this.canvasMain.strokeStyle = this.mainColor;
+        this.canvasMain.fillStyle = this.mainColor;
     }
 
     private calculateSteps(scaling: number): IStepInfo {
@@ -487,7 +487,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
     }
 
     private zoomByMarking(): void {
-        this.ctxMarking.clear();
+        this.canvasMarking.clear();
 
         const width: number = this.marking.width;
         const height: number = this.marking.height;
@@ -596,7 +596,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         this.mouseDown = false;
         this.isMarking = false;
         this.wrapper.style.cursor = "default";
-        this.ctxMarking.clear();
+        this.canvasMarking.clear();
     }
 
     private wrapper_mouseDown(e: MouseEvent): void {
@@ -692,19 +692,19 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
 }
 
 class LineChartLegend {
-
-    private ctx: ContextFixer;
-    get canvas(): HTMLCanvasElement {
-        return this.ctx.canvas;
-    }
+    public canvas: Canvas;
 
     private defHeight: number;
-    private height: number;
-    private width: number;
+    private __height: number;
+    private __width: number;
 
     private __backgroundColor: string = "black";
     private __textColor = "white";
     private __borderColor = "green";
+
+    get width(): number { return this.__width; }
+    get height(): number { return this.__height; }
+
     set backgroundColor(color: string | null) {
         if (color) {
             this.__backgroundColor = color;
@@ -736,29 +736,25 @@ class LineChartLegend {
 
     constructor(width: number, height: number, darkTheme: boolean) {
         this.defHeight = height;
-        this.height = height;
-        this.width = width;
+        this.__height = height;
+        this.__width = width;
 
         this.__darkTheme = darkTheme;
 
-        const canvas: HTMLCanvasElement = document.createElement("canvas");
-
-        canvas.width = this.width;
-        canvas.height = this.height;
-
-        this.ctx = new ContextFixer(canvas);
+        this.canvas = new Canvas(false);
+        this.canvas.width = this.__width;
+        this.canvas.height = this.__height;
     }
 
     private draw(): void {
-        const ctx = this.ctx;
         const data = this.__dataSources;
-        ctx.clear();
+        this.canvas.clear();
 
-        ctx.fillStyle = this.__backgroundColor;
-        ctx.strokeStyle = this.__borderColor;
-        ctx.ctx.rect(0, 0, this.width, this.height);
-        ctx.fill();
-        ctx.stroke();
+        this.canvas.fillStyle = this.__backgroundColor;
+        this.canvas.strokeStyle = this.__borderColor;
+        this.canvas.rect(0, 0, this.__width, this.__height);
+        this.canvas.fill();
+        this.canvas.stroke();
 
         if (data) {
 
@@ -770,7 +766,7 @@ class LineChartLegend {
 
             let positionY: number = topBottompadding;
             for (let i = 0; i < data.length; i++) {
-                if (positionY > this.height - topBottompadding) {
+                if (positionY > this.__height - topBottompadding) {
                     this.resize(positionY + topBottompadding);
                     this.draw();
                     return;
@@ -779,51 +775,51 @@ class LineChartLegend {
                 let positionX: number = sidePadding;
                 const name: string = data[i].infos.SensorInfos[0].Name;
                 let unit: string | undefined = data[i].infos.SensorInfos[0].Unit;
-                ctx.beginPath();
+                this.canvas.beginPath();
 
                 if (this.__darkTheme) {
-                    ctx.strokeStyle = data[i].color.toString();
+                    this.canvas.strokeStyle = data[i].color.toString();
                 }
                 else {
-                    ctx.strokeStyle = data[i].color.toString(true);
+                    this.canvas.strokeStyle = data[i].color.toString(true);
                 }
-                ctx.ctx.lineCap = "round";
-                ctx.moveTo(positionX, positionY);
+                this.canvas.lineCap = "round";
+                this.canvas.moveTo(positionX, positionY);
                 positionX += lineLength;
-                ctx.lineTo(positionX, positionY);
-                ctx.lineWidth = lineWidth;
-                ctx.stroke();
-                ctx.lineWidth = 1;
+                this.canvas.lineTo(positionX, positionY);
+                this.canvas.lineWidth = lineWidth;
+                this.canvas.stroke();
+                this.canvas.lineWidth = 1;
 
                 positionX += 10;
-                ctx.moveTo(positionX, positionY);
-                ctx.fillStyle = this.__textColor;
-                ctx.textAlign = "start";
-                ctx.textBaseline = "middle";
+                this.canvas.moveTo(positionX, positionY);
+                this.canvas.fillStyle = this.__textColor;
+                this.canvas.textAlign = "start";
+                this.canvas.textBaseline = "middle";
                 if (unit) {
                     unit = unit.replace("&deg;", "°");
-                    ctx.fillText(name + " (" + unit + ")", positionX, positionY, (this.width - positionX - sidePadding));
+                    this.canvas.fillText(name + " (" + unit + ")", positionX, positionY, (this.__width - positionX - sidePadding));
                 }
                 else {
-                    ctx.fillText(name, positionX, positionY, (this.width - positionX - sidePadding));
+                    this.canvas.fillText(name, positionX, positionY, (this.__width - positionX - sidePadding));
                 }
 
-                ctx.closePath();
+                this.canvas.closePath();
 
                 positionY += lineSpacing;
             }
         }
         else {
-            ctx.fillStyle = this.__textColor;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("No data", (this.width / 2), (this.height / 2));
+            this.canvas.fillStyle = this.__textColor;
+            this.canvas.textAlign = "center";
+            this.canvas.textBaseline = "middle";
+            this.canvas.fillText("No data", (this.__width / 2), (this.__height / 2));
         }
     }
 
     private resize(height: number): void {
-        this.height = height;
-        this.ctx.canvas.height = height;
+        this.__height = height;
+        this.canvas.height = height;
     }
 
 }
@@ -839,123 +835,4 @@ interface IMarking {
     secondPoint: Point;
     width: number;
     height: number;
-}
-
-class ContextFixer {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    fillStyle: string;
-    strokeStyle: string;
-    textAlign: string;
-    textBaseline: string;
-    lineWidth: number;
-
-    constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
-        const temp = this.canvas.getContext("2d");
-        if (temp === null) {
-            throw new Error("Context undefined exception, context 2D not supported");
-        }
-        this.ctx = temp;
-        this.fillStyle = "black";
-        this.strokeStyle = "black";
-        this.lineWidth = 1;
-    }
-    fill() {
-        this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fill();
-    }
-    moveTo(x: number, y: number): void {
-        const newX: number = Math.floor(x) + 0.5;
-        const newY: number = Math.floor(y) + 0.5;
-        this.ctx.moveTo(newX, newY);
-    }
-    lineTo(x: number, y: number): void {
-        this.ctx.lineWidth = this.lineWidth;
-        const newX: number = Math.floor(x) + 0.5;
-        const newY: number = Math.floor(y) + 0.5;
-        this.ctx.lineTo(newX, newY);
-    }
-    clear(): void {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-    beginPath(): void {
-        this.ctx.beginPath();
-    }
-    closePath(): void {
-        this.ctx.closePath();
-    }
-    stroke(): void {
-        this.ctx.lineWidth = this.lineWidth;
-        this.ctx.strokeStyle = this.strokeStyle;
-        this.ctx.stroke();
-    }
-    fillText(text: string, x: number, y: number, maxWidth?: number): void {
-        this.ctx.fillStyle = this.fillStyle;
-        this.ctx.textAlign = this.textAlign;
-        this.ctx.textBaseline = this.textBaseline;
-        if (maxWidth) {
-            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
-        }
-        else {
-            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
-        }
-    }
-    fillRect(x: number, y: number, width: number, height: number): void {
-        this.ctx.fillStyle = this.fillStyle;
-        const newX: number = Math.floor(x);
-        const newY: number = Math.floor(y);
-        const newWidth: number = Math.floor(width);
-        const newHeight: number = Math.floor(height);
-        this.ctx.fillRect(newX, newY, newWidth, newHeight);
-    }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
-        radius = radius < 0 ? 0 : radius;
-        this.ctx.arc(x, y, radius, startAngle, endAngle);
-    }
-    measureText(text: string): number {
-        return this.ctx.measureText(text).width;
-    }
-    translate(x: number, y: number): void {
-        this.ctx.translate(x, y);
-    }
-    rotate(angle: number): void {
-        this.ctx.rotate(angle);
-    }
-}
-
-class LayeredCanvas {
-    private wrapper: HTMLElement;
-    private canvases: HTMLCanvasElement[] = [];
-    private mk: HtmlHelper = new HtmlHelper;
-
-    constructor(wrapper: HTMLElement) {
-        this.wrapper = wrapper;
-    }
-
-    addCanvas(): HTMLCanvasElement {
-        const canvas: HTMLCanvasElement = this.mk.tag("canvas", "plot-canvas") as HTMLCanvasElement;
-        this.wrapper.appendChild(canvas);
-        this.canvases.push(canvas);
-        return canvas;
-    }
-
-    getWidth(): number {
-        if (this.canvases.length > 0) {
-            return this.canvases[0].width;
-        }
-        return -1;
-    }
-    getHeight(): number {
-        if (this.canvases.length > 0) {
-            return this.canvases[0].height;
-        }
-        return -1;
-    }
-    setSize(width: number, height: number): void {
-        for (const c of this.canvases) {
-            c.width = width;
-            c.height = height;
-        }
-    }
 }

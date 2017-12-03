@@ -606,3 +606,161 @@ class TempDataSourceList extends Component {
     }
 
 }
+
+
+class Canvas extends Component {
+
+    private __canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    private mk: HtmlHelper = new HtmlHelper();
+    private dprAdjust: boolean;
+
+    get canvas(): HTMLCanvasElement { return this.__canvas; }
+    get context(): CanvasRenderingContext2D { return this.ctx; }
+
+    set height(height: number) {
+        if (this.dprAdjust) {
+            this.__canvas.height = height * devicePixelRatio;
+            this.__canvas.style.height = height + "px";
+            this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        }
+        else this.__canvas.height = height
+    }
+    get height() { return this.__canvas.height; }
+
+    set width(width: number) {
+        if (this.dprAdjust) {
+            this.__canvas.width = width * devicePixelRatio;
+            this.__canvas.style.width = width + "px";
+            this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        }
+        else this.__canvas.width = width
+    }
+    get width() { return this.__canvas.height; }
+
+    set fillStyle(fillStyle: string) { this.ctx.fillStyle = fillStyle; }
+    set strokeStyle(strokeStyle: string) { this.ctx.strokeStyle = strokeStyle; }
+    set lineWidth(lineWidth: number) { this.ctx.lineWidth = lineWidth; }
+    set textBaseline(textBaseline: string) { this.ctx.textBaseline = textBaseline; }
+    set textAlign(textAlign: string) { this.ctx.textAlign = textAlign; }
+    set font(font: string) { this.ctx.font = font; }
+    set lineCap(lineCap: string) { this.ctx.lineCap = lineCap; }
+
+    constructor(adjustForPixelRatio?: boolean) {
+        super();
+        this.dprAdjust = adjustForPixelRatio || true;
+        this.__canvas = this.mk.tag("canvas") as HTMLCanvasElement;
+        this.wrapper = this.mk.tag("div", "comp-canvas");
+        this.wrapper.appendChild(this.__canvas);
+
+        const tempContext = this.__canvas.getContext("2d");
+        if (tempContext) {
+            this.ctx = tempContext;
+        }
+        else {
+            console.error("Context not defined error");
+        }
+    }
+
+
+
+    fill() {
+        this.ctx.fill();
+    }
+    moveTo(x: number, y: number): void {
+        const newX: number = Math.floor(x) + 0.5;
+        const newY: number = Math.floor(y) + 0.5;
+        this.ctx.moveTo(newX, newY);
+    }
+    lineTo(x: number, y: number): void {
+        const newX: number = Math.floor(x) + 0.5;
+        const newY: number = Math.floor(y) + 0.5;
+        this.ctx.lineTo(newX, newY);
+    }
+    clear(): void {
+        this.ctx.clearRect(0, 0, this.__canvas.width, this.__canvas.height);
+    }
+    beginPath(): void {
+        this.ctx.beginPath();
+    }
+    closePath(): void {
+        this.ctx.closePath();
+    }
+    stroke(): void {
+        this.ctx.stroke();
+    }
+    fillText(text: string, x: number, y: number, maxWidth?: number): void {
+        if (maxWidth) {
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
+        }
+        else {
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
+        }
+    }
+    fillRect(x: number, y: number, width: number, height: number): void {
+        const newX: number = Math.floor(x);
+        const newY: number = Math.floor(y);
+        const newWidth: number = Math.floor(width);
+        const newHeight: number = Math.floor(height);
+        this.ctx.fillRect(newX, newY, newWidth, newHeight);
+    }
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
+        radius = radius < 0 ? 0 : radius;
+        this.ctx.arc(x, y, radius, startAngle, endAngle);
+    }
+    measureText(text: string): number {
+        return this.ctx.measureText(text).width;
+    }
+    translate(x: number, y: number): void {
+        this.ctx.translate(x, y);
+    }
+    rotate(angle: number): void {
+        this.ctx.rotate(angle);
+    }
+    drawImage(image: Canvas, dstX: number, dstY: number): void {
+        this.ctx.drawImage(image.canvas, dstX, dstY);
+    }
+    setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number): void {
+        this.ctx.setTransform(m11, m12, m21, m22, dx, dy);
+    }
+    rect(x: number, y: number, w: number, h: number): void {
+        this.ctx.rect(x, y, w, h);
+    }
+}
+
+class LayeredCanvas extends Component {
+    private canvases: Canvas[] = [];
+    private mk: HtmlHelper = new HtmlHelper();
+
+    get width(): number {
+        if (this.canvases.length > 0) {
+            return this.canvases[0].width;
+        }
+        return -1;
+    }
+    get height(): number {
+        if (this.canvases.length > 0) {
+            return this.canvases[0].height;
+        }
+        return -1;
+    }
+
+    constructor() {
+        super();
+        this.wrapper = this.mk.tag("div", "comp-layeredCanvas");
+    }
+
+    public addCanvas(): Canvas {
+        const canvas = new Canvas();
+        this.wrapper.appendChild(canvas.wrapper);
+        this.canvases.push(canvas);
+        return canvas;
+    }
+
+    public setSize(width: number, height: number): void {
+        for (const c of this.canvases) {
+            c.width = width;
+            c.height = height;
+        }
+    }
+}

@@ -77,13 +77,14 @@ var LineChartController = (function (_super) {
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
         this.wrapper.style.cursor = this.defaultCursor;
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMarking = new ContextFixer(this.canvas.addCanvas());
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
-        this.ctxLegend = new ContextFixer(this.canvas.addCanvas());
-        this.width = this.canvas.getWidth();
-        this.height = this.canvas.getHeight();
-        this.ctxMain.strokeStyle = this.mainColor;
+        this.canvas = new LayeredCanvas();
+        this.canvasMarking = this.canvas.addCanvas();
+        this.canvasMain = this.canvas.addCanvas();
+        this.canvasLegend = this.canvas.addCanvas();
+        this.wrapper.appendChild(this.canvas.wrapper);
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.canvasMain.strokeStyle = this.mainColor;
         this.wrapper.addEventListener("mousedown", function (e) { return _this.wrapper_mouseDown(e); });
         this.wrapper.addEventListener("mousemove", function (e) { return _this.wrapper_mouseMove(e); });
         this.wrapper.addEventListener("mouseup", function (e) { return _this.wrapper_mouseUp(e); });
@@ -114,11 +115,11 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.drawMarking = function () {
-        this.ctxMarking.clear();
-        this.ctxMarking.fillStyle = this.markingColor;
+        this.canvasMarking.clear();
+        this.canvasMarking.fillStyle = this.markingColor;
         this.marking.width = this.marking.secondPoint.x - this.marking.firstPoint.x;
         this.marking.height = this.marking.secondPoint.y - this.marking.firstPoint.y;
-        this.ctxMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
+        this.canvasMarking.fillRect(this.marking.firstPoint.x, this.marking.firstPoint.y, this.marking.width, this.marking.height);
     };
     LineChartController.prototype.onSizeChange = function () {
         this.canvas.setSize(this.width, this.height);
@@ -204,7 +205,7 @@ var LineChartController = (function (_super) {
         this.draw();
     };
     LineChartController.prototype.draw = function () {
-        this.ctxMain.clear();
+        this.canvasMain.clear();
         this.drawXAxis();
         this.drawYAxis();
         this.drawLegend();
@@ -221,20 +222,20 @@ var LineChartController = (function (_super) {
                 var lastPoint = this.getAbsolute(this.data[d].getValue(firstVisibleIdx));
                 var totalLength = this.data[d].length();
                 var checkPoint = lastPoint;
-                this.ctxMain.beginPath();
+                this.canvasMain.beginPath();
                 if (this.darkTheme) {
                     //console.log("Dark theme");
-                    this.ctxMain.strokeStyle = this.data[d].color.toString();
+                    this.canvasMain.strokeStyle = this.data[d].color.toString();
                 }
                 else {
                     //console.log("Light theme");
-                    this.ctxMain.strokeStyle = this.data[d].color.toString(true);
+                    this.canvasMain.strokeStyle = this.data[d].color.toString(true);
                 }
                 for (var i = firstVisibleIdx; i < totalLength; i++) {
                     var point = this.getAbsolute(this.data[d].getValue(i));
                     if (!(Math.abs(point.x - checkPoint.x) < 0.5 && Math.abs(point.y - checkPoint.y) < 0.5)) {
-                        this.ctxMain.moveTo(point.x, point.y);
-                        this.ctxMain.lineTo(checkPoint.x, checkPoint.y);
+                        this.canvasMain.moveTo(point.x, point.y);
+                        this.canvasMain.lineTo(checkPoint.x, checkPoint.y);
                         checkPoint = point;
                     }
                     if (point.x > this.width) {
@@ -242,34 +243,34 @@ var LineChartController = (function (_super) {
                     }
                     lastPoint = point;
                 }
-                this.ctxMain.ctx.closePath();
-                this.ctxMain.stroke();
-                this.ctxMain.fillStyle = this.mainColor;
+                this.canvasMain.closePath();
+                this.canvasMain.stroke();
+                this.canvasMain.fillStyle = this.mainColor;
             }
             if (this.selectedPoint !== null) {
                 var abs = this.getAbsolute(this.selectedPoint);
                 var pointString = this.selectedPoint.toString();
-                this.ctxMain.strokeStyle = this.axisColor;
-                this.ctxMain.fillStyle = this.axisColor;
-                this.ctxMain.beginPath();
-                this.ctxMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
-                this.ctxMain.stroke();
-                this.ctxMain.textBaseline = "middle";
+                this.canvasMain.strokeStyle = this.axisColor;
+                this.canvasMain.fillStyle = this.axisColor;
+                this.canvasMain.beginPath();
+                this.canvasMain.arc(abs.x, abs.y, 5, 0, 2 * Math.PI);
+                this.canvasMain.stroke();
+                this.canvasMain.textBaseline = "middle";
                 var modifiedPoint = this.selectedPoint.divide(new Point(1000, 1));
                 if (this.toggleLegend.value) {
-                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, this.height - 10);
+                    this.canvasMain.fillText(modifiedPoint.toString(), this.width - this.canvasMain.measureText(pointString) - 6, this.height - 10);
                 }
                 else {
-                    this.ctxMain.fillText(modifiedPoint.toString(), this.width - this.ctxMain.measureText(pointString) - 6, 10);
+                    this.canvasMain.fillText(modifiedPoint.toString(), this.width - this.canvasMain.measureText(pointString) - 6, 10);
                 }
-                this.ctxMain.fillStyle = this.mainColor;
-                this.ctxMain.strokeStyle = this.mainColor;
-                this.ctxMain.textBaseline = "alphabetic";
+                this.canvasMain.fillStyle = this.mainColor;
+                this.canvasMain.strokeStyle = this.mainColor;
+                this.canvasMain.textBaseline = "alphabetic";
             }
         }
     };
     LineChartController.prototype.drawLegend = function () {
-        this.ctxLegend.clear();
+        this.canvasLegend.clear();
         this.legend.darkTheme = this.darkTheme;
         if (this.toggleLegend.value) {
             if (this.data) {
@@ -283,14 +284,13 @@ var LineChartController = (function (_super) {
             else {
                 this.legend.dataSources = null;
             }
-            var legCan = this.legend.canvas;
             var margin = 10;
-            this.ctxLegend.ctx.drawImage(legCan, this.width - legCan.width - margin, margin);
+            this.canvasLegend.drawImage(this.legend.canvas, this.width - this.legend.width - margin, margin);
         }
     };
     LineChartController.prototype.drawXAxis = function () {
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
+        this.canvasMain.strokeStyle = this.axisColor;
+        this.canvasMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.y >= 0 && origo.y <= this.height ? true : false;
         var y = origo.y;
@@ -302,16 +302,16 @@ var LineChartController = (function (_super) {
                 y = this.height;
             }
         }
-        this.ctxMain.beginPath();
-        this.ctxMain.moveTo(0, y);
-        this.ctxMain.lineTo(this.width, y);
-        this.ctxMain.stroke();
+        this.canvasMain.beginPath();
+        this.canvasMain.moveTo(0, y);
+        this.canvasMain.lineTo(this.width, y);
+        this.canvasMain.stroke();
         var stepping = this.calculateSteps(this.scalePoint.x * 1000);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         for (var i = -steps; i < this.width + steps; i += steps) {
-            this.ctxMain.beginPath();
+            this.canvasMain.beginPath();
             var absX = i + this.movePoint.x % steps;
             var transformer = this.getRelative(new Point(absX, y));
             var num = void 0;
@@ -327,24 +327,24 @@ var LineChartController = (function (_super) {
             else {
                 num = val.toFixed(decimalPlaces);
             }
-            numWidth = this.ctxMain.measureText(num);
+            numWidth = this.canvasMain.measureText(num);
             numOffset = y === this.height ? y - 15 : y + 15;
-            this.ctxMain.fillText(num, absX - (numWidth / 2), numOffset);
-            this.ctxMain.stroke();
-            this.ctxMain.beginPath();
+            this.canvasMain.fillText(num, absX - (numWidth / 2), numOffset);
+            this.canvasMain.stroke();
+            this.canvasMain.beginPath();
             if (this.showGrid.value) {
-                this.ctxMain.moveTo(absX, 0);
-                this.ctxMain.lineTo(absX, this.height);
-                this.ctxMain.strokeStyle = this.gridColor;
-                this.ctxMain.stroke();
+                this.canvasMain.moveTo(absX, 0);
+                this.canvasMain.lineTo(absX, this.height);
+                this.canvasMain.strokeStyle = this.gridColor;
+                this.canvasMain.stroke();
             }
         }
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
+        this.canvasMain.strokeStyle = this.mainColor;
+        this.canvasMain.fillStyle = this.mainColor;
     };
     LineChartController.prototype.drawYAxis = function () {
-        this.ctxMain.strokeStyle = this.axisColor;
-        this.ctxMain.fillStyle = this.axisColor;
+        this.canvasMain.strokeStyle = this.axisColor;
+        this.canvasMain.fillStyle = this.axisColor;
         var origo = this.getAbsolute(new Point(0, 0));
         var visible = origo.x >= 0 && origo.x <= this.width ? true : false;
         var x = origo.x;
@@ -356,16 +356,16 @@ var LineChartController = (function (_super) {
                 x = this.width;
             }
         }
-        this.ctxMain.beginPath();
-        this.ctxMain.moveTo(x, 0);
-        this.ctxMain.lineTo(x, this.height);
-        this.ctxMain.stroke();
+        this.canvasMain.beginPath();
+        this.canvasMain.moveTo(x, 0);
+        this.canvasMain.lineTo(x, this.height);
+        this.canvasMain.stroke();
         var stepping = this.calculateSteps(this.scalePoint.y);
         var steps = stepping.steps;
         var decimalPlaces = stepping.decimalPlaces;
         var scale = stepping.scale;
         for (var i = -steps; i < this.height + steps; i += steps) {
-            this.ctxMain.beginPath();
+            this.canvasMain.beginPath();
             var absY = this.height - (i + this.movePoint.y % steps);
             var transformer = this.getRelative(new Point(x, absY));
             var number = void 0;
@@ -380,20 +380,20 @@ var LineChartController = (function (_super) {
             else {
                 number = transformer.y.toFixed(decimalPlaces);
             }
-            numWidth = this.ctxMain.measureText(number);
+            numWidth = this.canvasMain.measureText(number);
             numOffset = x === -1 ? x + 8 : x - (numWidth + 7);
-            this.ctxMain.fillText(number, numOffset, absY + 3);
-            this.ctxMain.stroke();
-            this.ctxMain.beginPath();
+            this.canvasMain.fillText(number, numOffset, absY + 3);
+            this.canvasMain.stroke();
+            this.canvasMain.beginPath();
             if (this.showGrid.value) {
-                this.ctxMain.moveTo(0, absY);
-                this.ctxMain.lineTo(this.width, absY);
-                this.ctxMain.strokeStyle = this.gridColor;
-                this.ctxMain.stroke();
+                this.canvasMain.moveTo(0, absY);
+                this.canvasMain.lineTo(this.width, absY);
+                this.canvasMain.strokeStyle = this.gridColor;
+                this.canvasMain.stroke();
             }
         }
-        this.ctxMain.strokeStyle = this.mainColor;
-        this.ctxMain.fillStyle = this.mainColor;
+        this.canvasMain.strokeStyle = this.mainColor;
+        this.canvasMain.fillStyle = this.mainColor;
     };
     LineChartController.prototype.calculateSteps = function (scaling) {
         var log10 = function (val) { return Math.log(val) / Math.LN10; };
@@ -417,7 +417,7 @@ var LineChartController = (function (_super) {
         return { steps: newstep, decimalPlaces: decimalPlaces, scale: scale };
     };
     LineChartController.prototype.zoomByMarking = function () {
-        this.ctxMarking.clear();
+        this.canvasMarking.clear();
         var width = this.marking.width;
         var height = this.marking.height;
         var xRatio = this.width / width;
@@ -501,7 +501,7 @@ var LineChartController = (function (_super) {
         this.mouseDown = false;
         this.isMarking = false;
         this.wrapper.style.cursor = "default";
-        this.ctxMarking.clear();
+        this.canvasMarking.clear();
     };
     LineChartController.prototype.wrapper_mouseDown = function (e) {
         e.preventDefault();
@@ -594,18 +594,20 @@ var LineChartLegend = (function () {
         this.__textColor = "white";
         this.__borderColor = "green";
         this.defHeight = height;
-        this.height = height;
-        this.width = width;
+        this.__height = height;
+        this.__width = width;
         this.__darkTheme = darkTheme;
-        var canvas = document.createElement("canvas");
-        canvas.width = this.width;
-        canvas.height = this.height;
-        this.ctx = new ContextFixer(canvas);
+        this.canvas = new Canvas(false);
+        this.canvas.width = this.__width;
+        this.canvas.height = this.__height;
     }
-    Object.defineProperty(LineChartLegend.prototype, "canvas", {
-        get: function () {
-            return this.ctx.canvas;
-        },
+    Object.defineProperty(LineChartLegend.prototype, "width", {
+        get: function () { return this.__width; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LineChartLegend.prototype, "height", {
+        get: function () { return this.__height; },
         enumerable: true,
         configurable: true
     });
@@ -653,14 +655,13 @@ var LineChartLegend = (function () {
         configurable: true
     });
     LineChartLegend.prototype.draw = function () {
-        var ctx = this.ctx;
         var data = this.__dataSources;
-        ctx.clear();
-        ctx.fillStyle = this.__backgroundColor;
-        ctx.strokeStyle = this.__borderColor;
-        ctx.ctx.rect(0, 0, this.width, this.height);
-        ctx.fill();
-        ctx.stroke();
+        this.canvas.clear();
+        this.canvas.fillStyle = this.__backgroundColor;
+        this.canvas.strokeStyle = this.__borderColor;
+        this.canvas.rect(0, 0, this.__width, this.__height);
+        this.canvas.fill();
+        this.canvas.stroke();
         if (data) {
             var lineSpacing = 13;
             var topBottompadding = 13;
@@ -669,7 +670,7 @@ var LineChartLegend = (function () {
             var lineWidth = 3;
             var positionY = topBottompadding;
             for (var i = 0; i < data.length; i++) {
-                if (positionY > this.height - topBottompadding) {
+                if (positionY > this.__height - topBottompadding) {
                     this.resize(positionY + topBottompadding);
                     this.draw();
                     return;
@@ -677,154 +678,47 @@ var LineChartLegend = (function () {
                 var positionX = sidePadding;
                 var name_1 = data[i].infos.SensorInfos[0].Name;
                 var unit = data[i].infos.SensorInfos[0].Unit;
-                ctx.beginPath();
+                this.canvas.beginPath();
                 if (this.__darkTheme) {
-                    ctx.strokeStyle = data[i].color.toString();
+                    this.canvas.strokeStyle = data[i].color.toString();
                 }
                 else {
-                    ctx.strokeStyle = data[i].color.toString(true);
+                    this.canvas.strokeStyle = data[i].color.toString(true);
                 }
-                ctx.ctx.lineCap = "round";
-                ctx.moveTo(positionX, positionY);
+                this.canvas.lineCap = "round";
+                this.canvas.moveTo(positionX, positionY);
                 positionX += lineLength;
-                ctx.lineTo(positionX, positionY);
-                ctx.lineWidth = lineWidth;
-                ctx.stroke();
-                ctx.lineWidth = 1;
+                this.canvas.lineTo(positionX, positionY);
+                this.canvas.lineWidth = lineWidth;
+                this.canvas.stroke();
+                this.canvas.lineWidth = 1;
                 positionX += 10;
-                ctx.moveTo(positionX, positionY);
-                ctx.fillStyle = this.__textColor;
-                ctx.textAlign = "start";
-                ctx.textBaseline = "middle";
+                this.canvas.moveTo(positionX, positionY);
+                this.canvas.fillStyle = this.__textColor;
+                this.canvas.textAlign = "start";
+                this.canvas.textBaseline = "middle";
                 if (unit) {
                     unit = unit.replace("&deg;", "°");
-                    ctx.fillText(name_1 + " (" + unit + ")", positionX, positionY, (this.width - positionX - sidePadding));
+                    this.canvas.fillText(name_1 + " (" + unit + ")", positionX, positionY, (this.__width - positionX - sidePadding));
                 }
                 else {
-                    ctx.fillText(name_1, positionX, positionY, (this.width - positionX - sidePadding));
+                    this.canvas.fillText(name_1, positionX, positionY, (this.__width - positionX - sidePadding));
                 }
-                ctx.closePath();
+                this.canvas.closePath();
                 positionY += lineSpacing;
             }
         }
         else {
-            ctx.fillStyle = this.__textColor;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("No data", (this.width / 2), (this.height / 2));
+            this.canvas.fillStyle = this.__textColor;
+            this.canvas.textAlign = "center";
+            this.canvas.textBaseline = "middle";
+            this.canvas.fillText("No data", (this.__width / 2), (this.__height / 2));
         }
     };
     LineChartLegend.prototype.resize = function (height) {
-        this.height = height;
-        this.ctx.canvas.height = height;
+        this.__height = height;
+        this.canvas.height = height;
     };
     return LineChartLegend;
 }());
-var ContextFixer = (function () {
-    function ContextFixer(canvas) {
-        this.canvas = canvas;
-        var temp = this.canvas.getContext("2d");
-        if (temp === null) {
-            throw new Error("Context undefined exception, context 2D not supported");
-        }
-        this.ctx = temp;
-        this.fillStyle = "black";
-        this.strokeStyle = "black";
-        this.lineWidth = 1;
-    }
-    ContextFixer.prototype.fill = function () {
-        this.ctx.fillStyle = this.fillStyle;
-        this.ctx.fill();
-    };
-    ContextFixer.prototype.moveTo = function (x, y) {
-        var newX = Math.floor(x) + 0.5;
-        var newY = Math.floor(y) + 0.5;
-        this.ctx.moveTo(newX, newY);
-    };
-    ContextFixer.prototype.lineTo = function (x, y) {
-        this.ctx.lineWidth = this.lineWidth;
-        var newX = Math.floor(x) + 0.5;
-        var newY = Math.floor(y) + 0.5;
-        this.ctx.lineTo(newX, newY);
-    };
-    ContextFixer.prototype.clear = function () {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    };
-    ContextFixer.prototype.beginPath = function () {
-        this.ctx.beginPath();
-    };
-    ContextFixer.prototype.closePath = function () {
-        this.ctx.closePath();
-    };
-    ContextFixer.prototype.stroke = function () {
-        this.ctx.lineWidth = this.lineWidth;
-        this.ctx.strokeStyle = this.strokeStyle;
-        this.ctx.stroke();
-    };
-    ContextFixer.prototype.fillText = function (text, x, y, maxWidth) {
-        this.ctx.fillStyle = this.fillStyle;
-        this.ctx.textAlign = this.textAlign;
-        this.ctx.textBaseline = this.textBaseline;
-        if (maxWidth) {
-            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
-        }
-        else {
-            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
-        }
-    };
-    ContextFixer.prototype.fillRect = function (x, y, width, height) {
-        this.ctx.fillStyle = this.fillStyle;
-        var newX = Math.floor(x);
-        var newY = Math.floor(y);
-        var newWidth = Math.floor(width);
-        var newHeight = Math.floor(height);
-        this.ctx.fillRect(newX, newY, newWidth, newHeight);
-    };
-    ContextFixer.prototype.arc = function (x, y, radius, startAngle, endAngle) {
-        radius = radius < 0 ? 0 : radius;
-        this.ctx.arc(x, y, radius, startAngle, endAngle);
-    };
-    ContextFixer.prototype.measureText = function (text) {
-        return this.ctx.measureText(text).width;
-    };
-    ContextFixer.prototype.translate = function (x, y) {
-        this.ctx.translate(x, y);
-    };
-    ContextFixer.prototype.rotate = function (angle) {
-        this.ctx.rotate(angle);
-    };
-    return ContextFixer;
-}());
-var LayeredCanvas = (function () {
-    function LayeredCanvas(wrapper) {
-        this.canvases = [];
-        this.mk = new HtmlHelper;
-        this.wrapper = wrapper;
-    }
-    LayeredCanvas.prototype.addCanvas = function () {
-        var canvas = this.mk.tag("canvas", "plot-canvas");
-        this.wrapper.appendChild(canvas);
-        this.canvases.push(canvas);
-        return canvas;
-    };
-    LayeredCanvas.prototype.getWidth = function () {
-        if (this.canvases.length > 0) {
-            return this.canvases[0].width;
-        }
-        return -1;
-    };
-    LayeredCanvas.prototype.getHeight = function () {
-        if (this.canvases.length > 0) {
-            return this.canvases[0].height;
-        }
-        return -1;
-    };
-    LayeredCanvas.prototype.setSize = function (width, height) {
-        for (var _i = 0, _a = this.canvases; _i < _a.length; _i++) {
-            var c = _a[_i];
-            c.width = width;
-            c.height = height;
-        }
-    };
-    return LayeredCanvas;
-}());
+//# sourceMappingURL=LineChartController.js.map

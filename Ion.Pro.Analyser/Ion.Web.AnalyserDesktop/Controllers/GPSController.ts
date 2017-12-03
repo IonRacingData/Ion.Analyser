@@ -3,7 +3,7 @@ class GPSController extends CanvasController {
     private lastID: string = "";
     private lastSensorInfo: sensys.ISensorInformation;
 
-    private ctxMain: ContextFixer;
+    private canvasMain: Canvas;
     private relSize: IRelativeSize;
     private availablePlotWidth: number;
     private availablePlotHeight: number;
@@ -30,9 +30,11 @@ class GPSController extends CanvasController {
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
 
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.canvas = new LayeredCanvas();
+        this.canvasMain = this.canvas.addCanvas();
         this.canvas.setSize(this.width, this.height);
+
+        this.wrapper.appendChild(this.canvas.wrapper);
         return this.wrapper;
     }
 
@@ -51,9 +53,9 @@ class GPSController extends CanvasController {
             let offsetY: number;
             const posDataLength: number = this.data.length();
 
-            this.ctxMain.clear();
-            this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.color;
+            this.canvasMain.clear();
+            this.canvasMain.beginPath();
+            this.canvasMain.strokeStyle = this.color;
 
             this.rescale();
 
@@ -62,17 +64,17 @@ class GPSController extends CanvasController {
 
             if (posDataLength > 0) {
                 const firstPoint: Point = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
-                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
+                this.canvasMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
 
             for (let i = 0; i < posDataLength; i++) {
 
                 const relPoint: Point = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 const absPoint: Point = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
+                this.canvasMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
 
             }
-            this.ctxMain.stroke();
+            this.canvasMain.stroke();
         }
     }
 

@@ -576,3 +576,203 @@ var TempDataSourceList = (function (_super) {
     };
     return TempDataSourceList;
 }(Component));
+var Canvas = (function (_super) {
+    __extends(Canvas, _super);
+    function Canvas(adjustForPixelRatio) {
+        var _this = _super.call(this) || this;
+        _this.mk = new HtmlHelper();
+        _this.dprAdjust = adjustForPixelRatio || true;
+        _this.__canvas = _this.mk.tag("canvas");
+        _this.wrapper = _this.mk.tag("div", "comp-canvas");
+        _this.wrapper.appendChild(_this.__canvas);
+        var tempContext = _this.__canvas.getContext("2d");
+        if (tempContext) {
+            _this.ctx = tempContext;
+        }
+        else {
+            console.error("Context not defined error");
+        }
+        return _this;
+    }
+    Object.defineProperty(Canvas.prototype, "canvas", {
+        get: function () { return this.__canvas; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "context", {
+        get: function () { return this.ctx; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "height", {
+        get: function () { return this.__canvas.height; },
+        set: function (height) {
+            if (this.dprAdjust) {
+                this.__canvas.height = height * devicePixelRatio;
+                this.__canvas.style.height = height + "px";
+                this.ctx.scale(devicePixelRatio, devicePixelRatio);
+            }
+            else
+                this.__canvas.height = height;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "width", {
+        get: function () { return this.__canvas.height; },
+        set: function (width) {
+            if (this.dprAdjust) {
+                this.__canvas.width = width * devicePixelRatio;
+                this.__canvas.style.width = width + "px";
+                this.ctx.scale(devicePixelRatio, devicePixelRatio);
+            }
+            else
+                this.__canvas.width = width;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "fillStyle", {
+        set: function (fillStyle) { this.ctx.fillStyle = fillStyle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "strokeStyle", {
+        set: function (strokeStyle) { this.ctx.strokeStyle = strokeStyle; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "lineWidth", {
+        set: function (lineWidth) { this.ctx.lineWidth = lineWidth; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "textBaseline", {
+        set: function (textBaseline) { this.ctx.textBaseline = textBaseline; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "textAlign", {
+        set: function (textAlign) { this.ctx.textAlign = textAlign; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "font", {
+        set: function (font) { this.ctx.font = font; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Canvas.prototype, "lineCap", {
+        set: function (lineCap) { this.ctx.lineCap = lineCap; },
+        enumerable: true,
+        configurable: true
+    });
+    Canvas.prototype.fill = function () {
+        this.ctx.fill();
+    };
+    Canvas.prototype.moveTo = function (x, y) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.moveTo(newX, newY);
+    };
+    Canvas.prototype.lineTo = function (x, y) {
+        var newX = Math.floor(x) + 0.5;
+        var newY = Math.floor(y) + 0.5;
+        this.ctx.lineTo(newX, newY);
+    };
+    Canvas.prototype.clear = function () {
+        this.ctx.clearRect(0, 0, this.__canvas.width, this.__canvas.height);
+    };
+    Canvas.prototype.beginPath = function () {
+        this.ctx.beginPath();
+    };
+    Canvas.prototype.closePath = function () {
+        this.ctx.closePath();
+    };
+    Canvas.prototype.stroke = function () {
+        this.ctx.stroke();
+    };
+    Canvas.prototype.fillText = function (text, x, y, maxWidth) {
+        if (maxWidth) {
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
+        }
+        else {
+            this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
+        }
+    };
+    Canvas.prototype.fillRect = function (x, y, width, height) {
+        var newX = Math.floor(x);
+        var newY = Math.floor(y);
+        var newWidth = Math.floor(width);
+        var newHeight = Math.floor(height);
+        this.ctx.fillRect(newX, newY, newWidth, newHeight);
+    };
+    Canvas.prototype.arc = function (x, y, radius, startAngle, endAngle) {
+        radius = radius < 0 ? 0 : radius;
+        this.ctx.arc(x, y, radius, startAngle, endAngle);
+    };
+    Canvas.prototype.measureText = function (text) {
+        return this.ctx.measureText(text).width;
+    };
+    Canvas.prototype.translate = function (x, y) {
+        this.ctx.translate(x, y);
+    };
+    Canvas.prototype.rotate = function (angle) {
+        this.ctx.rotate(angle);
+    };
+    Canvas.prototype.drawImage = function (image, dstX, dstY) {
+        this.ctx.drawImage(image.canvas, dstX, dstY);
+    };
+    Canvas.prototype.setTransform = function (m11, m12, m21, m22, dx, dy) {
+        this.ctx.setTransform(m11, m12, m21, m22, dx, dy);
+    };
+    Canvas.prototype.rect = function (x, y, w, h) {
+        this.ctx.rect(x, y, w, h);
+    };
+    return Canvas;
+}(Component));
+var LayeredCanvas = (function (_super) {
+    __extends(LayeredCanvas, _super);
+    function LayeredCanvas() {
+        var _this = _super.call(this) || this;
+        _this.canvases = [];
+        _this.mk = new HtmlHelper();
+        _this.wrapper = _this.mk.tag("div", "comp-layeredCanvas");
+        return _this;
+    }
+    Object.defineProperty(LayeredCanvas.prototype, "width", {
+        get: function () {
+            if (this.canvases.length > 0) {
+                return this.canvases[0].width;
+            }
+            return -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LayeredCanvas.prototype, "height", {
+        get: function () {
+            if (this.canvases.length > 0) {
+                return this.canvases[0].height;
+            }
+            return -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    LayeredCanvas.prototype.addCanvas = function () {
+        var canvas = new Canvas();
+        this.wrapper.appendChild(canvas.wrapper);
+        this.canvases.push(canvas);
+        return canvas;
+    };
+    LayeredCanvas.prototype.setSize = function (width, height) {
+        for (var _i = 0, _a = this.canvases; _i < _a.length; _i++) {
+            var c = _a[_i];
+            c.width = width;
+            c.height = height;
+        }
+    };
+    return LayeredCanvas;
+}(Component));
+//# sourceMappingURL=components.js.map

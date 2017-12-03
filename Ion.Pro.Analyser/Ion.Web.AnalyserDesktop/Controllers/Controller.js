@@ -232,8 +232,8 @@ var ScatterChartBase = (function (_super) {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        //this.canvas = new LayeredCanvasOld(this.wrapper);
+        //this.ctxMain = new ContextFixer(this.canvas.addCanvas());
         this.canvas.setSize(this.width, this.height);
         return this.wrapper;
     };
@@ -249,22 +249,22 @@ var ScatterChartBase = (function (_super) {
             var offsetX = void 0;
             var offsetY = void 0;
             var posDataLength = this.data.length();
-            this.ctxMain.clear();
-            this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.color;
+            this.cavasMain.clear();
+            this.cavasMain.beginPath();
+            this.cavasMain.strokeStyle = this.color;
             this.rescale();
             offsetX = (this.width - this.plotWidth) / 2;
             offsetY = (this.height - this.plotHeight) / 2;
             if (posDataLength > 0) {
                 var firstPoint = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
-                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
+                this.cavasMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
             for (var i = 0; i < posDataLength; i++) {
                 var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 var absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
+                this.cavasMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
             }
-            this.ctxMain.stroke();
+            this.cavasMain.stroke();
         }
     };
     ScatterChartBase.prototype.findMinMax = function () {
@@ -334,3 +334,4 @@ var Rectangle = (function () {
     };
     return Rectangle;
 }());
+//# sourceMappingURL=Controller.js.map

@@ -4,7 +4,9 @@ window.addEventListener("load", () => {
     startUp();
 });
 
-window.onbeforeunload = function(e) {
+window.onbeforeunload = function (e) {
+    if (testing) return;
+
     e = e || window.event;
 
     // For IE and Firefox prior to version 4

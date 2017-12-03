@@ -27,9 +27,10 @@ var GPSController = (function (_super) {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas(this.wrapper);
-        this.ctxMain = new ContextFixer(this.canvas.addCanvas());
+        this.canvas = new LayeredCanvas();
+        this.canvasMain = this.canvas.addCanvas();
         this.canvas.setSize(this.width, this.height);
+        this.wrapper.appendChild(this.canvas.wrapper);
         return this.wrapper;
     };
     GPSController.prototype.onSizeChange = function () {
@@ -44,22 +45,22 @@ var GPSController = (function (_super) {
             var offsetX = void 0;
             var offsetY = void 0;
             var posDataLength = this.data.length();
-            this.ctxMain.clear();
-            this.ctxMain.beginPath();
-            this.ctxMain.strokeStyle = this.color;
+            this.canvasMain.clear();
+            this.canvasMain.beginPath();
+            this.canvasMain.strokeStyle = this.color;
             this.rescale();
             offsetX = (this.width - this.plotWidth) / 2;
             offsetY = (this.height - this.plotHeight) / 2;
             if (posDataLength > 0) {
                 var firstPoint = this.getAbsolute(new Point(this.data.getValue(0).x, this.data.getValue(0).y));
-                this.ctxMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
+                this.canvasMain.lineTo(firstPoint.x + offsetX, firstPoint.y - offsetY);
             }
             for (var i = 0; i < posDataLength; i++) {
                 var relPoint = new Point(this.data.getValue(i).x, this.data.getValue(i).y);
                 var absPoint = this.getAbsolute(relPoint);
-                this.ctxMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
+                this.canvasMain.lineTo(absPoint.x + offsetX, absPoint.y - offsetY);
             }
-            this.ctxMain.stroke();
+            this.canvasMain.stroke();
         }
     };
     GPSController.prototype.findMinMax = function () {
@@ -115,3 +116,4 @@ var GPSController = (function (_super) {
     };
     return GPSController;
 }(CanvasController));
+//# sourceMappingURL=GPSController.js.map

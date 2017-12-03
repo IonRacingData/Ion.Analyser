@@ -24,10 +24,11 @@ var GaugeController = (function (_super) {
         _this.centerColor = "black";
         _this.wrapper = _this.mk.tag("div", "gauge-controller-wrapper");
         _this.contentWrapper = _this.mk.tag("div", "gauge-controller-content");
-        _this.canvas = new LayeredCanvas(_this.contentWrapper);
-        _this.ctxMain = new ContextFixer(_this.canvas.addCanvas());
-        _this.ctxNeedle = new ContextFixer(_this.canvas.addCanvas());
-        _this.ctxCenter = new ContextFixer(_this.canvas.addCanvas());
+        _this.canvas = new LayeredCanvas();
+        _this.canvasMain = _this.canvas.addCanvas();
+        _this.canvasNeedle = _this.canvas.addCanvas();
+        _this.canvasCenter = _this.canvas.addCanvas();
+        _this.contentWrapper.appendChild(_this.canvas.wrapper);
         _this.wrapper.appendChild(_this.contentWrapper);
         _this.wrapper.appendChild(_this.legendWrapper);
         // following 'if' doesn't work, need fixing
@@ -54,41 +55,41 @@ var GaugeController = (function (_super) {
         return labels;
     };
     GaugeController.prototype.draw = function () {
-        this.ctxMain.clear();
-        this.ctxCenter.clear();
-        this.ctxMain.fillStyle = this.color;
-        this.ctxMain.strokeStyle = this.color;
+        this.canvasMain.clear();
+        this.canvasCenter.clear();
+        this.canvasMain.fillStyle = this.color;
+        this.canvasMain.strokeStyle = this.color;
         var radius = this.size / 2;
         // center dot
-        this.ctxCenter.fillStyle = this.color;
-        this.ctxCenter.translate(radius + this.offsetX, radius + this.offsetY);
-        this.ctxCenter.beginPath();
-        this.ctxCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
-        this.ctxCenter.fill();
-        this.ctxCenter.closePath();
+        this.canvasCenter.fillStyle = this.color;
+        this.canvasCenter.translate(radius + this.offsetX, radius + this.offsetY);
+        this.canvasCenter.beginPath();
+        this.canvasCenter.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
+        this.canvasCenter.fill();
+        this.canvasCenter.closePath();
         // ring
-        this.ctxMain.beginPath();
-        this.ctxMain.translate(radius + this.offsetX, radius + this.offsetY);
-        this.ctxMain.arc(0, 0, radius - this.padding, 3 * Math.PI / 4, Math.PI / 4);
-        this.ctxMain.stroke();
-        this.ctxMain.closePath();
+        this.canvasMain.beginPath();
+        this.canvasMain.translate(radius + this.offsetX, radius + this.offsetY);
+        this.canvasMain.arc(0, 0, radius - this.padding, 3 * Math.PI / 4, Math.PI / 4);
+        this.canvasMain.stroke();
+        this.canvasMain.closePath();
         // labels
-        this.ctxMain.textBaseline = "middle";
-        this.ctxMain.textAlign = "center";
-        this.ctxMain.ctx.font = radius * 0.1 + "px sans-serif";
+        this.canvasMain.textBaseline = "middle";
+        this.canvasMain.textAlign = "center";
+        this.canvasMain.font = radius * 0.1 + "px sans-serif";
         for (var i = 0; i < this.labels.length; i++) {
             var increment = this.totalAngle / (this.labels.length - 1);
             var ang = (i * increment) + this.startAngle;
-            this.ctxMain.rotate(ang);
-            this.ctxMain.translate(0, -radius * 0.8);
-            this.ctxMain.rotate(-ang);
-            this.ctxMain.fillText(this.labels[i], 0, 0);
-            this.ctxMain.rotate(ang);
-            this.ctxMain.translate(0, radius * 0.8);
-            this.ctxMain.rotate(-ang);
+            this.canvasMain.rotate(ang);
+            this.canvasMain.translate(0, -radius * 0.8);
+            this.canvasMain.rotate(-ang);
+            this.canvasMain.fillText(this.labels[i], 0, 0);
+            this.canvasMain.rotate(ang);
+            this.canvasMain.translate(0, radius * 0.8);
+            this.canvasMain.rotate(-ang);
         }
-        this.ctxMain.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.ctxCenter.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.canvasMain.setTransform(1, 0, 0, 1, 0, 0);
+        this.canvasCenter.setTransform(1, 0, 0, 1, 0, 0);
         this.drawNeedle();
     };
     GaugeController.prototype.drawNeedle = function () {
@@ -101,19 +102,19 @@ var GaugeController = (function (_super) {
             this.percent = 0;
         }
         var val = this.percent * 100;
-        this.ctxNeedle.fillStyle = this.needleColor;
-        this.ctxNeedle.clear();
+        this.canvasNeedle.fillStyle = this.needleColor;
+        this.canvasNeedle.clear();
         var radius = this.size / 2;
-        this.ctxNeedle.translate(radius + this.offsetX, radius + this.offsetY);
+        this.canvasNeedle.translate(radius + this.offsetX, radius + this.offsetY);
         var ang = (val / 100) * this.totalAngle;
-        this.ctxNeedle.rotate(this.startAngle);
-        this.ctxNeedle.rotate(ang);
-        this.ctxNeedle.beginPath();
-        this.ctxNeedle.fillRect(-1, 0, 2, -radius * 0.85);
-        this.ctxNeedle.rotate(-this.startAngle);
-        this.ctxNeedle.rotate(-ang);
-        this.ctxNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
-        this.ctxNeedle.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.canvasNeedle.rotate(this.startAngle);
+        this.canvasNeedle.rotate(ang);
+        this.canvasNeedle.beginPath();
+        this.canvasNeedle.fillRect(-1, 0, 2, -radius * 0.85);
+        this.canvasNeedle.rotate(-this.startAngle);
+        this.canvasNeedle.rotate(-ang);
+        this.canvasNeedle.translate(-(radius + this.offsetX), -(radius + this.offsetY));
+        this.canvasNeedle.setTransform(1, 0, 0, 1, 0, 0);
     };
     GaugeController.prototype.onSizeChange = function () {
         this.contentHeight = this.height - this.legendHeight;
@@ -150,3 +151,4 @@ var GaugeController = (function (_super) {
     };
     return GaugeController;
 }(SingleValueCanvasController));
+//# sourceMappingURL=GaugeController.js.map

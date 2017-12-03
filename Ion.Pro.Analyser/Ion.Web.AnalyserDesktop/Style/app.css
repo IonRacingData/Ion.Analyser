@@ -284,13 +284,11 @@ span.table-resize{
     background-color: #29292D;
 }*/
 
-.plot-canvas {    
-    position: absolute;
-    /*border: 1px solid black;*/
-}
+
 /*.plot-wrapper {
     position: relative;
 }*/
+
 
 .controller-legend {
     font-size: 0.7em;
@@ -641,4 +639,8 @@ span.table-resize{
     position: absolute;
     top: 40px;
     left: 0;
+}
+
+.comp-canvas {
+    position: absolute;
 }
