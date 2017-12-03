@@ -328,7 +328,8 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
             }
 
             const margin: number = 10;
-            this.canvasLegend.drawImage(this.legend.canvas, this.width - this.legend.width - margin, margin);
+            const imageData = this.legend.canvas.getImageData(0, 0, this.legend.width, this.legend.height);
+            this.canvasLegend.putImageData(imageData, this.width - this.legend.width - margin, margin);
         }
     }
 
@@ -741,7 +742,7 @@ class LineChartLegend {
 
         this.__darkTheme = darkTheme;
 
-        this.canvas = new Canvas(false);
+        this.canvas = new Canvas();
         this.canvas.width = this.__width;
         this.canvas.height = this.__height;
     }

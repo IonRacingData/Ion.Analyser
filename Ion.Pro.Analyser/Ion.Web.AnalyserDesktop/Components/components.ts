@@ -662,34 +662,32 @@ class Canvas extends Component {
         }
     }
 
-
-
-    fill() {
+    public fill() {
         this.ctx.fill();
     }
-    moveTo(x: number, y: number): void {
+    public moveTo(x: number, y: number): void {
         const newX: number = Math.floor(x) + 0.5;
         const newY: number = Math.floor(y) + 0.5;
         this.ctx.moveTo(newX, newY);
     }
-    lineTo(x: number, y: number): void {
+    public lineTo(x: number, y: number): void {
         const newX: number = Math.floor(x) + 0.5;
         const newY: number = Math.floor(y) + 0.5;
         this.ctx.lineTo(newX, newY);
     }
-    clear(): void {
+    public clear(): void {
         this.ctx.clearRect(0, 0, this.__canvas.width, this.__canvas.height);
     }
-    beginPath(): void {
+    public beginPath(): void {
         this.ctx.beginPath();
     }
-    closePath(): void {
+    public closePath(): void {
         this.ctx.closePath();
     }
-    stroke(): void {
+    public stroke(): void {
         this.ctx.stroke();
     }
-    fillText(text: string, x: number, y: number, maxWidth?: number): void {
+    public fillText(text: string, x: number, y: number, maxWidth?: number): void {
         if (maxWidth) {
             this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5, maxWidth);
         }
@@ -697,34 +695,40 @@ class Canvas extends Component {
             this.ctx.fillText(text, Math.floor(x) + 0.5, Math.floor(y) + 0.5);
         }
     }
-    fillRect(x: number, y: number, width: number, height: number): void {
+    public fillRect(x: number, y: number, width: number, height: number): void {
         const newX: number = Math.floor(x);
         const newY: number = Math.floor(y);
         const newWidth: number = Math.floor(width);
         const newHeight: number = Math.floor(height);
         this.ctx.fillRect(newX, newY, newWidth, newHeight);
     }
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
+    public arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         radius = radius < 0 ? 0 : radius;
         this.ctx.arc(x, y, radius, startAngle, endAngle);
     }
-    measureText(text: string): number {
+    public measureText(text: string): number {
         return this.ctx.measureText(text).width;
     }
-    translate(x: number, y: number): void {
+    public translate(x: number, y: number): void {
         this.ctx.translate(x, y);
     }
-    rotate(angle: number): void {
+    public rotate(angle: number): void {
         this.ctx.rotate(angle);
     }
-    drawImage(image: Canvas, dstX: number, dstY: number): void {
+    public drawImage(image: Canvas, dstX: number, dstY: number): void {
         this.ctx.drawImage(image.canvas, dstX, dstY);
     }
-    setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number): void {
+    public setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number): void {
         this.ctx.setTransform(m11, m12, m21, m22, dx, dy);
     }
-    rect(x: number, y: number, w: number, h: number): void {
+    public rect(x: number, y: number, w: number, h: number): void {
         this.ctx.rect(x, y, w, h);
+    }
+    public getImageData(sx: number, sy: number, sw: number, sh: number): ImageData {
+        return this.ctx.getImageData(sx, sy, sw * devicePixelRatio, sh * devicePixelRatio );
+    }
+    public putImageData(imageData: ImageData, dx: number, dy: number): void {
+        this.ctx.putImageData(imageData, dx * devicePixelRatio, dy * devicePixelRatio );
     }
 }
 

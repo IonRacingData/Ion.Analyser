@@ -285,7 +285,8 @@ var LineChartController = (function (_super) {
                 this.legend.dataSources = null;
             }
             var margin = 10;
-            this.canvasLegend.drawImage(this.legend.canvas, this.width - this.legend.width - margin, margin);
+            var imageData = this.legend.canvas.getImageData(0, 0, this.legend.width, this.legend.height);
+            this.canvasLegend.putImageData(imageData, this.width - this.legend.width - margin, margin);
         }
     };
     LineChartController.prototype.drawXAxis = function () {
@@ -597,7 +598,7 @@ var LineChartLegend = (function () {
         this.__height = height;
         this.__width = width;
         this.__darkTheme = darkTheme;
-        this.canvas = new Canvas(false);
+        this.canvas = new Canvas();
         this.canvas.width = this.__width;
         this.canvas.height = this.__height;
     }

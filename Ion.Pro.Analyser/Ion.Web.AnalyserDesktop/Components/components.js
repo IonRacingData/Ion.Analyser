@@ -729,6 +729,12 @@ var Canvas = (function (_super) {
     Canvas.prototype.rect = function (x, y, w, h) {
         this.ctx.rect(x, y, w, h);
     };
+    Canvas.prototype.getImageData = function (sx, sy, sw, sh) {
+        return this.ctx.getImageData(sx, sy, sw * devicePixelRatio, sh * devicePixelRatio);
+    };
+    Canvas.prototype.putImageData = function (imageData, dx, dy) {
+        this.ctx.putImageData(imageData, dx * devicePixelRatio, dy * devicePixelRatio);
+    };
     return Canvas;
 }(Component));
 var LayeredCanvas = (function (_super) {
