@@ -23,9 +23,7 @@ class GPSController extends CanvasController {
 
         this.availablePlotWidth = this.width - (this.padding * 2);
         this.availablePlotHeight = this.height - (this.padding * 2);
-    }
 
-    public generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
@@ -35,7 +33,6 @@ class GPSController extends CanvasController {
         this.canvas.setSize(this.width, this.height);
 
         this.wrapper.appendChild(this.canvas.wrapper);
-        return this.wrapper;
     }
 
     protected onSizeChange(): void {

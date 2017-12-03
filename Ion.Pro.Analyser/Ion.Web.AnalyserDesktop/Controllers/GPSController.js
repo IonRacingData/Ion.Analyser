@@ -21,18 +21,15 @@ var GPSController = (function (_super) {
         _this.padding = _this.width * 0.05;
         _this.availablePlotWidth = _this.width - (_this.padding * 2);
         _this.availablePlotHeight = _this.height - (_this.padding * 2);
+        _this.wrapper = document.createElement("div");
+        _this.wrapper.setAttribute("tabindex", "0");
+        _this.wrapper.className = "plot-wrapper";
+        _this.canvas = new LayeredCanvas();
+        _this.canvasMain = _this.canvas.addCanvas();
+        _this.canvas.setSize(_this.width, _this.height);
+        _this.wrapper.appendChild(_this.canvas.wrapper);
         return _this;
     }
-    GPSController.prototype.generate = function () {
-        this.wrapper = document.createElement("div");
-        this.wrapper.setAttribute("tabindex", "0");
-        this.wrapper.className = "plot-wrapper";
-        this.canvas = new LayeredCanvas();
-        this.canvasMain = this.canvas.addCanvas();
-        this.canvas.setSize(this.width, this.height);
-        this.wrapper.appendChild(this.canvas.wrapper);
-        return this.wrapper;
-    };
     GPSController.prototype.onSizeChange = function () {
         this.canvas.setSize(this.width, this.height);
         this.padding = this.width * 0.05;

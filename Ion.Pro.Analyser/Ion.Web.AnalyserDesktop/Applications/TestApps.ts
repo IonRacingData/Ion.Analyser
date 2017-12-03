@@ -334,7 +334,7 @@ class LineChartTester implements IApplication, ICollectionViewer<Point> {
         this.window.content.style.overflow = "hidden";
 
         this.lineChart = new LineChartController();
-        this.window.content.appendChild(this.lineChart.generate());
+        this.window.content.appendChild(this.lineChart.wrapper);
         this.lineChart.setSize(this.window.width, this.window.height);
 
         kernel.senMan.register(this);
@@ -457,7 +457,7 @@ class GPSPlotTester implements IApplication, IViewer<Point3D> {
 
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
-        this.window.content.appendChild(this.plot.generate());
+        this.window.content.appendChild(this.plot.wrapper);
         kernel.senMan.register(this);
 
         this.createEvents(this.app.events);
@@ -668,7 +668,7 @@ class SteeringWheelTester implements IApplication, IViewer<Point> {
         this.plotWindow = this.window;
         kernel.senMan.register(this);
         this.wheel = new SteeringWheelController(this.window.width, this.window.height);
-        const wheelWrapper = this.wheel.generate();
+        const wheelWrapper = this.wheel.wrapper;
         this.window.content.appendChild(wheelWrapper);
         this.wheel.setPer(this.val);
 

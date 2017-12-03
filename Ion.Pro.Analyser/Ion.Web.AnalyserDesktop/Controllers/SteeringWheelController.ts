@@ -10,9 +10,7 @@ class SteeringWheelController extends SingleValueController {
         super();
         this.width = width;
         this.height = height;
-    }
 
-    public generate(): HTMLElement {
         this.wrapper = this.mk.tag("div", "steeringWheel-wrapper");
         this.wheelWrapper = this.mk.tag("div", "", null, this.svgWheel);
         this.wheelWrapper.style.width = "90%";
@@ -20,7 +18,6 @@ class SteeringWheelController extends SingleValueController {
         this.wrapper.appendChild(this.wheelWrapper);
         this.wrapper.style.width = this.width + "px";
         this.wrapper.style.height = this.height + "px";
-        return this.wrapper;
     }
 
     protected onDataChange(): void {

@@ -286,7 +286,7 @@ var LineChartTester = (function () {
         });
         this.window.content.style.overflow = "hidden";
         this.lineChart = new LineChartController();
-        this.window.content.appendChild(this.lineChart.generate());
+        this.window.content.appendChild(this.lineChart.wrapper);
         this.lineChart.setSize(this.window.width, this.window.height);
         kernel.senMan.register(this);
         this.createEvents(this.app.events);
@@ -388,7 +388,7 @@ var GPSPlotTester = (function () {
         });
         this.window.content.style.overflow = "hidden";
         this.plot = new GPSController(this.window.width, this.window.height);
-        this.window.content.appendChild(this.plot.generate());
+        this.window.content.appendChild(this.plot.wrapper);
         kernel.senMan.register(this);
         this.createEvents(this.app.events);
     };
@@ -568,7 +568,7 @@ var SteeringWheelTester = (function () {
         this.plotWindow = this.window;
         kernel.senMan.register(this);
         this.wheel = new SteeringWheelController(this.window.width, this.window.height);
-        var wheelWrapper = this.wheel.generate();
+        var wheelWrapper = this.wheel.wrapper;
         this.window.content.appendChild(wheelWrapper);
         this.wheel.setPer(this.val);
         //wheelWrapper.addEventListener("wheel", (e: WheelEvent) => {
@@ -596,3 +596,4 @@ var SteeringWheelTester = (function () {
     };
     return SteeringWheelTester;
 }());
+//# sourceMappingURL=TestApps.js.map

@@ -73,9 +73,7 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         super();
         this.movePoint = this.movePoint_start.copy();
         this.scalePoint = this.scalePoint_start.copy();
-    }
 
-    generate(): HTMLElement {
         this.wrapper = document.createElement("div");
         this.wrapper.setAttribute("tabindex", "0");
         this.wrapper.className = "plot-wrapper";
@@ -105,9 +103,8 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
         this.wrapper.addEventListener("keydown", (e: KeyboardEvent) => this.wrapper_keyDown(e));
         this.wrapper.addEventListener("keyup", (e: KeyboardEvent) => this.wrapper_keyUp(e));
         this.updateColors();
-
-        return this.wrapper;
     }
+
     darkTheme: boolean = true;
     private setColors(): void {
 
