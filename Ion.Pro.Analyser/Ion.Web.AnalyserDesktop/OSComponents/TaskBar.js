@@ -104,6 +104,78 @@ var MainMenu = (function (_super) {
     };
     return MainMenu;
 }(Applet));
+var SlidingMenu = (function (_super) {
+    __extends(SlidingMenu, _super);
+    function SlidingMenu(content) {
+        var _this = _super.call(this) || this;
+        _this.mk = new HtmlHelper();
+        _this.touchX = 0;
+        _this.width = 220;
+        _this.menuOpen = false;
+        _this.content = content;
+        _this.content.style.verticalAlign = "top";
+        var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="4.2" x2="21.1" y2="4.2"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19.8" x2="21.1" y2="19.8"/></g></svg>';
+        _this.content.appendChild(_this.mk.tag("div", "btn-taskbar", [{ event: "click", func: function () { return _this.btn_click(); } }], svg));
+        _this.menuWrapper = _this.mk.tag("div", "slidingMenu-wrapper");
+        _this.menuWrapper.style.left = -_this.width + "px";
+        _this.menuWrapper.style.transition = "left 0.3s";
+        var touchArea = _this.mk.tag("div", "slidingMenu-touchArea");
+        touchArea.addEventListener("touchstart", function (e) { _this.touchStart(e); });
+        touchArea.addEventListener("touchmove", function (e) { _this.touchMove(e); });
+        touchArea.addEventListener("touchend", function (e) { _this.touchEnd(e); });
+        _this.menuWrapper.addEventListener("touchstart", function (e) { _this.touchStart(e); });
+        _this.menuWrapper.addEventListener("touchmove", function (e) { _this.touchMove(e); });
+        _this.menuWrapper.addEventListener("touchend", function (e) { _this.touchEnd(e); });
+        document.body.appendChild(_this.menuWrapper);
+        document.body.appendChild(touchArea);
+        return _this;
+    }
+    SlidingMenu.prototype.btn_click = function () {
+        if (this.menuOpen)
+            this.close();
+        else
+            this.open();
+    };
+    SlidingMenu.prototype.open = function () {
+        this.menuWrapper.style.left = "0";
+        this.menuOpen = true;
+    };
+    SlidingMenu.prototype.close = function () {
+        this.menuWrapper.style.left = -this.width + "px";
+        this.menuOpen = false;
+    };
+    SlidingMenu.prototype.touchStart = function (e) {
+        this.touchX = e.touches[0].clientX;
+        this.menuWrapper.style.transition = "";
+    };
+    SlidingMenu.prototype.touchMove = function (e) {
+        var clientX = e.touches[0].clientX;
+        var dx = clientX - this.touchX;
+        var newPos = e.target === this.menuWrapper ? dx : -this.width + dx;
+        if (newPos > 0)
+            newPos = 0;
+        if (newPos < -this.width)
+            newPos = -this.width;
+        this.menuWrapper.style.left = newPos + "px";
+    };
+    SlidingMenu.prototype.touchEnd = function (e) {
+        this.menuWrapper.style.transition = "left 0.3s";
+        var limit = this.width / 3;
+        if (this.menuOpen) {
+            if (this.menuWrapper.offsetLeft < 0 - limit)
+                this.close();
+            else
+                this.open();
+        }
+        else {
+            if (this.menuWrapper.offsetLeft < -this.width + limit)
+                this.close();
+            else
+                this.open();
+        }
+    };
+    return SlidingMenu;
+}(Applet));
 var ChangeTheme = (function (_super) {
     __extends(ChangeTheme, _super);
     function ChangeTheme(content) {
@@ -113,7 +185,7 @@ var ChangeTheme = (function (_super) {
         _this.content.style.verticalAlign = "top";
         var mk = new HtmlHelper();
         var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.fill{fill:#F0F0F0;}	.fill2{fill:#2a2a2a;}</style><g id="XMLID_3_">	<circle id="XMLID_1_" class="fill" cx="8.2" cy="8.2" r="7.7"/>	<circle id="XMLID_2_" class="fill2" cx="15.8" cy="15.8" r="7.7"/></g></svg>';
-        _this.content.appendChild(mk.tag("div", "btn-themechange", [{ event: "click", func: function (e) { return _this.click_theme(e); } }], svg));
+        _this.content.appendChild(mk.tag("div", "btn-taskbar", [{ event: "click", func: function (e) { return _this.click_theme(e); } }], svg));
         return _this;
     }
     ChangeTheme.prototype.click_theme = function (e) {
@@ -191,3 +263,4 @@ var StatusBar = (function (_super) {
     };
     return StatusBar;
 }(Applet));
+//# sourceMappingURL=TaskBar.js.map

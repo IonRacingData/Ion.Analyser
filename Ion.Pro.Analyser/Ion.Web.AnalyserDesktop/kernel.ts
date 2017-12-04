@@ -57,7 +57,8 @@ function startUp() {
     const statusbar: HTMLElement = mk.tag("div", "taskbar-applet");
 
     const wl: WindowList = new WindowList(content);
-    const menu: MainMenu = new MainMenu(menuContent);
+    //const menu: MainMenu = new MainMenu(menuContent);
+    const menu: SlidingMenu = new SlidingMenu(menuContent);
     const theme: ChangeTheme = new ChangeTheme(themeChange);
     const bar: StatusBar = new StatusBar(statusbar);
 

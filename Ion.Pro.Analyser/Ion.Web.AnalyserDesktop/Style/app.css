@@ -184,15 +184,15 @@ body {
 }*/
 
 
-.btn-themechange {
+.btn-taskbar {
     padding: 8px;
 }
 
-    .btn-themechange:hover {
+    .btn-taskbar:hover {
         background-color: #313C53;    
     }
 
-    .btn-themechange:active {
+    .btn-taskbar:active {
         background-color: #273044;
     }
 
@@ -644,4 +644,27 @@ span.table-resize{
 
 .comp-canvas {
     position: absolute;
+}
+
+.slidingMenu-wrapper {
+    position: absolute;
+    z-index: 1000;
+    top: 40px;
+    width: 220px;
+    height: 100%;
+    background-color: darkolivegreen;
+    /*
+    transition: left 0.3s;*/
+}
+
+.slidingMenu-retracted {
+    left: -220px;
+}
+
+.slidingMenu-touchArea {
+    top: 40px;
+    z-index: 999;
+    position: absolute;
+    height: 100%;
+    width: 10px;
 }

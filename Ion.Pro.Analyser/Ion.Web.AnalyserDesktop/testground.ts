@@ -149,16 +149,10 @@ function tester() {
         draw();
     });
     
+
+    const menu: SlidingMenu = new SlidingMenu(document.createElement("div"));
     
-    /*const lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt augue at justo posuere, sed scelerisque libero rutrum. Donec fermentum, quam et placerat mattis, augue arcu cursus quam, vitae finibus neque nulla sed massa. Mauris congue massa non nisl rhoncus, id malesuada odio iaculis. Aliquam mauris neque, molestie sed tellus vitae, efficitur scelerisque enim. Aliquam viverra vulputate velit quis gravida. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur interdum lorem sed porttitor posuere. Sed posuere nulla quis neque tempus, id ullamcorper metus cursus.";
-    canvas.fillStyle = "white";
-    canvas.font = "30px sans-serif";
-    canvas.fillText(lorem, 50, 50);*/
-
-    const leg = new LineChartLegend(100, 50, false);
-    document.body.appendChild(leg.canvas.wrapper);
-    leg.dataSources = null;
-
+    
 }
 
 

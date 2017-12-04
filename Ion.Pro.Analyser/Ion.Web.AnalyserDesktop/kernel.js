@@ -28,7 +28,8 @@ function startUp() {
     var themeChange = mk.tag("div", "taskbar-applet");
     var statusbar = mk.tag("div", "taskbar-applet");
     var wl = new WindowList(content);
-    var menu = new MainMenu(menuContent);
+    //const menu: MainMenu = new MainMenu(menuContent);
+    var menu = new SlidingMenu(menuContent);
     var theme = new ChangeTheme(themeChange);
     var bar = new StatusBar(statusbar);
     var taskbar = document.getElementsByClassName("taskbar")[0];
