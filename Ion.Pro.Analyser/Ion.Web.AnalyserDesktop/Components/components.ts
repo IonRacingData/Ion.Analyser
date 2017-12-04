@@ -263,6 +263,7 @@ class TableList extends Component {
 
 class ExpandableList extends Component {
     private __data: any[];
+    private touchY: number = 0;
     private mk: HtmlHelper = new HtmlHelper();
 
     public selector: (<T>(obj: T) => IExpandableListSection) | null = null;
@@ -281,6 +282,22 @@ class ExpandableList extends Component {
         super();
         this.wrapper = document.createElement("div");
         this.wrapper.className = "comp-expList";
+
+        // temp events for touch scroll
+        this.wrapper.addEventListener("touchmove", (e) => {
+            const dy = this.touchY - e.touches[0].clientY;
+            this.touchY = e.touches[0].clientY;
+            const parent = this.wrapper.parentElement;
+            if (parent) {
+                parent.scrollTop += dy;
+            }
+        });
+        this.wrapper.addEventListener("touchend", () => {
+            this.touchY = 0;
+        });
+        this.wrapper.addEventListener("touchstart", (e) => {
+            this.touchY = e.touches[0].clientY;
+        });
     }
 
     public update() {
@@ -471,6 +488,7 @@ class TempDataSourceList extends Component {
     private mk: HtmlHelper = new HtmlHelper();
     private sensorTable: HTMLElement;
     private plot: IViewerBase<any>;
+    private touchY = 0;
 
     constructor(plot: IViewerBase<any>) {
         super();
@@ -493,7 +511,29 @@ class TempDataSourceList extends Component {
         else if (sensys.SensorManager.isCollectionViewer(plot)) {
             this.drawMultiSensors(plot as ICollectionViewer<any>, info);
         }
+
+        // temp events for touch scroll
+        this.wrapper.addEventListener("touchmove", (e) => {
+            const dy = this.touchY - e.touches[0].clientY;
+            this.touchY = e.touches[0].clientY;
+            const parent = this.wrapper.parentElement;
+            if (parent) {
+                // dirty fix
+                if (parent.childElementCount > 0) {
+                    const first = parent.firstChild as HTMLElement;
+                    if (first) first.scrollTop += dy;
+                }
+                parent.scrollTop += dy;
+            }
+        });
+        this.wrapper.addEventListener("touchend", () => {
+            this.touchY = 0;
+        });
+        this.wrapper.addEventListener("touchstart", (e) => {
+            this.touchY = e.touches[0].clientY;
+        });
     }
+
 
     public update(): void {
         const info: Array<IDataSource<any>> = kernel.senMan.getDataSources(this.plot.type);

@@ -543,7 +543,6 @@ var LineChartController = (function (_super) {
     };
     LineChartController.prototype.wrapper_touchStart = function (e) {
         e.preventDefault();
-        console.log(e);
         this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
         this.mouseDown = true;
         if (e.altKey) {
@@ -567,7 +566,6 @@ var LineChartController = (function (_super) {
         }
     };
     LineChartController.prototype.wrapper_touchEnd = function (e) {
-        console.log(e);
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {

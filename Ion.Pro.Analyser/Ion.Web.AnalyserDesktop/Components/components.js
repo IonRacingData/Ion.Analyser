@@ -261,11 +261,27 @@ var ExpandableList = (function (_super) {
     __extends(ExpandableList, _super);
     function ExpandableList() {
         var _this = _super.call(this) || this;
+        _this.touchY = 0;
         _this.mk = new HtmlHelper();
         _this.selector = null;
         _this.onItemClick = newEvent("ExpandableList.onItemClick");
         _this.wrapper = document.createElement("div");
         _this.wrapper.className = "comp-expList";
+        // temp events for touch scroll
+        _this.wrapper.addEventListener("touchmove", function (e) {
+            var dy = _this.touchY - e.touches[0].clientY;
+            _this.touchY = e.touches[0].clientY;
+            var parent = _this.wrapper.parentElement;
+            if (parent) {
+                parent.scrollTop += dy;
+            }
+        });
+        _this.wrapper.addEventListener("touchend", function () {
+            _this.touchY = 0;
+        });
+        _this.wrapper.addEventListener("touchstart", function (e) {
+            _this.touchY = e.touches[0].clientY;
+        });
         return _this;
     }
     Object.defineProperty(ExpandableList.prototype, "data", {
@@ -457,6 +473,7 @@ var TempDataSourceList = (function (_super) {
     function TempDataSourceList(plot) {
         var _this = _super.call(this) || this;
         _this.mk = new HtmlHelper();
+        _this.touchY = 0;
         _this.plot = plot;
         var info = kernel.senMan.getDataSources(plot.type);
         _this.sensorTable = _this.mk.tag("div");
@@ -471,6 +488,27 @@ var TempDataSourceList = (function (_super) {
         else if (sensys.SensorManager.isCollectionViewer(plot)) {
             _this.drawMultiSensors(plot, info);
         }
+        // temp events for touch scroll
+        _this.wrapper.addEventListener("touchmove", function (e) {
+            var dy = _this.touchY - e.touches[0].clientY;
+            _this.touchY = e.touches[0].clientY;
+            var parent = _this.wrapper.parentElement;
+            if (parent) {
+                // dirty fix
+                if (parent.childElementCount > 0) {
+                    var first = parent.firstChild;
+                    if (first)
+                        first.scrollTop += dy;
+                }
+                parent.scrollTop += dy;
+            }
+        });
+        _this.wrapper.addEventListener("touchend", function () {
+            _this.touchY = 0;
+        });
+        _this.wrapper.addEventListener("touchstart", function (e) {
+            _this.touchY = e.touches[0].clientY;
+        });
         return _this;
     }
     TempDataSourceList.prototype.update = function () {

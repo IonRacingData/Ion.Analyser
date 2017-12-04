@@ -644,7 +644,6 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
 
     private wrapper_touchStart(e: TouchEvent): void {
         e.preventDefault();
-        console.log(e);
         this.mouseMod = new Point(this.movePoint.x - e.touches[0].clientX, this.movePoint.y - (this.height - e.touches[0].clientY));
         this.mouseDown = true;
         if (e.altKey) {
@@ -671,7 +670,6 @@ class LineChartController extends MultiValueCanvasController implements IConfigu
     }
 
     private wrapper_touchEnd(e: TouchEvent): void {
-        console.log(e);
         this.wrapper.focus();
         this.mouseDown = false;
         if (this.isDragging) {
