@@ -111,23 +111,31 @@ var SlidingMenu = (function (_super) {
         _this.mk = new HtmlHelper();
         _this.touchX = 0;
         _this.width = 220;
+        _this.touchWidth = 10;
+        _this.transition = "left 0.2s";
         _this.menuOpen = false;
         _this.content = content;
         _this.content.style.verticalAlign = "top";
-        var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="4.2" x2="21.1" y2="4.2"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19.8" x2="21.1" y2="19.8"/></g></svg>';
+        var svg = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="5" x2="21.1" y2="5"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19" x2="21.1" y2="19"/></g></svg>';
         _this.content.appendChild(_this.mk.tag("div", "btn-taskbar", [{ event: "click", func: function () { return _this.btn_click(); } }], svg));
         _this.menuWrapper = _this.mk.tag("div", "slidingMenu-wrapper");
         _this.menuWrapper.style.left = -_this.width + "px";
-        _this.menuWrapper.style.transition = "left 0.3s";
-        var touchArea = _this.mk.tag("div", "slidingMenu-touchArea");
-        touchArea.addEventListener("touchstart", function (e) { _this.touchStart(e); });
-        touchArea.addEventListener("touchmove", function (e) { _this.touchMove(e); });
-        touchArea.addEventListener("touchend", function (e) { _this.touchEnd(e); });
+        _this.menuWrapper.style.width = _this.width + "px";
+        _this.menuWrapper.style.transition = _this.transition;
+        _this.touchArea = _this.mk.tag("div", "slidingMenu-touchArea");
+        _this.touchArea.addEventListener("touchstart", function (e) { _this.touchStart(e); });
+        _this.touchArea.addEventListener("touchmove", function (e) { _this.touchMove(e); });
+        _this.touchArea.addEventListener("touchend", function (e) { _this.touchEnd(e); });
         _this.menuWrapper.addEventListener("touchstart", function (e) { _this.touchStart(e); });
         _this.menuWrapper.addEventListener("touchmove", function (e) { _this.touchMove(e); });
         _this.menuWrapper.addEventListener("touchend", function (e) { _this.touchEnd(e); });
+        _this.touchArea.addEventListener("click", function () {
+            if (_this.menuOpen) {
+                _this.close();
+            }
+        });
         document.body.appendChild(_this.menuWrapper);
-        document.body.appendChild(touchArea);
+        document.body.appendChild(_this.touchArea);
         return _this;
     }
     SlidingMenu.prototype.btn_click = function () {
@@ -138,15 +146,18 @@ var SlidingMenu = (function (_super) {
     };
     SlidingMenu.prototype.open = function () {
         this.menuWrapper.style.left = "0";
+        this.touchArea.style.width = "100%";
         this.menuOpen = true;
     };
     SlidingMenu.prototype.close = function () {
         this.menuWrapper.style.left = -this.width + "px";
+        this.touchArea.style.width = this.touchWidth + "px";
         this.menuOpen = false;
     };
     SlidingMenu.prototype.touchStart = function (e) {
         this.touchX = e.touches[0].clientX;
         this.menuWrapper.style.transition = "";
+        this.touchArea.style.width = "100%";
     };
     SlidingMenu.prototype.touchMove = function (e) {
         var clientX = e.touches[0].clientX;
@@ -159,7 +170,7 @@ var SlidingMenu = (function (_super) {
         this.menuWrapper.style.left = newPos + "px";
     };
     SlidingMenu.prototype.touchEnd = function (e) {
-        this.menuWrapper.style.transition = "left 0.3s";
+        this.menuWrapper.style.transition = this.transition;
         var limit = this.width / 3;
         if (this.menuOpen) {
             if (this.menuWrapper.offsetLeft < 0 - limit)
@@ -173,6 +184,8 @@ var SlidingMenu = (function (_super) {
             else
                 this.open();
         }
+        if (!this.menuOpen)
+            this.touchArea.style.width = this.touchWidth + "px";
     };
     return SlidingMenu;
 }(Applet));

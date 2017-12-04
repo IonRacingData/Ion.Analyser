@@ -101,16 +101,19 @@ class MainMenu extends Applet {
 
 class SlidingMenu extends Applet {
     private menuWrapper: HTMLElement;
+    private touchArea: HTMLElement;
     private mk: HtmlHelper = new HtmlHelper();
     private touchX: number = 0;
     private width: number = 220;
+    private touchWidth: number = 10;
+    private transition: string = "left 0.2s";
     private menuOpen: boolean = false;
 
     constructor(content: HTMLElement) {
         super();
         this.content = content;
         this.content.style.verticalAlign = "top";
-        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:4;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="4.2" x2="21.1" y2="4.2"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19.8" x2="21.1" y2="19.8"/></g></svg>';
+        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="5" x2="21.1" y2="5"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19" x2="21.1" y2="19"/></g></svg>';
         this.content.appendChild(this.mk.tag(
             "div"
             , "btn-taskbar"
@@ -120,19 +123,26 @@ class SlidingMenu extends Applet {
 
         this.menuWrapper = this.mk.tag("div", "slidingMenu-wrapper");
         this.menuWrapper.style.left = -this.width + "px";
-        this.menuWrapper.style.transition = "left 0.3s";
+        this.menuWrapper.style.width = this.width + "px";
+        this.menuWrapper.style.transition = this.transition;
 
-        const touchArea: HTMLElement = this.mk.tag("div", "slidingMenu-touchArea");
+        this.touchArea = this.mk.tag("div", "slidingMenu-touchArea");
 
-        touchArea.addEventListener("touchstart", (e) => { this.touchStart(e) });
-        touchArea.addEventListener("touchmove", (e) => { this.touchMove(e) });
-        touchArea.addEventListener("touchend", (e) => { this.touchEnd(e) });
+        this.touchArea.addEventListener("touchstart", (e) => { this.touchStart(e) });
+        this.touchArea.addEventListener("touchmove", (e) => { this.touchMove(e) });
+        this.touchArea.addEventListener("touchend", (e) => { this.touchEnd(e) });
         this.menuWrapper.addEventListener("touchstart", (e) => { this.touchStart(e) });
         this.menuWrapper.addEventListener("touchmove", (e) => { this.touchMove(e) });
         this.menuWrapper.addEventListener("touchend", (e) => { this.touchEnd(e) });
-        
+
+        this.touchArea.addEventListener("click", () => {
+            if (this.menuOpen) {
+                this.close();
+            }
+        });
+
         document.body.appendChild(this.menuWrapper);
-        document.body.appendChild(touchArea);
+        document.body.appendChild(this.touchArea);
     }
 
     private btn_click(): void {
@@ -142,16 +152,19 @@ class SlidingMenu extends Applet {
 
     private open(): void {
         this.menuWrapper.style.left = "0";
+        this.touchArea.style.width = "100%";
         this.menuOpen = true;
     }
     private close(): void {
         this.menuWrapper.style.left = -this.width + "px";
+        this.touchArea.style.width = this.touchWidth + "px";
         this.menuOpen = false;
     }
 
     private touchStart(e: TouchEvent): void {
         this.touchX = e.touches[0].clientX;
         this.menuWrapper.style.transition = "";
+        this.touchArea.style.width = "100%";
     }
     private touchMove(e: TouchEvent): void {
         const clientX = e.touches[0].clientX;
@@ -162,7 +175,7 @@ class SlidingMenu extends Applet {
         this.menuWrapper.style.left = newPos + "px";
     }
     private touchEnd(e: TouchEvent): void {
-        this.menuWrapper.style.transition = "left 0.3s";
+        this.menuWrapper.style.transition = this.transition;
         const limit: number = this.width / 3;
         if (this.menuOpen) {
             if (this.menuWrapper.offsetLeft < 0 - limit) this.close();
@@ -172,8 +185,7 @@ class SlidingMenu extends Applet {
             if (this.menuWrapper.offsetLeft < -this.width + limit) this.close();
             else this.open();
         }
-
-        
+        if (!this.menuOpen) this.touchArea.style.width = this.touchWidth + "px";
     }
 }
 
