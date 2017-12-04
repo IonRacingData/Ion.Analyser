@@ -113,7 +113,7 @@ class SlidingMenu extends Applet {
         super();
         this.content = content;
         this.content.style.verticalAlign = "top";
-        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="5" x2="21.1" y2="5"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19" x2="21.1" y2="19"/></g></svg>';
+        const svg: string = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"	width="24px" height="24px" display="block" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve"><style type="text/css">	.st0{fill:none;stroke:#dbdbdb;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}</style><g id="XMLID_226_">	<line id="XMLID_229_" class="st0" x1="2.9" y1="5" x2="21.1" y2="5"/>	<line id="XMLID_228_" class="st0" x1="2.9" y1="12" x2="21.1" y2="12"/>	<line id="XMLID_227_" class="st0" x1="2.9" y1="19" x2="21.1" y2="19"/></g></svg>';
         this.content.appendChild(this.mk.tag(
             "div"
             , "btn-taskbar"
