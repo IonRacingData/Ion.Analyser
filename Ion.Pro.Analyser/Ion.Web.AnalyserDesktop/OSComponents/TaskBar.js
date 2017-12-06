@@ -136,8 +136,38 @@ var SlidingMenu = (function (_super) {
         });
         document.body.appendChild(_this.menuWrapper);
         document.body.appendChild(_this.touchArea);
+        _this.fillMenu();
         return _this;
     }
+    SlidingMenu.prototype.fillMenu = function () {
+        var _this = this;
+        var menuList = new MenuList();
+        this.menuWrapper.appendChild(menuList.wrapper);
+        var all = kernel.appMan.launchers;
+        if (all['hidden'])
+            delete all['hidden'];
+        var data = [];
+        for (var key in all) {
+            data.push([key, all[key]]);
+        }
+        menuList.selector = function (category) {
+            var launchers = category[1];
+            var items = [];
+            for (var _i = 0, launchers_1 = launchers; _i < launchers_1.length; _i++) {
+                var l = launchers_1[_i];
+                items.push({ text: l.name, object: l });
+            }
+            return {
+                title: category[0],
+                items: items
+            };
+        };
+        menuList.data = data;
+        menuList.onItemClick.addEventListener(function (e) {
+            e.data.createInstance();
+            _this.close();
+        });
+    };
     SlidingMenu.prototype.btn_click = function () {
         if (this.menuOpen)
             this.close();
@@ -162,7 +192,7 @@ var SlidingMenu = (function (_super) {
     SlidingMenu.prototype.touchMove = function (e) {
         var clientX = e.touches[0].clientX;
         var dx = clientX - this.touchX;
-        var newPos = e.target === this.menuWrapper ? dx : -this.width + dx;
+        var newPos = this.menuOpen ? dx : -this.width + dx;
         if (newPos > 0)
             newPos = 0;
         if (newPos < -this.width)

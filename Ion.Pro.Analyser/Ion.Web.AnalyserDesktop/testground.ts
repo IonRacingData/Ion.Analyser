@@ -20,6 +20,7 @@ function tester() {
     const ex: ExpandableList = new ExpandableList();
     const listArr: ListBoxRearrangable = new ListBoxRearrangable();
     const sw = new Switch();
+    const menuList = new MenuList();
 
     /*document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
@@ -30,6 +31,7 @@ function tester() {
     document.body.appendChild(table.wrapper);
     document.body.appendChild(listArr.wrapper);
     document.body.appendChild(sw.wrapper);*/
+    document.body.appendChild(menuList.wrapper);
 
     b.text = "Click Me!";
     b2.text = "Add Fourth";
@@ -61,7 +63,7 @@ function tester() {
                 { text: item.employee.first, object: item.employee.first },
                 { text: item.employee.last, object: item.employee.last },
             ],
-        } as IExpandableListSection;
+        } as IListGroup;
     };
     ex.data = exArr;
 
@@ -113,9 +115,25 @@ function tester() {
     lst.data = arr;
 
 
+    menuList.selector = (item: IWork) => {
+        return {
+            title: item.name,
+            items: [
+                { text: item.employee.first, object: item.employee.first },
+                { text: item.employee.last, object: item.employee.last },
+            ],
+        } as IListGroup;
+    };
+    menuList.data = exArr;
+
+    menuList.onItemClick.addEventListener((e) => {
+        console.log(e.data);
+    })
+
+
 
     const canvas = new Canvas();
-    document.body.appendChild(canvas.wrapper);
+    /*document.body.appendChild(canvas.wrapper);*/
 
     function draw() {
         canvas.clear();
@@ -150,7 +168,7 @@ function tester() {
     });
     
 
-    const menu: SlidingMenu = new SlidingMenu(document.createElement("div"));
+    
     
     
 }

@@ -265,8 +265,7 @@ var ExpandableList = (function (_super) {
         _this.mk = new HtmlHelper();
         _this.selector = null;
         _this.onItemClick = newEvent("ExpandableList.onItemClick");
-        _this.wrapper = document.createElement("div");
-        _this.wrapper.className = "comp-expList";
+        _this.wrapper = _this.mk.tag("div", "comp-expList");
         // temp events for touch scroll
         _this.wrapper.addEventListener("touchmove", function (e) {
             var dy = _this.touchY - e.touches[0].clientY;
@@ -593,18 +592,16 @@ var TempDataSourceList = (function (_super) {
         for (var i = 0; i < info.length; i++) {
             var sensor = info[i];
             var ctrl = drawMethod.call(this, plot, sensor);
-            var label = this.mk.tag("label", "listitem");
+            var label = this.mk.tag("label", "comp-tempDataSourceList-item");
             var firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
-            var innerBox = this.mk.tag("div");
-            innerBox.style.display = "inline-block";
-            innerBox.style.verticalAlign = "middle";
-            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
-            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            var innerBox = this.mk.tag("div", "comp-tempDataSourceList-textWrapper");
+            innerBox.appendChild(this.mk.tag("span", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("span", "", null, firstInfo.SensorSet.Name));
             label.appendChild(innerBox);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
             //label.appendChild(document.createTextNode(firstInfo.Name));
@@ -613,6 +610,83 @@ var TempDataSourceList = (function (_super) {
         }
     };
     return TempDataSourceList;
+}(Component));
+var MenuList = (function (_super) {
+    __extends(MenuList, _super);
+    function MenuList() {
+        var _this = _super.call(this) || this;
+        _this.touchY = 0;
+        _this.mk = new HtmlHelper();
+        _this.selector = null;
+        _this.onItemClick = newEvent("MenuList.onItemClick");
+        _this.onScroll = newEvent("MenuList.onItemClick");
+        _this.wrapper = _this.mk.tag("div", "comp-menuList");
+        // temp events for touch scroll
+        _this.wrapper.addEventListener("touchmove", function (e) {
+            var dy = _this.touchY - e.touches[0].clientY;
+            _this.touchY = e.touches[0].clientY;
+            var parent = _this.wrapper.parentElement;
+            if (parent) {
+                parent.scrollTop += dy;
+            }
+        });
+        _this.wrapper.addEventListener("touchend", function () {
+            _this.touchY = 0;
+        });
+        _this.wrapper.addEventListener("touchstart", function (e) {
+            _this.touchY = e.touches[0].clientY;
+        });
+        return _this;
+    }
+    Object.defineProperty(MenuList.prototype, "data", {
+        get: function () {
+            return this.__data;
+        },
+        set: function (data) {
+            this.__data = data;
+            this.generateList();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    MenuList.prototype.update = function () {
+        this.generateList();
+    };
+    MenuList.prototype.generateList = function () {
+        var _this = this;
+        var mk = this.mk;
+        this.wrapper.innerHTML = "";
+        for (var _i = 0, _a = this.__data; _i < _a.length; _i++) {
+            var d = _a[_i];
+            var section = mk.tag("div", "comp-menuList-section");
+            var list = mk.tag("ul");
+            var title = void 0;
+            var items = [];
+            if (this.selector) {
+                title = this.selector(d).title;
+                items = this.selector(d).items;
+            }
+            else {
+                title = d.toString();
+            }
+            section.appendChild(mk.tag("span", null, null, title));
+            var _loop_6 = function (i) {
+                var li = mk.tag("li");
+                li.appendChild(document.createTextNode(i.text));
+                list.appendChild(li);
+                li.onclick = function () {
+                    _this.onItemClick({ target: _this, data: i.object });
+                };
+            };
+            for (var _b = 0, items_2 = items; _b < items_2.length; _b++) {
+                var i = items_2[_b];
+                _loop_6(i);
+            }
+            section.appendChild(list);
+            this.wrapper.appendChild(section);
+        }
+    };
+    return MenuList;
 }(Component));
 var Canvas = (function (_super) {
     __extends(Canvas, _super);

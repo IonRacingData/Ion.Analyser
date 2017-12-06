@@ -432,6 +432,7 @@ span.table-resize{
 .dsaController-left {
     flex-grow: 1;
     flex-basis: 0;
+    overflow: auto;
 }
 .dsaController-right {
     flex-grow: 1;
@@ -472,7 +473,7 @@ span.table-resize{
 /*Lists*/
 .listitem {
     display: block;
-    padding: 5px 5px;
+    padding: 5px;
 }
 
 .listitem:hover {
@@ -514,6 +515,9 @@ span.table-resize{
     vertical-align: middle;
 }
 
+
+/* ListBox */
+
 .comp-listBox {
     vertical-align: top;
     max-height: 200px;
@@ -536,6 +540,11 @@ span.table-resize{
         }
 
 
+/* ExpandableList */
+
+.comp-expList {
+    white-space: nowrap;
+}
 .comp-expList-clicker {
     cursor: pointer;
     padding: 7px;
@@ -562,6 +571,9 @@ span.table-resize{
         cursor: pointer;
     }
 
+
+/* RearrangableList  */
+
 .comp-listBoxRearr {
     list-style: none;
     padding: 0;
@@ -578,6 +590,8 @@ span.table-resize{
     flex-direction: column;
     flex-grow: 1;
     margin-left: 10px;
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 
 .comp-listBoxRearr-textWrapper span:nth-child(2) {
@@ -611,6 +625,62 @@ span.table-resize{
     justify-content: center;
     min-width: 40px;
 }
+
+
+/* TempDataSourceList */
+
+.comp-tempDataSourceList-item {
+    padding: 5px;
+    display: flex;
+}
+.comp-tempDataSourceList-textWrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 10px;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+.comp-tempDataSourceList-textWrapper span:nth-child(2) {
+    font-size: 0.6em;
+    padding-left: 15px;
+}
+
+
+/* MenuList */
+.comp-menuList {
+    padding-bottom: 10px;
+}
+
+.comp-menuList-section {
+    border-bottom: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+}
+
+.comp-menuList-section span {
+    color: darkgray;
+    font-size: .7em;
+    margin: 10px 10px 5px 10px;
+}
+
+.comp-menuList ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.comp-menuList li {
+    font-size: 1em;
+    padding: 7px 0 7px 15px;
+    font-size: .9em;
+}
+
+    .comp-menuList li:hover {
+        background-color: darkgrey;
+        cursor: pointer;
+    }
+
 
 .comp-style {
     width: 90px;
@@ -648,16 +718,18 @@ span.table-resize{
 
 .slidingMenu-wrapper {
     position: absolute;
-    z-index: 1000;
+    z-index: 1000000000;
     top: 40px;
-    height: 100%;
+    height: calc(100% - 40px);
     background-color: darkolivegreen;
+    overflow-y: auto;
+    padding-bottom: 10px;
 }
 
 
 .slidingMenu-touchArea {
     top: 40px;
-    z-index: 999;
+    z-index: 999999999;
     position: absolute;
     height: 100%;
     width: 10px;

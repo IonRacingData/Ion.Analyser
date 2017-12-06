@@ -100,7 +100,7 @@ class DataSourceBuildController extends Component{
             }
         }
 
-        const data: IExpandableListSection[] = [];
+        const data: IListGroup[] = [];
         for (const info of infos) {
             let found: boolean = false;
             for (const section of data) {
@@ -109,20 +109,20 @@ class DataSourceBuildController extends Component{
                 }
                 if (section.title === info.Name) {
                     found = true;
-                    section.items.push({ text: info.SensorSet.Name, object: info } as IExpandableListItem);
+                    section.items.push({ text: info.SensorSet.Name, object: info } as IListGroupItems);
                     break;
                 }
             }
             if (!found) {
-                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info } as IExpandableListItem] } as IExpandableListSection);
+                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info } as IListGroupItems] } as IListGroup);
             }
         }
 
-        expList.selector = (item: IExpandableListSection) => {
+        expList.selector = (item: IListGroup) => {
             return {
                 title: item.title,
                 items: item.items,
-            } as IExpandableListSection;
+            } as IListGroup;
         };
 
         expList.data = data;

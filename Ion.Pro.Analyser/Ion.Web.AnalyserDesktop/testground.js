@@ -15,6 +15,7 @@ function tester() {
     var ex = new ExpandableList();
     var listArr = new ListBoxRearrangable();
     var sw = new Switch();
+    var menuList = new MenuList();
     /*document.body.appendChild(ex.wrapper);
     document.body.appendChild(b.wrapper);
     document.body.appendChild(b2.wrapper);
@@ -24,6 +25,7 @@ function tester() {
     document.body.appendChild(table.wrapper);
     document.body.appendChild(listArr.wrapper);
     document.body.appendChild(sw.wrapper);*/
+    document.body.appendChild(menuList.wrapper);
     b.text = "Click Me!";
     b2.text = "Add Fourth";
     b3.text = "Add expList item";
@@ -86,8 +88,21 @@ function tester() {
         alert("You clicked on: " + item.data.last + ", " + item.data.first);
     });
     lst.data = arr;
+    menuList.selector = function (item) {
+        return {
+            title: item.name,
+            items: [
+                { text: item.employee.first, object: item.employee.first },
+                { text: item.employee.last, object: item.employee.last },
+            ],
+        };
+    };
+    menuList.data = exArr;
+    menuList.onItemClick.addEventListener(function (e) {
+        console.log(e.data);
+    });
     var canvas = new Canvas();
-    document.body.appendChild(canvas.wrapper);
+    /*document.body.appendChild(canvas.wrapper);*/
     function draw() {
         canvas.clear();
         canvas.strokeStyle = "white";
@@ -116,7 +131,6 @@ function tester() {
         canvas.width = inWidth + counter;
         draw();
     });
-    var menu = new SlidingMenu(document.createElement("div"));
 }
 function storageTest() {
     var storageList = {

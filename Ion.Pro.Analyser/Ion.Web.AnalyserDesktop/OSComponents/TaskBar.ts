@@ -143,6 +143,41 @@ class SlidingMenu extends Applet {
 
         document.body.appendChild(this.menuWrapper);
         document.body.appendChild(this.touchArea);
+        this.fillMenu();
+    }
+
+    private fillMenu(): void {
+        const menuList: MenuList = new MenuList();
+        this.menuWrapper.appendChild(menuList.wrapper);
+
+        const all: { [category: string]: Launcher[] } = kernel.appMan.launchers;
+        if (all['hidden']) delete all['hidden'];
+        
+        let data: [string, Launcher[]][] = [];
+        for (const key in all) {
+            data.push([key, all[key]]);
+        }
+
+        menuList.selector = (category: [string, Launcher[]]) => {
+            const launchers = category[1];
+            const items: IListGroupItems[] = [];
+
+            for (const l of launchers) {
+                items.push({ text: l.name, object: l });
+            }
+
+            return {
+                title: category[0],
+                items: items
+            } as IListGroup;
+        }
+
+        menuList.data = data;
+        menuList.onItemClick.addEventListener((e) => {
+            e.data.createInstance();
+            this.close();
+        });
+        
     }
 
     private btn_click(): void {
@@ -169,7 +204,8 @@ class SlidingMenu extends Applet {
     private touchMove(e: TouchEvent): void {
         const clientX = e.touches[0].clientX;
         const dx = clientX - this.touchX;
-        let newPos: number = e.target === this.menuWrapper ? dx : -this.width + dx;
+        
+        let newPos: number = this.menuOpen ? dx : -this.width + dx;
         if (newPos > 0) newPos = 0;
         if (newPos < -this.width) newPos = -this.width;
         this.menuWrapper.style.left = newPos + "px";

@@ -129,3 +129,4 @@ var ComMessageStatus;
     ComMessageStatus[ComMessageStatus["Request110"] = 110] = "Request110";
     ComMessageStatus[ComMessageStatus["OK200"] = 200] = "OK200";
 })(ComMessageStatus || (ComMessageStatus = {}));
+//# sourceMappingURL=comsys.js.map

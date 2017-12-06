@@ -2,12 +2,12 @@ interface IDataEvent<T> extends IEventData {
     data: T;
 }
 
-interface IExpandableListSection {
+interface IListGroup {
     title: string;
-    items: IExpandableListItem[];
+    items: IListGroupItems[];
 }
 
-interface IExpandableListItem {
+interface IListGroupItems {
     text: string;
     object: any;
 }
@@ -53,7 +53,6 @@ abstract class Button extends Component {
 class IconButton extends Button {
     constructor() {
         super();
-
     }
 }
 
@@ -266,7 +265,7 @@ class ExpandableList extends Component {
     private touchY: number = 0;
     private mk: HtmlHelper = new HtmlHelper();
 
-    public selector: (<T>(obj: T) => IExpandableListSection) | null = null;
+    public selector: (<T>(obj: T) => IListGroup) | null = null;
 
     onItemClick = newEvent<IDataEvent<any>>("ExpandableList.onItemClick");
 
@@ -280,8 +279,7 @@ class ExpandableList extends Component {
 
     constructor() {
         super();
-        this.wrapper = document.createElement("div");
-        this.wrapper.className = "comp-expList";
+        this.wrapper = this.mk.tag("div", "comp-expList");
 
         // temp events for touch scroll
         this.wrapper.addEventListener("touchmove", (e) => {
@@ -320,7 +318,7 @@ class ExpandableList extends Component {
             collapsible.appendChild(list);
 
             let title: string;
-            let items: IExpandableListItem[] = [];
+            let items: IListGroupItems[] = [];
             if (this.selector) {
                 title = this.selector(d).title;
                 items = this.selector(d).items;
@@ -625,18 +623,16 @@ class TempDataSourceList extends Component {
         for (let i = 0; i < info.length; i++) {
             const sensor = info[i];
             const ctrl = drawMethod.call(this, plot, sensor);
-            const label = this.mk.tag("label", "listitem");
+            const label = this.mk.tag("label", "comp-tempDataSourceList-item");
             const firstInfo = sensor.infos.SensorInfos[0];
             label.title = firstInfo.ID.toString() + " (0x" + firstInfo.ID.toString(16) + ") " + (firstInfo.Key.toString() === firstInfo.Key ? firstInfo.Key : " No key found");
             if (firstInfo.ID.toString() === firstInfo.Key) {
                 label.style.color = "red";
             }
             label.appendChild(ctrl);
-            const innerBox = this.mk.tag("div");
-            innerBox.style.display = "inline-block";
-            innerBox.style.verticalAlign = "middle";
-            innerBox.appendChild(this.mk.tag("div", "", null, firstInfo.Name));
-            innerBox.appendChild(this.mk.tag("div", "small", null, firstInfo.SensorSet.Name));
+            const innerBox = this.mk.tag("div", "comp-tempDataSourceList-textWrapper");
+            innerBox.appendChild(this.mk.tag("span", "", null, firstInfo.Name));
+            innerBox.appendChild(this.mk.tag("span", "", null, firstInfo.SensorSet.Name));
             label.appendChild(innerBox);
             //label.appendChild(document.createTextNode((sensor.Key ? "" : "(" + sensor.ID.toString() + ") ") + sensor.Name));
             //label.appendChild(document.createTextNode(firstInfo.Name));
@@ -647,6 +643,82 @@ class TempDataSourceList extends Component {
 
 }
 
+class MenuList extends Component {
+    private __data: any[];
+    private touchY: number = 0;
+    private mk: HtmlHelper = new HtmlHelper();
+
+    public selector: (<T>(obj: T) => IListGroup) | null = null;
+
+    onItemClick = newEvent<IDataEvent<any>>("MenuList.onItemClick");
+    onScroll = newEvent<IDataEvent<any>>("MenuList.onItemClick");
+
+    get data(): any[] {
+        return this.__data;
+    }
+    set data(data: any[]) {
+        this.__data = data;
+        this.generateList();
+    }
+
+    constructor() {
+        super();
+        this.wrapper = this.mk.tag("div", "comp-menuList");
+
+        // temp events for touch scroll
+        this.wrapper.addEventListener("touchmove", (e) => {
+            const dy = this.touchY - e.touches[0].clientY;
+            this.touchY = e.touches[0].clientY;
+            const parent = this.wrapper.parentElement;
+            if (parent) {
+                parent.scrollTop += dy;
+            }
+        });
+        this.wrapper.addEventListener("touchend", () => {
+            this.touchY = 0;
+        });
+        this.wrapper.addEventListener("touchstart", (e) => {
+            this.touchY = e.touches[0].clientY;
+        });
+    }
+
+    public update() {
+        this.generateList();
+    }
+
+    private generateList() {
+        const mk: HtmlHelper = this.mk;
+        this.wrapper.innerHTML = "";
+        for (const d of this.__data) {
+            const section: HTMLElement = mk.tag("div", "comp-menuList-section");
+            const list: HTMLElement = mk.tag("ul");
+
+            let title: string;
+            let items: IListGroupItems[] = [];
+            if (this.selector) {
+                title = this.selector(d).title;
+                items = this.selector(d).items;
+            }
+            else {
+                title = (d as object).toString();
+            }
+
+            section.appendChild(mk.tag("span", null, null, title));
+            for (const i of items) {
+                const li: HTMLElement = mk.tag("li");
+                li.appendChild(document.createTextNode(i.text));
+                list.appendChild(li);
+
+                li.onclick = () => {
+                    this.onItemClick({ target: this, data: i.object });
+                }
+            }
+
+            section.appendChild(list);
+            this.wrapper.appendChild(section);
+        }
+    }
+}
 
 class Canvas extends Component {
 

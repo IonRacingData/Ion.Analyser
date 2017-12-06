@@ -265,3 +265,8 @@ span.table-resize{
 .comp-listBoxRearr-marker {
     background-color: #171717;
 }
+
+
+.comp-tempDataSourceList-item:hover {
+    background-color: #4a4a4a;
+}
