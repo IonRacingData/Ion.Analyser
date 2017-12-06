@@ -4,10 +4,10 @@ interface IDataEvent<T> extends IEventData {
 
 interface IListGroup {
     title: string;
-    items: IListGroupItems[];
+    items: IListGroupItem[];
 }
 
-interface IListGroupItems {
+interface IListGroupItem {
     text: string;
     object: any;
 }
@@ -318,7 +318,7 @@ class ExpandableList extends Component {
             collapsible.appendChild(list);
 
             let title: string;
-            let items: IListGroupItems[] = [];
+            let items: IListGroupItem[] = [];
             if (this.selector) {
                 title = this.selector(d).title;
                 items = this.selector(d).items;
@@ -694,7 +694,7 @@ class MenuList extends Component {
             const list: HTMLElement = mk.tag("ul");
 
             let title: string;
-            let items: IListGroupItems[] = [];
+            let items: IListGroupItem[] = [];
             if (this.selector) {
                 title = this.selector(d).title;
                 items = this.selector(d).items;

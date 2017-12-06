@@ -109,12 +109,12 @@ class DataSourceBuildController extends Component{
                 }
                 if (section.title === info.Name) {
                     found = true;
-                    section.items.push({ text: info.SensorSet.Name, object: info } as IListGroupItems);
+                    section.items.push({ text: info.SensorSet.Name, object: info } as IListGroupItem);
                     break;
                 }
             }
             if (!found) {
-                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info } as IListGroupItems] } as IListGroup);
+                data.push({ title: info.Name, items: [{ text: info.SensorSet.Name, object: info } as IListGroupItem] } as IListGroup);
             }
         }
 

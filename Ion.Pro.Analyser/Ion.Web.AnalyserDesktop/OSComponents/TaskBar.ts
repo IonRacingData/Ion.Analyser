@@ -160,7 +160,7 @@ class SlidingMenu extends Applet {
 
         menuList.selector = (category: [string, Launcher[]]) => {
             const launchers = category[1];
-            const items: IListGroupItems[] = [];
+            const items: IListGroupItem[] = [];
 
             for (const l of launchers) {
                 items.push({ text: l.name, object: l });
