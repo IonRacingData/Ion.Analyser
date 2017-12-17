@@ -2,46 +2,33 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ion.Pro.Analyser.Controllers
+namespace Ion.Pro.Analyser.Web
 {
-    public class Socket : Controller
+    public class WebSocket
     {
-        public IActionResult Connect()
+        public static bool IsWebSocketRequest(HttpContext context)
         {
-            HttpHeaderRequest request = HttpContext.Request;
-            if (request.HttpHeaderFields.ContainsKey("Upgrade") && request.HttpHeaderFields["Upgrade"] == "websocket")
-            {
-                string clientSecWebSocketKey = request.HttpHeaderFields["Sec-WebSocket-Key"];
-                string magicWebSocketString = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-                byte[] hashData = Encoding.Default.GetBytes(clientSecWebSocketKey + magicWebSocketString);
-                SHA1 sha1 = SHA1.Create();
-                byte[] data = sha1.ComputeHash(hashData);
-                string s = Convert.ToBase64String(data);
-
-                return new WebSocketResult(s, HandleSocket);
-            }
-            return Error("Problem creating WebSocket", HttpStatus.BadRequest400);
+            HttpHeaderRequest request = context.Request;
+            return request.HttpHeaderFields.ContainsKey("Upgrade") && request.HttpHeaderFields["Upgrade"] == "websocket";
         }
 
-        public void HandleSocket(HttpContext context)
+        public static WebSocketResult CreateResult(HttpContext context, Action<HttpContext> handler)
         {
-            ComBus.GetDefault().RegisterClient(new WebSocketComBusClient(context.Wrapper.Client));
-            //WebSocketClient client = new WebSocketClient(context.Wrapper.Client.GetStream());
+            HttpHeaderRequest request = context.Request;
 
-            /*while (true)
-            {
-                Console.WriteLine(client.ReadString());
+            string clientSecWebSocketKey = request.HttpHeaderFields["Sec-WebSocket-Key"];
+            string magicWebSocketString = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            byte[] hashData = Encoding.Default.GetBytes(clientSecWebSocketKey + magicWebSocketString);
+            SHA1 sha1 = SHA1.Create();
+            byte[] data = sha1.ComputeHash(hashData);
+            string s = Convert.ToBase64String(data);
 
-                client.WriteString("Cool :D");
-            }*/
+            return new WebSocketResult(s, handler);
         }
-
-        
     }
 
     public class WebSocketClient
@@ -131,11 +118,13 @@ namespace Ion.Pro.Analyser.Controllers
 
         public static WebSocketFrame CreateFrame(string data)
         {
-            WebSocketFrame frame = new WebSocketFrame();
-            frame.Fin = true;
-            frame.OpCode = 1;
-            frame.Masked = false;
-            frame.Data = Encoding.Default.GetBytes(data);
+            WebSocketFrame frame = new WebSocketFrame
+            {
+                Fin = true,
+                OpCode = 1,
+                Masked = false,
+                Data = Encoding.Default.GetBytes(data)
+            };
             frame.PayloadLength = frame.Data.Length;
             return frame;
         }
@@ -152,7 +141,7 @@ namespace Ion.Pro.Analyser.Controllers
             };
             return frame;
         }
-       
+
         /// <summary>
         /// Parses the two first bytes of the header, to be able to know if it should read in more length or not
         /// </summary>
@@ -184,8 +173,10 @@ namespace Ion.Pro.Analyser.Controllers
 
         public byte[] GetBytes(bool mask)
         {
-            List<byte> returnData = new List<byte>();
-            returnData.Add((byte)((Fin ? 1 : 0) << 0x7 | OpCode));
+            List<byte> returnData = new List<byte>
+            {
+                (byte)((Fin ? 1 : 0) << 0x7 | OpCode)
+            };
             if (PayloadLength > ushort.MaxValue)
             {
                 returnData.Add((byte)((Masked ? 1 : 0) << 0x7 | 127));
@@ -238,7 +229,7 @@ namespace Ion.Pro.Analyser.Controllers
             context.HttpContext.Response.HttpHeaderFields["Sec-WebSocket-Accept"] = await Task.FromResult(this.secWebSocketAccept);
             context.HttpContext.SocketHandler = this.handler;
             context.HttpContext.Wrapper.PreventClose = true;
-            
+
         }
     }
 }
