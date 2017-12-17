@@ -12,7 +12,7 @@ var Kernel;
 (function (Kernel) {
     var SenSys;
     (function (SenSys) {
-        var SensorManager = (function () {
+        var SensorManager = /** @class */ (function () {
             //static readonly event_registerViewer = "registerViewer";
             //static readonly event_unregisterViewer = "unregisterViewer";
             function SensorManager() {
@@ -334,7 +334,7 @@ var Kernel;
             return SensorManager;
         }());
         SenSys.SensorManager = SensorManager;
-        var SensorDataSet = (function () {
+        var SensorDataSet = /** @class */ (function () {
             function SensorDataSet(data) {
                 // List of all information
                 this.AllInfos = [];
@@ -391,7 +391,7 @@ var Kernel;
         SenSys.SensorDataSet = SensorDataSet;
     })(SenSys = Kernel.SenSys || (Kernel.SenSys = {}));
 })(Kernel || (Kernel = {}));
-var SensorGroup = (function () {
+var SensorGroup = /** @class */ (function () {
     function SensorGroup(type) {
         this.infos = new SensorPlotInfo();
         this.type = type;
@@ -409,7 +409,7 @@ var SensorGroup = (function () {
     };
     return SensorGroup;
 }());
-var PointSensorGroup = (function (_super) {
+var PointSensorGroup = /** @class */ (function (_super) {
     __extends(PointSensorGroup, _super);
     function PointSensorGroup(data) {
         var _this = _super.call(this, Point) || this;
@@ -432,11 +432,11 @@ var PointSensorGroup = (function (_super) {
     PointSensorGroup.prototype.length = function () {
         return this.data.points.length;
     };
+    PointSensorGroup.numGroups = 1;
+    PointSensorGroup.type = Point;
     return PointSensorGroup;
 }(SensorGroup));
-PointSensorGroup.numGroups = 1;
-PointSensorGroup.type = Point;
-var Point3DSensorGroup = (function (_super) {
+var Point3DSensorGroup = /** @class */ (function (_super) {
     __extends(Point3DSensorGroup, _super);
     function Point3DSensorGroup(data) {
         var _this = _super.call(this, Point3D) || this;
@@ -469,19 +469,20 @@ var Point3DSensorGroup = (function (_super) {
     Point3DSensorGroup.prototype.length = function () {
         return Math.max(this.dataX.points.length, this.dataY.points.length);
     };
+    Point3DSensorGroup.numGroups = 2;
+    Point3DSensorGroup.type = Point3D;
     return Point3DSensorGroup;
 }(SensorGroup));
-Point3DSensorGroup.numGroups = 2;
-Point3DSensorGroup.type = Point3D;
-var DataSourceInfo = (function () {
+var DataSourceInfo = /** @class */ (function () {
     function DataSourceInfo() {
     }
     return DataSourceInfo;
 }());
-var DataSourceTemplate = (function () {
+var DataSourceTemplate = /** @class */ (function () {
     function DataSourceTemplate() {
         this.sources = [];
         this.layers = [];
     }
     return DataSourceTemplate;
 }());
+//# sourceMappingURL=sensys.js.map

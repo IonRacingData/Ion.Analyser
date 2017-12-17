@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Controller = (function (_super) {
+var Controller = /** @class */ (function (_super) {
     __extends(Controller, _super);
     function Controller() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -22,7 +22,7 @@ var Controller = (function (_super) {
     };
     return Controller;
 }(Component));
-var SingleValueController = (function (_super) {
+var SingleValueController = /** @class */ (function (_super) {
     __extends(SingleValueController, _super);
     function SingleValueController() {
         var _this = _super.call(this) || this;
@@ -90,7 +90,7 @@ var SingleValueController = (function (_super) {
     };
     return SingleValueController;
 }(Controller));
-var CanvasController = (function (_super) {
+var CanvasController = /** @class */ (function (_super) {
     __extends(CanvasController, _super);
     function CanvasController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -116,7 +116,7 @@ var CanvasController = (function (_super) {
     };
     return CanvasController;
 }(Controller));
-var MultiValueCanvasController = (function (_super) {
+var MultiValueCanvasController = /** @class */ (function (_super) {
     __extends(MultiValueCanvasController, _super);
     function MultiValueCanvasController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -148,7 +148,7 @@ var MultiValueCanvasController = (function (_super) {
     MultiValueCanvasController.prototype.onSensorChange = function () { };
     return MultiValueCanvasController;
 }(CanvasController));
-var SingleValueCanvasController = (function (_super) {
+var SingleValueCanvasController = /** @class */ (function (_super) {
     __extends(SingleValueCanvasController, _super);
     function SingleValueCanvasController() {
         var _this = _super.call(this) || this;
@@ -213,7 +213,7 @@ var SingleValueCanvasController = (function (_super) {
     };
     return SingleValueCanvasController;
 }(CanvasController));
-var ScatterChartBase = (function (_super) {
+var ScatterChartBase = /** @class */ (function (_super) {
     __extends(ScatterChartBase, _super);
     function ScatterChartBase(width, height) {
         var _this = _super.call(this) || this;
@@ -321,7 +321,7 @@ var ScatterChartBase = (function (_super) {
     };
     return ScatterChartBase;
 }(CanvasController));
-var Rectangle = (function () {
+var Rectangle = /** @class */ (function () {
     function Rectangle(min, max) {
         this.min = min;
         this.max = max;
@@ -334,3 +334,4 @@ var Rectangle = (function () {
     };
     return Rectangle;
 }());
+//# sourceMappingURL=Controller.js.map

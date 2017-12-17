@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var SteeringWheelController = (function (_super) {
+var SteeringWheelController = /** @class */ (function (_super) {
     __extends(SteeringWheelController, _super);
     function SteeringWheelController(width, height) {
         var _this = _super.call(this) || this;
@@ -49,3 +49,4 @@ var SteeringWheelController = (function (_super) {
     };
     return SteeringWheelController;
 }(SingleValueController));
+//# sourceMappingURL=SteeringWheelController.js.map

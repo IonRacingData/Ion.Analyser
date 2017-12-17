@@ -1,4 +1,4 @@
-var ApplicationManager = (function () {
+var ApplicationManager = /** @class */ (function () {
     function ApplicationManager() {
         this.appList = [];
         this.launchers = {};
@@ -55,3 +55,4 @@ var ApplicationManager = (function () {
     };
     return ApplicationManager;
 }());
+//# sourceMappingURL=appsys.js.map

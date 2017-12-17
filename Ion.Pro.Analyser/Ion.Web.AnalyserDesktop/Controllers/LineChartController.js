@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var LineChartController = (function (_super) {
+var LineChartController = /** @class */ (function (_super) {
     __extends(LineChartController, _super);
     function LineChartController() {
         var _this = _super.call(this) || this;
@@ -588,7 +588,7 @@ var LineChartController = (function (_super) {
     };
     return LineChartController;
 }(MultiValueCanvasController));
-var LineChartLegend = (function () {
+var LineChartLegend = /** @class */ (function () {
     function LineChartLegend(width, height, darkTheme) {
         this.__backgroundColor = "black";
         this.__textColor = "white";
@@ -720,7 +720,7 @@ var LineChartLegend = (function () {
     };
     return LineChartLegend;
 }());
-var ContextFixer = (function () {
+var ContextFixer = /** @class */ (function () {
     function ContextFixer(canvas) {
         this.canvas = canvas;
         var temp = this.canvas.getContext("2d");
@@ -795,7 +795,7 @@ var ContextFixer = (function () {
     };
     return ContextFixer;
 }());
-var LayeredCanvas = (function () {
+var LayeredCanvas = /** @class */ (function () {
     function LayeredCanvas(wrapper) {
         this.canvases = [];
         this.mk = new HtmlHelper;
@@ -828,3 +828,4 @@ var LayeredCanvas = (function () {
     };
     return LayeredCanvas;
 }());
+//# sourceMappingURL=LineChartController.js.map

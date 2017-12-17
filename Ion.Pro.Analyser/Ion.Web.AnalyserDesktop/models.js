@@ -1,5 +1,5 @@
 /* tslint:enable:interface-name */
-var Launcher = (function () {
+var Launcher = /** @class */ (function () {
     function Launcher(mainFunction, name) {
         var args = [];
         for (var _i = 2; _i < arguments.length; _i++) {
@@ -18,7 +18,7 @@ var Launcher = (function () {
     };
     return Launcher;
 }());
-var Color = (function () {
+var Color = /** @class */ (function () {
     function Color(r, g, b, a) {
         if (a === void 0) { a = null; }
         this.a = null;
@@ -59,7 +59,7 @@ var Color = (function () {
     };
     return Color;
 }());
-var SensorDataContainer = (function () {
+var SensorDataContainer = /** @class */ (function () {
     function SensorDataContainer(id, p) {
         if (p === void 0) { p = []; }
         this.ID = id;
@@ -138,7 +138,7 @@ var SensorDataContainer = (function () {
     };
     return SensorDataContainer;
 }());
-var SensorValue = (function () {
+var SensorValue = /** @class */ (function () {
     function SensorValue(value, timestamp) {
         this.value = 0;
         this.timestamp = 0;
@@ -150,7 +150,7 @@ var SensorValue = (function () {
     };
     return SensorValue;
 }());
-var PlotDataHelper = (function () {
+var PlotDataHelper = /** @class */ (function () {
     function PlotDataHelper() {
     }
     PlotDataHelper.getClosest = function (plotData, p) {
@@ -188,7 +188,7 @@ var PlotDataHelper = (function () {
     };
     return PlotDataHelper;
 }());
-var Point = (function () {
+var Point = /** @class */ (function () {
     function Point(x, y) {
         this.x = x;
         this.y = y;
@@ -216,7 +216,7 @@ var Point = (function () {
     };
     return Point;
 }());
-var Point3D = (function () {
+var Point3D = /** @class */ (function () {
     function Point3D(x, y, z) {
         this.x = x;
         this.y = y;
@@ -239,7 +239,7 @@ var Point3D = (function () {
     };
     return Point3D;
 }());
-var Point4D = (function () {
+var Point4D = /** @class */ (function () {
     function Point4D(x, y, z, i) {
         this.x = x;
         this.y = y;
@@ -260,7 +260,7 @@ var Point4D = (function () {
     };
     return Point4D;
 }());
-var Multicallback = (function () {
+var Multicallback = /** @class */ (function () {
     function Multicallback(count, callback) {
         this.responses = [];
         this.curId = 0;
@@ -285,14 +285,14 @@ var Multicallback = (function () {
     };
     return Multicallback;
 }());
-var SensorPlotInfo = (function () {
+var SensorPlotInfo = /** @class */ (function () {
     function SensorPlotInfo() {
         this.Keys = [];
         this.SensorInfos = [];
     }
     return SensorPlotInfo;
 }());
-var SensorInfoHelper = (function () {
+var SensorInfoHelper = /** @class */ (function () {
     function SensorInfoHelper() {
     }
     SensorInfoHelper.maxValue = function (info) {
@@ -335,3 +335,4 @@ var SensorInfoHelper = (function () {
     };
     return SensorInfoHelper;
 }());
+//# sourceMappingURL=models.js.map

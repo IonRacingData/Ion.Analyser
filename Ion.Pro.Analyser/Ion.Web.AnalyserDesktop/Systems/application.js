@@ -1,4 +1,4 @@
-var Application = (function () {
+var Application = /** @class */ (function () {
     function Application(app) {
         this.windows = [];
         this.events = new EventHandler();
@@ -31,3 +31,4 @@ var Application = (function () {
     };
     return Application;
 }());
+//# sourceMappingURL=application.js.map

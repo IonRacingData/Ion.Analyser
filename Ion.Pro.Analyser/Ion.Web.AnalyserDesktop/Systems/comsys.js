@@ -11,7 +11,7 @@ function requestAction(action, callback) {
     request.open("GET", "/test/" + action, true);
     request.send();
 }
-var NetworkManager = (function () {
+var NetworkManager = /** @class */ (function () {
     function NetworkManager() {
         this.curId = 0;
         this.backlog = [];
@@ -129,3 +129,4 @@ var ComMessageStatus;
     ComMessageStatus[ComMessageStatus["Request110"] = 110] = "Request110";
     ComMessageStatus[ComMessageStatus["OK200"] = 200] = "OK200";
 })(ComMessageStatus || (ComMessageStatus = {}));
+//# sourceMappingURL=comsys.js.map

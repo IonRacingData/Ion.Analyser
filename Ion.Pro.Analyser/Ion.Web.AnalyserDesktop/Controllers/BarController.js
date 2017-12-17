@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var BarController = (function (_super) {
+var BarController = /** @class */ (function (_super) {
     __extends(BarController, _super);
     function BarController(width, height, direction) {
         var _this = _super.call(this) || this;
@@ -159,3 +159,4 @@ var Direction;
     Direction[Direction["Horizontal"] = 1] = "Horizontal";
     Direction[Direction["Vertical"] = 2] = "Vertical";
 })(Direction || (Direction = {}));
+//# sourceMappingURL=BarController.js.map

@@ -1,4 +1,4 @@
-var DataAssigner = (function () {
+var DataAssigner = /** @class */ (function () {
     function DataAssigner() {
         this.mk = new HtmlHelper();
     }
@@ -216,7 +216,7 @@ var DataAssigner = (function () {
     }
 }
 */
-var SensorSetSelector = (function () {
+var SensorSetSelector = /** @class */ (function () {
     function SensorSetSelector() {
         this.mk = new HtmlHelper();
     }
@@ -252,3 +252,4 @@ var SensorSetSelector = (function () {
     };
     return SensorSetSelector;
 }());
+//# sourceMappingURL=TestDataViewer.js.map

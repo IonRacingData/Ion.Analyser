@@ -1,6 +1,6 @@
 var selectedSpan = null;
 /* tslint:enable:interface-name */
-var HtmlHelper = (function () {
+var HtmlHelper = /** @class */ (function () {
     function HtmlHelper() {
     }
     HtmlHelper.prototype.tag = function (tag, className, events, innerHTML) {
@@ -25,7 +25,7 @@ var HtmlHelper = (function () {
     };
     return HtmlHelper;
 }());
-var HtmlTableGen = (function () {
+var HtmlTableGen = /** @class */ (function () {
     function HtmlTableGen(className, resizeable) {
         if (className === void 0) { className = ""; }
         if (resizeable === void 0) { resizeable = false; }
@@ -132,3 +132,4 @@ var HtmlTableGen = (function () {
     };
     return HtmlTableGen;
 }());
+//# sourceMappingURL=htmlhelper.js.map

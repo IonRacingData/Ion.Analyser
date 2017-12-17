@@ -8,12 +8,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Component = (function () {
+var Component = /** @class */ (function () {
     function Component() {
     }
     return Component;
 }());
-var Button = (function (_super) {
+var Button = /** @class */ (function (_super) {
     __extends(Button, _super);
     function Button() {
         var _this = _super.call(this) || this;
@@ -44,14 +44,14 @@ var Button = (function (_super) {
     };
     return Button;
 }(Component));
-var IconButton = (function (_super) {
+var IconButton = /** @class */ (function (_super) {
     __extends(IconButton, _super);
     function IconButton() {
         return _super.call(this) || this;
     }
     return IconButton;
 }(Button));
-var TextButton = (function (_super) {
+var TextButton = /** @class */ (function (_super) {
     __extends(TextButton, _super);
     function TextButton() {
         var _this = _super.call(this) || this;
@@ -76,7 +76,7 @@ var TextButton = (function (_super) {
     });
     return TextButton;
 }(Button));
-var ListBox = (function (_super) {
+var ListBox = /** @class */ (function (_super) {
     __extends(ListBox, _super);
     function ListBox() {
         var _this = _super.call(this) || this;
@@ -133,7 +133,7 @@ var ListBox = (function (_super) {
     };
     return ListBox;
 }(Component));
-var Switch = (function (_super) {
+var Switch = /** @class */ (function (_super) {
     __extends(Switch, _super);
     function Switch() {
         var _this = _super.call(this) || this;
@@ -175,7 +175,7 @@ var Switch = (function (_super) {
     };
     return Switch;
 }(Component));
-var TableList = (function (_super) {
+var TableList = /** @class */ (function (_super) {
     __extends(TableList, _super);
     function TableList() {
         var _this = _super.call(this) || this;
@@ -257,7 +257,7 @@ var TableList = (function (_super) {
     };
     return TableList;
 }(Component));
-var ExpandableList = (function (_super) {
+var ExpandableList = /** @class */ (function (_super) {
     __extends(ExpandableList, _super);
     function ExpandableList() {
         var _this = _super.call(this) || this;
@@ -331,7 +331,7 @@ var ExpandableList = (function (_super) {
     };
     return ExpandableList;
 }(Component));
-var ListBoxRearrangable = (function (_super) {
+var ListBoxRearrangable = /** @class */ (function (_super) {
     __extends(ListBoxRearrangable, _super);
     function ListBoxRearrangable() {
         var _this = _super.call(this) || this;
@@ -452,7 +452,7 @@ var ListBoxRearrangable = (function (_super) {
     };
     return ListBoxRearrangable;
 }(Component));
-var TempDataSourceList = (function (_super) {
+var TempDataSourceList = /** @class */ (function (_super) {
     __extends(TempDataSourceList, _super);
     function TempDataSourceList(plot) {
         var _this = _super.call(this) || this;
@@ -576,3 +576,4 @@ var TempDataSourceList = (function (_super) {
     };
     return TempDataSourceList;
 }(Component));
+//# sourceMappingURL=components.js.map

@@ -1,4 +1,4 @@
-var MenuWindow = (function () {
+var MenuWindow = /** @class */ (function () {
     function MenuWindow(container, x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
@@ -110,10 +110,11 @@ var MenuWindow = (function () {
     };
     return MenuWindow;
 }());
-var MenuItem = (function () {
+var MenuItem = /** @class */ (function () {
     function MenuItem(name, value) {
         this.name = name;
         this.value = value;
     }
     return MenuItem;
 }());
+//# sourceMappingURL=menuwindow.js.map

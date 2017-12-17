@@ -8,17 +8,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Taskbar = (function () {
+var Taskbar = /** @class */ (function () {
     function Taskbar() {
     }
     return Taskbar;
 }());
-var Applet = (function () {
+var Applet = /** @class */ (function () {
     function Applet() {
     }
     return Applet;
 }());
-var WindowList = (function (_super) {
+var WindowList = /** @class */ (function (_super) {
     __extends(WindowList, _super);
     function WindowList(content) {
         var _this = _super.call(this) || this;
@@ -70,7 +70,7 @@ var WindowList = (function (_super) {
     };
     return WindowList;
 }(Applet));
-var MainMenu = (function (_super) {
+var MainMenu = /** @class */ (function (_super) {
     __extends(MainMenu, _super);
     function MainMenu(content) {
         var _this = _super.call(this) || this;
@@ -104,7 +104,7 @@ var MainMenu = (function (_super) {
     };
     return MainMenu;
 }(Applet));
-var ChangeTheme = (function (_super) {
+var ChangeTheme = /** @class */ (function (_super) {
     __extends(ChangeTheme, _super);
     function ChangeTheme(content) {
         var _this = _super.call(this) || this;
@@ -128,7 +128,7 @@ var ChangeTheme = (function (_super) {
     };
     return ChangeTheme;
 }(Applet));
-var StatusBar = (function (_super) {
+var StatusBar = /** @class */ (function (_super) {
     __extends(StatusBar, _super);
     function StatusBar(content) {
         var _this = _super.call(this) || this;
@@ -191,3 +191,4 @@ var StatusBar = (function (_super) {
     };
     return StatusBar;
 }(Applet));
+//# sourceMappingURL=TaskBar.js.map

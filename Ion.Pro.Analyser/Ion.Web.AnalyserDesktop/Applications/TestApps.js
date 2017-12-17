@@ -1,4 +1,4 @@
-var TestViewer = (function () {
+var TestViewer = /** @class */ (function () {
     function TestViewer() {
     }
     TestViewer.prototype.main = function () {
@@ -16,7 +16,7 @@ var TestViewer = (function () {
     };
     return TestViewer;
 }());
-var ConfigWindow = (function () {
+var ConfigWindow = /** @class */ (function () {
     function ConfigWindow() {
     }
     ConfigWindow.prototype.main = function (client) {
@@ -81,7 +81,7 @@ var ConfigWindow = (function () {
     };
     return ConfigWindow;
 }());
-var SVGEditor = (function () {
+var SVGEditor = /** @class */ (function () {
     function SVGEditor() {
         this.mk = new HtmlHelper();
         this.curLine = null;
@@ -179,7 +179,7 @@ var SVGEditor = (function () {
         this.innerTable.appendChild(gen.generate());
     }
 }*/
-var CsvGenerator = (function () {
+var CsvGenerator = /** @class */ (function () {
     function CsvGenerator() {
         this.mk = new HtmlHelper();
     }
@@ -251,14 +251,14 @@ var CsvGenerator = (function () {
     };
     return CsvGenerator;
 }());
-var StorageTester = (function () {
+var StorageTester = /** @class */ (function () {
     function StorageTester() {
     }
     StorageTester.prototype.main = function () {
     };
     return StorageTester;
 }());
-var LineChartTester = (function () {
+var LineChartTester = /** @class */ (function () {
     function LineChartTester() {
         this.plotType = "Line Chart";
         this.type = Point;
@@ -313,7 +313,7 @@ var LineChartTester = (function () {
     };
     return LineChartTester;
 }());
-var GaugeTester = (function () {
+var GaugeTester = /** @class */ (function () {
     function GaugeTester() {
         this.plotType = "Gauge";
         this.type = Point;
@@ -365,7 +365,7 @@ var GaugeTester = (function () {
     };
     return GaugeTester;
 }());
-var GPSPlotTester = (function () {
+var GPSPlotTester = /** @class */ (function () {
     function GPSPlotTester() {
         this.plotType = "GPS";
         this.type = Point3D;
@@ -409,7 +409,7 @@ var GPSPlotTester = (function () {
     };
     return GPSPlotTester;
 }());
-var LabelTester = (function () {
+var LabelTester = /** @class */ (function () {
     function LabelTester() {
         this.plotType = "Label";
         this.type = Point;
@@ -455,7 +455,7 @@ var LabelTester = (function () {
     };
     return LabelTester;
 }());
-var BarTester = (function () {
+var BarTester = /** @class */ (function () {
     function BarTester() {
         this.plotType = "Bar Chart";
         this.type = Point;
@@ -520,7 +520,7 @@ var BarTester = (function () {
     };
     return BarTester;
 }());
-var LegacyRPIManager = (function () {
+var LegacyRPIManager = /** @class */ (function () {
     function LegacyRPIManager() {
         this.mk = new HtmlHelper();
     }
@@ -555,7 +555,7 @@ var LegacyRPIManager = (function () {
     };
     return LegacyRPIManager;
 }());
-var SteeringWheelTester = (function () {
+var SteeringWheelTester = /** @class */ (function () {
     function SteeringWheelTester() {
         this.plotType = "Steering Wheel";
         this.type = Point;
@@ -596,3 +596,4 @@ var SteeringWheelTester = (function () {
     };
     return SteeringWheelTester;
 }());
+//# sourceMappingURL=TestApps.js.map

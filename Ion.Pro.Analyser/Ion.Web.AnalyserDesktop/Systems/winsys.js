@@ -1,4 +1,4 @@
-var WindowManager = (function () {
+var WindowManager = /** @class */ (function () {
     function WindowManager(container) {
         var _this = this;
         this.curTheme = "";
@@ -255,3 +255,4 @@ var WindowManager = (function () {
     };
     return WindowManager;
 }());
+//# sourceMappingURL=winsys.js.map

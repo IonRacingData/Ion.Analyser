@@ -1,4 +1,4 @@
-var DataSourceBuilder = (function () {
+var DataSourceBuilder = /** @class */ (function () {
     function DataSourceBuilder() {
         this.mk = new HtmlHelper();
         this.page1Width = 401.5;
@@ -53,7 +53,7 @@ var DataSourceBuilder = (function () {
     };
     return DataSourceBuilder;
 }());
-var Carousel = (function () {
+var Carousel = /** @class */ (function () {
     function Carousel() {
         var _this = this;
         this.slides = [];
@@ -101,3 +101,4 @@ var Carousel = (function () {
     };
     return Carousel;
 }());
+//# sourceMappingURL=DataSourceBuilder.js.map

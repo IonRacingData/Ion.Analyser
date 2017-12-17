@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var GaugeController = (function (_super) {
+var GaugeController = /** @class */ (function (_super) {
     __extends(GaugeController, _super);
     function GaugeController(width, height, min, max, step) {
         var _this = _super.call(this) || this;
@@ -147,3 +147,4 @@ var GaugeController = (function (_super) {
     };
     return GaugeController;
 }(SingleValueCanvasController));
+//# sourceMappingURL=GaugeController.js.map

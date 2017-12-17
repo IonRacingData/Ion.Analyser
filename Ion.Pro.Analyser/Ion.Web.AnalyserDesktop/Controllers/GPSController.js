@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var GPSController = (function (_super) {
+var GPSController = /** @class */ (function (_super) {
     __extends(GPSController, _super);
     function GPSController(width, height) {
         var _this = _super.call(this) || this;
@@ -115,3 +115,4 @@ var GPSController = (function (_super) {
     };
     return GPSController;
 }(CanvasController));
+//# sourceMappingURL=GPSController.js.map

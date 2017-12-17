@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var DataSourceAssignmentController = (function (_super) {
+var DataSourceAssignmentController = /** @class */ (function (_super) {
     __extends(DataSourceAssignmentController, _super);
     function DataSourceAssignmentController(viewer) {
         var _this = _super.call(this) || this;
@@ -186,3 +186,4 @@ var DataSourceAssignmentController = (function (_super) {
     };
     return DataSourceAssignmentController;
 }(Component));
+//# sourceMappingURL=DataSourceAssignmentController.js.map

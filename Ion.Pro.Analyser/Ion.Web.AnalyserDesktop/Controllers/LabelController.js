@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var LabelController = (function (_super) {
+var LabelController = /** @class */ (function (_super) {
     __extends(LabelController, _super);
     function LabelController(width, height) {
         var _this = _super.call(this) || this;
@@ -62,3 +62,4 @@ var LabelController = (function (_super) {
     };
     return LabelController;
 }(SingleValueController));
+//# sourceMappingURL=LabelController.js.map

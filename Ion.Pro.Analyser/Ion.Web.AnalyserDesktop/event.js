@@ -1,4 +1,4 @@
-var EventData = (function () {
+var EventData = /** @class */ (function () {
     function EventData() {
     }
     return EventData;
@@ -22,7 +22,7 @@ function newEvent(info) {
     };
     return handler;
 }
-var EventHandler = (function () {
+var EventHandler = /** @class */ (function () {
     function EventHandler() {
         this.localEvents = [];
         this.localNewEvent = [];
@@ -51,7 +51,7 @@ var EventHandler = (function () {
     };
     return EventHandler;
 }());
-var EventManager = (function () {
+var EventManager = /** @class */ (function () {
     function EventManager() {
         this.events = {};
     }
@@ -79,3 +79,4 @@ var EventManager = (function () {
     };
     return EventManager;
 }());
+//# sourceMappingURL=event.js.map
